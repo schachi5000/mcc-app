@@ -6,10 +6,12 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
@@ -31,11 +33,14 @@ fun GameCard(
         KamelImage(
             modifier = Modifier.fillMaxSize(),
             contentScale = ContentScale.Crop,
-            resource = asyncPainterResource("https://de.marvelcdb.com/bundles/cards/$cardName.png"),
+            resource = asyncPainterResource(
+                data = "https://de.marvelcdb.com/bundles/cards/$cardName.png",
+                filterQuality = FilterQuality.Medium
+            ),
             contentDescription = cardName,
             animationSpec = tween(),
             onLoading = {
-                Box(modifier = Modifier.fillMaxSize().background(Color.Gray))
+                CircularProgressIndicator(it)
             }
         )
     }

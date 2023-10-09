@@ -36,7 +36,7 @@ fun App() {
 
         LaunchedEffect(Unit) {
             withContext(Dispatchers.IO) {
-                cards = getCardPack("core").take(50)
+                cards = getCardPack("core").filter { it.type == "hero" }
                 println("${cards.size} loaded!")
             }
         }
