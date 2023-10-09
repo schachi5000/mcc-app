@@ -2,6 +2,7 @@ plugins {
     kotlin("multiplatform")
     id("com.android.library")
     id("org.jetbrains.compose")
+    kotlin("plugin.serialization") version "1.9.10"
 }
 
 kotlin {
@@ -28,6 +29,9 @@ kotlin {
                 implementation(compose.components.resources)
                 implementation("media.kamel:kamel-image:0.7.3")
                 implementation("io.ktor:ktor-client-core:2.3.1")
+                implementation("io.ktor:ktor-client-content-negotiation:2.3.1")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:2.3.1")
+                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
             }
         }
         val androidMain by getting {
