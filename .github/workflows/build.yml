@@ -1,0 +1,21 @@
+name:
+  Build
+
+on:
+  push:
+    branches-ignore:
+      - main
+      - dev
+
+concurrency:
+  group: ${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout the code
+        uses: actions/checkout@v2
+      - name: Build
+        run: ./gradlew androidApp:assembleDebug
