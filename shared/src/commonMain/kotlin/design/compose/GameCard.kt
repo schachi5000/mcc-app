@@ -5,6 +5,8 @@ import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import io.kamel.image.KamelImage
+import io.kamel.image.asyncPainterResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -15,9 +17,9 @@ fun GameCard(
     cardName: String? = null
 ) {
     Card(elevation = 4.dp) {
-        Image(
-            painter = painterResource("captain_america.jpeg"),
-            contentDescription = null,
+        KamelImage(
+            asyncPainterResource("https://de.marvelcdb.com/bundles/cards/$cardName.png"),
+            cardName
         )
     }
 }
