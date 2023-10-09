@@ -1,10 +1,15 @@
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.WindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.systemBars
+import androidx.compose.foundation.layout.windowInsetsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,26 +37,32 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 @Composable
 fun App() {
     MaterialTheme {
-        var cards by remember { mutableStateOf<List<Card>>(emptyList()) }
+        Box(
+            Modifier.fillMaxSize()
+                .padding(vertical = 8.dp)
+                .windowInsetsPadding(WindowInsets.systemBars)
+        ) {
+            var cards by remember { mutableStateOf<List<Card>>(emptyList()) }
 
-        LaunchedEffect(Unit) {
-            withContext(Dispatchers.IO) {
-                cards = getCardPack("core").filter { it.type == "hero" }
-                println("${cards.size} loaded!")
-            }
-        }
-
-        LazyVerticalGrid(
-            modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
-            columns = GridCells.Fixed(3),
-            horizontalArrangement = Arrangement.spacedBy(8.dp),
-            verticalArrangement = Arrangement.spacedBy(8.dp),
-            content = {
-                items(cards) {
-                    GameCard(cardName = it.code)
+            LaunchedEffect(Unit) {
+                withContext(Dispatchers.IO) {
+                    cards = getCardPack("core").filter { it.type == "hero" }
+                    println("${cards.size} loaded!")
                 }
             }
-        )
+
+            LazyVerticalGrid(
+                modifier = Modifier.fillMaxSize().padding(horizontal = 8.dp),
+                columns = GridCells.Fixed(3),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(8.dp),
+                content = {
+                    items(cards) {
+                        GameCard(cardName = it.code)
+                    }
+                }
+            )
+        }
     }
 }
 
