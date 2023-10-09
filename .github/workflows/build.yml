@@ -2,10 +2,7 @@ name:
   Build
 
 on:
-  push:
-    branches-ignore:
-      - main
-      - dev
+  push
 
 concurrency:
   group: ${{ github.ref }}
