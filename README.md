@@ -11,6 +11,12 @@ The Marvel Champions Companion App is a cross-platform application developed wit
 - Game Guide: Get rules, tips, and instructions for Marvel Champions.
 - Community: Connect with other Marvel Champions players and share your experiences.
 
+## Technologies & Frameworks
+- UI Framework: [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 
+- ViewModel: [moko](https://moko.icerock.dev)
+- Image Loading: [Kamel](https://github.com/Kamel-Media/Kamel)
+- HTTP Client: [Ktor](https://ktor.io/docs/getting-started-ktor-client-multiplatform-mobile.html)
+
 ## Mockups
 ![Start Screen](docs/mockups/start.png)
 ![Deck Screen](docs/mockups/deck.png)
