@@ -13,7 +13,9 @@ The Marvel Champions Companion App is a cross-platform application developed wit
 
 ## Mockups
 
-[Deck Screen](docs/mockups/deck.png)
+![Start Screen](docs/mockups/start.png)
+![Deck Screen](docs/mockups/deck.png)
+![Search](docs/mockups/search.png)
 
 ## Installation
 The app can be installed on Android devices via the Google Play Store and on iOS devices via the Apple App Store. Alternatively, you can download and manually install the app from this repository.
