@@ -36,8 +36,7 @@ fun App() {
         val scope = rememberCoroutineScope()
 
         Scaffold(
-            Modifier.fillMaxSize()
-                .windowInsetsPadding(WindowInsets.systemBars),
+            Modifier.windowInsetsPadding(WindowInsets.systemBars).fillMaxSize(),
             backgroundColor = Color(0xfff0f0f0),
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
