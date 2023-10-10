@@ -59,7 +59,7 @@ fun EntryRow(entry: Entry, onCardSelected: (Card) -> Unit) {
                 }
             }
         }
-        Spacer(Modifier.size(16.dp))
+        Spacer(Modifier.size(24.dp))
     }
 }
 
