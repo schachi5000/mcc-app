@@ -1,4 +1,4 @@
-package design.compose
+package design
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image

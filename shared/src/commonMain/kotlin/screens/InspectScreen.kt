@@ -1,4 +1,4 @@
-package design.compose
+package screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -17,6 +17,7 @@ import androidx.compose.ui.text.intl.Locale
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import design.GameCard
 import model.Card
 
 @Composable
@@ -45,7 +46,7 @@ fun EntryRow(entry: Entry, onCardSelected: (Card) -> Unit) {
         )
         LazyRow(
 
-            horizontalArrangement = Arrangement.spacedBy(8.dp)
+            horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             items(entry.cards.count()) {
                 if (it == 0) {

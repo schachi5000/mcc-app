@@ -23,12 +23,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import design.compose.Entry
-import design.compose.InspectScreen
+import data.CardDataSource
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import provider.CardDataSource
+import screens.Entry
+import screens.InspectScreen
 
 @Composable
 fun App() {
