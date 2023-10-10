@@ -14,7 +14,18 @@ data class Card(
     val imageSrc: String,
     @SerialName("linked_card")
     val linkedCard: Card? = null,
-)
+) {
+    val orientation = when (type) {
+        CardType.SIDE_SCHEME,
+        CardType.MAIN_SCHEME -> CardOrientation.LANDSCAPE
+
+        else -> CardOrientation.PORTRAIT
+    }
+}
+
+enum class CardOrientation {
+    PORTRAIT, LANDSCAPE
+}
 
 object CardType {
     const val HERO = "hero"
