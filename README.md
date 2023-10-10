@@ -27,7 +27,7 @@ The app can be installed on Android devices via the Google Play Store and on iOS
 
 ## Contributors
 We welcome contributions from developers and Marvel Champions enthusiasts. 
-If you'd like to contribute to the development of the app, follow the guidelines in our [Contributing Guide](CONTRIBUTING.md).-->
+If you'd like to contribute to the development of the app, follow the guidelines in our [Contributing Guide](CONTRIBUTING.md).
 
 ## License
 This project is licensed under the [GPL License](LICENSE.txt).
