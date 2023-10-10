@@ -41,6 +41,6 @@ This project is licensed under the [GPL License](LICENSE.txt).
 This project is not affiliated with or endorsed by Marvel Champions or its respective owners. Marvel Champions is a registered trademark of its respective owners. This project is non-profit and created for the benefit of the Marvel Champions community.
 
 ## Author
-This project is developed by [Alexander Schacher].
+This project is developed by Alexander Schacher.
 
 Thank you for using the Marvel Champions Companion App!
