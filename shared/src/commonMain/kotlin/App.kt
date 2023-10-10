@@ -32,8 +32,7 @@ fun App() {
             var cards by remember { mutableStateOf<List<Card>>(emptyList()) }
 
             LaunchedEffect(Unit) {
-                cards = CardDataSource.getCardPack("core")//.filter { it.type == "hero" }
-                println("${cards.size} loaded!")
+                cards = CardDataSource.getCardPack("core").filter { it.type == "hero" }
             }
 
             LazyVerticalGrid(
@@ -43,7 +42,7 @@ fun App() {
                 verticalArrangement = Arrangement.spacedBy(8.dp),
                 content = {
                     items(cards) {
-                        GameCard(cardName = it.code)
+                        GameCard(card = it)
                     }
                 }
             )

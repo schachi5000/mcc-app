@@ -1,55 +1,51 @@
 package design.compose
 
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.Image
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import model.Card
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 
+const val PORTRAIT_RATIO = 0.715f
+const val LANDSCAPE_RATIO = 1.396f
+
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun GameCard(
     modifier: Modifier = Modifier,
-    cardName: String? = null
+    card: Card
 ) {
     Card(
-        modifier = modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize().aspectRatio(PORTRAIT_RATIO),
         elevation = 4.dp,
         shape = RoundedCornerShape(8.dp)
     ) {
         KamelImage(
             modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop,
             resource = asyncPainterResource(
-                data = "https://de.marvelcdb.com/bundles/cards/$cardName.png",
+                data = "https://de.marvelcdb.com/bundles/cards/${card.code}.png",
                 filterQuality = FilterQuality.Medium
             ),
-            contentDescription = cardName,
-            animationSpec = tween(),
+            contentDescription = card.name,
+            animationSpec = tween(
+                durationMillis = 500
+            ),
             onLoading = {
-                LoadingCard()
-            }
-        )
+                Image(
+                    painter = painterResource("card_back.png"),
+                    contentDescription = "Placeholder",
+                    modifier = Modifier.fillMaxSize()
+                )
+            })
     }
-}
-
-@Composable
-fun LoadingCard() {
-    Box(
-        modifier = Modifier
-            .size(
-                width = with(LocalDensity.current) { 300.toDp() },
-                height = with(LocalDensity.current) { 418.toDp() })
-            .background(color = Color.LightGray),
-    )
 }
