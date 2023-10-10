@@ -4,27 +4,24 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
-import androidx.compose.material.CircularProgressIndicator
-import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun GameCard(
     modifier: Modifier = Modifier,
     cardName: String? = null
 ) {
-    println("Loading card $cardName")
     Card(
         modifier = modifier.fillMaxSize(),
         elevation = 4.dp,
@@ -40,8 +37,19 @@ fun GameCard(
             contentDescription = cardName,
             animationSpec = tween(),
             onLoading = {
-                CircularProgressIndicator(it)
+                LoadingCard()
             }
         )
     }
+}
+
+@Composable
+fun LoadingCard() {
+    Box(
+        modifier = Modifier
+            .size(
+                width = with(LocalDensity.current) { 300.toDp() },
+                height = with(LocalDensity.current) { 418.toDp() })
+            .background(color = Color.LightGray),
+    )
 }
