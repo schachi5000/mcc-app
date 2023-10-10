@@ -19,6 +19,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import design.compose.GameCard
 import model.Card
+import model.CardType
 import provider.CardDataSource
 
 @Composable
@@ -32,7 +33,7 @@ fun App() {
             var cards by remember { mutableStateOf<List<Card>>(emptyList()) }
 
             LaunchedEffect(Unit) {
-                cards = CardDataSource.getCardPack("core")//.filter { it.type == "hero" }
+                cards = CardDataSource.getCardPack("core").filter { it.type == CardType.SIDE_SCHEME }
             }
 
             LazyVerticalGrid(

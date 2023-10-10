@@ -13,11 +13,23 @@ import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import model.Card
+import model.CardType
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 const val PORTRAIT_RATIO = 0.715f
 const val LANDSCAPE_RATIO = 1.396f
+
+private fun Card.getOrientation() = when (type) {
+    CardType.SIDE_SCHEME,
+    CardType.MAIN_SCHEME -> CardOrientation.LANDSCAPE
+
+    else -> CardOrientation.PORTRAIT
+}
+
+enum class CardOrientation {
+    PORTRAIT, LANDSCAPE
+}
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -26,7 +38,12 @@ fun GameCard(
     card: Card
 ) {
     Card(
-        modifier = modifier.fillMaxSize().aspectRatio(PORTRAIT_RATIO),
+        modifier = modifier.fillMaxSize().aspectRatio(
+            when (card.getOrientation()) {
+                CardOrientation.LANDSCAPE -> LANDSCAPE_RATIO
+                CardOrientation.PORTRAIT -> PORTRAIT_RATIO
+            }
+        ),
         elevation = 4.dp,
         shape = RoundedCornerShape(8.dp)
     ) {
