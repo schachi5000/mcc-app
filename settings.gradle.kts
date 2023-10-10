@@ -1,4 +1,4 @@
-rootProject.name = "Marvel Champions Compose"
+rootProject.name = "Marvel Champions Companion"
 
 include(":androidApp")
 include(":shared")
