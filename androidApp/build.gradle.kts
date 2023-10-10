@@ -28,10 +28,32 @@ android {
         versionCode = 1
         versionName = "1.0"
     }
+
+    buildTypes{
+        getByName("debug") {
+            isMinifyEnabled = false
+            versionNameSuffix = "-debug"
+            applicationIdSuffix = ".debug"
+        }
+        getByName("release") {
+            isMinifyEnabled = false
+        }
+    }
+
+    signingConfigs{
+        create("release") {
+            //  keyAlias = ""
+            //  keyPassword = ""
+            //  storeFile = file("../androidApp/src/androidMain/signing/release.keystore")
+            //  storePassword = ""
+        }
+    }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
+
     kotlin {
         jvmToolchain(17)
     }
@@ -42,6 +64,11 @@ android {
 
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
+    }
+    buildTypes {
+        getByName("release") {
+            signingConfig = signingConfigs.getByName("release")
+        }
     }
 
     dependencies {
