@@ -87,7 +87,7 @@ fun BottomBar() {
             label = { Text(text = "Decks") },
             selected = (selectedIndex.value == 0),
             onClick = { selectedIndex.value = 0 },
-            selectedContentColor = Color.Black,
+            selectedContentColor = Color(0xfff78f3f),
             unselectedContentColor = Color.LightGray
         )
         BottomNavigationItem(
@@ -97,7 +97,7 @@ fun BottomBar() {
             label = { Text(text = "Featured") },
             selected = (selectedIndex.value == 1),
             onClick = { selectedIndex.value = 1 },
-            selectedContentColor = Color.Black,
+            selectedContentColor = Color(0xffe23636),
             unselectedContentColor = Color.LightGray
         )
         BottomNavigationItem(
@@ -107,7 +107,7 @@ fun BottomBar() {
             label = { Text(text = "Suche") },
             selected = (selectedIndex.value == 2),
             onClick = { selectedIndex.value = 2 },
-            selectedContentColor = Color.Black,
+            selectedContentColor = Color(0xff518cca),
             unselectedContentColor = Color.LightGray
         )
     }
