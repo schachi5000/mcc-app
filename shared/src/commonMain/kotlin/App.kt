@@ -1,3 +1,4 @@
+import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -12,6 +13,8 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
+import androidx.compose.material.darkColors
+import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -32,13 +35,15 @@ import screens.InspectScreen
 
 @Composable
 fun App() {
-    MaterialTheme {
+    MaterialTheme(
+        colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
+    ) {
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
 
         Scaffold(
             Modifier.fillMaxSize(),
-            backgroundColor = Color(0xfff0f0f0),
+            backgroundColor = MaterialTheme.colors.background,
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
             },
@@ -74,7 +79,7 @@ fun BottomBar() {
                 shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
                 shadowElevation = 8.dp.toPx()
             },
-        backgroundColor = Color.White,
+        backgroundColor = MaterialTheme.colors.surface,
         elevation = 8.dp,
     ) {
         BottomNavigationItem(
