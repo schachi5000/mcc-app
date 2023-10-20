@@ -39,7 +39,8 @@ fun GameCard(
         modifier = modifier.height(196.dp)
             .aspectRatio(aspectRation),
         shape = RoundedCornerShape(8.dp),
-        onClick = onClick
+        onClick = onClick,
+        elevation = 6.dp,
     ) {
         KamelImage(
             modifier = Modifier.aspectRatio(aspectRation),
