@@ -10,7 +10,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.unit.dp
 import io.kamel.image.KamelImage
@@ -38,8 +37,7 @@ fun GameCard(
 
     Card(
         modifier = modifier.height(196.dp)
-            .aspectRatio(aspectRation)
-            .shadow(6.dp),
+            .aspectRatio(aspectRation),
         shape = RoundedCornerShape(8.dp),
         onClick = onClick
     ) {
