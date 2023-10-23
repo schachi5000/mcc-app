@@ -47,7 +47,7 @@ object KtorCardDataSource {
     suspend fun getAllCards() = this.getAllCardPacks()
         .map {
             CoroutineScope(coroutineContext).async {
-                Logger.d { "starting download of: ${it.name}" }
+                Logger.d { "Starting download of: ${it.name}" }
                 val result = getCardPack(it.code)
                 Logger.d { "finished download of: ${it.name}" }
                 result

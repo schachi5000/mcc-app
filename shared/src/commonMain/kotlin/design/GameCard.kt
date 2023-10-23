@@ -10,8 +10,10 @@ import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import model.Card
@@ -57,6 +59,16 @@ fun GameCard(
                     painter = painterResource("card_back.png"),
                     contentDescription = "Placeholder",
                     modifier = Modifier.fillMaxSize()
+                )
+            },
+            onFailure = {
+                Logger.e(throwable = it) {
+                    "Failed to load image for card: ${card}"
+                }
+                Image(
+                    painter = painterResource("card_back.png"),
+                    contentDescription = "Placeholder",
+                    modifier = Modifier.fillMaxSize().alpha(0.3f),
                 )
             })
     }
