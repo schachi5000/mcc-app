@@ -24,9 +24,12 @@ import model.Card
 @Composable
 fun InspectScreen(
     modifier: Modifier = Modifier,
-    entries: List<Entry>,
+    cards: List<Card>,
     onCardSelected: (Card) -> Unit = {}
 ) {
+    val entries = cards.groupBy { it.type }
+        .map { Entry("${it.key} (${it.value.size})", it.value) }
+
     LazyColumn(modifier = modifier.fillMaxWidth()) {
         items(entries.count()) { item ->
             if (item == 0) {

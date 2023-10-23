@@ -16,22 +16,22 @@ import androidx.compose.material.Text
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import data.CardDataSource
+import data.CardRepository
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import screens.Entry
 import screens.InspectScreen
+
+
+val cardRepository = CardRepository()
 
 @Composable
 fun App() {
@@ -50,14 +50,9 @@ fun App() {
             bottomBar = { BottomBar() }
         ) {
             Box(modifier = Modifier.padding(it)) {
-                var cards by remember { mutableStateOf<List<Entry>>(emptyList()) }
-                LaunchedEffect(Unit) {
-                    cards = CardDataSource.getCardPack("core")
-                        .groupBy { it.type }
-                        .map { Entry("${it.key} (${it.value.size})", it.value) }
-                }
+                val cards = cardRepository.cards.collectAsState()
 
-                InspectScreen(entries = cards) {
+                InspectScreen(cards = cards.value) {
                     scope.launch {
                         snackbarHostState.showSnackbar(it.name)
                     }

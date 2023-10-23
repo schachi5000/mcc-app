@@ -10,8 +10,6 @@ data class Card(
     @SerialName("type_code")
     val type: String,
     val name: String,
-    @SerialName("imagesrc")
-    val imageSrc: String,
     @SerialName("linked_card")
     val linkedCard: Card? = null,
 ) {
