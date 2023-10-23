@@ -16,7 +16,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
@@ -24,14 +23,14 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import data.CardRepository
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import screens.InspectScreen
+import search.SearchScreen
+import search.SearchViewModel
 
 
-val cardRepository = CardRepository()
+val searchViewModel = SearchViewModel()
 
 @Composable
 fun App() {
@@ -50,9 +49,7 @@ fun App() {
             bottomBar = { BottomBar() }
         ) {
             Box(modifier = Modifier.padding(it)) {
-                val cards = cardRepository.cards.collectAsState()
-
-                InspectScreen(cards = cards.value) {
+                SearchScreen(searchViewModel) {
                     scope.launch {
                         snackbarHostState.showSnackbar(it.name)
                     }

@@ -25,7 +25,7 @@ import model.Card
 fun InspectScreen(
     modifier: Modifier = Modifier,
     cards: List<Card>,
-    onCardSelected: (Card) -> Unit = {}
+    onCardClicked: (Card) -> Unit = {}
 ) {
     val entries = cards.groupBy { it.type }
         .map { Entry("${it.key} (${it.value.size})", it.value) }
@@ -37,7 +37,7 @@ fun InspectScreen(
             }
 
             EntryRow(entries[item]) {
-                onCardSelected(it)
+                onCardClicked(it)
             }
         }
     }

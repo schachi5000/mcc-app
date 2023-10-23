@@ -1,5 +1,6 @@
 package data
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -15,6 +16,7 @@ class CardRepository {
     init {
         MainScope().launch {
             val result = KtorCardDataSource.getAllCards()
+            Logger.d { "${result.size} cards loaded" }
             _cards.emit(result)
         }
     }
