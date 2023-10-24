@@ -23,6 +23,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import data.CardRepository
+import dev.icerock.moko.mvvm.compose.getViewModel
+import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -49,7 +52,8 @@ fun App() {
             bottomBar = { BottomBar() }
         ) {
             Box(modifier = Modifier.padding(it)) {
-                SearchScreen(searchViewModel) {
+                val viewModel = getViewModel(Unit, viewModelFactory { SearchViewModel(CardRepository()) })
+                SearchScreen(viewModel) {
                     scope.launch {
                         snackbarHostState.showSnackbar(it.name)
                     }

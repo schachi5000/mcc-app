@@ -1,20 +1,18 @@
 package search
 
 import data.CardRepository
-import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
+import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import model.Card
 
-class SearchViewModel(private val cardRepository: CardRepository = CardRepository()) {
+class SearchViewModel(private val cardRepository: CardRepository = CardRepository()) : ViewModel() {
 
     private val _state = MutableStateFlow(SearchUiState())
 
     val state = _state.asStateFlow()
-
-    private val scope = CoroutineScope(Dispatchers.Main)
 
     fun onSearch(query: String?) {
         if (query.isNullOrEmpty()) {
@@ -24,15 +22,18 @@ class SearchViewModel(private val cardRepository: CardRepository = CardRepositor
             return
         }
 
-        val filterCards = this.cardRepository.cards.value.filter {
-            it.name.lowercase().contains(query.lowercase())
-        }
 
-        _state.update {
-            it.copy(
-                query = query,
-                result = filterCards
-            )
+        viewModelScope.launch {
+            val filteredCards = cardRepository.cards.value.filter {
+                it.name.lowercase().contains(query.lowercase())
+            }
+
+            _state.update {
+                it.copy(
+                    query = query,
+                    result = filteredCards
+                )
+            }
         }
     }
 }
