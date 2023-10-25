@@ -54,9 +54,17 @@ fun App(databaseDao: DatabaseDao) {
             },
             bottomBar = {
                 BottomBar {
-                    if (it == 1) {
-                        scope.launch {
-                            cardRepository.refresh()
+                    scope.launch {
+                        when (it) {
+                            1 -> {
+                                snackbarHostState.showSnackbar("Refreshing")
+                                cardRepository.refresh()
+                            }
+
+                            0 -> {
+                                snackbarHostState.showSnackbar("Adding dummy deck")
+                                deckRepository.addDummyDeck()
+                            }
                         }
                     }
                 }

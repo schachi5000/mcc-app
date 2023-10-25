@@ -43,11 +43,20 @@ class DatabaseDao(
         }
 
     fun addDeck(deck: Deck) {
-        this.dbQuery.addDeck(deck.id, deck.name, deck.cards.map { it.code }.joinToString { "," })
+        Logger.d { "Adding deck ${deck.name} to database" }
+        this.dbQuery.addDeck(deck.id, deck.name, deck.cards.map { it.code }.joinToString(","))
     }
 
     fun getDecks(): List<Deck> = this.dbQuery.selectAllDecks().executeAsList().map {
-        it.toDeck()
+        val cards = it.cardCodes.split(",").map {
+            this.dbQuery.selectCardByCode(it).executeAsOne().toCard()
+        }
+
+        Deck(
+            id = it.id,
+            name = it.name,
+            cards = cards
+        )
     }
 }
 
@@ -58,10 +67,4 @@ private fun database.Card.toCard() = Card(
     name = this.name,
     imagePath = this.imagePath,
     linkedCard = null
-)
-
-private fun database.Deck.toDeck() = Deck(
-    id = this.id,
-    name = this.name,
-    cards = this.cardCodes.split(",").mapNotNull { null }
 )
