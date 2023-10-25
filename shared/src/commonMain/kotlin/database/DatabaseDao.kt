@@ -2,8 +2,11 @@ package database
 
 import co.touchlab.kermit.Logger
 import model.Card
+import model.Deck
 
-class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
+class DatabaseDao(
+    databaseDriverFactory: DatabaseDriverFactory
+) {
     private val database = AppDatabase(databaseDriverFactory.createDriver())
 
     private val dbQuery = database.appDatabaseQueries
@@ -38,13 +41,27 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
                 )
             )
         }
+
+    fun addDeck(deck: Deck) {
+        this.dbQuery.addDeck(deck.id, deck.name, deck.cards.map { it.code }.joinToString { "," })
+    }
+
+    fun getDecks(): List<Deck> = this.dbQuery.selectAllDecks().executeAsList().map {
+        it.toDeck()
+    }
 }
 
 private fun database.Card.toCard() = Card(
-    code = code,
-    position = position.toInt(),
-    type = type,
-    name = name,
-    imagePath = imagePath,
+    code = this.code,
+    position = this.position.toInt(),
+    type = this.type,
+    name = this.name,
+    imagePath = this.imagePath,
     linkedCard = null
+)
+
+private fun database.Deck.toDeck() = Deck(
+    id = this.id,
+    name = this.name,
+    cards = this.cardCodes.split(",").mapNotNull { null }
 )

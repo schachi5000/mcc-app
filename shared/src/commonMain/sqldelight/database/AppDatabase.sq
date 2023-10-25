@@ -1,6 +1,10 @@
+import database.Card;
+import kotlin.String;
+import kotlin.collections.List;
+
 --- Cards
 CREATE TABLE Card (
-    code TEXT NOT NULL,
+    code TEXT NOT NULL PRIMARY KEY,
     position INTEGER NOT NULL,
     type TEXT NOT NULL,
     name TEXT NOT NULL,
@@ -9,7 +13,7 @@ CREATE TABLE Card (
 );
 
 addCard:
-INSERT INTO Card(code, position, type, name, imagePath, linkedCardCode)
+INSERT OR REPLACE INTO Card(code, position, type, name, imagePath, linkedCardCode)
 VALUES(?, ?, ?, ?, ?, ?);
 
 selectCardByCode:
@@ -23,23 +27,24 @@ FROM Card;
 
 -- Decks
 CREATE TABLE Deck (
-    code TEXT NOT NULL,
-    name TEXT NOT NULL
+    id TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cardCodes TEXT NOT NULL
 );
 
 addDeck:
-INSERT INTO Deck(code, name)
-VALUES(?, ?);
+INSERT OR REPLACE INTO Deck(id, name, cardCodes)
+VALUES(?, ?, ?);
 
 selectAllDecks:
 SELECT *
 FROM Deck;
 
-selectDeckByCode:
+selectDeckById:
 SELECT *
 FROM Deck
-WHERE code = ?;
+WHERE id = ?;
 
-removeDeckByCode:
+removeDeckById:
 DELETE FROM Deck
-WHERE code = ?;
+WHERE id = ?;

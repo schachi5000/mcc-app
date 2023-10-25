@@ -30,15 +30,18 @@ import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import repositories.CardRepository
+import repositories.DeckRepository
 import search.SearchScreen
 import search.SearchViewModel
 
 @Composable
 fun App(databaseDao: DatabaseDao) {
+
     MaterialTheme(
         colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
     ) {
         val cardRepository = CardRepository(databaseDao)
+        val deckRepository = DeckRepository(cardRepository, databaseDao)
 
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
