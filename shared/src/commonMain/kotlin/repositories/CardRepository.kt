@@ -1,23 +1,23 @@
-package data
+package repositories
 
 import co.touchlab.kermit.Logger
-import database.CardDatabaseDao
+import database.DatabaseDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import model.Card
 
-class CardRepository(private val cardDatabaseDao: CardDatabaseDao) {
+class CardRepository(private val databaseDao: DatabaseDao) {
 
-    var cards: List<Card> = this.cardDatabaseDao.getAllCards()
+    var cards: List<Card> = this.databaseDao.getAllCards()
         private set
 
     suspend fun refresh() {
         withContext(Dispatchers.IO) {
             val result = KtorCardDataSource.getAllCards()
             Logger.d { "${result.size} cards loaded" }
-            cardDatabaseDao.addCards(result)
-            cards = cardDatabaseDao.getAllCards()
+            databaseDao.addCards(result)
+            cards = databaseDao.getAllCards()
         }
     }
 }

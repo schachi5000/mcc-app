@@ -3,10 +3,10 @@ package database
 import co.touchlab.kermit.Logger
 import model.Card
 
-class CardDatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
-    private val database = CardDatabase(databaseDriverFactory.createDriver())
+class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
+    private val database = AppDatabase(databaseDriverFactory.createDriver())
 
-    private val dbQuery = database.cardDatabaseQueries
+    private val dbQuery = database.appDatabaseQueries
 
     fun addCards(cards: List<Card>) {
         Logger.d { "Adding ${cards.size} cards to database" }

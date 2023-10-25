@@ -1,10 +1,10 @@
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
-import database.CardDatabaseDao
+import database.DatabaseDao
 import database.DatabaseDriverFactory
 
 actual fun getPlatformName(): String = "Android"
 
 @Composable fun MainView() {
-    App(CardDatabaseDao(DatabaseDriverFactory(LocalContext.current)))
+    App(DatabaseDao(DatabaseDriverFactory(LocalContext.current)))
 }

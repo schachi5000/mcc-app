@@ -93,7 +93,7 @@ android {
 }
 
 sqldelight {
-    database("CardDatabase") {
+    database("AppDatabase") {
         packageName = "database"
     }
 }

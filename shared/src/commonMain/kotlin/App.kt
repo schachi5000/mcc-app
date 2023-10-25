@@ -23,22 +23,22 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import data.CardRepository
-import database.CardDatabaseDao
+import database.DatabaseDao
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import repositories.CardRepository
 import search.SearchScreen
 import search.SearchViewModel
 
 @Composable
-fun App(cardDatabaseDao: CardDatabaseDao) {
+fun App(databaseDao: DatabaseDao) {
     MaterialTheme(
         colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
     ) {
-        val cardRepository = CardRepository(cardDatabaseDao)
+        val cardRepository = CardRepository(databaseDao)
 
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()

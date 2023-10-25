@@ -1,3 +1,4 @@
+--- Cards
 CREATE TABLE Card (
     code TEXT NOT NULL,
     position INTEGER NOT NULL,
@@ -19,3 +20,26 @@ WHERE code = ?;
 selectAllCards:
 SELECT *
 FROM Card;
+
+-- Decks
+CREATE TABLE Deck (
+    code TEXT NOT NULL,
+    name TEXT NOT NULL
+);
+
+addDeck:
+INSERT INTO Deck(code, name)
+VALUES(?, ?);
+
+selectAllDecks:
+SELECT *
+FROM Deck;
+
+selectDeckByCode:
+SELECT *
+FROM Deck
+WHERE code = ?;
+
+removeDeckByCode:
+DELETE FROM Deck
+WHERE code = ?;
