@@ -16,7 +16,6 @@ class CardDatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
     }
 
     fun addCard(card: Card) {
-        Logger.d { "Adding card ${card.name} to database" }
         this.dbQuery.addCard(
             card.code,
             card.position.toLong(),
