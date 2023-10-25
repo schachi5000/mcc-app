@@ -2,8 +2,6 @@ package database
 
 import co.touchlab.kermit.Logger
 import model.Card
-import net.schacher.mcc.database.CardDatabase
-
 
 class CardDatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
     private val database = CardDatabase(databaseDriverFactory.createDriver())
@@ -42,13 +40,11 @@ class CardDatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
         }
 }
 
-private fun netschachermccdatabase.Card.toCard(): Card {
-    return Card(
-        code = code,
-        position = position.toInt(),
-        type = type,
-        name = name,
-        imagePath = imagePath,
-        linkedCard = null
-    )
-}
+private fun database.Card.toCard() = Card(
+    code = code,
+    position = position.toInt(),
+    type = type,
+    name = name,
+    imagePath = imagePath,
+    linkedCard = null
+)

@@ -94,6 +94,6 @@ android {
 
 sqldelight {
     database("CardDatabase") {
-        packageName = "net.schacher.mcc.database"
+        packageName = "database"
     }
 }
