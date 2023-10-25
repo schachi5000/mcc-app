@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import model.Card
 
-class SearchViewModel(private val cardRepository: CardRepository = CardRepository()) : ViewModel() {
+class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(SearchUiState())
 
@@ -22,9 +22,8 @@ class SearchViewModel(private val cardRepository: CardRepository = CardRepositor
             return
         }
 
-
         viewModelScope.launch {
-            val filteredCards = cardRepository.cards.value.filter {
+            val filteredCards = cardRepository.cards.filter {
                 it.name.lowercase().contains(query.lowercase())
             }
 

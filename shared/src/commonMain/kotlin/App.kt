@@ -24,6 +24,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import data.CardRepository
+import database.CardDatabaseDao
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
@@ -32,14 +33,13 @@ import org.jetbrains.compose.resources.painterResource
 import search.SearchScreen
 import search.SearchViewModel
 
-
-val searchViewModel = SearchViewModel()
-
 @Composable
-fun App() {
+fun App(cardDatabaseDao: CardDatabaseDao) {
     MaterialTheme(
         colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
     ) {
+        val cardRepository = CardRepository(cardDatabaseDao)
+
         val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
 
@@ -49,10 +49,19 @@ fun App() {
             snackbarHost = {
                 SnackbarHost(hostState = snackbarHostState)
             },
-            bottomBar = { BottomBar() }
+            bottomBar = {
+                BottomBar {
+                    if (it == 1) {
+                        scope.launch {
+                            cardRepository.refresh()
+                        }
+                    }
+                }
+            }
         ) {
             Box(modifier = Modifier.padding(it)) {
-                val viewModel = getViewModel(Unit, viewModelFactory { SearchViewModel(CardRepository()) })
+                val viewModel =
+                    getViewModel(Unit, viewModelFactory { SearchViewModel(cardRepository) })
                 SearchScreen(viewModel) {
                     scope.launch {
                         snackbarHostState.showSnackbar(it.name)
@@ -65,7 +74,7 @@ fun App() {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun BottomBar() {
+fun BottomBar(onItemSelected: (Int) -> Unit) {
     val selectedIndex = remember { mutableStateOf(0) }
     BottomNavigation(
         modifier = Modifier.fillMaxWidth()
@@ -87,7 +96,10 @@ fun BottomBar() {
             },
             label = { Text(text = "Decks") },
             selected = (selectedIndex.value == 0),
-            onClick = { selectedIndex.value = 0 },
+            onClick = {
+                selectedIndex.value = 0
+                onItemSelected(0)
+            },
             selectedContentColor = Color(0xfff78f3f),
             unselectedContentColor = Color.LightGray
         )
@@ -97,7 +109,10 @@ fun BottomBar() {
             },
             label = { Text(text = "Featured") },
             selected = (selectedIndex.value == 1),
-            onClick = { selectedIndex.value = 1 },
+            onClick = {
+                selectedIndex.value = 1
+                onItemSelected(1)
+            },
             selectedContentColor = Color(0xffe23636),
             unselectedContentColor = Color.LightGray
         )
@@ -107,7 +122,10 @@ fun BottomBar() {
             },
             label = { Text(text = "Suche") },
             selected = (selectedIndex.value == 2),
-            onClick = { selectedIndex.value = 2 },
+            onClick = {
+                selectedIndex.value = 2
+                onItemSelected(2)
+            },
             selectedContentColor = Color(0xff518cca),
             unselectedContentColor = Color.LightGray
         )

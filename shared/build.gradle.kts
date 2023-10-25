@@ -3,9 +3,12 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization") version "1.9.10"
+    id("com.squareup.sqldelight") version "1.5.5"
 }
 
 val ktorVersion = "2.3.4"
+val sqlDelightVersion = "1.5.5"
+val moko = "0.16.1"
 
 kotlin {
     androidTarget()
@@ -36,8 +39,9 @@ kotlin {
                 implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
                 implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-                implementation("dev.icerock.moko:mvvm-core:0.16.1") // only ViewModel, EventsDispatcher, Dispatchers.UI
-                implementation("dev.icerock.moko:mvvm-compose:0.16.1")
+                implementation("dev.icerock.moko:mvvm-core:$moko")
+                implementation("dev.icerock.moko:mvvm-compose:$moko")
+                implementation("com.squareup.sqldelight:runtime:$sqlDelightVersion")
             }
         }
         val androidMain by getting {
@@ -46,6 +50,8 @@ kotlin {
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.10.1")
                 implementation("io.ktor:ktor-client-android:$ktorVersion")
+                implementation("com.squareup.sqldelight:android-driver:$sqlDelightVersion")
+
             }
         }
         val iosX64Main by getting
@@ -59,6 +65,8 @@ kotlin {
 
             dependencies {
                 implementation("io.ktor:ktor-client-darwin:$ktorVersion")
+                implementation("com.squareup.sqldelight:native-driver:$sqlDelightVersion")
+
             }
         }
     }
@@ -81,5 +89,11 @@ android {
     }
     kotlin {
         jvmToolchain(17)
+    }
+}
+
+sqldelight {
+    database("CardDatabase") {
+        packageName = "net.schacher.mcc.database"
     }
 }

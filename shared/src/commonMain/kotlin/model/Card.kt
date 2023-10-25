@@ -12,6 +12,7 @@ data class Card(
     val name: String,
     @SerialName("linked_card")
     val linkedCard: Card? = null,
+    val imagePath: String? = null
 ) {
     val orientation = when (type) {
         CardType.SIDE_SCHEME,

@@ -1,23 +1,26 @@
 package data
 
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import database.CardDatabaseDao
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 import model.Card
 
-class CardRepository {
+class CardRepository(private val cardDatabaseDao: CardDatabaseDao) {
 
-    private val _cards = MutableStateFlow(emptyList<Card>())
+    var cards: List<Card> = this.cardDatabaseDao.getAllCards()
+        private set
 
-    val cards = _cards.asStateFlow()
-
-    init {
-        MainScope().launch {
+    suspend fun refresh() {
+        withContext(Dispatchers.IO) {
             val result = KtorCardDataSource.getAllCards()
             Logger.d { "${result.size} cards loaded" }
-            _cards.emit(result)
+            result.forEach {
+                cardDatabaseDao.addCard(it)
+            }
+
+            cards = cardDatabaseDao.getAllCards()
         }
     }
 }

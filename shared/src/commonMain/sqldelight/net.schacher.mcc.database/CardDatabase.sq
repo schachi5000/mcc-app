@@ -1,0 +1,21 @@
+CREATE TABLE Card (
+    code TEXT NOT NULL,
+    position INTEGER NOT NULL,
+    type TEXT NOT NULL,
+    name TEXT NOT NULL,
+    imagePath TEXT,
+    linkedCardCode TEXT
+);
+
+addCard:
+INSERT INTO Card(code, position, type, name, imagePath, linkedCardCode)
+VALUES(?, ?, ?, ?, ?, ?);
+
+selectCardByCode:
+SELECT *
+FROM Card
+WHERE code = ?;
+
+selectAllCards:
+SELECT *
+FROM Card;
