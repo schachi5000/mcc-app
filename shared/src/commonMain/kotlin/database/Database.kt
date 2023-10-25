@@ -10,6 +10,11 @@ class CardDatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
 
     private val dbQuery = database.cardDatabaseQueries
 
+    fun addCards(cards: List<Card>) {
+        Logger.d { "Adding ${cards.size} cards to database" }
+        cards.forEach { this.addCard(it) }
+    }
+
     fun addCard(card: Card) {
         Logger.d { "Adding card ${card.name} to database" }
         this.dbQuery.addCard(
@@ -22,33 +27,29 @@ class CardDatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
         )
     }
 
-    fun getAllCards(): List<Card> = this.dbQuery.selectAllCards().executeAsList().map {
-        val card = Card(
-            code = it.code,
-            position = it.position.toInt(),
-            type = it.type,
-            name = it.name,
-            imagePath = it.imagePath,
-            linkedCard = null
-        )
+    fun getAllCards(): List<Card> = this.dbQuery.selectAllCards()
+        .executeAsList()
+        .map {
+            val card = it.toCard()
+            val linkedCard = it.linkedCardCode?.let {
+                dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+            }
 
-        val linkedCard = if (!it.linkedCardCode.isNullOrEmpty()) {
-            dbQuery.selectCardByCode(it.linkedCardCode).executeAsList().firstOrNull()?.let {
-                Card(
-                    code = it.code,
-                    position = it.position.toInt(),
-                    type = it.type,
-                    name = it.name,
-                    imagePath = it.imagePath,
+            card.copy(
+                linkedCard = linkedCard?.copy(
                     linkedCard = card
                 )
-            }
-        } else {
-            null
+            )
         }
+}
 
-        card.copy(
-            linkedCard = linkedCard
-        )
-    }
+private fun netschachermccdatabase.Card.toCard(): Card {
+    return Card(
+        code = code,
+        position = position.toInt(),
+        type = type,
+        name = name,
+        imagePath = imagePath,
+        linkedCard = null
+    )
 }

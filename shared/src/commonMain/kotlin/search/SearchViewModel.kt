@@ -2,6 +2,7 @@ package search
 
 import data.CardRepository
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -22,14 +23,13 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
             return
         }
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.Default) {
             val filteredCards = cardRepository.cards.filter {
                 it.name.lowercase().contains(query.lowercase())
             }
 
             _state.update {
                 it.copy(
-                    query = query,
                     result = filteredCards
                 )
             }
@@ -38,6 +38,5 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
 }
 
 data class SearchUiState(
-    val query: String? = null,
     val result: List<Card> = emptyList()
 )

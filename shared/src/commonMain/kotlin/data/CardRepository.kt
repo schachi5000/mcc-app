@@ -16,10 +16,7 @@ class CardRepository(private val cardDatabaseDao: CardDatabaseDao) {
         withContext(Dispatchers.IO) {
             val result = KtorCardDataSource.getAllCards()
             Logger.d { "${result.size} cards loaded" }
-            result.forEach {
-                cardDatabaseDao.addCard(it)
-            }
-
+            cardDatabaseDao.addCards(result)
             cards = cardDatabaseDao.getAllCards()
         }
     }
