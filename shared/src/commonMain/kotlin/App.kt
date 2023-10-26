@@ -75,7 +75,7 @@ fun App(databaseDao: DatabaseDao) {
                     getViewModel(Unit, viewModelFactory { SearchViewModel(cardRepository) })
                 SearchScreen(viewModel) {
                     scope.launch {
-                        snackbarHostState.showSnackbar(it.name)
+                        snackbarHostState.showSnackbar("${it.name} | ${it.code}")
                     }
                 }
             }

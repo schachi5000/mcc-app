@@ -16,6 +16,7 @@ import model.Card
 import model.Pack
 import kotlin.coroutines.coroutineContext
 
+// TODO convert to class and hide behind interface
 object KtorCardDataSource {
 
     private const val BASE_URL = "https://de.marvelcdb.com"
