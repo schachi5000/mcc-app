@@ -1,7 +1,7 @@
 package net.schacher.mcc.shared.repositories
 
 import co.touchlab.kermit.Logger
-import database.DatabaseDao
+import net.schacher.mcc.shared.database.DatabaseDao
 import net.schacher.mcc.shared.model.Deck
 
 class DeckRepository(

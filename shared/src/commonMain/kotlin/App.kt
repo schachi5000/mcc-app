@@ -21,10 +21,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import database.DatabaseDao
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.database.DatabaseDao
 import net.schacher.mcc.shared.design.theme.DarkColorScheme
 import net.schacher.mcc.shared.design.theme.LightColorScheme
 import net.schacher.mcc.shared.repositories.CardRepository

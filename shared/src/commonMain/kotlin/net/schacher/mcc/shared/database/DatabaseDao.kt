@@ -1,6 +1,7 @@
-package database
+package net.schacher.mcc.shared.database
 
 import co.touchlab.kermit.Logger
+import database.AppDatabase
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 
