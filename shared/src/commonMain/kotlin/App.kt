@@ -13,8 +13,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.Text
-import androidx.compose.material.darkColors
-import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -24,6 +22,8 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import database.DatabaseDao
+import design.theme.DarkColorScheme
+import design.theme.LightColorScheme
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
@@ -38,7 +38,7 @@ import search.SearchViewModel
 fun App(databaseDao: DatabaseDao) {
 
     MaterialTheme(
-        colors = if (isSystemInDarkTheme()) darkColors() else lightColors()
+        colors = if (isSystemInDarkTheme()) DarkColorScheme else LightColorScheme
     ) {
         val cardRepository = CardRepository(databaseDao)
         val deckRepository = DeckRepository(cardRepository, databaseDao)
@@ -93,10 +93,8 @@ fun BottomBar(onItemSelected: (Int) -> Unit) {
             .graphicsLayer {
                 clip = true
                 shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
-                shadowElevation = 8.dp.toPx()
             },
         backgroundColor = MaterialTheme.colors.surface,
-        elevation = 8.dp,
     ) {
         BottomNavigationItem(
             icon = {
@@ -112,7 +110,7 @@ fun BottomBar(onItemSelected: (Int) -> Unit) {
                 onItemSelected(0)
             },
             selectedContentColor = Color(0xfff78f3f),
-            unselectedContentColor = Color.LightGray
+            unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
         )
         BottomNavigationItem(
             icon = {
@@ -125,7 +123,7 @@ fun BottomBar(onItemSelected: (Int) -> Unit) {
                 onItemSelected(1)
             },
             selectedContentColor = Color(0xffe23636),
-            unselectedContentColor = Color.LightGray
+            unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
         )
         BottomNavigationItem(
             icon = {
@@ -138,7 +136,7 @@ fun BottomBar(onItemSelected: (Int) -> Unit) {
                 onItemSelected(2)
             },
             selectedContentColor = Color(0xff518cca),
-            unselectedContentColor = Color.LightGray
+            unselectedContentColor = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
         )
     }
 }

@@ -1,13 +1,18 @@
 package search
 
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -22,7 +27,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import model.Card
-import screens.InspectScreen
+import screens.Entry
+import screens.EntryRow
 
 @Composable
 fun SearchScreen(
@@ -31,14 +37,35 @@ fun SearchScreen(
 ) {
     val state by searchViewModel.state.collectAsState()
 
-    Column(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+    Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        val entries = state.result.groupBy { it.type }
+            .map { Entry("${it.key} (${it.value.size})", it.value) }
+
+        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+            items(entries.count()) { item ->
+                if (item == 0) {
+                    Spacer(Modifier.statusBarsPadding().padding(bottom = 88.dp))
+                }
+
+                EntryRow(
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = if (item == 0) 0.dp else 16.dp,
+                        end = 16.dp,
+                        bottom = 16.dp
+                    ),
+                    entry = entries[item]
+                ) {
+                    onCardClicked(it)
+                }
+            }
+        }
+
         Row(modifier = Modifier.padding(16.dp)) {
             SearchBar { query ->
                 searchViewModel.onSearch(query)
             }
         }
-
-        InspectScreen(cards = state.result, onCardClicked = onCardClicked)
     }
 }
 
@@ -47,18 +74,28 @@ private fun SearchBar(onQueryChanged: (String) -> Unit) {
     var input by remember { mutableStateOf("") }
 
     TextField(
-        modifier = Modifier.fillMaxWidth(),
-        shape = RoundedCornerShape(32.dp),
+        modifier = Modifier.fillMaxWidth()
+            .background(MaterialTheme.colors.surface, RoundedCornerShape(32.dp)),
         value = input,
         colors = TextFieldDefaults.textFieldColors(
-            backgroundColor = Color(0xFFF0F0F0),
-            cursorColor = Color.Black,
+            backgroundColor = Color.Transparent,
+            cursorColor = MaterialTheme.colors.onSurface,
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
         ),
         trailingIcon = {
-            Icon(Icons.Rounded.Clear, "", tint = Color.Black)
+            IconButton(
+                onClick = {
+                    input = ""
+                    onQueryChanged("")
+                }
+            ) {
+                Icon(
+                    Icons.Rounded.Clear, "Trailing icon", tint = MaterialTheme.colors.onSurface
+                )
+            }
         },
+        maxLines = 1,
         onValueChange = {
             input = it
             onQueryChanged(it)

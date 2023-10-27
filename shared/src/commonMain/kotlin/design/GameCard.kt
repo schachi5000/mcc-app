@@ -11,7 +11,9 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import io.kamel.image.KamelImage
@@ -44,20 +46,21 @@ fun GameCard(
         onClick = onClick
     ) {
         KamelImage(
-            modifier = Modifier.aspectRatio(aspectRation),
+            modifier = Modifier.aspectRatio(aspectRation).scale(1.025f),
             resource = asyncPainterResource(
                 data = "https://de.marvelcdb.com/bundles/cards/${card.code}.png",
                 filterQuality = FilterQuality.Medium
             ),
             contentDescription = card.name,
+            contentScale = ContentScale.FillBounds,
             animationSpec = tween(
-                durationMillis = 500
+                durationMillis = 1000
             ),
             onLoading = {
                 Image(
                     painter = painterResource("card_back.png"),
                     contentDescription = "Placeholder",
-                    modifier = Modifier.fillMaxSize()
+                    modifier = Modifier.fillMaxSize(),
                 )
             },
             onFailure = {
