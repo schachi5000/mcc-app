@@ -63,7 +63,7 @@ fun GameCard(
             },
             onFailure = {
                 Logger.e(throwable = it) {
-                    "Failed to load image for card: ${card}"
+                    "Failed to load image for card: $card"
                 }
                 Image(
                     painter = painterResource("card_back.png"),
