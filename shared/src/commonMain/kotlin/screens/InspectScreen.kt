@@ -39,7 +39,15 @@ fun InspectScreen(
                 Spacer(Modifier.statusBarsPadding())
             }
 
-            EntryRow(entries[item]) {
+            EntryRow(
+                modifier = Modifier.padding(
+                    start = 16.dp,
+                    top = if (item == 0) 0.dp else 16.dp,
+                    end = 16.dp,
+                    bottom = 16.dp
+                ),
+                entry = entries[item]
+            ) {
                 onCardClicked(it)
             }
         }
@@ -47,10 +55,10 @@ fun InspectScreen(
 }
 
 @Composable
-fun EntryRow(entry: Entry, onCardSelected: (Card) -> Unit) {
+fun EntryRow(modifier: Modifier, entry: Entry, onCardSelected: (Card) -> Unit) {
     Column(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
         Text(
-            modifier = Modifier.padding(16.dp),
+            modifier = modifier,
             text = entry.title.toUpperCase(Locale.current),
             fontWeight = FontWeight.Bold,
             fontSize = 28.sp
@@ -73,7 +81,8 @@ fun EntryRow(entry: Entry, onCardSelected: (Card) -> Unit) {
                         text = entry.cards[it].name,
                         textAlign = TextAlign.Center,
                         maxLines = 2,
-                        fontSize = 15.sp
+                        fontSize = 15.sp,
+                        fontWeight = FontWeight.SemiBold
                     )
                 }
                 if (it == entry.cards.lastIndex) {
