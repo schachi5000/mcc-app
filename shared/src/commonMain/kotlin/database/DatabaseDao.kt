@@ -1,8 +1,8 @@
 package database
 
 import co.touchlab.kermit.Logger
-import model.Card
-import model.Deck
+import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.Deck
 
 class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
 

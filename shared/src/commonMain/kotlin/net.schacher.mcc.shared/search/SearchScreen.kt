@@ -1,4 +1,4 @@
-package search
+package net.schacher.mcc.shared.search
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -26,9 +26,9 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import model.Card
-import screens.Entry
-import screens.EntryRow
+import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.screens.Entry
+import net.schacher.mcc.shared.screens.EntryRow
 
 @Composable
 fun SearchScreen(

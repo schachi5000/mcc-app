@@ -1,11 +1,11 @@
-package repositories
+package net.schacher.mcc.shared.repositories
 
 import co.touchlab.kermit.Logger
 import database.DatabaseDao
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
-import model.Card
+import net.schacher.mcc.shared.model.Card
 
 class CardRepository(private val databaseDao: DatabaseDao) {
 

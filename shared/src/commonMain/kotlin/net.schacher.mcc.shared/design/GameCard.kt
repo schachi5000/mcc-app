@@ -1,4 +1,4 @@
-package design
+package net.schacher.mcc.shared.design
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -18,8 +18,8 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
-import model.Card
-import model.CardOrientation
+import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardOrientation
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 

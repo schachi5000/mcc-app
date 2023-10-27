@@ -1,4 +1,4 @@
-package screens
+package net.schacher.mcc.shared.screens
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,8 +21,8 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import design.GameCard
-import model.Card
+import net.schacher.mcc.shared.design.GameCard
+import net.schacher.mcc.shared.model.Card
 
 @Composable
 fun InspectScreen(

@@ -1,4 +1,4 @@
-package model
+package net.schacher.mcc.shared.model
 
 import kotlinx.serialization.Serializable
 

@@ -1,4 +1,4 @@
-package com.myapplication
+package net.schacher.mcc
 
 import MainView
 import android.os.Bundle

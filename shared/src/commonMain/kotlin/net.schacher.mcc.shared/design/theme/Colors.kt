@@ -1,4 +1,4 @@
-package design.theme
+package net.schacher.mcc.shared.design.theme
 
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors

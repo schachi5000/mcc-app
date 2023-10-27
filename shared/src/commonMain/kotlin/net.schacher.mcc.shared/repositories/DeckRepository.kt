@@ -1,8 +1,8 @@
-package repositories
+package net.schacher.mcc.shared.repositories
 
 import co.touchlab.kermit.Logger
 import database.DatabaseDao
-import model.Deck
+import net.schacher.mcc.shared.model.Deck
 
 class DeckRepository(
     private val cardRepository: CardRepository,

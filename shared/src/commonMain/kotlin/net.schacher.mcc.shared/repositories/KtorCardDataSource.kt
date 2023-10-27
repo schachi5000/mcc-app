@@ -1,4 +1,4 @@
-package repositories
+package net.schacher.mcc.shared.repositories
 
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
@@ -12,8 +12,8 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.serialization.json.Json
-import model.Card
-import model.Pack
+import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.Pack
 import kotlin.coroutines.coroutineContext
 
 // TODO convert to class and hide behind interface
@@ -45,7 +45,7 @@ object KtorCardDataSource {
         .get("$BASE_URL/api/public/cards/$packCode")
         .body<List<Card>>()
 
-    suspend fun getAllCards() = this.getAllCardPacks()
+    suspend fun getAllCards() = getAllCardPacks()
         .map {
             CoroutineScope(coroutineContext).async {
                 Logger.d { "Starting download of: ${it.name}" }

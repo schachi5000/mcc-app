@@ -22,17 +22,17 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import database.DatabaseDao
-import design.theme.DarkColorScheme
-import design.theme.LightColorScheme
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.design.theme.DarkColorScheme
+import net.schacher.mcc.shared.design.theme.LightColorScheme
+import net.schacher.mcc.shared.repositories.CardRepository
+import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.search.SearchScreen
+import net.schacher.mcc.shared.search.SearchViewModel
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
-import repositories.CardRepository
-import repositories.DeckRepository
-import search.SearchScreen
-import search.SearchViewModel
 
 @Composable
 fun App(databaseDao: DatabaseDao) {

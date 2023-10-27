@@ -1,4 +1,4 @@
-package search
+package net.schacher.mcc.shared.search
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.Dispatchers
@@ -6,8 +6,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import model.Card
-import repositories.CardRepository
+import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.repositories.CardRepository
 
 class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() {
 
