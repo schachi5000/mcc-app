@@ -12,12 +12,15 @@ class CardRepository(private val databaseDao: DatabaseDao) {
     var cards: List<Card> = this.databaseDao.getAllCards()
         private set
 
-    suspend fun refresh() {
-        withContext(Dispatchers.IO) {
-            val result = KtorCardDataSource.getAllCards()
-            Logger.d { "${result.size} cards loaded" }
-            databaseDao.addCards(result)
-            cards = databaseDao.getAllCards()
-        }
+    suspend fun refresh() = withContext(Dispatchers.IO) {
+        val result = KtorCardDataSource.getAllCards()
+        Logger.d { "${result.size} cards loaded" }
+        databaseDao.addCards(result)
+        cards = databaseDao.getAllCards()
+    }
+
+    suspend fun deleteAllCards() = withContext(Dispatchers.IO) {
+        databaseDao.removeAllCards()
+        cards = databaseDao.getAllCards()
     }
 }

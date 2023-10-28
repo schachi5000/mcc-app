@@ -62,6 +62,11 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
             cards = cards
         )
     }
+
+    fun removeAllCards() {
+        Logger.d { "Deleting all cards from database" }
+        this.dbQuery.removeAllCards()
+    }
 }
 
 private fun database.Card.toCard() = Card(

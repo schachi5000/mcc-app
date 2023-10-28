@@ -13,6 +13,7 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -22,6 +23,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -33,12 +35,15 @@ import net.schacher.mcc.shared.screens.EntryRow
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel,
+    snackbarHostState: SnackbarHostState,
     onCardClicked: (Card) -> Unit
 ) {
+    val coroutineScope = rememberCoroutineScope()
     val state by searchViewModel.state.collectAsState()
 
     Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-        val entries = state.result.groupBy { it.type }
+        val entries = state.result
+            .groupBy { it.type }
             .map { Entry("${it.key} (${it.value.size})", it.value) }
 
         LazyColumn(modifier = Modifier.fillMaxWidth()) {
@@ -53,8 +58,7 @@ fun SearchScreen(
                         top = if (item == 0) 0.dp else 16.dp,
                         end = 16.dp,
                         bottom = 16.dp
-                    ),
-                    entry = entries[item]
+                    ), entry = entries[item]
                 ) {
                     onCardClicked(it)
                 }
@@ -84,14 +88,17 @@ private fun SearchBar(onQueryChanged: (String) -> Unit) {
             unfocusedIndicatorColor = Color.Transparent
         ),
         trailingIcon = {
-            IconButton(
+            IconButton(enabled = input.isNotEmpty(),
                 onClick = {
                     input = ""
                     onQueryChanged("")
-                }
-            ) {
+                }) {
                 Icon(
-                    Icons.Rounded.Clear, "Trailing icon", tint = MaterialTheme.colors.onSurface
+                    Icons.Rounded.Clear,
+                    "Trailing icon",
+                    tint = MaterialTheme.colors.onSurface.copy(
+                        alpha = if (input.isEmpty()) 0.5f else 1f
+                    )
                 )
             }
         },
