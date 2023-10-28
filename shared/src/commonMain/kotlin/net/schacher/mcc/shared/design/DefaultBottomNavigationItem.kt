@@ -34,7 +34,7 @@ fun RowScope.DefaultBottomNavigationItem(
     label: String,
     icon: @Composable () -> Unit,
     color: Color,
-    selected: Boolean,
+    selected: Boolean = false,
     onClick: () -> Unit
 ) {
     BottomNavigationItem(

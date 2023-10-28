@@ -9,8 +9,11 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
+import androidx.compose.material.Button
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -52,7 +55,6 @@ import net.schacher.mcc.shared.screens.search.SearchViewModel
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun App(databaseDao: DatabaseDao) {
-
     MaterialTheme(
         colors = if (isSystemInDarkTheme()) DarkColorScheme else LightColorScheme
     ) {
@@ -101,36 +103,53 @@ fun App(databaseDao: DatabaseDao) {
                     SnackbarHost(hostState = snackbarHostState)
                 },
                 bottomBar = {
-                    BottomBar(selectedTabIndex)
+                    BottomBar(selectedTabIndex) {
+                        scope.launch {
+                            if (sheetState.isVisible) sheetState.hide() else sheetState.show()
+                        }
+                    }
                 }) {
                 Box(modifier = Modifier.padding(it)) {
                     AnimatedContent(selectedTabIndex.value) {
                         when (selectedTabIndex.value) {
-                            0 -> Box(Modifier.fillMaxSize().background(Color.Red))
+                            0 -> Box(Modifier.fillMaxSize().background(Color.LightGray))
                             1 -> {
-                                val deckViewModel = getViewModel(Unit, viewModelFactory {
+                                DeckScreen(getViewModel(Unit, viewModelFactory {
                                     DeckViewModel(deckRepository, cardRepository)
-                                })
-
-                                DeckScreen(deckViewModel)
+                                }))
                             }
 
                             2 -> {
-                                val viewModel = getViewModel(Unit, viewModelFactory {
+                                SearchScreen(getViewModel(Unit, viewModelFactory {
                                     SearchViewModel(cardRepository)
-                                })
-
-                                SearchScreen(viewModel, snackbarHostState) {
+                                })) {
                                     scope.launch {
                                         snackbarHostState.showSnackbar("${it.name} | ${it.code}")
                                     }
                                 }
                             }
+                        }
+                    }
 
-                            3 -> scope.launch {
+                    Button(
+                        shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier
+                            .align(Alignment.BottomEnd)
+                            .padding(16.dp)
+                            .size(48.dp),
+                        colors = ButtonDefaults.buttonColors(
+                            backgroundColor = MaterialTheme.colors.surface
+                        ),
+                        onClick = {
+                            scope.launch {
                                 if (sheetState.isVisible) sheetState.hide() else sheetState.show()
                             }
-                        }
+                        }) {
+                        Icon(
+                            imageVector = Icons.Rounded.MoreVert,
+                            "More",
+                            tint = MaterialTheme.colors.onSurface
+                        )
                     }
                 }
             }
@@ -138,8 +157,9 @@ fun App(databaseDao: DatabaseDao) {
     }
 }
 
+
 @Composable
-fun BottomBar(onItemSelected: MutableState<Int>) {
+fun BottomBar(onItemSelected: MutableState<Int>, onMoreClicked: () -> Unit) {
     BottomNavigation(
         modifier = Modifier.fillMaxWidth().height(72.dp).graphicsLayer {
             clip = true
@@ -157,7 +177,7 @@ fun BottomBar(onItemSelected: MutableState<Int>) {
         DefaultBottomNavigationItem(
             label = "Featured",
             icon = "ic_featured_decks.xml",
-            color = Color(0xffe23636),
+            color = Color(0xff31e29c),
             selected = (onItemSelected.value == 1),
             onClick = { onItemSelected.value = 1 },
         )
@@ -167,14 +187,6 @@ fun BottomBar(onItemSelected: MutableState<Int>) {
             color = Color(0xff518cca),
             selected = (onItemSelected.value == 2),
             onClick = { onItemSelected.value = 2 },
-        )
-
-        DefaultBottomNavigationItem(
-            label = "Mehr",
-            icon = { Icon(imageVector = Icons.Rounded.MoreVert, "More") },
-            color = Color(0xff31e29c),
-            selected = (onItemSelected.value == 3),
-            onClick = { onItemSelected.value = 3 },
         )
     }
 }

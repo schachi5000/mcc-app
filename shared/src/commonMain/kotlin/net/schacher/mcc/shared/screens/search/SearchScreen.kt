@@ -13,7 +13,6 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -34,7 +33,6 @@ import net.schacher.mcc.shared.model.Card
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel,
-    snackbarHostState: SnackbarHostState,
     onCardClicked: (Card) -> Unit
 ) {
     val state by searchViewModel.state.collectAsState()
