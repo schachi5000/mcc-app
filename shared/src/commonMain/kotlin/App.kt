@@ -1,22 +1,36 @@
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.icons.rounded.Refresh
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -34,6 +48,7 @@ import net.schacher.mcc.shared.search.SearchScreen
 import net.schacher.mcc.shared.search.SearchViewModel
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun App(databaseDao: DatabaseDao) {
 
@@ -43,31 +58,73 @@ fun App(databaseDao: DatabaseDao) {
         val cardRepository = CardRepository(databaseDao)
         val deckRepository = DeckRepository(cardRepository, databaseDao)
 
-        val snackbarHostState = remember { SnackbarHostState() }
         val scope = rememberCoroutineScope()
 
-        Scaffold(
-            Modifier.fillMaxSize(),
-            backgroundColor = MaterialTheme.colors.background,
-            snackbarHost = {
-                SnackbarHost(hostState = snackbarHostState)
-            },
-            bottomBar = {
-                BottomBar { index, label ->
-                    scope.launch {
-                        when (index) {
-                            else -> snackbarHostState.showSnackbar(label)
+        val sheetState = rememberModalBottomSheetState(Hidden)
+        val snackbarHostState = remember { SnackbarHostState() }
+
+        ModalBottomSheetLayout(
+            sheetState = sheetState,
+            sheetContent = {
+                Column(
+                    Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Spacer(Modifier.height(8.dp))
+                    Row(
+                        modifier = Modifier
+                            .fillMaxWidth()
+                            .clickable { }
+                            .padding(horizontal = 16.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = "More",
+                            modifier = Modifier.padding(16.dp)
+                        )
+                        Text("Datebank aktualisieren")
+                    }
+                    Row(
+                        modifier = Modifier.padding(horizontal = 16.dp).clickable { },
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            imageVector = Icons.Rounded.Delete,
+                            contentDescription = "More",
+                            modifier = Modifier.padding(16.dp).size(16.dp)
+                        )
+                        Text("Datebank löschen")
+                    }
+
+                    Spacer(Modifier.height(32.dp))
+                }
+            }) {
+            Scaffold(
+                Modifier.fillMaxSize(),
+                backgroundColor = MaterialTheme.colors.background,
+                snackbarHost = {
+                    SnackbarHost(hostState = snackbarHostState)
+                },
+                bottomBar = {
+                    BottomBar { index, label ->
+                        scope.launch {
+                            when (index) {
+                                3 -> if (!sheetState.isVisible) sheetState.show() else sheetState.hide()
+                                else -> snackbarHostState.showSnackbar(label)
+                            }
                         }
                     }
                 }
-            }
-        ) {
-            Box(modifier = Modifier.padding(it)) {
-                val viewModel =
-                    getViewModel(Unit, viewModelFactory { SearchViewModel(cardRepository) })
-                SearchScreen(viewModel, snackbarHostState) {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("${it.name} | ${it.code}")
+            ) {
+                Box(modifier = Modifier.padding(it)) {
+                    val viewModel =
+                        getViewModel(Unit, viewModelFactory { SearchViewModel(cardRepository) })
+                    SearchScreen(viewModel, snackbarHostState) {
+                        scope.launch {
+                            snackbarHostState.showSnackbar("${it.name} | ${it.code}")
+                        }
                     }
                 }
             }
