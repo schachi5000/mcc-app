@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.screens
+package net.schacher.mcc.shared.design
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -21,7 +21,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.toUpperCase
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.schacher.mcc.shared.design.GameCard
 import net.schacher.mcc.shared.model.Card
 
 @Composable

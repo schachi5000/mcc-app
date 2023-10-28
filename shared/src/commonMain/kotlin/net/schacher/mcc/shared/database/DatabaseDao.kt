@@ -46,9 +46,17 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
             )
         }
 
+    fun removeAllCards() {
+        Logger.d { "Deleting all cards from database" }
+        this.dbQuery.removeAllCards()
+    }
+
     fun addDeck(deck: Deck) {
         Logger.d { "Adding deck ${deck.name} to database" }
-        this.dbQuery.addDeck(deck.id, deck.name, deck.cards.joinToString(LIST_DELIMITER) { it.code })
+        this.dbQuery.addDeck(
+            deck.id,
+            deck.name,
+            deck.cards.joinToString(LIST_DELIMITER) { it.code })
     }
 
     fun getDecks(): List<Deck> = this.dbQuery.selectAllDecks().executeAsList().map {
@@ -63,9 +71,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
         )
     }
 
-    fun removeAllCards() {
-        Logger.d { "Deleting all cards from database" }
-        this.dbQuery.removeAllCards()
+    fun removeDeck(id: String) {
+        Logger.d { "Deleting deck $id from database" }
+        this.dbQuery.removeDeckById(id)
     }
 }
 

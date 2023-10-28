@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.search
+package net.schacher.mcc.shared.screens.search
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.Dispatchers

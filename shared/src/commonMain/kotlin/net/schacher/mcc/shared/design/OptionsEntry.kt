@@ -36,7 +36,7 @@ fun OptionsEntry(label: String, icon: @Composable () -> Unit, onClick: () -> Uni
         modifier = Modifier
             .fillMaxWidth()
             .clickable { onClick() }
-            .padding(16.dp),
+            .padding(vertical = 16.dp, horizontal = 24.dp),
         verticalAlignment = Alignment.CenterVertically
     ) {
         icon()
