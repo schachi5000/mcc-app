@@ -66,7 +66,7 @@ fun App(databaseDao: DatabaseDao) {
         val sheetState = rememberModalBottomSheetState(Hidden)
         val snackbarHostState = remember { SnackbarHostState() }
 
-        val selectedTabIndex = remember { mutableStateOf(0) }
+        val selectedTabIndex = remember { mutableStateOf(1) }
 
         ModalBottomSheetLayout(sheetState = sheetState, sheetContent = {
             Column(
@@ -84,7 +84,8 @@ fun App(databaseDao: DatabaseDao) {
                             cardRepository.refresh()
                         }
                     })
-                OptionsEntry(label = "Datebank löschen",
+                OptionsEntry(
+                    label = "Datebank löschen",
                     imageVector = Icons.Rounded.Delete,
                     onClick = {
                         scope.launch {
@@ -102,41 +103,28 @@ fun App(databaseDao: DatabaseDao) {
                 snackbarHost = {
                     SnackbarHost(hostState = snackbarHostState)
                 },
-                bottomBar = {
-                    BottomBar(selectedTabIndex) {
-                        scope.launch {
-                            if (sheetState.isVisible) sheetState.hide() else sheetState.show()
-                        }
-                    }
-                }) {
+                bottomBar = { BottomBar(selectedTabIndex) }
+            ) {
                 Box(modifier = Modifier.padding(it)) {
                     AnimatedContent(selectedTabIndex.value) {
                         when (selectedTabIndex.value) {
-                            0 -> Box(Modifier.fillMaxSize().background(Color.LightGray))
-                            1 -> {
-                                DeckScreen(getViewModel(Unit, viewModelFactory {
-                                    DeckViewModel(deckRepository, cardRepository)
-                                }))
-                            }
+                            0 -> DeckScreen(getViewModel(Unit, viewModelFactory {
+                                DeckViewModel(deckRepository, cardRepository)
+                            }))
 
-                            2 -> {
-                                SearchScreen(getViewModel(Unit, viewModelFactory {
-                                    SearchViewModel(cardRepository)
-                                })) {
-                                    scope.launch {
-                                        snackbarHostState.showSnackbar("${it.name} | ${it.code}")
-                                    }
+                            1 -> Box(Modifier.fillMaxSize().background(Color.LightGray))
+                            2 -> SearchScreen(getViewModel(Unit, viewModelFactory {
+                                SearchViewModel(cardRepository)
+                            })) {
+                                scope.launch {
+                                    snackbarHostState.showSnackbar("${it.name} | ${it.code}")
                                 }
                             }
                         }
                     }
 
-                    Button(
-                        shape = RoundedCornerShape(16.dp),
-                        modifier = Modifier
-                            .align(Alignment.BottomEnd)
-                            .padding(16.dp)
-                            .size(48.dp),
+                    Button(shape = RoundedCornerShape(16.dp),
+                        modifier = Modifier.align(Alignment.BottomEnd).padding(16.dp).size(48.dp),
                         colors = ButtonDefaults.buttonColors(
                             backgroundColor = MaterialTheme.colors.surface
                         ),
@@ -159,7 +147,7 @@ fun App(databaseDao: DatabaseDao) {
 
 
 @Composable
-fun BottomBar(onItemSelected: MutableState<Int>, onMoreClicked: () -> Unit) {
+fun BottomBar(onItemSelected: MutableState<Int>) {
     BottomNavigation(
         modifier = Modifier.fillMaxWidth().height(72.dp).graphicsLayer {
             clip = true
