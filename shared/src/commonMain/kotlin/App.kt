@@ -1,5 +1,4 @@
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.foundation.background
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -49,6 +48,8 @@ import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.deck.DeckViewModel
+import net.schacher.mcc.shared.screens.featured.FeaturedScreen
+import net.schacher.mcc.shared.screens.featured.FeaturedViewModel
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 
@@ -112,7 +113,10 @@ fun App(databaseDao: DatabaseDao) {
                                 DeckViewModel(deckRepository, cardRepository)
                             }))
 
-                            1 -> Box(Modifier.fillMaxSize().background(Color.LightGray))
+                            1 -> FeaturedScreen(getViewModel(Unit, viewModelFactory {
+                                FeaturedViewModel()
+                            }))
+
                             2 -> SearchScreen(getViewModel(Unit, viewModelFactory {
                                 SearchViewModel(cardRepository)
                             })) {

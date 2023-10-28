@@ -13,6 +13,7 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.serialization.json.Json
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Pack
 import kotlin.coroutines.coroutineContext
 
@@ -60,4 +61,8 @@ object KtorCardDataSource {
     suspend fun getCard(cardCode: String) = httpClient
         .get("$BASE_URL/api/public/card/$cardCode")
         .body<Card>()
+
+    suspend fun getFeaturedDecksByDate(date: String): List<Deck> {
+        return emptyList()
+    }
 }
