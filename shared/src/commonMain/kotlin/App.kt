@@ -1,15 +1,12 @@
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.isSystemInDarkTheme
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.ExperimentalMaterialApi
@@ -20,7 +17,6 @@ import androidx.compose.material.ModalBottomSheetValue.Hidden
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.MoreVert
@@ -40,13 +36,13 @@ import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.database.DatabaseDao
 import net.schacher.mcc.shared.design.DefaultBottomNavigationItem
+import net.schacher.mcc.shared.design.OptionsEntry
 import net.schacher.mcc.shared.design.theme.DarkColorScheme
 import net.schacher.mcc.shared.design.theme.LightColorScheme
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.search.SearchScreen
 import net.schacher.mcc.shared.search.SearchViewModel
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -72,31 +68,28 @@ fun App(databaseDao: DatabaseDao) {
                     horizontalAlignment = Alignment.Start,
                 ) {
                     Spacer(Modifier.height(8.dp))
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .clickable { }
-                            .padding(horizontal = 16.dp),
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Refresh,
-                            contentDescription = "More",
-                            modifier = Modifier.padding(16.dp)
-                        )
-                        Text("Datebank aktualisieren")
-                    }
-                    Row(
-                        modifier = Modifier.padding(horizontal = 16.dp).clickable { },
-                        verticalAlignment = Alignment.CenterVertically
-                    ) {
-                        Icon(
-                            imageVector = Icons.Rounded.Delete,
-                            contentDescription = "More",
-                            modifier = Modifier.padding(16.dp).size(16.dp)
-                        )
-                        Text("Datebank löschen")
-                    }
+                    OptionsEntry(
+                        label = "Datebank aktualisieren",
+                        imageVector = Icons.Rounded.Refresh,
+                        onClick = {
+                            scope.launch {
+                                sheetState.hide()
+                                snackbarHostState.showSnackbar("Datebank aktualisieren")
+                                cardRepository.refresh()
+                            }
+                        }
+                    )
+                    OptionsEntry(
+                        label = "Datebank löschen",
+                        imageVector = Icons.Rounded.Delete,
+                        onClick = {
+                            scope.launch {
+                                sheetState.hide()
+                                snackbarHostState.showSnackbar("Datebank wird gelöscht")
+                                cardRepository.deleteAllCards()
+                            }
+                        }
+                    )
 
                     Spacer(Modifier.height(32.dp))
                 }
@@ -132,7 +125,6 @@ fun App(databaseDao: DatabaseDao) {
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun BottomBar(onItemSelected: (Int, String) -> Unit) {
     val selectedIndex = remember { mutableStateOf(0) }
