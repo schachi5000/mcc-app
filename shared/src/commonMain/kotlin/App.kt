@@ -69,41 +69,42 @@ fun App(databaseDao: DatabaseDao) {
 
         val selectedTabIndex = remember { mutableStateOf(1) }
 
-        ModalBottomSheetLayout(sheetState = sheetState, sheetContent = {
-            Column(
-                Modifier.fillMaxWidth(),
-                verticalArrangement = Arrangement.Center,
-                horizontalAlignment = Alignment.Start,
-            ) {
-                Spacer(Modifier.height(8.dp))
-                OptionsEntry(label = "Datebank aktualisieren",
-                    imageVector = Icons.Rounded.Refresh,
-                    onClick = {
-                        scope.launch {
-                            sheetState.hide()
-                            snackbarHostState.showSnackbar("Datebank aktualisieren")
-                            cardRepository.refresh()
-                        }
-                    })
-                OptionsEntry(
-                    label = "Datebank löschen",
-                    imageVector = Icons.Rounded.Delete,
-                    onClick = {
-                        scope.launch {
-                            sheetState.hide()
-                            snackbarHostState.showSnackbar("Datebank wird gelöscht")
-                            cardRepository.deleteAllCards()
-                        }
-                    })
+        ModalBottomSheetLayout(
+            sheetState = sheetState,
+            scrimColor = MaterialTheme.colors.background.copy(alpha = 0.2f),
+            sheetContent = {
+                Column(
+                    modifier = Modifier.fillMaxWidth(),
+                    verticalArrangement = Arrangement.Center,
+                    horizontalAlignment = Alignment.Start,
+                ) {
+                    Spacer(Modifier.height(8.dp))
+                    OptionsEntry(label = "Datebank aktualisieren",
+                        imageVector = Icons.Rounded.Refresh,
+                        onClick = {
+                            scope.launch {
+                                sheetState.hide()
+                                snackbarHostState.showSnackbar("Datebank aktualisieren")
+                                cardRepository.refresh()
+                            }
+                        })
+                    OptionsEntry(
+                        label = "Datebank löschen",
+                        imageVector = Icons.Rounded.Delete,
+                        onClick = {
+                            scope.launch {
+                                sheetState.hide()
+                                snackbarHostState.showSnackbar("Datebank wird gelöscht")
+                                cardRepository.deleteAllCards()
+                            }
+                        })
 
-                Spacer(Modifier.height(32.dp))
-            }
-        }) {
+                    Spacer(Modifier.height(32.dp))
+                }
+            }) {
             Scaffold(Modifier.fillMaxSize(),
                 backgroundColor = MaterialTheme.colors.background,
-                snackbarHost = {
-                    SnackbarHost(hostState = snackbarHostState)
-                },
+                snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
                 bottomBar = { BottomBar(selectedTabIndex) }
             ) {
                 Box(modifier = Modifier.padding(it)) {

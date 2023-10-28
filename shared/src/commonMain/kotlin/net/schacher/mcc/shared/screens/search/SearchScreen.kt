@@ -10,6 +10,8 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
@@ -25,6 +27,8 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.Entry
 import net.schacher.mcc.shared.design.EntryRow
@@ -72,6 +76,7 @@ fun SearchScreen(
 @Composable
 private fun SearchBar(onQueryChanged: (String) -> Unit) {
     var input by remember { mutableStateOf("") }
+    val focusManager = LocalFocusManager.current
 
     TextField(
         modifier = Modifier.fillMaxWidth()
@@ -83,6 +88,10 @@ private fun SearchBar(onQueryChanged: (String) -> Unit) {
             focusedIndicatorColor = Color.Transparent,
             unfocusedIndicatorColor = Color.Transparent
         ),
+        keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+        keyboardActions = KeyboardActions(
+            onDone = { focusManager.clearFocus() }
+        ),
         trailingIcon = {
             IconButton(enabled = input.isNotEmpty(),
                 onClick = {
@@ -93,12 +102,12 @@ private fun SearchBar(onQueryChanged: (String) -> Unit) {
                     Icons.Rounded.Clear,
                     "Trailing icon",
                     tint = MaterialTheme.colors.onSurface.copy(
-                        alpha = if (input.isEmpty()) 0.5f else 1f
+                        alpha = if (input.isEmpty()) 0.25f else 1f
                     )
                 )
             }
         },
-        maxLines = 1,
+        singleLine = true,
         onValueChange = {
             input = it
             onQueryChanged(it)
