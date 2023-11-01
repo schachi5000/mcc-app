@@ -1,6 +1,6 @@
 import androidx.compose.ui.window.ComposeUIViewController
-import database.DatabaseDao
-import database.DatabaseDriverFactory
+import net.schacher.mcc.shared.database.DatabaseDao
+import net.schacher.mcc.shared.database.DatabaseDriverFactory
 
 actual fun getPlatformName(): String = "iOS"
 

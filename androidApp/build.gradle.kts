@@ -17,7 +17,7 @@ kotlin {
 
 android {
     compileSdk = (findProperty("android.compileSdk") as String).toInt()
-    namespace = "com.myapplication"
+    namespace = "net.schacher.mcc"
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 

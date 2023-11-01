@@ -25,6 +25,9 @@ selectAllCards:
 SELECT *
 FROM Card;
 
+removeAllCards:
+DELETE FROM Card;
+
 -- Decks
 CREATE TABLE Deck (
     id TEXT NOT NULL PRIMARY KEY,
@@ -48,3 +51,6 @@ WHERE id = ?;
 removeDeckById:
 DELETE FROM Deck
 WHERE id = ?;
+
+removeAllDecks:
+DELETE FROM Deck;
