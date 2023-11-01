@@ -18,22 +18,19 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
-import model.Card
-import model.CardOrientation
-import model.CardType.MAIN_SCHEME
-import model.CardType.MINION
-import model.CardType.OBLIGATION
-import model.CardType.SIDE_SCHEME
-import model.CardType.TREACHERY
-import model.CardType.VILLAIN
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardOrientation
+import net.schacher.mcc.shared.model.CardType.MAIN_SCHEME
+import net.schacher.mcc.shared.model.CardType.MINION
+import net.schacher.mcc.shared.model.CardType.OBLIGATION
+import net.schacher.mcc.shared.model.CardType.SIDE_SCHEME
+import net.schacher.mcc.shared.model.CardType.TREACHERY
+import net.schacher.mcc.shared.model.CardType.VILLAIN
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 const val PORTRAIT_RATIO = 0.715f
 const val LANDSCAPE_RATIO = 1.396f
-
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
 @Composable
