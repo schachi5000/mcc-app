@@ -18,6 +18,14 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import model.Card
+import model.CardOrientation
+import model.CardType.MAIN_SCHEME
+import model.CardType.MINION
+import model.CardType.OBLIGATION
+import model.CardType.SIDE_SCHEME
+import model.CardType.TREACHERY
+import model.CardType.VILLAIN
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardOrientation
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -58,7 +66,7 @@ fun GameCard(
             ),
             onLoading = {
                 Image(
-                    painter = painterResource("card_back.png"),
+                    painter = painterResource(card.getBackResource()),
                     contentDescription = "Placeholder",
                     modifier = Modifier.fillMaxSize(),
                 )
@@ -68,10 +76,21 @@ fun GameCard(
                     "Failed to load image for card: $card"
                 }
                 Image(
-                    painter = painterResource("card_back.png"),
+                    painter = painterResource(card.getBackResource()),
                     contentDescription = "Placeholder",
                     modifier = Modifier.fillMaxSize().alpha(0.3f),
                 )
             })
     }
+}
+
+private fun Card.getBackResource(): String = when (this.type) {
+    OBLIGATION,
+    TREACHERY,
+    MINION,
+    SIDE_SCHEME,
+    MAIN_SCHEME,
+    VILLAIN -> "card_yellow.png"
+
+    else -> "card_blue.png"
 }
