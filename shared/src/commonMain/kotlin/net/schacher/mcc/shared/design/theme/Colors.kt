@@ -5,7 +5,7 @@ import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
 
 val LightColorScheme = lightColors(
-    background = Color(0xFFd4d4d4),
+    background = Color(0xffededed),
     surface = Color(0xFFFFFFFF),
 )
 
