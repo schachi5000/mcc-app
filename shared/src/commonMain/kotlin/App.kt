@@ -36,6 +36,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
@@ -108,8 +109,9 @@ fun App(databaseDao: DatabaseDao) {
                 bottomBar = { BottomBar(selectedTabIndex) }
             ) {
                 Box(modifier = Modifier.padding(it)) {
-                    AnimatedContent(selectedTabIndex.value) {
-                        when (selectedTabIndex.value) {
+                    AnimatedContent(selectedTabIndex) {
+                        Logger.d { "selectedTabIndex: ${it.value}" }
+                        when (it.value) {
                             0 -> DeckScreen(getViewModel(Unit, viewModelFactory {
                                 DeckViewModel(deckRepository, cardRepository)
                             }))

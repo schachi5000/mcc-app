@@ -106,12 +106,13 @@ fun SearchBar(
         IconButton(
             modifier = Modifier
                 .padding(end = 8.dp)
-                .size(48.dp),
+                .size(48.dp)
+                .background(MaterialTheme.colors.surface, CircleShape),
             onClick = { onDoneClick() }
         ) {
             Icon(
                 Icons.Rounded.ArrowBack, "Clear",
-                tint = MaterialTheme.colors.primary
+                tint = MaterialTheme.colors.onBackground
             )
         }
 
