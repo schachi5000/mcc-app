@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
@@ -88,6 +89,18 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
             OptionsEntry(
                 label = "${state.deckCount} Decks",
                 iconResource = "ic_deck.xml"
+            )
+        }
+
+        Spacer(Modifier.size(16.dp))
+
+        OptionsGroup("Debug") {
+            OptionsEntry(
+                label = "Add Public Deck",
+                imageVector = Icons.Rounded.Add,
+                onClick = {
+                    settingsViewModel.addPublicDeckById("511044")
+                }
             )
         }
     }

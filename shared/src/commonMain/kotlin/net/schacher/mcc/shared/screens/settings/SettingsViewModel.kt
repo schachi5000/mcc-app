@@ -14,17 +14,17 @@ class SettingsViewModel(
     private val deckRepository: DeckRepository,
 ) : ViewModel() {
 
-    private val _uiState = MutableStateFlow(
+    private val _state = MutableStateFlow(
         SettingsUiState(
             cardRepository.cards.size,
             deckRepository.decks.size
         )
     )
 
-    val state = _uiState.asStateFlow()
+    val state = _state.asStateFlow()
 
     fun onWipeDatabaseClick() {
-        if (state.value.syncInProgress) {
+        if (this.state.value.syncInProgress) {
             return
         }
 
@@ -34,17 +34,31 @@ class SettingsViewModel(
             deckRepository.deleteAllDecks()
             Logger.d { "Wiping complete" }
 
-            _uiState.update { it.copy(cardCount = 0, deckCount = 0) }
+            _state.update { it.copy(cardCount = 0, deckCount = 0) }
         }
     }
 
     fun onSyncClick() {
-        _uiState.update { it.copy(syncInProgress = true) }
+        _state.update { it.copy(syncInProgress = true) }
 
         viewModelScope.launch {
             cardRepository.refresh()
 
-            _uiState.update {
+            _state.update {
+                it.copy(
+                    cardCount = cardRepository.cards.size,
+                    deckCount = deckRepository.decks.size,
+                    syncInProgress = false
+                )
+            }
+        }
+    }
+
+    fun addPublicDeckById(deckId: String) {
+        this.viewModelScope.launch {
+            deckRepository.addDeckById(deckId.toInt())
+
+            _state.update {
                 it.copy(
                     cardCount = cardRepository.cards.size,
                     deckCount = deckRepository.decks.size,

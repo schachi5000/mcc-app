@@ -39,7 +39,7 @@ fun RowScope.DefaultBottomNavigationItem(
 ) {
     BottomNavigationItem(
         icon = icon,
-        label = { Text(text = label) },
+        label = { Text(text = label, maxLines = 1) },
         selected = selected,
         onClick = { onClick() },
         selectedContentColor = color,

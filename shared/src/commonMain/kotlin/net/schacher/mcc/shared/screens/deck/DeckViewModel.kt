@@ -14,9 +14,11 @@ class DeckViewModel(
     private val _state = MutableStateFlow(DeckUiState(this.deckRepository.decks))
 
     val state = _state.asStateFlow()
+
+    fun onRefresh() {
+        _state.value = DeckUiState(this.deckRepository.decks)
+    }
 }
 
-data class DeckUiState(
-    val decks: List<Deck> = emptyList()
-)
+data class DeckUiState(val decks: List<Deck> = emptyList())
 

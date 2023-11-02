@@ -66,15 +66,17 @@ object KtorCardDataSource {
         return emptyList()
     }
 
-    suspend fun getPublickDeckById(deckId: String) = httpClient
+    suspend fun getPublicDeckById(deckId: Int) = httpClient
         .get("$BASE_URL/api/public/deck/$deckId")
         .body<DeckDto>()
         .let {
             Deck(
                 id = it.id,
                 name = it.name,
-                heroCard = getCard(it.slots.first()),
-                cards = it.slots.map { cardCode -> getCard(cardCode) }
+                heroCard = getCard(it.investigator_code!!),
+                cards = it.slots.entries.map { entry ->
+                    List(entry.value) { getCard(entry.key) }
+                }.flatten()
             )
         }
 }
