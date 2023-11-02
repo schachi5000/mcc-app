@@ -20,7 +20,7 @@ fun RowScope.DefaultBottomNavigationItem(
     onClick: () -> Unit
 ) {
     BottomNavigationItem(
-        icon = { Icon(painterResource(icon), "") },
+        icon = { Icon(painterResource(icon), icon) },
         label = { Text(text = label) },
         selected = selected,
         onClick = { onClick() },

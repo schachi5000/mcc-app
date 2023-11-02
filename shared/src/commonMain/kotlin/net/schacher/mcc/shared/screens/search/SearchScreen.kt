@@ -23,7 +23,6 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.ArrowBack
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -32,7 +31,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -45,6 +43,8 @@ import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.Entry
 import net.schacher.mcc.shared.design.EntryRow
 import net.schacher.mcc.shared.model.Card
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.painterResource
 
 @Composable
 fun SearchScreen(
@@ -99,6 +99,7 @@ fun SearchScreen(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SearchBar(
     onDoneClick: () -> Unit,
@@ -112,12 +113,11 @@ fun SearchBar(
                 modifier = Modifier
                     .padding(end = 8.dp)
                     .size(48.dp)
-                    .rotate(-90f)
                     .background(MaterialTheme.colors.surface, CircleShape),
                 onClick = { onDoneClick() }
             ) {
                 Icon(
-                    Icons.Rounded.ArrowBack, "Clear",
+                    painterResource("ic_hide_keyboard.xml"), "Clear",
                     tint = MaterialTheme.colors.onBackground
                 )
             }
