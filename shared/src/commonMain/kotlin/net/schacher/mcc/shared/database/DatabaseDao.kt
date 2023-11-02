@@ -75,6 +75,11 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
         Logger.d { "Deleting deck $id from database" }
         this.dbQuery.removeDeckById(id)
     }
+
+    fun removeAllDecks() {
+        Logger.d { "Deleting all decks from database" }
+        this.dbQuery.removeAllDecks()
+    }
 }
 
 private fun database.Card.toCard() = Card(

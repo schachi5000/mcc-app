@@ -1,26 +1,44 @@
 package net.schacher.mcc.shared.screens.settings
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.keyframes
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Icon
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.OptionsEntry
 import net.schacher.mcc.shared.design.OptionsGroup
-import net.schacher.mcc.shared.repositories.CardRepository
 
 @Composable
-fun SettingsScreen(cardRepository: CardRepository, snackbarHostState: SnackbarHostState) {
-    val scope = rememberCoroutineScope()
+fun SettingsScreen(settingsViewModel: SettingsViewModel) {
+    val state by settingsViewModel.state.collectAsState()
+
+    val infiniteTransition = rememberInfiniteTransition()
+    val angle by infiniteTransition.animateFloat(
+        initialValue = 0f,
+        targetValue = 360f,
+        animationSpec = infiniteRepeatable(
+            animation = keyframes {
+                durationMillis = 1000
+            }
+        )
+    )
 
     Column(
         modifier = Modifier.fillMaxSize()
@@ -32,21 +50,45 @@ fun SettingsScreen(cardRepository: CardRepository, snackbarHostState: SnackbarHo
             OptionsEntry(label = "Sync with MarvelCDB",
                 imageVector = Icons.Rounded.Refresh,
                 onClick = {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Datebank aktualisieren")
-                        cardRepository.refresh()
-                    }
+                    settingsViewModel.onSyncClick()
                 })
 
             OptionsEntry(
                 label = "Alle Einträge löschen",
                 imageVector = Icons.Rounded.Delete,
                 onClick = {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Datebank wird gelöscht")
-                        cardRepository.deleteAllCards()
-                    }
+                    settingsViewModel.onWipeDatabaseClick()
                 })
+        }
+
+        Spacer(Modifier.size(16.dp))
+
+        OptionsGroup("Einträge") {
+            AnimatedVisibility(state.syncInProgress) {
+                OptionsEntry(
+                    label = "Aktualisieren Datenbank",
+                    icon = {
+                        Icon(
+                            imageVector = Icons.Rounded.Refresh,
+                            contentDescription = "",
+                            modifier = Modifier
+                                .padding(end = 16.dp)
+                                .rotate(angle)
+                                .size(18.dp)
+                        )
+                    }
+                )
+            }
+
+            OptionsEntry(
+                label = "${state.cardCount} Karten",
+                iconResource = "ic_cards.xml"
+            )
+
+            OptionsEntry(
+                label = "${state.deckCount} Decks",
+                iconResource = "ic_deck.xml"
+            )
         }
     }
 }

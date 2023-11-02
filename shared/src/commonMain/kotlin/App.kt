@@ -44,6 +44,7 @@ import net.schacher.mcc.shared.screens.featured.FeaturedViewModel
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
+import net.schacher.mcc.shared.screens.settings.SettingsViewModel
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -76,15 +77,15 @@ fun App(databaseDao: DatabaseDao) {
                     AnimatedContent(selectedTabIndex) {
                         Logger.d { "selectedTabIndex: ${it.value}" }
                         when (it.value) {
-                            0 -> DeckScreen(getViewModel(Unit, viewModelFactory {
+                            0 -> DeckScreen(getViewModel(it.value, viewModelFactory {
                                 DeckViewModel(deckRepository, cardRepository)
                             }))
 
-                            1 -> FeaturedScreen(getViewModel(Unit, viewModelFactory {
+                            1 -> FeaturedScreen(getViewModel(it.value, viewModelFactory {
                                 FeaturedViewModel()
                             }))
 
-                            2 -> SearchScreen(getViewModel(Unit, viewModelFactory {
+                            2 -> SearchScreen(getViewModel(it.value, viewModelFactory {
                                 SearchViewModel(cardRepository)
                             })) {
                                 scope.launch {
@@ -92,7 +93,9 @@ fun App(databaseDao: DatabaseDao) {
                                 }
                             }
 
-                            3 -> SettingsScreen(cardRepository, snackbarHostState)
+                            3 -> SettingsScreen(getViewModel(it.value, viewModelFactory {
+                                SettingsViewModel(cardRepository, deckRepository)
+                            }))
                         }
                     }
                 }
@@ -115,7 +118,7 @@ fun BottomBar(onItemSelected: MutableState<Int>) {
     ) {
         DefaultBottomNavigationItem(
             label = "Decks",
-            icon = "ic_collection.xml",
+            icon = "ic_deck.xml",
             color = Color(0xfff78f3f),
             selected = (onItemSelected.value == 0),
             onClick = { onItemSelected.value = 0 },

@@ -1,6 +1,9 @@
 package net.schacher.mcc.shared.repositories
 
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.database.DatabaseDao
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
@@ -27,5 +30,9 @@ class DeckRepository(
         databaseDao.getDecks().forEach {
             Logger.d { "Deck: $it" }
         }
+    }
+
+    suspend fun deleteAllDecks() = withContext(Dispatchers.IO) {
+        databaseDao.removeAllDecks()
     }
 }
