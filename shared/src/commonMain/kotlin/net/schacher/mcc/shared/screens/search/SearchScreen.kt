@@ -83,8 +83,7 @@ fun SearchBar(
     onDoneClick: () -> Unit,
     onQueryChange: (String) -> Unit
 ) {
-    var input by remember { mutableStateOf("test") }
-    val focusManager = LocalFocusManager.current
+    var input by remember { mutableStateOf("") }
 
     Row {
         IconButton(
