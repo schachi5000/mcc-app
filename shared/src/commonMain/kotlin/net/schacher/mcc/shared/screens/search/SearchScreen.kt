@@ -30,7 +30,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
@@ -51,7 +55,20 @@ fun SearchScreen(
             .groupBy { it.type }
             .map { Entry("${it.key} (${it.value.size})", it.value) }
 
-        LazyColumn(modifier = Modifier.fillMaxWidth()) {
+        val nestedScrollConnection = remember {
+            object : NestedScrollConnection {
+
+                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                    focusManager.clearFocus()
+                    return Offset.Zero
+                }
+            }
+        }
+
+        LazyColumn(
+            modifier = Modifier.fillMaxWidth()
+                .nestedScroll(nestedScrollConnection)
+        ) {
             items(entries.count()) { item ->
                 if (item == 0) {
                     Spacer(Modifier.statusBarsPadding().padding(bottom = 88.dp))
@@ -94,7 +111,7 @@ fun SearchBar(
         ) {
             Icon(
                 Icons.Rounded.ArrowBack, "Clear",
-                tint = MaterialTheme.colors.onSurface
+                tint = MaterialTheme.colors.primary
             )
         }
 
