@@ -25,12 +25,15 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -123,12 +126,15 @@ fun SearchBar(
             }
         }
 
+        val focusRequester = remember { FocusRequester() }
+
         TextField(
             modifier = Modifier
                 .weight(1f)
                 .size(48.dp)
                 .fillMaxWidth()
-                .background(MaterialTheme.colors.surface, RoundedCornerShape(32.dp)),
+                .background(MaterialTheme.colors.surface, RoundedCornerShape(32.dp))
+                .focusRequester(focusRequester),
             value = input,
             colors = TextFieldDefaults.textFieldColors(
                 backgroundColor = Color.Transparent,
@@ -147,6 +153,10 @@ fun SearchBar(
             },
             label = null,
         )
+
+        LaunchedEffect(Unit) {
+            focusRequester.requestFocus()
+        }
 
         AnimatedVisibility(visible = input.isNotEmpty()) {
             IconButton(

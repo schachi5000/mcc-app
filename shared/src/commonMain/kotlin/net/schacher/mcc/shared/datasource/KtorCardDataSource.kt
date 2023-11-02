@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.repositories
+package net.schacher.mcc.shared.datasource
 
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
@@ -65,4 +65,16 @@ object KtorCardDataSource {
     suspend fun getFeaturedDecksByDate(date: String): List<Deck> {
         return emptyList()
     }
+
+    suspend fun getPublickDeckById(deckId: String) = httpClient
+        .get("$BASE_URL/api/public/deck/$deckId")
+        .body<DeckDto>()
+        .let {
+            Deck(
+                id = it.id,
+                name = it.name,
+                heroCard = getCard(it.slots.first()),
+                cards = it.slots.map { cardCode -> getCard(cardCode) }
+            )
+        }
 }

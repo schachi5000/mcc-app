@@ -6,7 +6,9 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.database.DatabaseDao
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType.HERO
 import net.schacher.mcc.shared.model.Deck
+import kotlin.random.Random
 
 class DeckRepository(
     private val cardRepository: CardRepository,
@@ -15,8 +17,15 @@ class DeckRepository(
     val decks: List<Deck>
         get() = this.databaseDao.getDecks()
 
-    fun createDeck(label: String, card: Card) {
-        val deck = Deck(label, label, listOf(card))
+    private val randomDeckNumer: Int
+        get() = Random.nextInt(Int.MAX_VALUE) * -1
+
+    fun createDeck(label: String, heroCard: Card) {
+        if (heroCard.type != HERO) {
+            throw Exception("Hero card must be of type HERO - $heroCard")
+        }
+
+        val deck = Deck(randomDeckNumer, label, heroCard, listOf(heroCard))
         this.databaseDao.addDeck(deck)
     }
 
@@ -26,7 +35,7 @@ class DeckRepository(
 
     fun addDummyDeck() {
         val cards = cardRepository.cards.take(10)
-        databaseDao.addDeck(Deck("deck1", "Deck 1", cards))
+        databaseDao.addDeck(Deck(randomDeckNumer, "deck1", cardRepository.cards.first { it.type == HERO }, cards))
         databaseDao.getDecks().forEach {
             Logger.d { "Deck: $it" }
         }

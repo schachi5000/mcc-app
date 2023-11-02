@@ -31,6 +31,8 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
         )
     }
 
+    fun getCardByCode(cardCode: String): Card = this.dbQuery.selectCardByCode(cardCode).executeAsOne().toCard()
+
     fun getAllCards(): List<Card> = this.dbQuery.selectAllCards()
         .executeAsList()
         .map {
@@ -54,8 +56,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
     fun addDeck(deck: Deck) {
         Logger.d { "Adding deck ${deck.name} to database" }
         this.dbQuery.addDeck(
-            deck.id,
+            deck.id.toLong(),
             deck.name,
+            deck.heroCard.code,
             deck.cards.joinToString(LIST_DELIMITER) { it.code })
     }
 
@@ -65,15 +68,16 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
         }
 
         Deck(
-            id = it.id,
+            id = it.id.toInt(),
             name = it.name,
+            heroCard = this.getCardByCode(it.heroCardCode),
             cards = cards
         )
     }
 
-    fun removeDeck(id: String) {
-        Logger.d { "Deleting deck $id from database" }
-        this.dbQuery.removeDeckById(id)
+    fun removeDeck(deckId: Int) {
+        Logger.d { "Deleting deck $deckId from database" }
+        this.dbQuery.removeDeckById(deckId.toLong())
     }
 
     fun removeAllDecks() {

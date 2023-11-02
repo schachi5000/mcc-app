@@ -1,14 +1,12 @@
 package net.schacher.mcc.shared.model
 
-import net.schacher.mcc.shared.model.CardType.HERO
 
 data class Deck(
-    val id: String,
+    val id: Int,
     val name: String,
+    val heroCard: Card,
     val cards: List<Card>
 ) {
-    val heroCard: Card? = cards.firstOrNull { it.type == HERO }
-
     val validDeck: Boolean
-        get() = cards.size == 40 && heroCard != null
+        get() = cards.size == 40
 }

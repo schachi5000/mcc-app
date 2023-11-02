@@ -17,6 +17,6 @@ class DeckViewModel(
 }
 
 data class DeckUiState(
-    val result: List<Deck> = emptyList()
+    val decks: List<Deck> = emptyList()
 )
 
