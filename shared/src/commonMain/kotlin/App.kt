@@ -105,10 +105,12 @@ fun App(databaseDao: DatabaseDao) {
 @Composable
 fun BottomBar(onItemSelected: MutableState<Int>) {
     BottomNavigation(
-        modifier = Modifier.fillMaxWidth().height(72.dp).graphicsLayer {
-            clip = true
-            shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
-        },
+        modifier = Modifier.fillMaxWidth()
+            .height(72.dp)
+            .graphicsLayer {
+                clip = true
+                shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
+            },
         backgroundColor = MaterialTheme.colors.surface,
     ) {
         DefaultBottomNavigationItem(
