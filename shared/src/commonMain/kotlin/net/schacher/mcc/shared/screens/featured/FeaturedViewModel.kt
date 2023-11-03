@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.screens.featured
 
-import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -16,7 +15,6 @@ class FeaturedViewModel(private val cardRepository: CardRepository) : ViewModel(
     val state = _state.asStateFlow()
 
     init {
-        Logger.d { "FeaturedViewModel init" }
         viewModelScope.launch {
             val decks = KtorCardDataSource.getFeaturedDecksByDate("2023-10-28") {
                 cardRepository.getCard(it)
