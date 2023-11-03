@@ -16,19 +16,27 @@ import net.schacher.mcc.shared.design.compose.Deck
 import net.schacher.mcc.shared.model.Deck
 
 @Composable
-fun FeaturedScreen(featuredViewModel: FeaturedViewModel, onDeckClick: (Deck) -> Unit) {
+fun FeaturedScreen(
+    featuredViewModel: FeaturedViewModel,
+    onDeckClick: (Deck) -> Unit
+) {
     val state by featuredViewModel.state.collectAsState()
 
     Box(
         modifier = Modifier.fillMaxSize()
             .statusBarsPadding()
-            .padding(16.dp)
+            .padding(horizontal = 16.dp)
     ) {
         LazyColumn {
             items(state.decks.size) { index ->
+                if (index == 0) {
+                    Spacer(Modifier.statusBarsPadding().height(16.dp))
+                }
+
                 Deck(state.decks[index]) {
                     onDeckClick(state.decks[index])
                 }
+
                 Spacer(Modifier.height(16.dp))
             }
         }

@@ -12,13 +12,13 @@ class DeckViewModel(
     private val deckRepository: DeckRepository,
     private val cardRepository: CardRepository
 ) : ViewModel() {
-    private val _state = MutableStateFlow(DeckUiState(this.deckRepository.decks.value))
+    private val _state = MutableStateFlow(DeckUiState(this.deckRepository.state.value))
 
     val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
-            deckRepository.decks.collect { value ->
+            deckRepository.state.collect { value ->
                 _state.value = DeckUiState(value)
             }
         }

@@ -18,9 +18,12 @@ class DeckRepository(
     private val cardRepository: CardRepository,
     private val databaseDao: DatabaseDao
 ) {
-    private val _decks = MutableStateFlow(databaseDao.getDecks())
+    private val _state = MutableStateFlow(databaseDao.getDecks())
 
-    val decks = _decks.asStateFlow()
+    val state = _state.asStateFlow()
+
+    val decks: List<Deck>
+        get() = this.state.value
 
     private val randomDeckNumber: Int
         get() = Random.nextInt(Int.MAX_VALUE) * -1
@@ -32,12 +35,12 @@ class DeckRepository(
 
         val deck = Deck(randomDeckNumber, label, heroCard, aspect, listOf(heroCard))
         this.databaseDao.addDeck(deck)
-        _decks.update { databaseDao.getDecks() }
+        _state.update { databaseDao.getDecks() }
     }
 
     fun removeDeck(deck: Deck) {
         this.databaseDao.removeDeck(deck.id)
-        _decks.update { databaseDao.getDecks() }
+        _state.update { databaseDao.getDecks() }
     }
 
     suspend fun addDeckById(deckId: Int) {
@@ -46,11 +49,11 @@ class DeckRepository(
         }
 
         this.databaseDao.addDeck(deck)
-        _decks.update { databaseDao.getDecks() }
+        _state.emit(databaseDao.getDecks())
     }
 
     suspend fun deleteAllDecks() = withContext(Dispatchers.IO) {
         databaseDao.removeAllDecks()
-        _decks.update { databaseDao.getDecks() }
+        _state.emit(databaseDao.getDecks())
     }
 }

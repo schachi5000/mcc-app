@@ -17,7 +17,7 @@ class SettingsViewModel(
     private val _state = MutableStateFlow(
         SettingsUiState(
             cardRepository.cards.size,
-            deckRepository.decks.value.size
+            deckRepository.state.value.size
         )
     )
 
@@ -25,7 +25,7 @@ class SettingsViewModel(
 
     init {
         viewModelScope.launch {
-            deckRepository.decks.collect { value ->
+            deckRepository.state.collect { value ->
                 _state.update { it.copy(deckCount = value.size) }
             }
         }
@@ -55,24 +55,28 @@ class SettingsViewModel(
             _state.update {
                 it.copy(
                     cardCount = cardRepository.cards.size,
-                    deckCount = deckRepository.decks.value.size,
+                    deckCount = deckRepository.state.value.size,
                     syncInProgress = false
                 )
             }
         }
     }
 
-    fun addPublicDeckById(deckId: String) {
-        this.viewModelScope.launch {
-            deckRepository.addDeckById(deckId.toInt())
+    fun addPublicDecksById(deckId: List<String>) {
+        _state.update { it.copy(syncInProgress = false) }
 
-            _state.update {
-                it.copy(
-                    cardCount = cardRepository.cards.size,
-                    deckCount = deckRepository.decks.value.size,
-                    syncInProgress = false
-                )
+        this.viewModelScope.launch {
+            deckId.forEach {
+                deckRepository.addDeckById(it.toInt())
+                _state.update {
+                    it.copy(
+                        cardCount = cardRepository.cards.size,
+                        deckCount = deckRepository.state.value.size,
+                    )
+                }
             }
+
+            _state.update { it.copy(syncInProgress = false) }
         }
     }
 }

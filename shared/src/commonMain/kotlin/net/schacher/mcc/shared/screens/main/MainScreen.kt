@@ -96,8 +96,8 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
                 Logger.d { "selectedTabIndex: ${state.value.selectedTabIndex}" }
                 when (state.value.selectedTabIndex) {
                     0 -> DeckScreen(deckViewModel = deckViewModel,
-                        onDeckClicked = { mainViewModel.onDeckClicked(it) },
-                        onAddDeckClicked = {}
+                        onDeckClick = { mainViewModel.onDeckClicked(it) },
+                        onAddDeckClick = {}
                     )
 
                     1 -> FeaturedScreen(featuredViewModel) {

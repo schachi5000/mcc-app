@@ -96,10 +96,25 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
 
         OptionsGroup("Debug") {
             OptionsEntry(
-                label = "Add Public Deck",
+                label = "Add Public Decks",
                 imageVector = Icons.Rounded.Add,
                 onClick = {
-                    settingsViewModel.addPublicDeckById("511044")
+                    settingsViewModel.addPublicDecksById(
+                        listOf(
+                            "511044",
+                            "533658",
+                            "533636",
+                            "511177",
+                            "519524",
+                            "511180",
+                            "511046",
+                            "516826",
+                            "516215",
+                            "516215",
+                            "516216",
+                            "511045"
+                        )
+                    )
                 }
             )
         }
