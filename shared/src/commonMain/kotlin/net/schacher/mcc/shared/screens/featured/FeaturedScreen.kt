@@ -13,9 +13,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.Deck
+import net.schacher.mcc.shared.model.Deck
 
 @Composable
-fun FeaturedScreen(featuredViewModel: FeaturedViewModel) {
+fun FeaturedScreen(featuredViewModel: FeaturedViewModel, onDeckClick: (Deck) -> Unit) {
     val state by featuredViewModel.state.collectAsState()
 
     Box(
@@ -25,7 +26,9 @@ fun FeaturedScreen(featuredViewModel: FeaturedViewModel) {
     ) {
         LazyColumn {
             items(state.decks.size) { index ->
-                Deck(state.decks[index])
+                Deck(state.decks[index]) {
+                    onDeckClick(state.decks[index])
+                }
                 Spacer(Modifier.height(16.dp))
             }
         }

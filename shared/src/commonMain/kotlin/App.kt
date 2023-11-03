@@ -12,7 +12,8 @@ import net.schacher.mcc.shared.screens.main.MainViewModel
 fun App(databaseDao: DatabaseDao) {
     val cardRepository = CardRepository(databaseDao)
     val deckRepository = DeckRepository(cardRepository, databaseDao)
-    val mainViewModel = getViewModel(Unit, viewModelFactory { MainViewModel(cardRepository) })
+
+    val mainViewModel = getViewModel(Unit, viewModelFactory { MainViewModel(cardRepository, deckRepository) })
 
     MccTheme {
         MainScreen(mainViewModel, cardRepository, deckRepository)

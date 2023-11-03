@@ -18,12 +18,16 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
@@ -33,12 +37,18 @@ import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.DefaultBottomNavigationItem
+import net.schacher.mcc.shared.design.compose.OptionsBottomSheet
+import net.schacher.mcc.shared.design.compose.OptionsEntry
+import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.deck.DeckViewModel
 import net.schacher.mcc.shared.screens.featured.FeaturedScreen
 import net.schacher.mcc.shared.screens.featured.FeaturedViewModel
+import net.schacher.mcc.shared.screens.main.MainUiState.ContextMenu.CardMenu
+import net.schacher.mcc.shared.screens.main.MainUiState.ContextMenu.DeckMenu
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
@@ -54,18 +64,23 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
     val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
     val snackbarHostState = remember { SnackbarHostState() }
 
-
     val featuredViewModel = getViewModel(Unit, viewModelFactory { FeaturedViewModel(cardRepository) })
     val deckViewModel = getViewModel(Unit, viewModelFactory { DeckViewModel(deckRepository, cardRepository) })
     val searchViewModel = getViewModel(Unit, viewModelFactory { SearchViewModel(cardRepository) })
-    val settingsViewModel =
-        getViewModel(Unit, viewModelFactory { SettingsViewModel(cardRepository, deckRepository) })
+    val settingsViewModel = getViewModel(Unit, viewModelFactory { SettingsViewModel(cardRepository, deckRepository) })
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        scrimColor = MaterialTheme.colors.background.copy(alpha = 0.2f),
+        scrimColor = MaterialTheme.colors.background.copy(alpha = 0.75f),
+        sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
+        sheetBackgroundColor = MaterialTheme.colors.surface,
         sheetContent = {
-            // TODO Add context sheets here
+            state.value.contextMenu?.let {
+                when (it) {
+                    is CardMenu -> CardMenuBottomSheet(mainViewModel, it.card)
+                    is DeckMenu -> DeckMenuBottomSheet(mainViewModel, it.deck)
+                }
+            }
         }) {
         Scaffold(
             Modifier.fillMaxSize(),
@@ -80,14 +95,38 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
             Box(modifier = Modifier.padding(it)) {
                 Logger.d { "selectedTabIndex: ${state.value.selectedTabIndex}" }
                 when (state.value.selectedTabIndex) {
-                    0 -> DeckScreen(deckViewModel)
-                    1 -> FeaturedScreen(featuredViewModel)
+                    0 -> DeckScreen(deckViewModel = deckViewModel,
+                        onDeckClicked = { mainViewModel.onDeckClicked(it) },
+                        onAddDeckClicked = {}
+                    )
+
+                    1 -> FeaturedScreen(featuredViewModel) {
+                        mainViewModel.onDeckClicked(it)
+                    }
+
                     2 -> SearchScreen(searchViewModel) {
+                        mainViewModel.onCardClicked(it)
                         scope.launch { snackbarHostState.showSnackbar("${it.name} | ${it.code}") }
                     }
 
                     3 -> SettingsScreen(settingsViewModel)
                 }
+            }
+        }
+    }
+
+    scope.launch {
+        if (state.value.contextMenu != null) {
+            sheetState.show()
+        } else {
+            sheetState.hide()
+        }
+    }
+
+    LaunchedEffect(sheetState) {
+        snapshotFlow { sheetState.isVisible }.collect { isVisible ->
+            if (!isVisible) {
+                mainViewModel.onContextMenuClosed()
             }
         }
     }
@@ -140,5 +179,27 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
             selected = (selectedTabIndex == 3),
             onClick = { onTabSelected(3) },
         )
+    }
+}
+
+@Composable
+fun CardMenuBottomSheet(mainViewModel: MainViewModel, card: Card) {
+    OptionsBottomSheet {
+        OptionsEntry(
+            label = "Zu Deck hinzufügen",
+            imageVector = Icons.Rounded.Add
+        ) {}
+    }
+}
+
+@Composable
+fun DeckMenuBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
+    OptionsBottomSheet {
+        OptionsEntry(
+            label = "Löschen",
+            imageVector = Icons.Rounded.Delete
+        ) {
+            mainViewModel.onRemoveDeckClick(deck)
+        }
     }
 }

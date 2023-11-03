@@ -3,6 +3,7 @@ package net.schacher.mcc.shared.screens.deck
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
@@ -11,12 +12,16 @@ class DeckViewModel(
     private val deckRepository: DeckRepository,
     private val cardRepository: CardRepository
 ) : ViewModel() {
-    private val _state = MutableStateFlow(DeckUiState(this.deckRepository.decks))
+    private val _state = MutableStateFlow(DeckUiState(this.deckRepository.decks.value))
 
     val state = _state.asStateFlow()
 
-    fun onRefresh() {
-        _state.value = DeckUiState(this.deckRepository.decks)
+    init {
+        viewModelScope.launch {
+            deckRepository.decks.collect { value ->
+                _state.value = DeckUiState(value)
+            }
+        }
     }
 }
 

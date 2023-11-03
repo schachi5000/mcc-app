@@ -17,11 +17,19 @@ class SettingsViewModel(
     private val _state = MutableStateFlow(
         SettingsUiState(
             cardRepository.cards.size,
-            deckRepository.decks.size
+            deckRepository.decks.value.size
         )
     )
 
     val state = _state.asStateFlow()
+
+    init {
+        viewModelScope.launch {
+            deckRepository.decks.collect { value ->
+                _state.update { it.copy(deckCount = value.size) }
+            }
+        }
+    }
 
     fun onWipeDatabaseClick() {
         if (this.state.value.syncInProgress) {
@@ -47,7 +55,7 @@ class SettingsViewModel(
             _state.update {
                 it.copy(
                     cardCount = cardRepository.cards.size,
-                    deckCount = deckRepository.decks.size,
+                    deckCount = deckRepository.decks.value.size,
                     syncInProgress = false
                 )
             }
@@ -61,7 +69,7 @@ class SettingsViewModel(
             _state.update {
                 it.copy(
                     cardCount = cardRepository.cards.size,
-                    deckCount = deckRepository.decks.size,
+                    deckCount = deckRepository.decks.value.size,
                     syncInProgress = false
                 )
             }

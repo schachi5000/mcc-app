@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -24,7 +25,7 @@ import net.schacher.mcc.shared.design.theme.getColor
 import net.schacher.mcc.shared.model.Deck
 
 @Composable
-fun Deck(deck: Deck) {
+fun Deck(deck: Deck, onClick: () -> Unit = {}) {
     Column {
         DeckStack(modifier = Modifier.fillMaxWidth(), deck.aspect?.getColor() ?: Color.LightGray)
         Spacer(Modifier.height(1.dp))
@@ -34,6 +35,7 @@ fun Deck(deck: Deck) {
                 .height(128.dp)
                 .clip(RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colors.surface)
+                .clickable { onClick() }
         ) {
             Card(card = deck.heroCard)
 
@@ -55,7 +57,7 @@ private fun DeckStack(modifier: Modifier = Modifier, color: Color) {
 
     Column(modifier) {
         Box(Modifier.height(5.dp).padding(horizontal = 16.dp)) {
-            Row(Modifier.fillMaxSize().background(backgroundColor,shape)) { }
+            Row(Modifier.fillMaxSize().background(backgroundColor, shape)) { }
             Row(Modifier.fillMaxSize().alpha(0.2f).background(color, shape)) { }
         }
         Spacer(Modifier.height(1.dp))
