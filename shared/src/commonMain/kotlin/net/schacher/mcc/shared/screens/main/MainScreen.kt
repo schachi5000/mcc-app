@@ -3,6 +3,7 @@ package net.schacher.mcc.shared.screens.main
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -36,8 +37,9 @@ import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.DefaultBottomNavigationItem
-import net.schacher.mcc.shared.design.compose.OptionsBottomSheet
+import net.schacher.mcc.shared.design.compose.InspectScreen
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
@@ -47,8 +49,9 @@ import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.deck.DeckViewModel
 import net.schacher.mcc.shared.screens.featured.FeaturedScreen
 import net.schacher.mcc.shared.screens.featured.FeaturedViewModel
-import net.schacher.mcc.shared.screens.main.MainUiState.ContextMenu.CardMenu
-import net.schacher.mcc.shared.screens.main.MainUiState.ContextMenu.DeckMenu
+import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
+import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckInspector
+import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
@@ -61,7 +64,7 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
     val state = mainViewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
 
-    val sheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true)
     val snackbarHostState = remember { SnackbarHostState() }
 
     val featuredViewModel = getViewModel(Unit, viewModelFactory { FeaturedViewModel(cardRepository) })
@@ -71,14 +74,16 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        scrimColor = MaterialTheme.colors.background.copy(alpha = 0.75f),
+        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.25f),
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetBackgroundColor = MaterialTheme.colors.surface,
         sheetContent = {
-            state.value.contextMenu?.let {
+            state.value.subScreen?.let {
                 when (it) {
                     is CardMenu -> CardMenuBottomSheet(mainViewModel, it.card)
                     is DeckMenu -> DeckMenuBottomSheet(mainViewModel, it.deck)
+                    is DeckInspector -> DeckInspectorBottomSheet(mainViewModel, it.deck)
+                    else -> {}
                 }
             }
         }) {
@@ -116,7 +121,7 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
     }
 
     scope.launch {
-        if (state.value.contextMenu != null) {
+        if (state.value.subScreen != null) {
             sheetState.show()
         } else {
             sheetState.hide()
@@ -184,7 +189,7 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
 
 @Composable
 fun CardMenuBottomSheet(mainViewModel: MainViewModel, card: Card) {
-    OptionsBottomSheet {
+    BottomSheetContainer {
         OptionsEntry(
             label = "Zu Deck hinzufügen",
             imageVector = Icons.Rounded.Add
@@ -194,12 +199,19 @@ fun CardMenuBottomSheet(mainViewModel: MainViewModel, card: Card) {
 
 @Composable
 fun DeckMenuBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
-    OptionsBottomSheet {
+    BottomSheetContainer {
         OptionsEntry(
             label = "Löschen",
             imageVector = Icons.Rounded.Delete
         ) {
             mainViewModel.onRemoveDeckClick(deck)
         }
+    }
+}
+
+@Composable
+fun DeckInspectorBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
+    BottomSheetContainer(modifier = Modifier.fillMaxHeight(0.9f)) {
+        InspectScreen(cards = deck.cards) {}
     }
 }

@@ -2,7 +2,7 @@ package net.schacher.mcc.design
 
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import net.schacher.mcc.shared.design.compose.OptionsBottomSheet
+import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
 import net.schacher.mcc.shared.screens.search.SearchBar
@@ -25,7 +25,7 @@ fun OptionsGroupPreview() {
 @Preview
 @Composable
 fun DefaultBottomSheetPreview() {
-    OptionsBottomSheet {
+    BottomSheetContainer {
 
     }
 }

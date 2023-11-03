@@ -87,14 +87,21 @@ object KtorCardDataSource {
         .get("$BASE_URL/deck/$deckId")
         .body<DeckDto>()
         .let {
+            val heroCard = getCard(it.investigator_code!!)
+
             Deck(
                 id = it.id,
                 name = it.name,
-                heroCard = getCard(it.investigator_code!!),
+                heroCard = heroCard,
                 aspect = it.meta?.parseAspect(),
-                cards = it.slots.entries.map { entry ->
-                    List(entry.value) { cardProvider(entry.key) }
-                }.flatten().filterNotNull()
+                cards = it.slots.entries
+                    .map { entry ->
+                        List(entry.value) { cardProvider(entry.key) }
+                    }
+                    .flatten()
+                    .filterNotNull()
+                    .toMutableList()
+                    .also { it.add(0, heroCard) }
             )
         }
 }
