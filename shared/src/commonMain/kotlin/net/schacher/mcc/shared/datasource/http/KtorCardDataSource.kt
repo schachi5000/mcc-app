@@ -23,6 +23,7 @@ object KtorCardDataSource {
 
     private const val BASE_URL = "https://de.marvelcdb.com/api/public"
 
+
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
@@ -71,15 +72,7 @@ object KtorCardDataSource {
                 id = it.id,
                 name = it.name,
                 heroCard = getCard(it.investigator_code!!),
-                aspect = it.meta?.let {
-                    when {
-                        it.contains("justice") -> Aspect.JUSTICE
-                        it.contains("leadership") -> Aspect.LEADERSHIP
-                        it.contains("aggression") -> Aspect.AGGRESSION
-                        it.contains("protection") -> Aspect.PROTECTION
-                        else -> null
-                    }
-                },
+                aspect = it.aspect,
                 cards = it.slots.entries.map { entry ->
                     List(entry.value) { cardProvider(entry.key) }
                 }.flatten().filterNotNull()
@@ -94,18 +87,24 @@ object KtorCardDataSource {
                 id = it.id,
                 name = it.name,
                 heroCard = getCard(it.investigator_code!!),
-                aspect = it.meta?.let {
-                    when {
-                        it.contains("justice") -> Aspect.JUSTICE
-                        it.contains("leadership") -> Aspect.LEADERSHIP
-                        it.contains("aggression") -> Aspect.AGGRESSION
-                        it.contains("protection") -> Aspect.PROTECTION
-                        else -> null
-                    }
-                },
+                aspect = it.aspect,
                 cards = it.slots.entries.map { entry ->
                     List(entry.value) { cardProvider(entry.key) }
                 }.flatten().filterNotNull()
             )
         }
 }
+
+private const val LEADERSHIP = "leadership"
+private const val JUSTICE = "justice"
+private const val AGGRESSION = "aggression"
+private const val PROTECTION = "protection"
+
+private val DeckDto.aspect: Aspect?
+    get() = when {
+        this.meta?.contains(JUSTICE) == true -> Aspect.JUSTICE
+        this.meta?.contains(LEADERSHIP) == true -> Aspect.LEADERSHIP
+        this.meta?.contains(AGGRESSION) == true -> Aspect.AGGRESSION
+        this.meta?.contains(PROTECTION) == true -> Aspect.PROTECTION
+        else -> null
+    }
