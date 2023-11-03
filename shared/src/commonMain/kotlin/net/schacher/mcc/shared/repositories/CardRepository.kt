@@ -4,8 +4,8 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
-import net.schacher.mcc.shared.database.DatabaseDao
-import net.schacher.mcc.shared.datasource.KtorCardDataSource
+import net.schacher.mcc.shared.datasource.database.DatabaseDao
+import net.schacher.mcc.shared.datasource.http.KtorCardDataSource
 import net.schacher.mcc.shared.model.Card
 
 class CardRepository(private val databaseDao: DatabaseDao) {
@@ -24,4 +24,6 @@ class CardRepository(private val databaseDao: DatabaseDao) {
         databaseDao.removeAllCards()
         cards = databaseDao.getAllCards()
     }
+
+    fun getCard(cardCode: String): Card? = this.cards.firstOrNull { it.code == cardCode }
 }

@@ -4,8 +4,8 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
-import net.schacher.mcc.shared.database.DatabaseDao
-import net.schacher.mcc.shared.datasource.KtorCardDataSource
+import net.schacher.mcc.shared.datasource.database.DatabaseDao
+import net.schacher.mcc.shared.datasource.http.KtorCardDataSource
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType.HERO
 import net.schacher.mcc.shared.model.Deck
@@ -18,7 +18,7 @@ class DeckRepository(
     val decks: List<Deck>
         get() = this.databaseDao.getDecks()
 
-    private val randomDeckNumer: Int
+    private val randomDeckNumber: Int
         get() = Random.nextInt(Int.MAX_VALUE) * -1
 
     fun createDeck(label: String, heroCard: Card) {
@@ -26,7 +26,7 @@ class DeckRepository(
             throw Exception("Hero card must be of type HERO - $heroCard")
         }
 
-        val deck = Deck(randomDeckNumer, label, heroCard, listOf(heroCard))
+        val deck = Deck(randomDeckNumber, label, heroCard, listOf(heroCard))
         this.databaseDao.addDeck(deck)
     }
 
@@ -38,7 +38,7 @@ class DeckRepository(
         val cards = cardRepository.cards.take(10)
         databaseDao.addDeck(
             Deck(
-                randomDeckNumer,
+                randomDeckNumber,
                 "deck1",
                 cardRepository.cards.first { it.type == HERO },
                 cards
@@ -50,7 +50,10 @@ class DeckRepository(
     }
 
     suspend fun addDeckById(deckId: Int) {
-        val deck = KtorCardDataSource.getPublicDeckById(deckId)
+        val deck = KtorCardDataSource.getPublicDeckById(deckId) {
+            this.databaseDao.getCardByCode(it)
+        }
+
         this.databaseDao.addDeck(deck)
     }
 

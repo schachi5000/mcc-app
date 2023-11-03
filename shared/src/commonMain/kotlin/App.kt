@@ -31,7 +31,7 @@ import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
-import net.schacher.mcc.shared.database.DatabaseDao
+import net.schacher.mcc.shared.datasource.database.DatabaseDao
 import net.schacher.mcc.shared.design.DefaultBottomNavigationItem
 import net.schacher.mcc.shared.design.theme.DarkColorScheme
 import net.schacher.mcc.shared.design.theme.LightColorScheme
@@ -82,7 +82,7 @@ fun App(databaseDao: DatabaseDao) {
                             }))
 
                             1 -> FeaturedScreen(getViewModel(it.value, viewModelFactory {
-                                FeaturedViewModel()
+                                FeaturedViewModel(cardRepository)
                             }))
 
                             2 -> SearchScreen(getViewModel(it.value, viewModelFactory {

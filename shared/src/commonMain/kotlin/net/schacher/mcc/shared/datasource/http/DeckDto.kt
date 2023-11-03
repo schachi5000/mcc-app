@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.datasource
+package net.schacher.mcc.shared.datasource.http
 
 import kotlinx.serialization.Serializable
 
@@ -14,6 +14,6 @@ data class DeckDto(
     val name: String,
     val slots: Map<String, Int>,
     val tags: String,
-    val user_id: String?,
+    val user_id: Int?,
     val version: String?
 )

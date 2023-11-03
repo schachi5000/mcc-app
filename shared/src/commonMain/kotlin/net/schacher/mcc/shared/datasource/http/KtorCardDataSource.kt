@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.datasource
+package net.schacher.mcc.shared.datasource.http
 
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
@@ -62,11 +62,21 @@ object KtorCardDataSource {
         .get("$BASE_URL/api/public/card/$cardCode")
         .body<Card>()
 
-    suspend fun getFeaturedDecksByDate(date: String): List<Deck> {
-        return emptyList()
-    }
+    suspend fun getFeaturedDecksByDate(date: String, cardProvider: (String) -> Card?) = httpClient
+        .get("$BASE_URL/api/public/decklists/by_date/$date")
+        .body<List<DeckDto>>()
+        .map {
+            Deck(
+                id = it.id,
+                name = it.name,
+                heroCard = getCard(it.investigator_code!!),
+                cards = it.slots.entries.map { entry ->
+                    List(entry.value) { cardProvider(entry.key) }
+                }.flatten().filterNotNull()
+            )
+        }
 
-    suspend fun getPublicDeckById(deckId: Int) = httpClient
+    suspend fun getPublicDeckById(deckId: Int, cardProvider: (String) -> Card?) = httpClient
         .get("$BASE_URL/api/public/deck/$deckId")
         .body<DeckDto>()
         .let {
@@ -75,8 +85,8 @@ object KtorCardDataSource {
                 name = it.name,
                 heroCard = getCard(it.investigator_code!!),
                 cards = it.slots.entries.map { entry ->
-                    List(entry.value) { getCard(entry.key) }
-                }.flatten()
+                    List(entry.value) { cardProvider(entry.key) }
+                }.flatten().filterNotNull()
             )
         }
 }
