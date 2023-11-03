@@ -1,9 +1,11 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -48,27 +50,18 @@ fun Deck(deck: Deck) {
 
 @Composable
 private fun DeckStack(modifier: Modifier = Modifier, color: Color) {
+    val shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+    val backgroundColor = Color.White.copy(alpha = 0.9f)
+
     Column(modifier) {
-        Row(
-            Modifier.height(5.dp)
-                .padding(horizontal = 16.dp)
-                .alpha(0.2f)
-                .background(
-                    color,
-                    RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
-                )
-                .fillMaxWidth()
-        ) { }
+        Box(Modifier.height(5.dp).padding(horizontal = 16.dp)) {
+            Row(Modifier.fillMaxSize().background(backgroundColor,shape)) { }
+            Row(Modifier.fillMaxSize().alpha(0.2f).background(color, shape)) { }
+        }
         Spacer(Modifier.height(1.dp))
-        Row(
-            Modifier.height(5.dp)
-                .padding(horizontal = 8.dp)
-                .alpha(0.3f)
-                .background(
-                    color,
-                    RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
-                )
-                .fillMaxWidth()
-        ) { }
+        Box(Modifier.height(5.dp).padding(horizontal = 8.dp)) {
+            Row(Modifier.fillMaxSize().background(backgroundColor, shape)) { }
+            Row(Modifier.fillMaxSize().alpha(0.4f).background(color, shape)) { }
+        }
     }
 }

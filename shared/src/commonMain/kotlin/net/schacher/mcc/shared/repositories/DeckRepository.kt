@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.repositories
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
@@ -33,22 +32,6 @@ class DeckRepository(
 
     fun removeDeck(deck: Deck) {
         this.databaseDao.removeDeck(deck.id)
-    }
-
-    fun addDummyDeck() {
-        val cards = cardRepository.cards.take(10)
-        databaseDao.addDeck(
-            Deck(
-                randomDeckNumber,
-                "deck1",
-                cardRepository.cards.first { it.type == HERO },
-                Aspect.LEADERSHIP,
-                cards
-            )
-        )
-        databaseDao.getDecks().forEach {
-            Logger.d { "Deck: $it" }
-        }
     }
 
     suspend fun addDeckById(deckId: Int) {
