@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.screens.main
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -17,7 +18,7 @@ class MainViewModel(
     private val deckRepository: DeckRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(MainUiState(preparingApp = this.cardRepository.cards.isEmpty()))
+    private val _state = MutableStateFlow(MainUiState(preparingApp = true))
 
     val state = _state.asStateFlow()
 
@@ -26,6 +27,10 @@ class MainViewModel(
             if (cardRepository.cards.isEmpty()) {
                 _state.update { it.copy(preparingApp = true) }
                 cardRepository.refresh()
+                _state.update { it.copy(preparingApp = false) }
+            } else {
+                _state.update { it.copy(preparingApp = true) }
+                delay(2000)
                 _state.update { it.copy(preparingApp = false) }
             }
         }
