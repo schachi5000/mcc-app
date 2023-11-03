@@ -3,6 +3,7 @@ package net.schacher.mcc.shared.design.compose
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -12,23 +13,58 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.model.Deck
 
 @Composable
 fun Deck(deck: Deck) {
-    Row(
-        modifier = Modifier.wrapContentHeight()
-            .fillMaxWidth()
-            .height(128.dp)
-            .clip(RoundedCornerShape(8.dp))
-            .background(MaterialTheme.colors.surface)
-    ) {
-        Card(card = deck.heroCard)
+    Column {
+        DeckStack(modifier = Modifier.fillMaxWidth())
+        Spacer(Modifier.height(1.dp))
+        Row(
+            modifier = Modifier.wrapContentHeight()
+                .fillMaxWidth()
+                .height(128.dp)
+                .clip(RoundedCornerShape(8.dp))
+                .background(MaterialTheme.colors.surface)
+        ) {
+            Card(card = deck.heroCard)
 
-        Column(modifier = Modifier.padding(8.dp)) {
-            Text(text = deck.name)
+            Column(modifier = Modifier.padding(8.dp)) {
+                Text(
+                    text = deck.name,
+                    maxLines = 1,
+                    fontWeight = FontWeight.SemiBold
+                )
+            }
         }
     }
 }
+
+@Composable
+private fun DeckStack(modifier: Modifier = Modifier) {
+    Column(modifier) {
+        Row(
+            Modifier.height(5.dp)
+                .padding(horizontal = 16.dp)
+                .alpha(0.3f)
+                .background(MaterialTheme.colors.onSurface, StackShape())
+                .fillMaxWidth()
+        ) { }
+        Spacer(Modifier.height(1.dp))
+        Row(
+            Modifier.height(5.dp)
+                .padding(horizontal = 8.dp)
+                .alpha(0.2f)
+                .background(MaterialTheme.colors.onSurface, StackShape())
+                .fillMaxWidth()
+        ) { }
+    }
+}
+
+private fun StackShape() = RoundedCornerShape(
+    topStart = 8.dp, topEnd = 8.dp
+)

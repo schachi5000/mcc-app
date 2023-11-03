@@ -20,7 +20,7 @@ import kotlin.coroutines.coroutineContext
 // TODO convert to class and hide behind interface
 object KtorCardDataSource {
 
-    private const val BASE_URL = "https://de.marvelcdb.com"
+    private const val BASE_URL = "https://de.marvelcdb.com/api/public"
 
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
@@ -39,11 +39,11 @@ object KtorCardDataSource {
     }
 
     suspend fun getAllCardPacks() = httpClient
-        .get("$BASE_URL/api/public/packs")
+        .get("$BASE_URL/packs")
         .body<List<Pack>>()
 
     suspend fun getCardPack(packCode: String) = httpClient
-        .get("$BASE_URL/api/public/cards/$packCode")
+        .get("$BASE_URL/cards/$packCode")
         .body<List<Card>>()
 
     suspend fun getAllCards() = getAllCardPacks()
@@ -59,11 +59,11 @@ object KtorCardDataSource {
         .flatten()
 
     suspend fun getCard(cardCode: String) = httpClient
-        .get("$BASE_URL/api/public/card/$cardCode")
+        .get("$BASE_URL/card/$cardCode")
         .body<Card>()
 
     suspend fun getFeaturedDecksByDate(date: String, cardProvider: (String) -> Card?) = httpClient
-        .get("$BASE_URL/api/public/decklists/by_date/$date")
+        .get("$BASE_URL/decklists/by_date/$date")
         .body<List<DeckDto>>()
         .map {
             Deck(
@@ -77,7 +77,7 @@ object KtorCardDataSource {
         }
 
     suspend fun getPublicDeckById(deckId: Int, cardProvider: (String) -> Card?) = httpClient
-        .get("$BASE_URL/api/public/deck/$deckId")
+        .get("$BASE_URL/deck/$deckId")
         .body<DeckDto>()
         .let {
             Deck(
