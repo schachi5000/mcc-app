@@ -15,14 +15,16 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import net.schacher.mcc.shared.design.theme.getColor
 import net.schacher.mcc.shared.model.Deck
 
 @Composable
 fun Deck(deck: Deck) {
     Column {
-        DeckStack(modifier = Modifier.fillMaxWidth())
+        DeckStack(modifier = Modifier.fillMaxWidth(), deck.aspect?.getColor() ?: Color.LightGray)
         Spacer(Modifier.height(1.dp))
         Row(
             modifier = Modifier.wrapContentHeight()
@@ -45,26 +47,28 @@ fun Deck(deck: Deck) {
 }
 
 @Composable
-private fun DeckStack(modifier: Modifier = Modifier) {
+private fun DeckStack(modifier: Modifier = Modifier, color: Color) {
     Column(modifier) {
         Row(
             Modifier.height(5.dp)
                 .padding(horizontal = 16.dp)
-                .alpha(0.3f)
-                .background(MaterialTheme.colors.onSurface, StackShape())
+                .alpha(0.2f)
+                .background(
+                    color,
+                    RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+                )
                 .fillMaxWidth()
         ) { }
         Spacer(Modifier.height(1.dp))
         Row(
             Modifier.height(5.dp)
                 .padding(horizontal = 8.dp)
-                .alpha(0.2f)
-                .background(MaterialTheme.colors.onSurface, StackShape())
+                .alpha(0.3f)
+                .background(
+                    color,
+                    RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+                )
                 .fillMaxWidth()
         ) { }
     }
 }
-
-private fun StackShape() = RoundedCornerShape(
-    topStart = 8.dp, topEnd = 8.dp
-)

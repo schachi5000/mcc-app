@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.datasource.database
 
 import co.touchlab.kermit.Logger
 import database.AppDatabase
+import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 
@@ -58,6 +59,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
         this.dbQuery.addDeck(
             deck.id.toLong(),
             deck.name,
+            deck.aspect?.name,
             deck.heroCard.code,
             deck.cards.joinToString(LIST_DELIMITER) { it.code })
     }
@@ -71,6 +73,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
             id = it.id.toInt(),
             name = it.name,
             heroCard = this.getCardByCode(it.heroCardCode),
+            aspect = it.aspect?.let { Aspect.valueOf(it) },
             cards = cards
         )
     }

@@ -6,6 +6,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
 import net.schacher.mcc.shared.datasource.http.KtorCardDataSource
+import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType.HERO
 import net.schacher.mcc.shared.model.Deck
@@ -21,12 +22,12 @@ class DeckRepository(
     private val randomDeckNumber: Int
         get() = Random.nextInt(Int.MAX_VALUE) * -1
 
-    fun createDeck(label: String, heroCard: Card) {
+    fun createDeck(label: String, aspect: Aspect, heroCard: Card) {
         if (heroCard.type != HERO) {
             throw Exception("Hero card must be of type HERO - $heroCard")
         }
 
-        val deck = Deck(randomDeckNumber, label, heroCard, listOf(heroCard))
+        val deck = Deck(randomDeckNumber, label, heroCard, aspect, listOf(heroCard))
         this.databaseDao.addDeck(deck)
     }
 
@@ -41,6 +42,7 @@ class DeckRepository(
                 randomDeckNumber,
                 "deck1",
                 cardRepository.cards.first { it.type == HERO },
+                Aspect.LEADERSHIP,
                 cards
             )
         )

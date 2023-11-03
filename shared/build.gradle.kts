@@ -7,6 +7,7 @@ plugins {
 }
 
 val ktorVersion = "2.3.4"
+val coinVersion = "3.5.0"
 val sqlDelightVersion = "1.5.5"
 val moko = "0.16.1"
 
@@ -43,6 +44,7 @@ kotlin {
                 implementation("dev.icerock.moko:mvvm-compose:$moko")
                 implementation("com.squareup.sqldelight:runtime:$sqlDelightVersion")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+                implementation("io.insert-koin:koin-core:$coinVersion")
             }
         }
         val androidMain by getting {

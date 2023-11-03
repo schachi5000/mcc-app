@@ -8,6 +8,7 @@ CREATE TABLE Card (
     position INTEGER NOT NULL,
     type TEXT NOT NULL,
     name TEXT NOT NULL,
+    aspect TEXT,
     imagePath TEXT,
     linkedCardCode TEXT
 );
@@ -32,13 +33,14 @@ DELETE FROM Card;
 CREATE TABLE Deck (
     id INTEGER NOT NULL PRIMARY KEY,
     name TEXT NOT NULL,
+    aspect TEXT,
     heroCardCode TEXT NOT NULL,
     cardCodes TEXT NOT NULL
 );
 
 addDeck:
-INSERT OR REPLACE INTO Deck(id, name, heroCardCode, cardCodes)
-VALUES(?, ?, ?, ?);
+INSERT OR REPLACE INTO Deck(id, name, aspect, heroCardCode, cardCodes)
+VALUES(?, ?, ?, ?, ?);
 
 selectAllDecks:
 SELECT *

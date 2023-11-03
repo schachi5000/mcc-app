@@ -12,6 +12,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.serialization.json.Json
+import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Pack
@@ -70,6 +71,15 @@ object KtorCardDataSource {
                 id = it.id,
                 name = it.name,
                 heroCard = getCard(it.investigator_code!!),
+                aspect = it.meta?.let {
+                    when {
+                        it.contains("justice") -> Aspect.JUSTICE
+                        it.contains("leadership") -> Aspect.LEADERSHIP
+                        it.contains("aggression") -> Aspect.AGGRESSION
+                        it.contains("protection") -> Aspect.PROTECTION
+                        else -> null
+                    }
+                },
                 cards = it.slots.entries.map { entry ->
                     List(entry.value) { cardProvider(entry.key) }
                 }.flatten().filterNotNull()
@@ -84,6 +94,15 @@ object KtorCardDataSource {
                 id = it.id,
                 name = it.name,
                 heroCard = getCard(it.investigator_code!!),
+                aspect = it.meta?.let {
+                    when {
+                        it.contains("justice") -> Aspect.JUSTICE
+                        it.contains("leadership") -> Aspect.LEADERSHIP
+                        it.contains("aggression") -> Aspect.AGGRESSION
+                        it.contains("protection") -> Aspect.PROTECTION
+                        else -> null
+                    }
+                },
                 cards = it.slots.entries.map { entry ->
                     List(entry.value) { cardProvider(entry.key) }
                 }.flatten().filterNotNull()
