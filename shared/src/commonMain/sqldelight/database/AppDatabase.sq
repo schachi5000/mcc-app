@@ -8,14 +8,15 @@ CREATE TABLE Card (
     position INTEGER NOT NULL,
     type TEXT,
     name TEXT NOT NULL,
+    packCode TEXT NOT NULL,
     aspect TEXT,
     imagePath TEXT,
     linkedCardCode TEXT
 );
 
 addCard:
-INSERT OR REPLACE INTO Card(code, position, type, name, imagePath, linkedCardCode)
-VALUES(?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Card(code, position, type, name, packCode, imagePath, linkedCardCode)
+VALUES(?, ?, ?, ?, ?, ?,?);
 
 selectCardByCode:
 SELECT *

@@ -23,12 +23,13 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
 
     fun addCard(card: Card) {
         this.dbQuery.addCard(
-            card.code,
-            card.position.toLong(),
-            card.type,
-            card.name,
-            card.imagePath,
-            card.linkedCard?.code
+            code = card.code,
+            position = card.position.toLong(),
+            type = card.type,
+            packCode = card.packCode,
+            name = card.name,
+            imagePath = card.imagePath,
+            linkedCardCode = card.linkedCard?.code
         )
     }
 
@@ -95,5 +96,6 @@ private fun database.Card.toCard() = Card(
     type = this.type,
     name = this.name,
     imagePath = this.imagePath,
+    packCode = this.packCode,
     linkedCard = null
 )

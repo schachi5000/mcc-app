@@ -1,10 +1,9 @@
-package net.schacher.mcc.shared.model
+package net.schacher.mcc.shared.datasource.http
 
 import kotlinx.serialization.Serializable
 
-
 @Serializable
-data class Pack(
+data class PackDto(
     val name: String,
     val code: String,
     val position: Int,

@@ -1,13 +1,12 @@
 package net.schacher.mcc.shared.model
 
-import kotlinx.serialization.Serializable
 
-@Serializable
 data class Card(
     val code: String,
     val position: Int,
     val type: String?,
     val name: String,
+    val packCode: String,
     val aspect: Aspect? = null,
     val linkedCard: Card? = null,
     val imagePath: String? = null

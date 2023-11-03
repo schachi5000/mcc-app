@@ -16,7 +16,6 @@ import kotlinx.serialization.json.Json
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.model.Pack
 import kotlin.coroutines.coroutineContext
 
 // TODO convert to class and hide behind interface
@@ -45,14 +44,14 @@ object KtorCardDataSource {
 
     suspend fun getAllCardPacks() = httpClient
         .get("$BASE_URL/packs")
-        .body<List<Pack>>()
+        .body<List<PackDto>>()
 
     suspend fun getCardPack(packCode: String) = httpClient
         .get("$BASE_URL/cards/$packCode")
         .body<List<CardDto>>()
         .map { it.toCard() }
 
-    suspend fun getAllCards() = getAllCardPacks()
+    suspend fun getAllCards() = this.getAllCardPacks()
         .map {
             CoroutineScope(coroutineContext).async {
                 Logger.d { "Starting download of: ${it.name}" }
@@ -118,5 +117,6 @@ private fun CardDto.toCard() = Card(
     position = this.position,
     type = this.type_code,
     name = this.name,
+    packCode = this.pack_code,
     aspect = this.faction_code.parseAspect(),
 )
