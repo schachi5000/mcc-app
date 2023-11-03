@@ -30,6 +30,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
@@ -74,7 +75,7 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        scrimColor = MaterialTheme.colors.onBackground.copy(alpha = 0.25f),
+        scrimColor = Color.Black.copy(alpha = 0.25f),
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetBackgroundColor = MaterialTheme.colors.surface,
         sheetContent = {
@@ -88,7 +89,7 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
             }
         }) {
         Scaffold(
-            Modifier.fillMaxSize(),
+            Modifier.fillMaxSize().blur(if (state.value.subScreen != null) 4.dp else 0.dp),
             backgroundColor = MaterialTheme.colors.background,
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
@@ -97,7 +98,10 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
                 }
             }
         ) {
-            Box(modifier = Modifier.padding(it)) {
+            Box(
+                modifier = Modifier.padding(it)
+
+            ) {
                 Logger.d { "selectedTabIndex: ${state.value.selectedTabIndex}" }
                 when (state.value.selectedTabIndex) {
                     0 -> DeckScreen(deckViewModel = deckViewModel,

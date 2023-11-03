@@ -76,7 +76,7 @@ private fun InfoRow(label: String, iconResource: String) {
 @Composable
 private fun DeckStack(modifier: Modifier = Modifier, color: Color) {
     val shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
-    val backgroundColor = Color.White.copy(alpha = 0.9f)
+    val backgroundColor = Color.White.copy(alpha = 0.75f)
 
     Column(modifier) {
         Box(Modifier.height(5.dp).padding(horizontal = 16.dp)) {

@@ -17,7 +17,7 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Column(modifier = modifier.fillMaxWidth()) {
+    Column(modifier = modifier.fillMaxWidth().background(MaterialTheme.colors.surface)) {
         Spacer(Modifier.height(8.dp))
         Row(
             modifier = Modifier.size(32.dp, 4.dp)
