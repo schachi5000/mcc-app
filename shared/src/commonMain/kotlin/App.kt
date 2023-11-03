@@ -62,6 +62,12 @@ fun App(databaseDao: DatabaseDao) {
 
         val selectedTabIndex = remember { mutableStateOf(1) }
 
+        val featuredViewModel = getViewModel(Unit, viewModelFactory { FeaturedViewModel(cardRepository) })
+        val deckViewModel = getViewModel(Unit, viewModelFactory { DeckViewModel(deckRepository, cardRepository) })
+        val searchViewModel = getViewModel(Unit, viewModelFactory { SearchViewModel(cardRepository) })
+        val settingsViewModel =
+            getViewModel(Unit, viewModelFactory { SettingsViewModel(cardRepository, deckRepository) })
+
         ModalBottomSheetLayout(
             sheetState = sheetState,
             scrimColor = MaterialTheme.colors.background.copy(alpha = 0.2f),
@@ -77,25 +83,13 @@ fun App(databaseDao: DatabaseDao) {
                     AnimatedContent(selectedTabIndex) {
                         Logger.d { "selectedTabIndex: ${it.value}" }
                         when (it.value) {
-                            0 -> DeckScreen(getViewModel(it.value, viewModelFactory {
-                                DeckViewModel(deckRepository, cardRepository)
-                            }))
-
-                            1 -> FeaturedScreen(getViewModel(it.value, viewModelFactory {
-                                FeaturedViewModel(cardRepository)
-                            }))
-
-                            2 -> SearchScreen(getViewModel(it.value, viewModelFactory {
-                                SearchViewModel(cardRepository)
-                            })) {
-                                scope.launch {
-                                    snackbarHostState.showSnackbar("${it.name} | ${it.code}")
-                                }
+                            0 -> DeckScreen(deckViewModel)
+                            1 -> FeaturedScreen(featuredViewModel)
+                            2 -> SearchScreen(searchViewModel) {
+                                scope.launch { snackbarHostState.showSnackbar("${it.name} | ${it.code}") }
                             }
 
-                            3 -> SettingsScreen(getViewModel(it.value, viewModelFactory {
-                                SettingsViewModel(cardRepository, deckRepository)
-                            }))
+                            3 -> SettingsScreen(settingsViewModel)
                         }
                     }
                 }
@@ -145,6 +139,15 @@ fun BottomBar(onItemSelected: MutableState<Int>) {
             onClick = { onItemSelected.value = 3 },
         )
     }
+}
+
+@Composable
+fun TestScreen(cardRepository: CardRepository) {
+    val viewModel = getViewModel(Unit, viewModelFactory {
+        FeaturedViewModel(cardRepository)
+    })
+
+    FeaturedScreen(viewModel)
 }
 
 expect fun getPlatformName(): String
