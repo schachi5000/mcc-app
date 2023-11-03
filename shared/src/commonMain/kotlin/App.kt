@@ -140,5 +140,3 @@ fun BottomBar(onItemSelected: MutableState<Int>) {
         )
     }
 }
-
-expect fun getPlatformName(): String

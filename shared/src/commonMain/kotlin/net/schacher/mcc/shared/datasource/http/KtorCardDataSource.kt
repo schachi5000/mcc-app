@@ -11,6 +11,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
@@ -24,10 +25,12 @@ object KtorCardDataSource {
     private const val BASE_URL = "https://de.marvelcdb.com/api/public"
 
 
+    @OptIn(ExperimentalSerializationApi::class)
     private val httpClient = HttpClient {
         install(ContentNegotiation) {
             json(Json {
                 ignoreUnknownKeys = true
+                explicitNulls = false
             })
         }
         install(Logging) {
@@ -46,7 +49,8 @@ object KtorCardDataSource {
 
     suspend fun getCardPack(packCode: String) = httpClient
         .get("$BASE_URL/cards/$packCode")
-        .body<List<Card>>()
+        .body<List<CardDto>>()
+        .map { it.toCard() }
 
     suspend fun getAllCards() = getAllCardPacks()
         .map {
@@ -62,7 +66,8 @@ object KtorCardDataSource {
 
     suspend fun getCard(cardCode: String) = httpClient
         .get("$BASE_URL/card/$cardCode")
-        .body<Card>()
+        .body<CardDto>()
+        .toCard()
 
     suspend fun getFeaturedDecksByDate(date: String, cardProvider: (String) -> Card?) = httpClient
         .get("$BASE_URL/decklists/by_date/$date")
@@ -72,7 +77,7 @@ object KtorCardDataSource {
                 id = it.id,
                 name = it.name,
                 heroCard = getCard(it.investigator_code!!),
-                aspect = it.aspect,
+                aspect = it.meta?.parseAspect(),
                 cards = it.slots.entries.map { entry ->
                     List(entry.value) { cardProvider(entry.key) }
                 }.flatten().filterNotNull()
@@ -87,7 +92,7 @@ object KtorCardDataSource {
                 id = it.id,
                 name = it.name,
                 heroCard = getCard(it.investigator_code!!),
-                aspect = it.aspect,
+                aspect = it.meta?.parseAspect(),
                 cards = it.slots.entries.map { entry ->
                     List(entry.value) { cardProvider(entry.key) }
                 }.flatten().filterNotNull()
@@ -100,11 +105,18 @@ private const val JUSTICE = "justice"
 private const val AGGRESSION = "aggression"
 private const val PROTECTION = "protection"
 
-private val DeckDto.aspect: Aspect?
-    get() = when {
-        this.meta?.contains(JUSTICE) == true -> Aspect.JUSTICE
-        this.meta?.contains(LEADERSHIP) == true -> Aspect.LEADERSHIP
-        this.meta?.contains(AGGRESSION) == true -> Aspect.AGGRESSION
-        this.meta?.contains(PROTECTION) == true -> Aspect.PROTECTION
-        else -> null
-    }
+private fun String.parseAspect(): Aspect? = when {
+    this.contains(JUSTICE) -> Aspect.JUSTICE
+    this.contains(LEADERSHIP) -> Aspect.LEADERSHIP
+    this.contains(AGGRESSION) -> Aspect.AGGRESSION
+    this.contains(PROTECTION) -> Aspect.PROTECTION
+    else -> null
+}
+
+private fun CardDto.toCard() = Card(
+    code = this.code,
+    position = this.position,
+    type = this.type_code,
+    name = this.name,
+    aspect = this.faction_code.parseAspect(),
+)

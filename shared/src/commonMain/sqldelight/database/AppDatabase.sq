@@ -6,7 +6,7 @@ import kotlin.collections.List;
 CREATE TABLE Card (
     code TEXT NOT NULL PRIMARY KEY,
     position INTEGER NOT NULL,
-    type TEXT NOT NULL,
+    type TEXT,
     name TEXT NOT NULL,
     aspect TEXT,
     imagePath TEXT,
