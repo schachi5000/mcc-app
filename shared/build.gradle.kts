@@ -42,6 +42,7 @@ kotlin {
                 implementation("dev.icerock.moko:mvvm-core:$moko")
                 implementation("dev.icerock.moko:mvvm-compose:$moko")
                 implementation("com.squareup.sqldelight:runtime:$sqlDelightVersion")
+                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
             }
         }
         val androidMain by getting {
