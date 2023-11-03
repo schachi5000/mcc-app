@@ -32,7 +32,7 @@ import dev.icerock.moko.mvvm.compose.getViewModel
 import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
-import net.schacher.mcc.shared.design.DefaultBottomNavigationItem
+import net.schacher.mcc.shared.design.compose.DefaultBottomNavigationItem
 import net.schacher.mcc.shared.design.theme.DarkColorScheme
 import net.schacher.mcc.shared.design.theme.LightColorScheme
 import net.schacher.mcc.shared.repositories.CardRepository
@@ -139,15 +139,6 @@ fun BottomBar(onItemSelected: MutableState<Int>) {
             onClick = { onItemSelected.value = 3 },
         )
     }
-}
-
-@Composable
-fun TestScreen(cardRepository: CardRepository) {
-    val viewModel = getViewModel(Unit, viewModelFactory {
-        FeaturedViewModel(cardRepository)
-    })
-
-    FeaturedScreen(viewModel)
 }
 
 expect fun getPlatformName(): String

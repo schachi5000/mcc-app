@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.design
+package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
@@ -70,7 +70,7 @@ fun EntryRow(modifier: Modifier, entry: Entry, onCardSelected: (Card) -> Unit) {
                     Spacer(Modifier.size(16.dp))
                 }
                 Column {
-                    GameCard(card = entry.cards[it]) {
+                    Card(card = entry.cards[it]) {
                         onCardSelected(entry.cards[it])
                     }
                     Text(

@@ -23,8 +23,8 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
-import net.schacher.mcc.shared.design.OptionsEntry
-import net.schacher.mcc.shared.design.OptionsGroup
+import net.schacher.mcc.shared.design.compose.OptionsEntry
+import net.schacher.mcc.shared.design.compose.OptionsGroup
 
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel) {

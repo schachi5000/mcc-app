@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.design
+package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
@@ -34,7 +34,7 @@ const val LANDSCAPE_RATIO = 1.396f
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
 @Composable
-fun GameCard(
+fun Card(
     modifier: Modifier = Modifier,
     card: Card,
     onClick: () -> Unit = {}

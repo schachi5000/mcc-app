@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.design
+package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Row
@@ -14,7 +14,7 @@ import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.model.Deck
 
 @Composable
-fun GameDeck(deck: Deck) {
+fun Deck(deck: Deck) {
     Row(
         modifier = Modifier.wrapContentHeight()
             .fillMaxWidth()
@@ -22,6 +22,6 @@ fun GameDeck(deck: Deck) {
             .clip(RoundedCornerShape(8.dp))
             .background(MaterialTheme.colors.surface)
     ) {
-        GameCard(card = deck.heroCard)
+        Card(card = deck.heroCard)
     }
 }

@@ -43,8 +43,8 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import net.schacher.mcc.shared.design.Entry
-import net.schacher.mcc.shared.design.EntryRow
+import net.schacher.mcc.shared.design.compose.Entry
+import net.schacher.mcc.shared.design.compose.EntryRow
 import net.schacher.mcc.shared.model.Card
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
