@@ -32,7 +32,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun SplashScreen() {
+fun SplashScreen(preparing: Boolean) {
     val infiniteTransition = rememberInfiniteTransition()
     val angle by infiniteTransition.animateFloat(
         initialValue = 0f,
@@ -51,24 +51,28 @@ fun SplashScreen() {
             modifier = Modifier.blur(5.dp)
         )
 
-        Column(
-            modifier = Modifier.width(200.dp)
-                .align(Alignment.Center)
-                .height(100.dp)
-                .background(Color(0xa0000000), RoundedCornerShape(8.dp)),
-            verticalArrangement = Arrangement.Center,
-            horizontalAlignment = Alignment.CenterHorizontally
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Refresh,
-                contentDescription = "",
-                tint = Color.White,
-                modifier = Modifier
-                    .padding(end = 16.dp)
-                    .rotate(angle)
-                    .size(48.dp)
-            )
-            Text(text = "Loading...", color = Color.White)
+        if (preparing) {
+
+
+            Column(
+                modifier = Modifier.width(200.dp)
+                    .align(Alignment.Center)
+                    .height(100.dp)
+                    .background(Color(0xa0000000), RoundedCornerShape(8.dp)),
+                verticalArrangement = Arrangement.Center,
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Refresh,
+                    contentDescription = "",
+                    tint = Color.White,
+                    modifier = Modifier
+                        .padding(end = 16.dp)
+                        .rotate(angle)
+                        .size(48.dp)
+                )
+                Text(text = "Loading...", color = Color.White)
+            }
         }
     }
 }

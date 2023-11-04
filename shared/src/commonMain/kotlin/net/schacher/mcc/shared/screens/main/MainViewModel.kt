@@ -11,6 +11,11 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
+import net.schacher.mcc.shared.screens.main.MainUiState.Splash
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckInspector
 
@@ -19,13 +24,12 @@ class MainViewModel(
     private val deckRepository: DeckRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(MainUiState(preparingApp = true))
+    private val _state = MutableStateFlow(MainUiState(Splash(cardRepository.cards.isEmpty())))
 
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            _state.update { it.copy(preparingApp = true) }
+        this.viewModelScope.launch {
             if (cardRepository.cards.isEmpty()) {
                 try {
                     cardRepository.refresh()
@@ -35,37 +39,49 @@ class MainViewModel(
             } else {
                 delay(2000)
             }
-            _state.update { it.copy(preparingApp = false) }
+            _state.update {
+                it.copy(splash = null, mainScreen = Featured)
+            }
         }
     }
 
     fun onTabSelected(tabIndex: Int) {
-        viewModelScope.launch {
-            _state.update { it.copy(selectedTabIndex = tabIndex) }
+        this.viewModelScope.launch {
+            val mainScreen = when (tabIndex) {
+                0 -> Decks
+                1 -> Featured
+                2 -> Search
+                3 -> Settings
+                else -> return@launch
+            }
+
+            _state.update {
+                it.copy(mainScreen = mainScreen)
+            }
         }
     }
 
     fun onCardClicked(card: Card) {
-        viewModelScope.launch {
+        this.viewModelScope.launch {
             _state.update { it.copy(subScreen = CardMenu(card)) }
         }
     }
 
 
     fun onDeckClicked(deck: Deck) {
-        viewModelScope.launch {
+        this.viewModelScope.launch {
             _state.update { it.copy(subScreen = DeckInspector(deck)) }
         }
     }
 
     fun onContextMenuClosed() {
-        viewModelScope.launch {
+        this.viewModelScope.launch {
             _state.update { it.copy(subScreen = null) }
         }
     }
 
     fun onRemoveDeckClick(deck: Deck) {
-        viewModelScope.launch {
+        this.viewModelScope.launch {
             deckRepository.removeDeck(deck)
             _state.update { it.copy(subScreen = null) }
         }
@@ -74,10 +90,18 @@ class MainViewModel(
 
 
 data class MainUiState(
-    val preparingApp: Boolean = true,
-    val selectedTabIndex: Int = 1,
+    val splash: Splash? = null,
+    val mainScreen: MainScreen = Featured,
     val subScreen: SubScreen? = null
 ) {
+    data class Splash(val preparing: Boolean)
+
+    sealed interface MainScreen {
+        data object Decks : MainScreen
+        data object Featured : MainScreen
+        data object Search : MainScreen
+        data object Settings : MainScreen
+    }
 
     sealed interface SubScreen {
         data class CardMenu(val card: Card) : SubScreen

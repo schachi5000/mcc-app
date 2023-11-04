@@ -61,17 +61,27 @@ import net.schacher.mcc.shared.screens.splash.SplashScreen
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, deckRepository: DeckRepository) {
+fun MainScreen(
+    mainViewModel: MainViewModel,
+    cardRepository: CardRepository,
+    deckRepository: DeckRepository
+) {
     val state = mainViewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
 
-    val sheetState = rememberModalBottomSheetState(initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true)
+    val sheetState = rememberModalBottomSheetState(
+        initialValue = ModalBottomSheetValue.Hidden,
+        skipHalfExpanded = true
+    )
     val snackbarHostState = remember { SnackbarHostState() }
 
-    val featuredViewModel = getViewModel(Unit, viewModelFactory { FeaturedViewModel(cardRepository) })
-    val deckViewModel = getViewModel(Unit, viewModelFactory { DeckViewModel(deckRepository, cardRepository) })
+    val featuredViewModel =
+        getViewModel(Unit, viewModelFactory { FeaturedViewModel(cardRepository) })
+    val deckViewModel =
+        getViewModel(Unit, viewModelFactory { DeckViewModel(deckRepository, cardRepository) })
     val searchViewModel = getViewModel(Unit, viewModelFactory { SearchViewModel(cardRepository) })
-    val settingsViewModel = getViewModel(Unit, viewModelFactory { SettingsViewModel(cardRepository, deckRepository) })
+    val settingsViewModel =
+        getViewModel(Unit, viewModelFactory { SettingsViewModel(cardRepository, deckRepository) })
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
@@ -93,17 +103,16 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
             backgroundColor = MaterialTheme.colors.background,
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
-                BottomBar(state.value.selectedTabIndex) {
+                BottomBar(state.value.mainScreen.tabIndex) {
                     mainViewModel.onTabSelected(it)
                 }
             }
         ) {
             Box(
                 modifier = Modifier.padding(it)
-
             ) {
-                Logger.d { "selectedTabIndex: ${state.value.selectedTabIndex}" }
-                when (state.value.selectedTabIndex) {
+                Logger.d { "selectedTabIndex: ${state.value.mainScreen.tabIndex}" }
+                when (state.value.mainScreen.tabIndex) {
                     0 -> DeckScreen(deckViewModel = deckViewModel,
                         onDeckClick = { mainViewModel.onDeckClicked(it) },
                         onAddDeckClick = {}
@@ -141,10 +150,10 @@ fun MainScreen(mainViewModel: MainViewModel, cardRepository: CardRepository, dec
     }
 
     AnimatedVisibility(
-        visible = state.value.preparingApp,
+        visible = state.value.splash != null,
         exit = fadeOut()
     ) {
-        SplashScreen()
+        SplashScreen((state.value.splash)?.preparing ?: false)
     }
 }
 
@@ -219,3 +228,11 @@ fun DeckInspectorBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
         InspectScreen(cards = deck.cards) {}
     }
 }
+
+val MainUiState.MainScreen.tabIndex: Int
+    get() = when (this) {
+        MainUiState.MainScreen.Decks -> 0
+        MainUiState.MainScreen.Featured -> 1
+        MainUiState.MainScreen.Search -> 2
+        MainUiState.MainScreen.Settings -> 3
+    }
