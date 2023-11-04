@@ -26,7 +26,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import net.schacher.mcc.shared.design.theme.getColor
+import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Deck
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -34,7 +34,7 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun Deck(deck: Deck, onClick: () -> Unit = {}) {
     Column {
-        val color = deck.aspect?.getColor() ?: Color.LightGray
+        val color = deck.aspect.color
         DeckStack(modifier = Modifier.fillMaxWidth(), color)
         Spacer(Modifier.height(1.dp))
         Row(
@@ -68,7 +68,11 @@ fun Deck(deck: Deck, onClick: () -> Unit = {}) {
 @Composable
 private fun InfoRow(label: String, iconResource: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
-        Icon(painter = painterResource(iconResource), contentDescription = null, Modifier.size(16.dp))
+        Icon(
+            painter = painterResource(iconResource),
+            contentDescription = null,
+            Modifier.size(16.dp)
+        )
         Text(
             modifier = Modifier.padding(start = 4.dp),
             text = label,

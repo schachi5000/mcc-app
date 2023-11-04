@@ -30,10 +30,11 @@ object AspectColors {
     val Leadership = Color(0xFF1976d2)
 }
 
-fun Aspect?.getColor(): Color = when (this) {
-    Aspect.AGGRESSION -> Aggression
-    Aspect.PROTECTION -> Protection
-    Aspect.JUSTICE -> Justice
-    Aspect.LEADERSHIP -> Leadership
-    else -> Color.LightGray
-}
+val Aspect?.color: Color
+    get() = when (this) {
+        Aspect.AGGRESSION -> Aggression
+        Aspect.PROTECTION -> Protection
+        Aspect.JUSTICE -> Justice
+        Aspect.LEADERSHIP -> Leadership
+        else -> Color.Gray
+    }
