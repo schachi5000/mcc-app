@@ -13,13 +13,14 @@ val LightColorScheme = lightColors(
     background = Color(0xffededed),
     surface = Color(0xFFFFFFFF),
     primary = Color(0xFF145da1),
-
-    )
+    onPrimary = Color(0xFFFFFFFF)
+)
 
 val DarkColorScheme = darkColors(
     background = Color(0xFF000005),
     surface = Color(0xFF242424),
     primary = Color(0xFF145da1),
+    onPrimary = Color(0xFFFFFFFF)
 )
 
 object AspectColors {
@@ -29,9 +30,10 @@ object AspectColors {
     val Leadership = Color(0xFF1976d2)
 }
 
-fun Aspect.getColor(): Color = when (this) {
+fun Aspect?.getColor(): Color = when (this) {
     Aspect.AGGRESSION -> Aggression
     Aspect.PROTECTION -> Protection
     Aspect.JUSTICE -> Justice
     Aspect.LEADERSHIP -> Leadership
+    else -> Color.LightGray
 }

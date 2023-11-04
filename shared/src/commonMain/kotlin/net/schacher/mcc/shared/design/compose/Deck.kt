@@ -1,6 +1,8 @@
 package net.schacher.mcc.shared.design.compose
 
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -32,13 +34,15 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun Deck(deck: Deck, onClick: () -> Unit = {}) {
     Column {
-        DeckStack(modifier = Modifier.fillMaxWidth(), deck.aspect?.getColor() ?: Color.LightGray)
+        val color = deck.aspect?.getColor() ?: Color.LightGray
+        DeckStack(modifier = Modifier.fillMaxWidth(), color)
         Spacer(Modifier.height(1.dp))
         Row(
             modifier = Modifier.wrapContentHeight()
                 .fillMaxWidth()
                 .height(128.dp)
                 .clip(RoundedCornerShape(8.dp))
+                .border(BorderStroke(2.dp, color), RoundedCornerShape(8.dp))
                 .background(MaterialTheme.colors.surface)
                 .clickable { onClick() }
         ) {
