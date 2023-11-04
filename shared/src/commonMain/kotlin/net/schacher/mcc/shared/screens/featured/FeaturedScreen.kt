@@ -21,8 +21,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.Deck
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.screens.featured.Entry.DeckEntry
-import net.schacher.mcc.shared.screens.featured.Entry.HeaderEntry
+import net.schacher.mcc.shared.screens.featured.ListItem.DeckItem
+import net.schacher.mcc.shared.screens.featured.ListItem.HeaderItem
 
 @Composable
 fun FeaturedScreen(
@@ -31,11 +31,11 @@ fun FeaturedScreen(
 ) {
     val state by featuredViewModel.state.collectAsState()
 
-    val entries = mutableListOf<Entry>()
+    val entries = mutableListOf<ListItem>()
     state.decks.forEach { (date, decks) ->
-        entries.add(HeaderEntry("${date.dayOfMonth} ${date.month} "))
+        entries.add(HeaderItem("${date.dayOfMonth} ${date.month} "))
         decks.forEach { deck ->
-            entries.add(DeckEntry(deck))
+            entries.add(DeckItem(deck))
         }
     }
 
@@ -51,7 +51,7 @@ fun FeaturedScreen(
                 }
 
                 when (val entry = entries[index]) {
-                    is HeaderEntry -> {
+                    is HeaderItem -> {
                         Row(
                             modifier = Modifier.fillMaxWidth(),
                             horizontalArrangement = Arrangement.Center
@@ -63,13 +63,13 @@ fun FeaturedScreen(
                                         RoundedCornerShape(16.dp)
                                     )
                                     .padding(8.dp),
-                                text = entry.date,
+                                text = entry.header,
                                 color = MaterialTheme.colors.onPrimary
                             )
                         }
                     }
 
-                    is DeckEntry -> {
+                    is DeckItem -> {
                         Deck(entry.deck) {
                             onDeckClick(entry.deck)
                         }
@@ -83,7 +83,7 @@ fun FeaturedScreen(
     }
 }
 
-private sealed interface Entry {
-    data class DeckEntry(val deck: Deck) : Entry
-    data class HeaderEntry(val date: String) : Entry
+private sealed interface ListItem {
+    data class DeckItem(val deck: Deck) : ListItem
+    data class HeaderItem(val header: String) : ListItem
 }

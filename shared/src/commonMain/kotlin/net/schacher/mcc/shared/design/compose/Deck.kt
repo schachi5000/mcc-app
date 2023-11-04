@@ -26,7 +26,6 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import net.schacher.mcc.shared.design.theme.CornerRadius
 import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Deck
@@ -86,12 +85,15 @@ private fun InfoRow(label: String, iconResource: String) {
 @Composable
 private fun DeckStack(modifier: Modifier = Modifier, color: Color) {
     val shape = RoundedCornerShape(
-        topStart = CornerRadius.Deck,
-        topEnd = CornerRadius.Deck
+        topStart = 16.dp,
+        topEnd = 16.dp
     )
     val backgroundColor = Color.White.copy(alpha = 0.75f)
 
-    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+    Column(
+        modifier = modifier,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
         Box(Modifier.height(5.dp).fillMaxWidth(0.9f)) {
             Row(Modifier.fillMaxSize().background(backgroundColor, shape)) { }
             Row(Modifier.fillMaxSize().alpha(0.2f).background(color, shape)) { }

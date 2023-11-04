@@ -39,9 +39,10 @@ fun DeckScreen(
     onAddDeckClick: () -> Unit
 ) {
     val state by deckViewModel.state.collectAsState()
-    val entries = state.decks.map { DeckItem(it) }
-        .toMutableList()
-        .also { it.add(ListItem.AddDeck) }
+    val entries = mutableListOf<ListItem>().also {
+        it.addAll(state.decks.map { DeckItem(it) })
+        it.add(ListItem.AddDeckItem)
+    }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -59,7 +60,7 @@ fun DeckScreen(
                         onDeckClick(entry.deck)
                     }
 
-                    is ListItem.AddDeck -> AddDeckButton { onAddDeckClick() }
+                    is ListItem.AddDeckItem -> AddDeckButton { onAddDeckClick() }
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -99,5 +100,5 @@ fun AddDeckButton(onClick: () -> Unit) {
 
 private sealed interface ListItem {
     data class DeckItem(val deck: Deck) : ListItem
-    object AddDeck : ListItem
+    object AddDeckItem : ListItem
 }
