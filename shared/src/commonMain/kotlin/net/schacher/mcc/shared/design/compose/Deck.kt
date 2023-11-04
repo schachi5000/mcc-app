@@ -51,10 +51,10 @@ fun Deck(deck: Deck, onClick: () -> Unit = {}) {
                     fontWeight = FontWeight.SemiBold
                 )
 
-                Spacer(Modifier.height(8.dp))
-                InfoRow("${deck.requiredDecksCount} Packs benötigt", "ic_deck.xml")
                 Spacer(Modifier.height(4.dp))
                 InfoRow("${deck.cards.size} Karten", "ic_cards.xml")
+                Spacer(Modifier.height(4.dp))
+                InfoRow("${deck.requiredDecksCount} Packs benötigt", "ic_deck.xml")
             }
         }
     }

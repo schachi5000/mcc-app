@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.screens.main
 
+import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,15 +25,17 @@ class MainViewModel(
 
     init {
         viewModelScope.launch {
+            _state.update { it.copy(preparingApp = true) }
             if (cardRepository.cards.isEmpty()) {
-                _state.update { it.copy(preparingApp = true) }
-                cardRepository.refresh()
-                _state.update { it.copy(preparingApp = false) }
+                try {
+                    cardRepository.refresh()
+                } catch (e: Exception) {
+                    Logger.e(e) { "Error refreshing cards" }
+                }
             } else {
-                _state.update { it.copy(preparingApp = true) }
                 delay(2000)
-                _state.update { it.copy(preparingApp = false) }
             }
+            _state.update { it.copy(preparingApp = false) }
         }
     }
 

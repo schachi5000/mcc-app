@@ -13,7 +13,8 @@ val LightColorScheme = lightColors(
     background = Color(0xffededed),
     surface = Color(0xFFFFFFFF),
     primary = Color(0xFF145da1),
-)
+
+    )
 
 val DarkColorScheme = darkColors(
     background = Color(0xFF000005),

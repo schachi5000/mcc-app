@@ -68,19 +68,22 @@ object KtorCardDataSource {
         .body<CardDto>()
         .toCard()
 
-    suspend fun getFeaturedDecksByDate(date: String, cardProvider: (String) -> Card?) = httpClient
-        .get("$BASE_URL/decklists/by_date/$date")
-        .body<List<DeckDto>>()
-        .map {
-            Deck(
-                id = it.id,
-                name = it.name,
-                heroCard = getCard(it.investigator_code!!),
-                aspect = it.meta?.parseAspect(),
-                cards = it.slots.entries.map { entry ->
-                    List(entry.value) { cardProvider(entry.key) }
-                }.flatten().filterNotNull()
-            )
+    suspend fun getFeaturedDecksByDate(date: String, cardProvider: (String) -> Card?) =
+        runCatching {
+            this.httpClient
+                .get("$BASE_URL/decklists/by_date/$date")
+                .body<List<DeckDto>>()
+                .map {
+                    Deck(
+                        id = it.id,
+                        name = it.name,
+                        heroCard = getCard(it.investigator_code!!),
+                        aspect = it.meta?.parseAspect(),
+                        cards = it.slots.entries.map { entry ->
+                            List(entry.value) { cardProvider(entry.key) }
+                        }.flatten().filterNotNull()
+                    )
+                }
         }
 
     suspend fun getPublicDeckById(deckId: Int, cardProvider: (String) -> Card?) = httpClient

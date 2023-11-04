@@ -21,6 +21,7 @@ fun FeaturedScreen(
     onDeckClick: (Deck) -> Unit
 ) {
     val state by featuredViewModel.state.collectAsState()
+    val decks = state.decks.values.firstOrNull() ?: return
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -28,13 +29,13 @@ fun FeaturedScreen(
             .padding(horizontal = 16.dp)
     ) {
         LazyColumn {
-            items(state.decks.size) { index ->
+            items(decks.size) { index ->
                 if (index == 0) {
                     Spacer(Modifier.statusBarsPadding().height(16.dp))
                 }
 
-                Deck(state.decks[index]) {
-                    onDeckClick(state.decks[index])
+                Deck(decks[index]) {
+                    onDeckClick(decks[index])
                 }
 
                 Spacer(Modifier.height(16.dp))
