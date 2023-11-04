@@ -5,7 +5,6 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
@@ -18,6 +17,7 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardOrientation
 import net.schacher.mcc.shared.model.CardType.MAIN_SCHEME
@@ -47,7 +47,7 @@ fun Card(
     Card(
         modifier = modifier.height(196.dp)
             .aspectRatio(aspectRation),
-        shape = RoundedCornerShape(8.dp),
+        shape = CardShape,
         onClick = onClick
     ) {
         KamelImage(

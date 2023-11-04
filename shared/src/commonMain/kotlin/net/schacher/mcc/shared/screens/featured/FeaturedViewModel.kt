@@ -20,13 +20,12 @@ class FeaturedViewModel(private val cardRepository: CardRepository) : ViewModel(
 
     val state = _state.asStateFlow()
 
-    private val dates: List<String>
-        get() {
-            val now = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault())
-            return listOf(
-                now.date.toDateString(),
-                now.date.minus(1, kotlinx.datetime.DateTimeUnit.DAY).toDateString(),
-                now.date.minus(2, kotlinx.datetime.DateTimeUnit.DAY).toDateString(),
+    private val dates: List<LocalDate>
+        get() = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).let {
+            listOf(
+                it.date,
+                it.date.minus(1, kotlinx.datetime.DateTimeUnit.DAY),
+                it.date.minus(2, kotlinx.datetime.DateTimeUnit.DAY),
             )
         }
 
@@ -61,12 +60,7 @@ class FeaturedViewModel(private val cardRepository: CardRepository) : ViewModel(
     }
 }
 
-private fun LocalDate.toDateString(): String {
-    val dayOfMonth = this.dayOfMonth.let { day -> if (day < 10) "0$day" else day }
-    return "${this.year}-${this.monthNumber}-${dayOfMonth}"
-}
-
 data class FeaturedUiState(
-    val decks: Map<String, List<Deck>> = emptyMap(),
+    val decks: Map<LocalDate, List<Deck>> = emptyMap(),
     val refreshing: Boolean = false
 )

@@ -26,6 +26,8 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import net.schacher.mcc.shared.design.theme.CornerRadius
+import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Deck
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -42,7 +44,7 @@ fun Deck(deck: Deck, onClick: () -> Unit = {}) {
                 .fillMaxWidth()
                 .height(128.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .border(BorderStroke(2.dp, color), RoundedCornerShape(8.dp))
+                .border(BorderStroke(2.dp, color), DeckShape)
                 .background(MaterialTheme.colors.surface)
                 .clickable { onClick() }
         ) {
@@ -83,16 +85,19 @@ private fun InfoRow(label: String, iconResource: String) {
 
 @Composable
 private fun DeckStack(modifier: Modifier = Modifier, color: Color) {
-    val shape = RoundedCornerShape(topStart = 8.dp, topEnd = 8.dp)
+    val shape = RoundedCornerShape(
+        topStart = CornerRadius.Deck,
+        topEnd = CornerRadius.Deck
+    )
     val backgroundColor = Color.White.copy(alpha = 0.75f)
 
-    Column(modifier) {
-        Box(Modifier.height(5.dp).padding(horizontal = 16.dp)) {
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        Box(Modifier.height(5.dp).fillMaxWidth(0.9f)) {
             Row(Modifier.fillMaxSize().background(backgroundColor, shape)) { }
             Row(Modifier.fillMaxSize().alpha(0.2f).background(color, shape)) { }
         }
         Spacer(Modifier.height(1.dp))
-        Box(Modifier.height(5.dp).padding(horizontal = 8.dp)) {
+        Box(Modifier.height(5.dp).fillMaxWidth(0.95f)) {
             Row(Modifier.fillMaxSize().background(backgroundColor, shape)) { }
             Row(Modifier.fillMaxSize().alpha(0.4f).background(color, shape)) { }
         }

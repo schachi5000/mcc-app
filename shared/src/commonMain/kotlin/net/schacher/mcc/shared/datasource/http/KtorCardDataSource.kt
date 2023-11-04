@@ -11,6 +11,7 @@ import io.ktor.serialization.kotlinx.json.json
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import net.schacher.mcc.shared.model.Aspect
@@ -68,10 +69,10 @@ object KtorCardDataSource {
         .body<CardDto>()
         .toCard()
 
-    suspend fun getFeaturedDecksByDate(date: String, cardProvider: (String) -> Card?) =
+    suspend fun getFeaturedDecksByDate(date: LocalDate, cardProvider: (String) -> Card?) =
         runCatching {
             this.httpClient
-                .get("$BASE_URL/decklists/by_date/$date")
+                .get("$BASE_URL/decklists/by_date/${date.toDateString()}")
                 .body<List<DeckDto>>()
                 .map {
                     Deck(
@@ -107,6 +108,11 @@ object KtorCardDataSource {
                     .also { it.add(0, heroCard) }
             )
         }
+}
+
+private fun LocalDate.toDateString(): String {
+    val dayOfMonth = this.dayOfMonth.let { day -> if (day < 10) "0$day" else day }
+    return "${this.year}-${this.monthNumber}-${dayOfMonth}"
 }
 
 private const val LEADERSHIP = "leadership"
