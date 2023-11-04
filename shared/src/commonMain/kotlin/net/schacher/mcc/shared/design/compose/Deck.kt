@@ -45,7 +45,7 @@ fun Deck(deck: Deck, onClick: () -> Unit = {}) {
                 .fillMaxWidth()
                 .height(128.dp)
                 .clip(RoundedCornerShape(8.dp))
-                .border(BorderStroke(2.dp, color), DeckShape)
+                .border(BorderStroke(1.dp, color), DeckShape)
                 .background(MaterialTheme.colors.surface)
                 .clickable { onClick() }
         ) {
@@ -100,9 +100,9 @@ private fun DeckStack(modifier: Modifier = Modifier, color: Color) {
 
 @Composable
 private fun StackSegment(modifier: Modifier, color: Color, shape: Shape) {
-    val backgroundColor = Color.White.copy(alpha = 0.75f)
     Box(modifier.height(5.dp).fillMaxWidth()) {
         Row(Modifier.fillMaxSize().background(color, shape)) { }
-        Row(Modifier.fillMaxSize().alpha(0.2f).background(backgroundColor, shape)) { }
+        Row(Modifier.fillMaxSize().alpha(0.2f).background(Color.White.copy(alpha = 0.75f), shape))
+        { }
     }
 }
