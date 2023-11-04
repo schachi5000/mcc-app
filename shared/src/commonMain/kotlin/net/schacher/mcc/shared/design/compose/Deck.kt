@@ -24,8 +24,10 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
+import net.schacher.mcc.shared.design.theme.CornerRadius
 import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Deck
@@ -85,23 +87,22 @@ private fun InfoRow(label: String, iconResource: String) {
 @Composable
 private fun DeckStack(modifier: Modifier = Modifier, color: Color) {
     val shape = RoundedCornerShape(
-        topStart = 16.dp,
-        topEnd = 16.dp
+        topStart = CornerRadius.Deck,
+        topEnd = CornerRadius.Deck
     )
-    val backgroundColor = Color.White.copy(alpha = 0.75f)
 
-    Column(
-        modifier = modifier,
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        Box(Modifier.height(5.dp).fillMaxWidth(0.9f)) {
-            Row(Modifier.fillMaxSize().background(backgroundColor, shape)) { }
-            Row(Modifier.fillMaxSize().alpha(0.2f).background(color, shape)) { }
-        }
+    Column(modifier, horizontalAlignment = Alignment.CenterHorizontally) {
+        StackSegment(Modifier.padding(horizontal = 24.dp), color, shape)
         Spacer(Modifier.height(1.dp))
-        Box(Modifier.height(5.dp).fillMaxWidth(0.95f)) {
-            Row(Modifier.fillMaxSize().background(backgroundColor, shape)) { }
-            Row(Modifier.fillMaxSize().alpha(0.4f).background(color, shape)) { }
-        }
+        StackSegment(Modifier.padding(horizontal = 12.dp), color, shape)
+    }
+}
+
+@Composable
+private fun StackSegment(modifier: Modifier, color: Color, shape: Shape) {
+    val backgroundColor = Color.White.copy(alpha = 0.75f)
+    Box(modifier.height(5.dp).fillMaxWidth()) {
+        Row(Modifier.fillMaxSize().background(color, shape)) { }
+        Row(Modifier.fillMaxSize().alpha(0.2f).background(backgroundColor, shape)) { }
     }
 }

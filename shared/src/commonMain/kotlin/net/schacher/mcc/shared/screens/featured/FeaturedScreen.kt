@@ -33,7 +33,7 @@ fun FeaturedScreen(
 
     val entries = mutableListOf<ListItem>()
     state.decks.forEach { (date, decks) ->
-        entries.add(HeaderItem("${date.dayOfMonth} ${date.month} "))
+        entries.add(HeaderItem("${date.dayOfMonth}. ${date.month}"))
         decks.forEach { deck ->
             entries.add(DeckItem(deck))
         }

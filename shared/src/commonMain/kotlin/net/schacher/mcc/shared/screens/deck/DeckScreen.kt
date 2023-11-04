@@ -85,7 +85,7 @@ fun AddDeckButton(onClick: () -> Unit) {
             Icon(
                 imageVector = Icons.Rounded.Add,
                 contentDescription = null,
-                modifier = Modifier.size(48.dp)
+                modifier = Modifier.size(32.dp)
                     .align(Alignment.CenterHorizontally),
                 tint = MaterialTheme.colors.onSurface,
             )
@@ -100,5 +100,5 @@ fun AddDeckButton(onClick: () -> Unit) {
 
 private sealed interface ListItem {
     data class DeckItem(val deck: Deck) : ListItem
-    object AddDeckItem : ListItem
+    data object AddDeckItem : ListItem
 }
