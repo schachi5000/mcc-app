@@ -45,6 +45,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 private val deckHeight = 120.dp
+private val contentPadding = 8.dp
 
 @Composable
 fun Deck(deck: Deck, onClick: () -> Unit = {}) {
@@ -58,13 +59,13 @@ fun Deck(deck: Deck, onClick: () -> Unit = {}) {
             modifier = Modifier.fillMaxWidth()
                 .height(deckHeight)
                 .clickable { onClick() }
-                .padding(8.dp)
+                .padding(contentPadding)
         ) {
             Thumbnail(
                 modifier = Modifier.fillMaxHeight(),
                 card = deck.heroCard
             )
-            Spacer(Modifier.width(8.dp))
+            Spacer(Modifier.width(contentPadding))
             Column(
                 modifier = Modifier.fillMaxHeight()
                     .background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)
@@ -99,7 +100,7 @@ private fun BackgroundImage(modifier: Modifier = Modifier, deck: Deck) {
         KamelImage(
             modifier = Modifier.fillMaxSize()
                 .blur(6.dp)
-                .background(deck.aspect.color.copy(alpha = 0.75f))
+                .background(MaterialTheme.colors.surface)
                 .graphicsLayer {
                     scaleX = 1.6f
                     scaleY = 1.6f
