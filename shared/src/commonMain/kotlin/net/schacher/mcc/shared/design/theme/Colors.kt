@@ -36,5 +36,5 @@ val Aspect?.color: Color
         Aspect.PROTECTION -> Protection
         Aspect.JUSTICE -> Justice
         Aspect.LEADERSHIP -> Leadership
-        else -> Color.Gray
+        else -> Color(0xffc7c7c7)
     }
