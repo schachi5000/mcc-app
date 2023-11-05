@@ -97,12 +97,12 @@ private val Card.backSideColor: BackSideColor
         else -> BackSideColor.BLUE
     }
 
-private fun Card.getLoadingResource(): String = when (this.backSideColor) {
+internal fun Card.getLoadingResource(): String = when (this.backSideColor) {
     BackSideColor.YELLOW -> "card_yellow.png"
     else -> "card_blue.png"
 }
 
-private fun Card.getFailureResource(): String = when (this.backSideColor) {
+internal fun Card.getFailureResource(): String = when (this.backSideColor) {
     BackSideColor.YELLOW -> "card_yellow_no_image.png"
     else -> "card_blue_no_image.png"
 }
