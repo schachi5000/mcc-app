@@ -49,44 +49,63 @@ private val contentPadding = 8.dp
 
 @Composable
 fun Deck(deck: Deck, onClick: () -> Unit = {}) {
-
     Box {
-        BackgroundImage(
-            modifier = Modifier.fillMaxSize().height(deckHeight),
-            deck = deck,
+        Column(
+            modifier = Modifier.fillMaxWidth().height(deckHeight)
+                .padding(horizontal = 24.dp)
+                .clip(DeckShape)
+                .background(deck.aspect.color.copy(alpha = 0.4f), DeckShape)
+        ) {}
+
+        Column(
+            modifier = Modifier.fillMaxWidth().height(deckHeight)
+                .padding(start = 12.dp, top = 8.dp, end = 12.dp)
+                .clip(DeckShape)
+                .background(deck.aspect.color, DeckShape)
+        ) {}
+
+        DeckContent(deck, onClick)
+    }
+}
+
+@Composable
+private fun DeckContent(deck: Deck, onClick: () -> Unit = {}) {
+    BackgroundImage(
+        modifier = Modifier.fillMaxSize().padding(top = 16.dp).height(deckHeight),
+        deck = deck,
+    )
+    Row(
+        modifier = Modifier.fillMaxWidth()
+            .padding(top = 16.dp)
+            .height(deckHeight)
+            .clickable { onClick() }
+            .padding(contentPadding)
+    ) {
+        Thumbnail(
+            modifier = Modifier.fillMaxHeight(),
+            card = deck.heroCard
         )
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .height(deckHeight)
-                .clickable { onClick() }
-                .padding(contentPadding)
+        Spacer(Modifier.width(contentPadding))
+        Column(
+            modifier = Modifier.fillMaxHeight()
+                .background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)
+                .padding(12.dp)
         ) {
-            Thumbnail(
-                modifier = Modifier.fillMaxHeight(),
-                card = deck.heroCard
+            Text(
+                text = deck.name,
+                maxLines = 1,
+                fontWeight = FontWeight.SemiBold
             )
-            Spacer(Modifier.width(contentPadding))
+
+            Spacer(Modifier.height(4.dp))
             Column(
-                modifier = Modifier.fillMaxHeight()
-                    .background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)
-                    .padding(12.dp)
+                Modifier.fillMaxSize(),
+                verticalArrangement = Arrangement.Center
             ) {
-                Text(
-                    text = deck.name,
-                    maxLines = 1,
-                    fontWeight = FontWeight.SemiBold
-                )
 
+                InfoRow("${deck.cards.size} Karten", "ic_cards.xml")
                 Spacer(Modifier.height(4.dp))
-                Column(
-                    Modifier.fillMaxSize(),
-                    verticalArrangement = Arrangement.Center
-                ) {
-
-                    InfoRow("${deck.cards.size} Karten", "ic_cards.xml")
-                    Spacer(Modifier.height(4.dp))
-                    InfoRow("${deck.requiredDecksCount} Packs benötigt", "ic_deck.xml")
-                }
+                InfoRow("${deck.requiredDecksCount} Packs benötigt", "ic_deck.xml")
             }
         }
     }
