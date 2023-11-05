@@ -1,7 +1,5 @@
 package net.schacher.mcc.shared.screens.deck
 
-import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -25,7 +23,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.Deck
 import net.schacher.mcc.shared.design.theme.DeckShape
@@ -56,10 +53,7 @@ fun DeckScreen(
                 }
 
                 when (val entry = entries[index]) {
-                    is DeckItem -> Deck(entry.deck) {
-                        onDeckClick(entry.deck)
-                    }
-
+                    is DeckItem -> Deck(entry.deck) { onDeckClick(entry.deck) }
                     is ListItem.AddDeckItem -> AddDeckButton { onAddDeckClick() }
                 }
 
@@ -73,11 +67,10 @@ fun DeckScreen(
 fun AddDeckButton(onClick: () -> Unit) {
     Button(
         onClick = onClick,
-        modifier = Modifier.height(128.dp)
-            .fillMaxWidth()
-            .border(BorderStroke(2.dp, Color.LightGray), DeckShape),
+        modifier = Modifier.height(120.dp).fillMaxWidth(),
         shape = DeckShape,
-        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface)
+        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
+        elevation = null
     ) {
         Column(
             verticalArrangement = Arrangement.Center,
