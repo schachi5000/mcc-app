@@ -64,19 +64,20 @@ fun Deck(deck: Deck, onClick: () -> Unit = {}) {
                 .background(deck.aspect.color, DeckShape)
         ) {}
 
-        DeckContent(deck, onClick)
+        Box(Modifier.padding(top = 16.dp)) {
+            DeckContent(deck, onClick)
+        }
     }
 }
 
 @Composable
 private fun DeckContent(deck: Deck, onClick: () -> Unit = {}) {
     BackgroundImage(
-        modifier = Modifier.fillMaxSize().padding(top = 16.dp).height(deckHeight),
+        modifier = Modifier.fillMaxSize().height(deckHeight),
         deck = deck,
     )
     Row(
         modifier = Modifier.fillMaxWidth()
-            .padding(top = 16.dp)
             .height(deckHeight)
             .clickable { onClick() }
             .padding(contentPadding)
