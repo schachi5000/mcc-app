@@ -45,7 +45,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel) {
         modifier = Modifier.fillMaxSize()
             .statusBarsPadding()
             .padding(16.dp),
-        verticalArrangement = Arrangement.Bottom,
+        verticalArrangement = Arrangement.Top,
     ) {
         OptionsGroup("Datenbank") {
             OptionsEntry(label = "Sync with MarvelCDB",

@@ -1,7 +1,6 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -76,9 +75,11 @@ private fun DeckContent(deck: Deck, onClick: () -> Unit = {}) {
         modifier = Modifier.fillMaxSize().height(deckHeight),
         deck = deck,
     )
+
     Row(
         modifier = Modifier.fillMaxWidth()
             .height(deckHeight)
+            .clip(DeckShape)
             .clickable { onClick() }
             .padding(contentPadding)
     ) {
@@ -127,7 +128,7 @@ private fun BackgroundImage(modifier: Modifier = Modifier, deck: Deck) {
                 },
             resource = asyncPainterResource(
                 data = "https://de.marvelcdb.com/bundles/cards/${deck.heroCard.code}.png",
-                filterQuality = FilterQuality.Medium,
+                filterQuality = FilterQuality.Low,
             ),
             contentDescription = deck.name,
             contentScale = ContentScale.Crop,
@@ -145,7 +146,6 @@ private fun BackgroundImage(modifier: Modifier = Modifier, deck: Deck) {
     }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun Thumbnail(modifier: Modifier = Modifier, card: Card) {
     KamelImage(
@@ -155,28 +155,23 @@ private fun Thumbnail(modifier: Modifier = Modifier, card: Card) {
             .graphicsLayer { translationY = 20.dp.toPx() },
         resource = asyncPainterResource(
             data = "https://de.marvelcdb.com/bundles/cards/${card.code}.png",
-            filterQuality = FilterQuality.Medium
+            filterQuality = FilterQuality.Low
         ),
         contentDescription = card.name,
         contentScale = ContentScale.Crop,
-
-        animationSpec = tween(
-            durationMillis = 500
-        ),
+        animationSpec = tween(durationMillis = 500),
         onLoading = {
-            Image(
-                modifier = Modifier.fillMaxSize().blur(6.dp),
-                painter = painterResource(card.getLoadingResource()),
-                contentDescription = "Placeholder",
-            )
+            Box(
+                Modifier.fillMaxSize()
+                    .background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)
+                    .shimmerBrush(MaterialTheme.colors.onSurface.copy(alpha = 0.5f))
+            ) { }
         },
         onFailure = {
             Logger.e(throwable = it) { "Failed to load image for card: $card" }
-            Image(
-                modifier = Modifier.fillMaxSize(),
-                painter = painterResource(card.getFailureResource()),
-                contentDescription = "Placeholder",
-            )
+            Box(
+                Modifier.fillMaxSize().background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)
+            ) { }
         })
 }
 

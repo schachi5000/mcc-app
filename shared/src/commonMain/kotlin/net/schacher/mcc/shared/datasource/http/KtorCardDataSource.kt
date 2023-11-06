@@ -69,7 +69,7 @@ object KtorCardDataSource {
         .body<CardDto>()
         .toCard()
 
-    suspend fun getFeaturedDecksByDate(date: LocalDate, cardProvider: (String) -> Card?) =
+    suspend fun getFeaturedDecksByDate(date: LocalDate, cardProvider: suspend (String) -> Card?) =
         runCatching {
             this.httpClient
                 .get("$BASE_URL/decklists/by_date/${date.toDateString()}")

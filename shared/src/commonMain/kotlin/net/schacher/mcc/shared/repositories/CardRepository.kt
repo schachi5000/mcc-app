@@ -33,4 +33,22 @@ class CardRepository(private val databaseDao: DatabaseDao) {
     }
 
     fun getCard(cardCode: String): Card? = this.cards.firstOrNull { it.code == cardCode }
+
+    suspend fun getAndUpdateCard(cardCode: String): Card? {
+        val card = this.getCard(cardCode)
+        if (card != null) {
+            return card
+        }
+
+        try {
+            KtorCardDataSource.getCard(cardCode).also {
+                databaseDao.addCard(it)
+                _state.emit(databaseDao.getAllCards())
+            }
+        } catch (e: Exception) {
+            Logger.e(e) { "Error loading card: $cardCode" }
+        }
+
+        return this.getCard(cardCode)
+    }
 }

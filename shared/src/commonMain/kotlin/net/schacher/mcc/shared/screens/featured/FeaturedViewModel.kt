@@ -41,7 +41,7 @@ class FeaturedViewModel(private val cardRepository: CardRepository) : ViewModel(
         this.viewModelScope.launch {
             dates.forEach { date ->
                 val result = KtorCardDataSource.getFeaturedDecksByDate(date) {
-                    cardRepository.getCard(it)
+                    cardRepository.getAndUpdateCard(it)
                 }
 
                 val decks = result.getOrNull() ?: emptyList()
