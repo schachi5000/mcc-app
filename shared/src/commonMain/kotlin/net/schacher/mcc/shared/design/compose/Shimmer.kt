@@ -7,24 +7,37 @@ import androidx.compose.animation.core.infiniteRepeatable
 import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
+@Composable
+fun ShimmerBox(modifier: Modifier = Modifier, background: Color, shimmer: Color) {
+    Box(modifier) {
+        Box(modifier.fillMaxSize().background(background)) { }
+        Box(modifier.fillMaxSize().shimmerBrush(shimmer)) { }
+    }
+}
+
 fun Modifier.shimmerBrush(
     color: Color,
     widthOfShadowBrush: Int = 500,
-    angleOfAxisY: Float = 270f,
-    durationMillis: Int = 2000,
+    angleOfAxisY: Float = 90f,
+    durationMillis: Int = 3000,
 ): Modifier = composed {
     val shimmerColors = listOf(
+        color.copy(alpha = 0.0f),
         color.copy(alpha = 0.3f),
         color.copy(alpha = 0.5f),
         color.copy(alpha = 1.0f),
         color.copy(alpha = 0.5f),
         color.copy(alpha = 0.3f),
+        color.copy(alpha = 0.0f),
     )
 
     val transition = rememberInfiniteTransition()
