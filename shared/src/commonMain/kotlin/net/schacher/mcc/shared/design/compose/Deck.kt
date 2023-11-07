@@ -161,11 +161,10 @@ private fun Thumbnail(modifier: Modifier = Modifier, card: Card) {
         contentScale = ContentScale.Crop,
         animationSpec = tween(durationMillis = 500),
         onLoading = {
-            Box(
-                Modifier.fillMaxSize()
-                    .background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)
-                    .shimmerBrush(MaterialTheme.colors.onSurface.copy(alpha = 0.5f))
-            ) { }
+            ShimmerBox(
+                Modifier.fillMaxSize(),
+                MaterialTheme.colors.surface.copy(0.8f)
+            )
         },
         onFailure = {
             Logger.e(throwable = it) { "Failed to load image for card: $card" }
