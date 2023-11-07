@@ -42,7 +42,6 @@ fun DefaultBottomSheetPreview() {
 fun ShimmerBoxPreview() {
     ShimmerBox(
         Modifier.size(48.dp).clip(DeckShape),
-        Color.Black,
-        Color.DarkGray
+        Color.Red
     )
 }
