@@ -106,26 +106,17 @@ private fun Header(label: String) {
 @Composable
 private fun LoadingContent() {
     Column(
-        modifier = Modifier.fillMaxSize().padding(8.dp),
+        modifier = Modifier.fillMaxSize(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.statusBarsPadding().height(16.dp))
-        ShimmerBox(
-            Modifier.size(112.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)),
-            MaterialTheme.colors.surface,
-        )
-
+        Spacer(Modifier.height(16.dp))
+        LoadingHeader()
         Spacer(Modifier.height(16.dp))
         LoadingDeck()
         Spacer(Modifier.height(16.dp))
         LoadingDeck()
-        Spacer(Modifier.statusBarsPadding().height(16.dp))
-
-        ShimmerBox(
-            Modifier.size(96.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)),
-            MaterialTheme.colors.surface,
-        )
-
+        Spacer(Modifier.height(16.dp))
+        LoadingHeader()
         Spacer(Modifier.height(16.dp))
         LoadingDeck()
         Spacer(Modifier.height(16.dp))
@@ -134,6 +125,13 @@ private fun LoadingContent() {
     }
 }
 
+@Composable
+private fun LoadingHeader() {
+    ShimmerBox(
+        Modifier.size(112.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)),
+        MaterialTheme.colors.surface,
+    )
+}
 
 private sealed interface ListItem {
     data class DeckItem(val deck: Deck) : ListItem

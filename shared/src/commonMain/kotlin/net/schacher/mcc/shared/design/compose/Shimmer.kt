@@ -17,7 +17,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
-private const val DEFAULT_DURATION_MILLIS = 3000
+private const val DEFAULT_DURATION_MILLIS = 2000
 
 @Composable
 fun ShimmerBox(

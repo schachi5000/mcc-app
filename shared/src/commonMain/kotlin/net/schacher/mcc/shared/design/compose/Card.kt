@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
@@ -11,6 +12,7 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
@@ -70,13 +72,9 @@ fun Card(
                     "Failed to load image for card: $card"
                 }
                 Image(
-                    modifier = Modifier.fillMaxSize().border(
-                        8.dp, when (card.backSideColor) {
-                            BackSideColor.YELLOW -> SleeveColors.Yellow
-                            BackSideColor.BLUE -> SleeveColors.Blue
-                        },
-                        CardShape
-                    ),
+                    modifier = Modifier.fillMaxSize()
+                        .background(card.backSideColor, CardShape)
+                        .border(8.dp, card.backSideColor, CardShape),
                     painter = painterResource(card.getFailureResource()),
                     contentDescription = "Placeholder",
                 )
@@ -84,28 +82,19 @@ fun Card(
     }
 }
 
-enum class BackSideColor {
-    YELLOW, BLUE
-}
-
-private val Card.backSideColor: BackSideColor
+val Card.backSideColor: Color
     get() = when (this.type) {
         OBLIGATION,
         TREACHERY,
         MINION,
         SIDE_SCHEME,
         MAIN_SCHEME,
-        VILLAIN -> BackSideColor.YELLOW
+        VILLAIN -> SleeveColors.Yellow
 
-        else -> BackSideColor.BLUE
+        else -> SleeveColors.Blue
     }
 
-internal fun Card.getLoadingResource(): String = when (this.backSideColor) {
-    BackSideColor.YELLOW -> "card_yellow.png"
-    else -> "card_blue.png"
-}
-
-internal fun Card.getFailureResource(): String = when (this.backSideColor) {
-    BackSideColor.YELLOW -> "card_yellow_no_image.png"
+private fun Card.getFailureResource(): String = when (this.backSideColor) {
+    SleeveColors.Yellow -> "card_yellow_no_image.png"
     else -> "card_blue_no_image.png"
 }
