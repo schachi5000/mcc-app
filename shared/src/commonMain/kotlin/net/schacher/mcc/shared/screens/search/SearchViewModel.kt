@@ -23,6 +23,10 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
             return
         }
 
+        _state.update {
+            it.copy(loading = true)
+        }
+
         viewModelScope.launch(Dispatchers.Default) {
             val filteredCards = cardRepository.cards.filter {
                 it.name.lowercase().contains(query.lowercase())
@@ -30,7 +34,8 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
 
             _state.update {
                 it.copy(
-                    result = filteredCards
+                    result = filteredCards,
+                    loading = false
                 )
             }
         }
@@ -38,5 +43,6 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
 }
 
 data class SearchUiState(
+    val loading: Boolean = false,
     val result: List<Card> = emptyList()
 )
