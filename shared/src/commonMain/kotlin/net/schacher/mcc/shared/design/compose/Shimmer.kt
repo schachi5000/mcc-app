@@ -17,6 +17,8 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 
+private const val DEFAULT_DURATION_MILLIS = 3000
+
 @Composable
 fun ShimmerBox(
     modifier: Modifier = Modifier,
@@ -25,11 +27,12 @@ fun ShimmerBox(
         Color.LightGray
     } else {
         Color.DarkGray
-    }
+    },
+    durationMillis: Int = DEFAULT_DURATION_MILLIS,
 ) {
     Box(modifier) {
         Box(modifier.fillMaxSize().background(background)) { }
-        Box(modifier.fillMaxSize().shimmerBrush(shimmer)) { }
+        Box(modifier.fillMaxSize().shimmerBrush(shimmer, durationMillis = durationMillis)) { }
     }
 }
 
@@ -37,7 +40,7 @@ fun Modifier.shimmerBrush(
     color: Color,
     widthOfShadowBrush: Int = 500,
     angleOfAxisY: Float = 90f,
-    durationMillis: Int = 3000,
+    durationMillis: Int = DEFAULT_DURATION_MILLIS
 ): Modifier = composed {
     val shimmerColors = listOf(
         color.copy(alpha = 0.0f),

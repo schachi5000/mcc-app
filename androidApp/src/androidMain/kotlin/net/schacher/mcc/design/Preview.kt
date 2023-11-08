@@ -41,7 +41,9 @@ fun DefaultBottomSheetPreview() {
 @Composable
 fun ShimmerBoxPreview() {
     ShimmerBox(
-        Modifier.size(48.dp).clip(DeckShape),
+        Modifier
+            .size(48.dp)
+            .clip(DeckShape),
         Color.Red
     )
 }
