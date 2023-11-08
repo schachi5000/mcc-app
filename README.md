@@ -16,6 +16,8 @@ The Marvel Champions Companion App is a cross-platform application developed wit
 - ViewModel: [moko](https://moko.icerock.dev)
 - Image Loading: [Kamel](https://github.com/Kamel-Media/Kamel)
 - HTTP Client: [Ktor](https://ktor.io/docs/getting-started-ktor-client-multiplatform-mobile.html)
+- DI: [Koin](https://insert-koin.io/docs/reference/koin-mp/kmp)
+- Logging: [Kermit](https://github.com/touchlab/Kermit)
 
 ## Mockups
 ![Start Screen](docs/mockups/start.png)
