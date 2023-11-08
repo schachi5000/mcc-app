@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.datasource.http
+package net.schacher.mcc.shared.datasource.http.dto
 
 import kotlinx.serialization.Serializable
 

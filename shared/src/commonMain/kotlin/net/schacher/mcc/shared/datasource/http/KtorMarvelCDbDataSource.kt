@@ -14,16 +14,16 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import net.schacher.mcc.shared.datasource.http.dto.CardDto
+import net.schacher.mcc.shared.datasource.http.dto.DeckDto
+import net.schacher.mcc.shared.datasource.http.dto.PackDto
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import kotlin.coroutines.coroutineContext
 
-// TODO convert to class and hide behind interface
-object KtorCardDataSource {
-
-    private const val BASE_URL = "https://de.marvelcdb.com/api/public"
-
+class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marvelcdb.com/api/public") :
+    MarvelCDbDataSource {
 
     @OptIn(ExperimentalSerializationApi::class)
     private val httpClient = HttpClient {
@@ -43,16 +43,16 @@ object KtorCardDataSource {
         }
     }
 
-    suspend fun getAllCardPacks() = httpClient
-        .get("$BASE_URL/packs")
+    private suspend fun getAllCardPacks() = httpClient
+        .get("$serviceUrl/packs")
         .body<List<PackDto>>()
 
-    suspend fun getCardPack(packCode: String) = httpClient
-        .get("$BASE_URL/cards/$packCode")
+    override suspend fun getCardPack(packCode: String) = httpClient
+        .get("$serviceUrl/cards/$packCode")
         .body<List<CardDto>>()
         .map { it.toCard() }
 
-    suspend fun getAllCards() = this.getAllCardPacks()
+    override suspend fun getAllCards() = this.getAllCardPacks()
         .map {
             CoroutineScope(coroutineContext).async {
                 Logger.d { "Starting download of: ${it.name}" }
@@ -64,15 +64,15 @@ object KtorCardDataSource {
         .awaitAll()
         .flatten()
 
-    suspend fun getCard(cardCode: String) = httpClient
-        .get("$BASE_URL/card/$cardCode")
+    override suspend fun getCard(cardCode: String) = httpClient
+        .get("$serviceUrl/card/$cardCode")
         .body<CardDto>()
         .toCard()
 
-    suspend fun getFeaturedDecksByDate(date: LocalDate, cardProvider: suspend (String) -> Card?) =
+    override suspend fun getFeaturedDecksByDate(date: LocalDate, cardProvider: suspend (String) -> Card?) =
         runCatching {
             this.httpClient
-                .get("$BASE_URL/decklists/by_date/${date.toDateString()}")
+                .get("$serviceUrl/decklists/by_date/${date.toDateString()}")
                 .body<List<DeckDto>>()
                 .map {
                     Deck(
@@ -87,8 +87,8 @@ object KtorCardDataSource {
                 }
         }
 
-    suspend fun getPublicDeckById(deckId: Int, cardProvider: (String) -> Card?) = httpClient
-        .get("$BASE_URL/deck/$deckId")
+    override suspend fun getPublicDeckById(deckId: Int, cardProvider: (String) -> Card?) = httpClient
+        .get("$serviceUrl/deck/$deckId")
         .body<DeckDto>()
         .let {
             val heroCard = getCard(it.investigator_code!!)
@@ -116,8 +116,11 @@ private fun LocalDate.toDateString(): String {
 }
 
 private const val LEADERSHIP = "leadership"
+
 private const val JUSTICE = "justice"
+
 private const val AGGRESSION = "aggression"
+
 private const val PROTECTION = "protection"
 
 private fun String.parseAspect(): Aspect? = when {
