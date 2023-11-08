@@ -46,10 +46,11 @@ import net.schacher.mcc.shared.design.compose.isKeyboardVisible
 import net.schacher.mcc.shared.model.Card
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 
 @Composable
 fun SearchScreen(
-    searchViewModel: SearchViewModel,
+    searchViewModel: SearchViewModel = koinInject(),
     onCardClicked: (Card) -> Unit
 ) {
     val state by searchViewModel.state.collectAsState()
