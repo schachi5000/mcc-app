@@ -28,10 +28,11 @@ import net.schacher.mcc.shared.design.compose.Deck
 import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.ListItem.DeckItem
+import org.koin.compose.koinInject
 
 @Composable
 fun DeckScreen(
-    deckViewModel: DeckViewModel,
+    deckViewModel: DeckViewModel = koinInject(),
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit
 ) {

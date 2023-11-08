@@ -6,10 +6,14 @@ plugins {
     id("com.squareup.sqldelight") version "1.5.5"
 }
 
-val ktorVersion = "2.3.4"
-val coinVersion = "3.5.0"
-val sqlDelightVersion = "1.5.5"
-val moko = "0.16.1"
+
+object Versions {
+    const val ktor = "2.3.4"
+    const val coin = "3.5.0"
+    const val sqlDelight = "1.5.5"
+    const val moko = "0.16.1"
+    const val koin = "3.5.0"
+}
 
 kotlin {
     androidTarget()
@@ -33,18 +37,19 @@ kotlin {
                 api(compose.material)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+                implementation("io.insert-koin:koin-core:${Versions.koin}")
+                api("io.insert-koin:koin-compose:1.1.0")
                 implementation("co.touchlab:kermit:2.0.2")
                 implementation("media.kamel:kamel-image:0.7.3")
-                implementation("io.ktor:ktor-client-core:$ktorVersion")
-                implementation("io.ktor:ktor-client-logging:$ktorVersion")
-                implementation("io.ktor:ktor-client-content-negotiation:$ktorVersion")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:$ktorVersion")
+                implementation("io.ktor:ktor-client-core:${Versions.ktor}")
+                implementation("io.ktor:ktor-client-logging:${Versions.ktor}")
+                implementation("io.ktor:ktor-client-content-negotiation:${Versions.ktor}")
+                implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-                implementation("dev.icerock.moko:mvvm-core:$moko")
-                implementation("dev.icerock.moko:mvvm-compose:$moko")
-                implementation("com.squareup.sqldelight:runtime:$sqlDelightVersion")
+                implementation("dev.icerock.moko:mvvm-core:${Versions.moko}")
+                implementation("dev.icerock.moko:mvvm-compose:${Versions.moko}")
+                implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
-                implementation("io.insert-koin:koin-core:$coinVersion")
             }
         }
         val androidMain by getting {
@@ -52,9 +57,9 @@ kotlin {
                 api("androidx.activity:activity-compose:1.8.0")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.12.0")
-                implementation("io.ktor:ktor-client-android:$ktorVersion")
-                implementation("com.squareup.sqldelight:android-driver:$sqlDelightVersion")
-
+                implementation("io.ktor:ktor-client-android:${Versions.ktor}")
+                implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
+                implementation( "io.insert-koin:koin-androidx-compose:${Versions.koin}")
             }
         }
         val iosX64Main by getting
@@ -67,8 +72,8 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
 
             dependencies {
-                implementation("io.ktor:ktor-client-darwin:$ktorVersion")
-                implementation("com.squareup.sqldelight:native-driver:$sqlDelightVersion")
+                implementation("io.ktor:ktor-client-darwin:${Versions.ktor}")
+                implementation("com.squareup.sqldelight:native-driver:${Versions.sqlDelight}")
 
             }
         }

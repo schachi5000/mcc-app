@@ -7,10 +7,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
-import net.schacher.mcc.shared.datasource.http.KtorCardDataSource
+import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Card
 
-class CardRepository(private val databaseDao: DatabaseDao) {
+class CardRepository(
+    private val databaseDao: DatabaseDao,
+    private val marvelCDbDataSource: MarvelCDbDataSource
+) {
 
     private val _state = MutableStateFlow(this.databaseDao.getAllCards())
 
@@ -20,7 +23,7 @@ class CardRepository(private val databaseDao: DatabaseDao) {
         get() = this.state.value
 
     suspend fun refresh() = withContext(Dispatchers.IO) {
-        val result = KtorCardDataSource.getAllCards()
+        val result = marvelCDbDataSource.getAllCards()
         Logger.d { "${result.size} cards loaded" }
         databaseDao.addCards(result)
 
@@ -41,7 +44,7 @@ class CardRepository(private val databaseDao: DatabaseDao) {
         }
 
         try {
-            KtorCardDataSource.getCard(cardCode).also {
+            this.marvelCDbDataSource.getCard(cardCode).also {
                 databaseDao.addCard(it)
                 _state.emit(databaseDao.getAllCards())
             }

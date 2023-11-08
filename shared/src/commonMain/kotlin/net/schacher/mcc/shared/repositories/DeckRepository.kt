@@ -7,7 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
-import net.schacher.mcc.shared.datasource.http.KtorCardDataSource
+import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType.HERO
@@ -16,6 +16,7 @@ import kotlin.random.Random
 
 class DeckRepository(
     private val cardRepository: CardRepository,
+    private val marvelCDbDataSource: MarvelCDbDataSource,
     private val databaseDao: DatabaseDao
 ) {
     private val _state = MutableStateFlow(databaseDao.getDecks())
@@ -44,7 +45,7 @@ class DeckRepository(
     }
 
     suspend fun addDeckById(deckId: Int) {
-        val deck = KtorCardDataSource.getPublicDeckById(deckId) {
+        val deck = marvelCDbDataSource.getPublicDeckById(deckId) {
             this.cardRepository.getCard(it)
         }
 

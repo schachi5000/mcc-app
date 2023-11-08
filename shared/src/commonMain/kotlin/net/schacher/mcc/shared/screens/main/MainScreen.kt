@@ -35,8 +35,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
-import dev.icerock.moko.mvvm.compose.getViewModel
-import dev.icerock.moko.mvvm.compose.viewModelFactory
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.DefaultBottomNavigationItem
@@ -44,27 +42,20 @@ import net.schacher.mcc.shared.design.compose.InspectScreen
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.repositories.CardRepository
-import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.screens.deck.DeckScreen
-import net.schacher.mcc.shared.screens.deck.DeckViewModel
 import net.schacher.mcc.shared.screens.featured.FeaturedScreen
-import net.schacher.mcc.shared.screens.featured.FeaturedViewModel
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckInspector
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.search.SearchScreen
-import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
-import net.schacher.mcc.shared.screens.settings.SettingsViewModel
 import net.schacher.mcc.shared.screens.splash.SplashScreen
+import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(
-    mainViewModel: MainViewModel,
-    cardRepository: CardRepository,
-    deckRepository: DeckRepository
+    mainViewModel: MainViewModel = koinInject()
 ) {
     val state = mainViewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
@@ -74,14 +65,6 @@ fun MainScreen(
         skipHalfExpanded = true
     )
     val snackbarHostState = remember { SnackbarHostState() }
-
-    val featuredViewModel =
-        getViewModel(Unit, viewModelFactory { FeaturedViewModel(cardRepository) })
-    val deckViewModel =
-        getViewModel(Unit, viewModelFactory { DeckViewModel(deckRepository, cardRepository) })
-    val searchViewModel = getViewModel(Unit, viewModelFactory { SearchViewModel(cardRepository) })
-    val settingsViewModel =
-        getViewModel(Unit, viewModelFactory { SettingsViewModel(cardRepository, deckRepository) })
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
@@ -113,21 +96,21 @@ fun MainScreen(
             ) {
                 Logger.d { "selectedTabIndex: ${state.value.mainScreen.tabIndex}" }
                 when (state.value.mainScreen.tabIndex) {
-                    0 -> DeckScreen(deckViewModel = deckViewModel,
+                    0 -> DeckScreen(
                         onDeckClick = { mainViewModel.onDeckClicked(it) },
                         onAddDeckClick = {}
                     )
 
-                    1 -> FeaturedScreen(featuredViewModel) {
+                    1 -> FeaturedScreen {
                         mainViewModel.onDeckClicked(it)
                     }
 
-                    2 -> SearchScreen(searchViewModel) {
+                    2 -> SearchScreen {
                         mainViewModel.onCardClicked(it)
                         scope.launch { snackbarHostState.showSnackbar("${it.name} | ${it.code}") }
                     }
 
-                    3 -> SettingsScreen(settingsViewModel)
+                    3 -> SettingsScreen()
                 }
             }
         }

@@ -25,9 +25,10 @@ import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
+import org.koin.compose.koinInject
 
 @Composable
-fun SettingsScreen(settingsViewModel: SettingsViewModel) {
+fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
     val state by settingsViewModel.state.collectAsState()
 
     val infiniteTransition = rememberInfiniteTransition()

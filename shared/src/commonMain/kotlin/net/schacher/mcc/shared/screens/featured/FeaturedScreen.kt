@@ -32,10 +32,11 @@ import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.featured.ListItem.DeckItem
 import net.schacher.mcc.shared.screens.featured.ListItem.HeaderItem
+import org.koin.compose.koinInject
 
 @Composable
 fun FeaturedScreen(
-    featuredViewModel: FeaturedViewModel,
+    featuredViewModel: FeaturedViewModel = koinInject(),
     onDeckClick: (Deck) -> Unit
 ) {
     val state by featuredViewModel.state.collectAsState()
