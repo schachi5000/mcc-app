@@ -190,3 +190,11 @@ private fun InfoRow(label: String, iconResource: String) {
         )
     }
 }
+
+@Composable
+fun LoadingDeck() {
+    ShimmerBox(
+        modifier = Modifier.fillMaxWidth().height(deckHeight + 24.dp).clip(DeckShape),
+        background = MaterialTheme.colors.surface,
+    )
+}

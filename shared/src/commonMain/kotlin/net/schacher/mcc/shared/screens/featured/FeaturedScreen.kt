@@ -1,13 +1,18 @@
 package net.schacher.mcc.shared.screens.featured
 
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -18,9 +23,13 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.design.compose.Deck
+import net.schacher.mcc.shared.design.compose.LoadingDeck
+import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.featured.ListItem.DeckItem
 import net.schacher.mcc.shared.screens.featured.ListItem.HeaderItem
@@ -32,34 +41,50 @@ fun FeaturedScreen(
 ) {
     val state by featuredViewModel.state.collectAsState()
 
-    val entries = mutableListOf<ListItem>()
-    state.decks.forEach { (date, decks) ->
-        entries.add(HeaderItem("${date.dayOfMonth}. ${date.month}"))
-        decks.forEach { deck ->
-            entries.add(DeckItem(deck))
-        }
-    }
+    Logger.d { "Updating state $state" }
 
     Box(
         modifier = Modifier.fillMaxSize()
             .statusBarsPadding()
             .padding(horizontal = 16.dp)
     ) {
-        LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
-            items(entries.size) { index ->
-                if (index == 0) {
-                    Spacer(Modifier.statusBarsPadding().height(16.dp))
+        AnimatedVisibility(
+            visible = !state.loading,
+            exit = fadeOut(),
+            enter = fadeIn()
+        ) {
+            val entries = mutableListOf<ListItem>()
+            state.decks.forEach { (date, decks) ->
+                entries.add(HeaderItem("${date.dayOfMonth}. ${date.month}"))
+                decks.forEach { deck ->
+                    entries.add(DeckItem(deck))
                 }
-
-                when (val entry = entries[index]) {
-                    is HeaderItem -> Header(entry.header)
-                    is DeckItem -> Deck(entry.deck) {
-                        onDeckClick(entry.deck)
-                    }
-                }
-
-                Spacer(Modifier.height(16.dp))
             }
+
+            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
+                items(entries.size) { index ->
+                    if (index == 0) {
+                        Spacer(Modifier.statusBarsPadding().height(16.dp))
+                    }
+
+                    when (val entry = entries[index]) {
+                        is HeaderItem -> Header(entry.header)
+                        is DeckItem -> Deck(entry.deck) {
+                            onDeckClick(entry.deck)
+                        }
+                    }
+
+                    Spacer(Modifier.height(16.dp))
+                }
+            }
+        }
+
+        AnimatedVisibility(
+            visible = state.loading,
+            exit = fadeOut(),
+            enter = fadeIn()
+        ) {
+            LoadingContent()
         }
     }
 }
@@ -80,6 +105,38 @@ private fun Header(label: String) {
         )
     }
 }
+
+@Composable
+private fun LoadingContent() {
+    Column(
+        modifier = Modifier.fillMaxSize().padding(8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        Spacer(Modifier.statusBarsPadding().height(16.dp))
+        ShimmerBox(
+            Modifier.size(96.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)),
+            MaterialTheme.colors.surface,
+        )
+
+        Spacer(Modifier.height(16.dp))
+        LoadingDeck()
+        Spacer(Modifier.height(16.dp))
+        LoadingDeck()
+        Spacer(Modifier.statusBarsPadding().height(16.dp))
+
+        ShimmerBox(
+            Modifier.size(96.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)),
+            MaterialTheme.colors.surface,
+        )
+
+        Spacer(Modifier.height(16.dp))
+        LoadingDeck()
+        Spacer(Modifier.height(16.dp))
+        LoadingDeck()
+        Spacer(Modifier.height(16.dp))
+    }
+}
+
 
 private sealed interface ListItem {
     data class DeckItem(val deck: Deck) : ListItem

@@ -35,7 +35,7 @@ class FeaturedViewModel(private val cardRepository: CardRepository) : ViewModel(
 
     fun onRefresh() {
         _state.update {
-            it.copy(refreshing = true)
+            it.copy(loading = true)
         }
 
         this.viewModelScope.launch {
@@ -49,12 +49,14 @@ class FeaturedViewModel(private val cardRepository: CardRepository) : ViewModel(
                     it.copy(
                         decks = it.decks.toMutableMap()
                             .also { map -> map[date] = decks }
+                            .filter { (_, entries) -> entries.isNotEmpty() },
+                        loading = it.decks.entries.all { it.value.isEmpty() }
                     )
                 }
             }
 
             _state.update {
-                it.copy(refreshing = false)
+                it.copy(loading = false)
             }
         }
     }
@@ -62,5 +64,5 @@ class FeaturedViewModel(private val cardRepository: CardRepository) : ViewModel(
 
 data class FeaturedUiState(
     val decks: Map<LocalDate, List<Deck>> = emptyMap(),
-    val refreshing: Boolean = false
+    val loading: Boolean = false
 )
