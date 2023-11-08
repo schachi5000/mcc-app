@@ -4,6 +4,7 @@ plugins {
     id("org.jetbrains.compose")
     kotlin("plugin.serialization") version "1.9.10"
     id("com.squareup.sqldelight") version "1.5.5"
+    id("dev.icerock.mobile.multiplatform-resources").version("0.23.0")
 }
 
 
@@ -48,18 +49,21 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
                 implementation("dev.icerock.moko:mvvm-core:${Versions.moko}")
                 implementation("dev.icerock.moko:mvvm-compose:${Versions.moko}")
+                implementation("dev.icerock.moko:resources:0.23.0")
+                implementation("dev.icerock.moko:resources-compose:0.23.0")
                 implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
             }
         }
         val androidMain by getting {
             dependencies {
+                dependsOn(commonMain)
                 api("androidx.activity:activity-compose:1.8.0")
                 api("androidx.appcompat:appcompat:1.6.1")
                 api("androidx.core:core-ktx:1.12.0")
                 implementation("io.ktor:ktor-client-android:${Versions.ktor}")
                 implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
-                implementation( "io.insert-koin:koin-androidx-compose:${Versions.koin}")
+                implementation("io.insert-koin:koin-androidx-compose:${Versions.koin}")
             }
         }
         val iosX64Main by getting
@@ -104,4 +108,10 @@ sqldelight {
     database("AppDatabase") {
         packageName = "database"
     }
+}
+
+multiplatformResources {
+    multiplatformResourcesPackage = "org.example.library" // required
+    multiplatformResourcesClassName = "SharedRes" // optional, default MR
+    iosBaseLocalizationRegion = "en" // optional, default "en"
 }

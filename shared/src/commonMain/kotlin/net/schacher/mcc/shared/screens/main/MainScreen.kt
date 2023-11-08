@@ -35,6 +35,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
+import dev.icerock.moko.resources.compose.localized
+import dev.icerock.moko.resources.desc.Resource
+import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.DefaultBottomNavigationItem
@@ -50,6 +53,7 @@ import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.splash.SplashScreen
+import org.example.library.SharedRes
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterialApi::class)
@@ -153,7 +157,7 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         backgroundColor = MaterialTheme.colors.surface,
     ) {
         DefaultBottomNavigationItem(
-            label = "Decks",
+            label = StringDesc.Resource(SharedRes.strings.test_string).localized(),
             icon = "ic_deck.xml",
             color = Color(0xfff78f3f),
             selected = (selectedTabIndex == 0),
