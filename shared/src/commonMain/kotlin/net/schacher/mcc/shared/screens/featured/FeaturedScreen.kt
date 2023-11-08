@@ -26,7 +26,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.design.compose.Deck
 import net.schacher.mcc.shared.design.compose.LoadingDeck
 import net.schacher.mcc.shared.design.compose.ShimmerBox
@@ -40,8 +39,6 @@ fun FeaturedScreen(
     onDeckClick: (Deck) -> Unit
 ) {
     val state by featuredViewModel.state.collectAsState()
-
-    Logger.d { "Updating state $state" }
 
     Box(
         modifier = Modifier.fillMaxSize()
@@ -114,7 +111,7 @@ private fun LoadingContent() {
     ) {
         Spacer(Modifier.statusBarsPadding().height(16.dp))
         ShimmerBox(
-            Modifier.size(96.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)),
+            Modifier.size(112.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)),
             MaterialTheme.colors.surface,
         )
 

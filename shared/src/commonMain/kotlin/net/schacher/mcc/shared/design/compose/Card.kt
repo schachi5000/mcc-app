@@ -9,7 +9,6 @@ import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
@@ -62,11 +61,7 @@ fun Card(
                 durationMillis = 500
             ),
             onLoading = {
-                Image(
-                    modifier = Modifier.fillMaxSize().blur(6.dp),
-                    painter = painterResource(card.getLoadingResource()),
-                    contentDescription = "Placeholder",
-                )
+                ShimmerBox(modifier = Modifier.fillMaxSize())
             },
             onFailure = {
                 Logger.e(throwable = it) {

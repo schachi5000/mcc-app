@@ -22,7 +22,7 @@ private const val DEFAULT_DURATION_MILLIS = 3000
 @Composable
 fun ShimmerBox(
     modifier: Modifier = Modifier,
-    background: Color,
+    background: Color = MaterialTheme.colors.surface,
     shimmer: Color = if (MaterialTheme.colors.isLight) {
         Color.LightGray
     } else {
