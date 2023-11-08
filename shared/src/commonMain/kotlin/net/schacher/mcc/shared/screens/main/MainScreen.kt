@@ -162,21 +162,21 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
             onClick = { onTabSelected(0) },
         )
         DefaultBottomNavigationItem(
-            label = "Featured",
+            label = stringResource(SharedRes.strings.featured),
             icon = "ic_featured_decks.xml",
             color = Color(0xff31e29c),
             selected = (selectedTabIndex == 1),
             onClick = { onTabSelected(1) },
         )
         DefaultBottomNavigationItem(
-            label = "Suche",
+            label = stringResource(SharedRes.strings.search),
             icon = "ic_search.xml",
             color = Color(0xff518cca),
             selected = (selectedTabIndex == 2),
             onClick = { onTabSelected(2) },
         )
         DefaultBottomNavigationItem(
-            label = "Einstellungen",
+            label = stringResource(SharedRes.strings.settings),
             icon = { Icon(Icons.Rounded.Settings, "Settings") },
             color = Color(0xffe74c3c),
             selected = (selectedTabIndex == 3),

@@ -13,6 +13,7 @@ object Versions {
     const val coin = "3.5.0"
     const val sqlDelight = "1.5.5"
     const val moko = "0.16.1"
+    const val mokoResources = "0.23.0"
     const val koin = "3.5.0"
 }
 
@@ -27,6 +28,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "shared"
             isStatic = true
+            export("dev.icerock.moko:resources:${Versions.mokoResources}")
         }
     }
 
@@ -49,8 +51,8 @@ kotlin {
                 implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
                 implementation("dev.icerock.moko:mvvm-core:${Versions.moko}")
                 implementation("dev.icerock.moko:mvvm-compose:${Versions.moko}")
-                implementation("dev.icerock.moko:resources:0.23.0")
                 implementation("dev.icerock.moko:resources-compose:0.23.0")
+                api("dev.icerock.moko:resources:0.23.0")
                 implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
             }
@@ -113,5 +115,5 @@ sqldelight {
 multiplatformResources {
     multiplatformResourcesPackage = "net.schacher.mcc.shared"
     multiplatformResourcesClassName = "SharedRes"
-    iosBaseLocalizationRegion = "de"
+    iosBaseLocalizationRegion = "en"
 }

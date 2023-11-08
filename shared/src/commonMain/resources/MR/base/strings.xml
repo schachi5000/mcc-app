@@ -1,4 +1,7 @@
 <?xml version="1.0" encoding="UTF-8" ?>
 <resources>
     <string name="test_string">Deck English</string>
+    <string name="featured">Featured</string>
+    <string name="search">Search</string>
+    <string name="settings">Settings</string>
 </resources>
