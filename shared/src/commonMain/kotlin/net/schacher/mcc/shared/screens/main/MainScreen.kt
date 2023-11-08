@@ -35,9 +35,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
-import dev.icerock.moko.resources.compose.localized
-import dev.icerock.moko.resources.desc.Resource
-import dev.icerock.moko.resources.desc.StringDesc
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.SharedRes
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
@@ -157,7 +155,7 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         backgroundColor = MaterialTheme.colors.surface,
     ) {
         DefaultBottomNavigationItem(
-            label = StringDesc.Resource(SharedRes.strings.test_string).localized(),
+            label = stringResource(SharedRes.strings.test_string),
             icon = "ic_deck.xml",
             color = Color(0xfff78f3f),
             selected = (selectedTabIndex == 0),

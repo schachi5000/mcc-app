@@ -95,10 +95,10 @@
 			buildConfigurationList = 7555FFA5242A565B00829871 /* Build configuration list for PBXNativeTarget "iosApp" */;
 			buildPhases = (
 				05D91A912A5EF49C00F138EB /* Compile Kotlin */,
+				11A8C5B62AFBE2CB0014E690 /* Copy Moko Resources */,
 				7555FF77242A565900829871 /* Sources */,
 				7555FF79242A565900829871 /* Resources */,
 				F85CB1118929364A9C6EFABC /* Frameworks */,
-				11A8C5B62AFBE2CB0014E690 /* ShellScript */,
 			);
 			buildRules = (
 			);
@@ -173,7 +173,7 @@
 			shellPath = /bin/sh;
 			shellScript = "cd \"$SRCROOT/..\"\n./gradlew :shared:embedAndSignAppleFrameworkForXcode\n";
 		};
-		11A8C5B62AFBE2CB0014E690 /* ShellScript */ = {
+		11A8C5B62AFBE2CB0014E690 /* Copy Moko Resources */ = {
 			isa = PBXShellScriptBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
@@ -182,6 +182,7 @@
 			);
 			inputPaths = (
 			);
+			name = "Copy Moko Resources";
 			outputFileListPaths = (
 			);
 			outputPaths = (
