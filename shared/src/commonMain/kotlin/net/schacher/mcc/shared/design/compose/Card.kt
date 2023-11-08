@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
@@ -17,6 +18,7 @@ import co.touchlab.kermit.Logger
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
 import net.schacher.mcc.shared.design.theme.CardShape
+import net.schacher.mcc.shared.design.theme.SleeveColors
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardOrientation
 import net.schacher.mcc.shared.model.CardType.MAIN_SCHEME
@@ -68,7 +70,13 @@ fun Card(
                     "Failed to load image for card: $card"
                 }
                 Image(
-                    modifier = Modifier.fillMaxSize(),
+                    modifier = Modifier.fillMaxSize().border(
+                        8.dp, when (card.backSideColor) {
+                            BackSideColor.YELLOW -> SleeveColors.Yellow
+                            BackSideColor.BLUE -> SleeveColors.Blue
+                        },
+                        CardShape
+                    ),
                     painter = painterResource(card.getFailureResource()),
                     contentDescription = "Placeholder",
                 )

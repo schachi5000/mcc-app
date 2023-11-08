@@ -23,6 +23,13 @@ val DarkColorScheme = darkColors(
     onPrimary = Color(0xFFFFFFFF)
 )
 
+
+object SleeveColors {
+    val Blue = Color(0xFF185ea4)
+    val Yellow = Color(0xFFe98a02)
+    val Black = Color(0xFF000000)
+}
+
 object AspectColors {
     val Aggression = Color(0xFFd32f2f)
     val Protection = Color(0xFF388e3c)
