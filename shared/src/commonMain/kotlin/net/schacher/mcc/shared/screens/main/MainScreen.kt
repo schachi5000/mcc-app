@@ -39,6 +39,7 @@ import dev.icerock.moko.resources.compose.localized
 import dev.icerock.moko.resources.desc.Resource
 import dev.icerock.moko.resources.desc.StringDesc
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.SharedRes
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.DefaultBottomNavigationItem
 import net.schacher.mcc.shared.design.compose.InspectScreen
@@ -53,7 +54,6 @@ import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.splash.SplashScreen
-import org.example.library.SharedRes
 import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterialApi::class)

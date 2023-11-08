@@ -111,7 +111,7 @@ sqldelight {
 }
 
 multiplatformResources {
-    multiplatformResourcesPackage = "org.example.library" // required
+    multiplatformResourcesPackage = "net.schacher.mcc.shared" // required
     multiplatformResourcesClassName = "SharedRes" // optional, default MR
     iosBaseLocalizationRegion = "en" // optional, default "en"
 }
