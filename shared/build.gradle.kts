@@ -52,7 +52,7 @@ kotlin {
                 implementation("dev.icerock.moko:mvvm-core:${Versions.moko}")
                 implementation("dev.icerock.moko:mvvm-compose:${Versions.moko}")
                 implementation("dev.icerock.moko:resources-compose:0.23.0")
-                api("dev.icerock.moko:resources:0.23.0")
+                api("dev.icerock.moko:resources:${Versions.mokoResources}")
                 implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
                 implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
             }
