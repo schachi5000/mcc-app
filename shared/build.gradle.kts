@@ -28,7 +28,6 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "shared"
             isStatic = true
-            export("dev.icerock.moko:resources:${Versions.mokoResources}")
         }
     }
 
