@@ -35,7 +35,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
+import dev.icerock.moko.resources.compose.stringResource
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.SharedRes
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.DefaultBottomNavigationItem
 import net.schacher.mcc.shared.design.compose.InspectScreen
@@ -153,28 +155,28 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         backgroundColor = MaterialTheme.colors.surface,
     ) {
         DefaultBottomNavigationItem(
-            label = "Decks",
+            label = stringResource(SharedRes.strings.decks),
             icon = "ic_deck.xml",
             color = Color(0xfff78f3f),
             selected = (selectedTabIndex == 0),
             onClick = { onTabSelected(0) },
         )
         DefaultBottomNavigationItem(
-            label = "Featured",
+            label = stringResource(SharedRes.strings.featured),
             icon = "ic_featured_decks.xml",
             color = Color(0xff31e29c),
             selected = (selectedTabIndex == 1),
             onClick = { onTabSelected(1) },
         )
         DefaultBottomNavigationItem(
-            label = "Suche",
+            label = stringResource(SharedRes.strings.search),
             icon = "ic_search.xml",
             color = Color(0xff518cca),
             selected = (selectedTabIndex == 2),
             onClick = { onTabSelected(2) },
         )
         DefaultBottomNavigationItem(
-            label = "Einstellungen",
+            label = stringResource(SharedRes.strings.settings),
             icon = { Icon(Icons.Rounded.Settings, "Settings") },
             color = Color(0xffe74c3c),
             selected = (selectedTabIndex == 3),

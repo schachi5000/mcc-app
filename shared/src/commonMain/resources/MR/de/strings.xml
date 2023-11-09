@@ -1,0 +1,7 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<resources>
+    <string name="decks">Decks</string>
+    <string name="featured">Featured</string>
+    <string name="search">Suche</string>
+    <string name="settings">Einstellungen</string>
+</resources>
