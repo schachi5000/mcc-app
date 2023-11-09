@@ -155,7 +155,7 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         backgroundColor = MaterialTheme.colors.surface,
     ) {
         DefaultBottomNavigationItem(
-            label = stringResource(SharedRes.strings.test_string),
+            label = stringResource(SharedRes.strings.decks),
             icon = "ic_deck.xml",
             color = Color(0xfff78f3f),
             selected = (selectedTabIndex == 0),
