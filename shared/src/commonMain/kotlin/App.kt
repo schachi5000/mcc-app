@@ -12,23 +12,24 @@ import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsViewModel
 import org.koin.compose.KoinApplication
+import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val network = module {
-    single<MarvelCDbDataSource> { KtorMarvelCDbDataSource() }
+    singleOf<MarvelCDbDataSource>(::KtorMarvelCDbDataSource)
 }
 
 val repositories = module {
-    single { CardRepository(get(), get()) }
-    single { DeckRepository(get(), get(), get()) }
+    singleOf(::CardRepository)
+    singleOf(::DeckRepository)
 }
 
 val viewModels = module {
-    single { MainViewModel(get(), get()) }
-    single { DeckViewModel(get(), get()) }
-    single { SettingsViewModel(get(), get()) }
-    single { SearchViewModel(get()) }
-    single { FeaturedViewModel(get(), get()) }
+    singleOf(::MainViewModel)
+    singleOf(::DeckViewModel)
+    singleOf(::SettingsViewModel)
+    singleOf(::SearchViewModel)
+    singleOf(::FeaturedViewModel)
 }
 
 @Composable
