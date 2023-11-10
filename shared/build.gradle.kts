@@ -1,12 +1,13 @@
+import org.jetbrains.compose.ExperimentalComposeLibrary
+
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
     id("org.jetbrains.compose")
-    kotlin("plugin.serialization") version "1.9.10"
-    id("com.squareup.sqldelight") version "1.5.5"
+    kotlin("plugin.serialization").version("1.9.10")
+    id("com.squareup.sqldelight").version("1.5.5")
     id("dev.icerock.mobile.multiplatform-resources").version("0.23.0")
 }
-
 
 object Versions {
     const val ktor = "2.3.4"
@@ -37,34 +38,34 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                @OptIn(ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
-                implementation("io.insert-koin:koin-core:${Versions.koin}")
-                api("io.insert-koin:koin-compose:1.1.0")
-                implementation("co.touchlab:kermit:2.0.2")
-                implementation("media.kamel:kamel-image:0.7.3")
-                implementation("io.ktor:ktor-client-core:${Versions.ktor}")
-                implementation("io.ktor:ktor-client-logging:${Versions.ktor}")
-                implementation("io.ktor:ktor-client-content-negotiation:${Versions.ktor}")
-                implementation("io.ktor:ktor-serialization-kotlinx-json:${Versions.ktor}")
-                implementation("org.jetbrains.kotlinx:kotlinx-serialization-json:1.6.0")
-                implementation("dev.icerock.moko:mvvm-core:${Versions.moko}")
-                implementation("dev.icerock.moko:mvvm-compose:${Versions.moko}")
-                implementation("dev.icerock.moko:resources-compose:0.23.0")
-                api("dev.icerock.moko:resources:${Versions.mokoResources}")
-                implementation("com.squareup.sqldelight:runtime:${Versions.sqlDelight}")
-                implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.4.1")
+                implementation(libs.koin.core)
+                api(libs.koin.compose)
+                implementation(libs.kermit)
+                implementation(libs.kamel)
+                implementation(libs.ktor.client.core)
+                implementation(libs.ktor.client.loggin)
+                implementation(libs.ktor.client.content.negotiation)
+                implementation(libs.ktor.serialization.json)
+                implementation(libs.kotlinx.serilization.json)
+                implementation(libs.kotlinx.datetime)
+                implementation(libs.sqldelight)
+                implementation(libs.moko.mvvm.core)
+                implementation(libs.moko.mvvm.compose)
+                implementation(libs.moko.resources.compose)
+                api(libs.moko.resources)
             }
         }
         val androidMain by getting {
             dependencies {
                 dependsOn(commonMain)
                 api(libs.androidx.activity)
-                api("androidx.appcompat:appcompat:1.6.1")
-                api("androidx.core:core-ktx:1.12.0")
-                implementation("io.ktor:ktor-client-android:${Versions.ktor}")
-                implementation("com.squareup.sqldelight:android-driver:${Versions.sqlDelight}")
-                implementation("io.insert-koin:koin-androidx-compose:${Versions.koin}")
+                api(libs.androidx.appcompat)
+                api(libs.androidx.core.ktx)
+                implementation(libs.ktor.client.android)
+                implementation(libs.sqldelight.android)
+                implementation(libs.koin.compose.androidx)
             }
         }
         val iosX64Main by getting
@@ -77,8 +78,8 @@ kotlin {
             iosSimulatorArm64Main.dependsOn(this)
 
             dependencies {
-                implementation("io.ktor:ktor-client-darwin:${Versions.ktor}")
-                implementation("com.squareup.sqldelight:native-driver:${Versions.sqlDelight}")
+                implementation(libs.ktor.client.darwin)
+                implementation(libs.sqldelight.native)
 
             }
         }
