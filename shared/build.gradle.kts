@@ -9,15 +9,6 @@ plugins {
     id("dev.icerock.mobile.multiplatform-resources").version("0.23.0")
 }
 
-object Versions {
-    const val ktor = "2.3.4"
-    const val coin = "3.5.0"
-    const val sqlDelight = "1.5.5"
-    const val moko = "0.16.1"
-    const val mokoResources = "0.23.0"
-    const val koin = "3.5.0"
-}
-
 kotlin {
     androidTarget()
 
