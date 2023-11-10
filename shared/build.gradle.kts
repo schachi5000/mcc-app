@@ -1,5 +1,3 @@
-import org.jetbrains.compose.ExperimentalComposeLibrary
-
 plugins {
     kotlin("multiplatform")
     id("com.android.library")
@@ -29,7 +27,7 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
-                @OptIn(ExperimentalComposeLibrary::class)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
                 implementation(libs.koin.core)
                 api(libs.koin.compose)
