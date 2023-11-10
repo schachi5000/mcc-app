@@ -117,8 +117,6 @@ private fun LoadingContent() {
         Spacer(Modifier.height(16.dp))
         LoadingDeck()
         Spacer(Modifier.height(16.dp))
-        LoadingHeader()
-        Spacer(Modifier.height(16.dp))
         LoadingDeck()
         Spacer(Modifier.height(16.dp))
         LoadingDeck()
@@ -129,8 +127,7 @@ private fun LoadingContent() {
 @Composable
 private fun LoadingHeader() {
     ShimmerBox(
-        Modifier.size(112.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)),
-        MaterialTheme.colors.surface,
+        Modifier.size(112.dp, height = 24.dp).clip(RoundedCornerShape(16.dp))
     )
 }
 
