@@ -3,8 +3,8 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     kotlin("plugin.serialization").version("1.9.10")
-    id("com.squareup.sqldelight").version("1.5.5")
-    id("dev.icerock.mobile.multiplatform-resources").version("0.23.0")
+    id("com.squareup.sqldelight").version(libs.versions.sqlDelight)
+    id("dev.icerock.mobile.multiplatform-resources").version(libs.versions.mokoResources)
 }
 
 kotlin {
