@@ -18,6 +18,7 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "shared"
             isStatic = true
+            export(libs.moko.resources)
         }
     }
 
