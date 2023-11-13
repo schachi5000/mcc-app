@@ -43,3 +43,7 @@ moko-resources = { module = "dev.icerock.moko:resources", version.ref = "mokoRes
 sqldelight = { module = "com.squareup.sqldelight:runtime", version.ref = "sqlDelight" }
 sqldelight-android = { module = "com.squareup.sqldelight:android-driver", version.ref = "sqlDelight" }
 sqldelight-native = { module = "com.squareup.sqldelight:native-driver", version.ref = "sqlDelight" }
+
+[plugins]
+sqldelight = { id = "com.squareup.sqldelight", version.ref = "sqlDelight" }
+moko-resources = { id = "dev.icerock.mobile.multiplatform-resources", version.ref = "mokoResources" }
