@@ -1,10 +1,9 @@
 plugins {
     kotlin("multiplatform")
+    kotlin("plugin.serialization").version("1.9.10")
     id("com.android.library")
     id("org.jetbrains.compose")
-    kotlin("plugin.serialization").version("1.9.10")
-    id("com.squareup.sqldelight").version(libs.versions.sqlDelight)
-    id("dev.icerock.mobile.multiplatform-resources").version(libs.versions.mokoResources)
+    alias(libs.plugins.sqldelight)
 }
 
 kotlin {
@@ -18,7 +17,6 @@ kotlin {
         iosTarget.binaries.framework {
             baseName = "shared"
             isStatic = true
-            export(libs.moko.resources)
         }
     }
 
@@ -43,8 +41,6 @@ kotlin {
                 implementation(libs.sqldelight)
                 implementation(libs.moko.mvvm.core)
                 implementation(libs.moko.mvvm.compose)
-                implementation(libs.moko.resources.compose)
-                api(libs.moko.resources)
             }
         }
         val androidMain by getting {
@@ -53,9 +49,9 @@ kotlin {
                 api(libs.androidx.activity)
                 api(libs.androidx.appcompat)
                 api(libs.androidx.core.ktx)
+                implementation(libs.koin.compose.androidx)
                 implementation(libs.ktor.client.android)
                 implementation(libs.sqldelight.android)
-                implementation(libs.koin.compose.androidx)
             }
         }
         val iosX64Main by getting
@@ -70,7 +66,6 @@ kotlin {
             dependencies {
                 implementation(libs.ktor.client.darwin)
                 implementation(libs.sqldelight.native)
-
             }
         }
     }
@@ -100,10 +95,4 @@ sqldelight {
     database("AppDatabase") {
         packageName = "database"
     }
-}
-
-multiplatformResources {
-    multiplatformResourcesPackage = "net.schacher.mcc.shared"
-    multiplatformResourcesClassName = "SharedRes"
-    iosBaseLocalizationRegion = "en"
 }
