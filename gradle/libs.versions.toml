@@ -1,4 +1,5 @@
 [versions]
+kotlin = "1.9.21"
 appcompat = "1.6.1"
 coreKtx = "1.12.0"
 ktor = "2.3.4"
@@ -10,7 +11,7 @@ kamel = "0.7.3"
 kermit = "2.0.2"
 koin = "3.5.0"
 koin-compose = "1.1.0"
-activity = "1.8.0"
+activity = "1.8.1"
 serialization = "1.6.0"
 
 [libraries]
