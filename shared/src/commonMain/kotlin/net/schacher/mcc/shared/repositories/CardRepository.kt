@@ -6,16 +6,16 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.withContext
-import net.schacher.mcc.shared.datasource.database.DatabaseDao
+import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Card
 
 class CardRepository(
-    private val databaseDao: DatabaseDao,
+    private val cardDatabaseDao: CardDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource
 ) {
 
-    private val _state = MutableStateFlow(this.databaseDao.getAllCards())
+    private val _state = MutableStateFlow(this.cardDatabaseDao.getAllCards())
 
     val state = _state.asStateFlow()
 
@@ -25,14 +25,14 @@ class CardRepository(
     suspend fun refresh() = withContext(Dispatchers.IO) {
         val result = marvelCDbDataSource.getAllCards()
         Logger.d { "${result.size} cards loaded" }
-        databaseDao.addCards(result)
+        cardDatabaseDao.addCards(result)
 
-        _state.emit(databaseDao.getAllCards())
+        _state.emit(cardDatabaseDao.getAllCards())
     }
 
     suspend fun deleteAllCards() = withContext(Dispatchers.IO) {
-        databaseDao.removeAllCards()
-        _state.emit(databaseDao.getAllCards())
+        cardDatabaseDao.removeAllCards()
+        _state.emit(cardDatabaseDao.getAllCards())
     }
 
     fun getCard(cardCode: String): Card? = this.cards.firstOrNull { it.code == cardCode }
@@ -45,8 +45,8 @@ class CardRepository(
 
         try {
             this.marvelCDbDataSource.getCard(cardCode).also {
-                databaseDao.addCard(it)
-                _state.emit(databaseDao.getAllCards())
+                cardDatabaseDao.addCard(it)
+                _state.emit(cardDatabaseDao.getAllCards())
             }
         } catch (e: Exception) {
             Logger.e(e) { "Error loading card: $cardCode" }

@@ -1,5 +1,7 @@
 import androidx.compose.runtime.Composable
+import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
+import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
 import net.schacher.mcc.shared.datasource.http.KtorMarvelCDbDataSource
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.design.theme.MccTheme
@@ -36,7 +38,8 @@ val viewModels = module {
 fun App(databaseDao: DatabaseDao) {
     KoinApplication(application = {
         modules(
-            module { single { databaseDao } },
+            module { single<CardDatabaseDao> { databaseDao } },
+            module { single<DeckDatabaseDao> { databaseDao } },
             network,
             repositories,
             viewModels

@@ -6,7 +6,7 @@ import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 
-class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
+class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) : DeckDatabaseDao, CardDatabaseDao {
 
     private companion object {
         const val LIST_DELIMITER = ";"
@@ -16,12 +16,12 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
 
     private val dbQuery = database.appDatabaseQueries
 
-    fun addCards(cards: List<Card>) {
+    override fun addCards(cards: List<Card>) {
         Logger.d { "Adding ${cards.size} cards to database" }
         cards.forEach { this.addCard(it) }
     }
 
-    fun addCard(card: Card) {
+    override fun addCard(card: Card) {
         this.dbQuery.addCard(
             code = card.code,
             position = card.position.toLong(),
@@ -33,9 +33,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
         )
     }
 
-    fun getCardByCode(cardCode: String): Card = this.dbQuery.selectCardByCode(cardCode).executeAsOne().toCard()
+    override fun getCardByCode(cardCode: String): Card = this.dbQuery.selectCardByCode(cardCode).executeAsOne().toCard()
 
-    fun getAllCards(): List<Card> = this.dbQuery.selectAllCards()
+    override fun getAllCards(): List<Card> = this.dbQuery.selectAllCards()
         .executeAsList()
         .map {
             val card = it.toCard()
@@ -50,12 +50,12 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
             )
         }
 
-    fun removeAllCards() {
+    override fun removeAllCards() {
         Logger.d { "Deleting all cards from database" }
         this.dbQuery.removeAllCards()
     }
 
-    fun addDeck(deck: Deck) {
+    override fun addDeck(deck: Deck) {
         Logger.d { "Adding deck ${deck.name} to database" }
         this.dbQuery.addDeck(
             deck.id.toLong(),
@@ -65,7 +65,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
             deck.cards.joinToString(LIST_DELIMITER) { it.code })
     }
 
-    fun getDecks(): List<Deck> = this.dbQuery.selectAllDecks().executeAsList().map {
+    override fun getDecks(): List<Deck> = this.dbQuery.selectAllDecks().executeAsList().map {
         val cards = it.cardCodes.split(LIST_DELIMITER).map {
             this.dbQuery.selectCardByCode(it).executeAsOne().toCard()
         }
@@ -79,12 +79,12 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) {
         )
     }
 
-    fun removeDeck(deckId: Int) {
+    override fun removeDeck(deckId: Int) {
         Logger.d { "Deleting deck $deckId from database" }
         this.dbQuery.removeDeckById(deckId.toLong())
     }
 
-    fun removeAllDecks() {
+    override fun removeAllDecks() {
         Logger.d { "Deleting all decks from database" }
         this.dbQuery.removeAllDecks()
     }

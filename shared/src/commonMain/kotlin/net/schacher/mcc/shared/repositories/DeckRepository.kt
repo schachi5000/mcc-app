@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.withContext
-import net.schacher.mcc.shared.datasource.database.DatabaseDao
+import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
@@ -17,9 +17,9 @@ import kotlin.random.Random
 class DeckRepository(
     private val cardRepository: CardRepository,
     private val marvelCDbDataSource: MarvelCDbDataSource,
-    private val databaseDao: DatabaseDao
+    private val deckDatabaseDao: DeckDatabaseDao
 ) {
-    private val _state = MutableStateFlow(databaseDao.getDecks())
+    private val _state = MutableStateFlow(deckDatabaseDao.getDecks())
 
     val state = _state.asStateFlow()
 
@@ -35,13 +35,13 @@ class DeckRepository(
         }
 
         val deck = Deck(randomDeckNumber, label, heroCard, aspect, listOf(heroCard))
-        this.databaseDao.addDeck(deck)
-        _state.update { databaseDao.getDecks() }
+        this.deckDatabaseDao.addDeck(deck)
+        _state.update { deckDatabaseDao.getDecks() }
     }
 
     fun removeDeck(deck: Deck) {
-        this.databaseDao.removeDeck(deck.id)
-        _state.update { databaseDao.getDecks() }
+        this.deckDatabaseDao.removeDeck(deck.id)
+        _state.update { deckDatabaseDao.getDecks() }
     }
 
     fun addCardToDeck(deckId: Int, cardCode: String) {
@@ -56,8 +56,8 @@ class DeckRepository(
             cards = deck.cards + card
         )
 
-        this.databaseDao.addDeck(newDeck)
-        _state.update { databaseDao.getDecks() }
+        this.deckDatabaseDao.addDeck(newDeck)
+        _state.update { deckDatabaseDao.getDecks() }
     }
 
     suspend fun addDeckById(deckId: Int) {
@@ -65,12 +65,12 @@ class DeckRepository(
             this.cardRepository.getCard(it)
         }
 
-        this.databaseDao.addDeck(deck)
-        _state.emit(databaseDao.getDecks())
+        this.deckDatabaseDao.addDeck(deck)
+        _state.emit(deckDatabaseDao.getDecks())
     }
 
     suspend fun deleteAllDecks() = withContext(Dispatchers.IO) {
-        databaseDao.removeAllDecks()
-        _state.emit(databaseDao.getDecks())
+        deckDatabaseDao.removeAllDecks()
+        _state.emit(deckDatabaseDao.getDecks())
     }
 }
