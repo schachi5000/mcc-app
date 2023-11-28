@@ -85,6 +85,7 @@ fun MainScreen(
                 }
             }
         }) {
+
         Scaffold(
             Modifier.fillMaxSize().blur(if (state.value.subScreen != null) 4.dp else 0.dp),
             backgroundColor = MaterialTheme.colors.background,
@@ -159,28 +160,28 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         DefaultBottomNavigationItem(
             label = "My Decks",
             icon = "ic_deck.xml",
-            color = Color(0xfff78f3f),
+            color = Decks.tabColor,
             selected = (selectedTabIndex == 0),
             onClick = { onTabSelected(0) },
         )
         DefaultBottomNavigationItem(
             label = "Featured",
             icon = "ic_featured_decks.xml",
-            color = Color(0xff31e29c),
+            color = Featured.tabColor,
             selected = (selectedTabIndex == 1),
             onClick = { onTabSelected(1) },
         )
         DefaultBottomNavigationItem(
             label = "Search",
             icon = "ic_search.xml",
-            color = Color(0xff518cca),
+            color = Search.tabColor,
             selected = (selectedTabIndex == 2),
             onClick = { onTabSelected(2) },
         )
         DefaultBottomNavigationItem(
             label = "Settings",
             icon = { Icon(Icons.Rounded.Settings, "Settings") },
-            color = Color(0xffe74c3c),
+            color = Settings.tabColor,
             selected = (selectedTabIndex == 3),
             onClick = { onTabSelected(3) },
         )
@@ -216,6 +217,13 @@ fun DeckInspectorBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
     }
 }
 
+val MainUiState.MainScreen.tabColor: Color
+    get() = when (this) {
+        Decks -> Color(0xfff78f3f)
+        Featured -> Color(0xff31e29c)
+        Search -> Color(0xff518cca)
+        Settings -> Color(0xffe74c3c)
+    }
 val MainUiState.MainScreen.tabIndex: Int
     get() = when (this) {
         Decks -> 0
