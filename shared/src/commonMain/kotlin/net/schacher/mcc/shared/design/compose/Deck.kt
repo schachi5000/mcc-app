@@ -107,7 +107,7 @@ private fun DeckContent(deck: Deck, onClick: () -> Unit = {}) {
 
                 InfoRow("${deck.cards.size} Karten", "ic_cards.xml")
                 Spacer(Modifier.height(4.dp))
-                InfoRow("${deck.requiredDecksCount} Packs benötigt", "ic_deck.xml")
+                InfoRow("${deck.requiredDecks.size} Packs benötigt", "ic_deck.xml")
             }
         }
     }

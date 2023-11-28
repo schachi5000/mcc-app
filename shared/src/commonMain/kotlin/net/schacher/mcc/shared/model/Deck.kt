@@ -12,5 +12,5 @@ data class Deck(
     val validDeck: Boolean
         get() = cards.size == VALID_DECK_SIZE
 
-    val requiredDecksCount = cards.map { it.packCode }.toSet().size
+    val requiredDecks = cards.map { it.packCode }.toSet()
 }
