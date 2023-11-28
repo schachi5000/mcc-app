@@ -44,6 +44,22 @@ class DeckRepository(
         _state.update { databaseDao.getDecks() }
     }
 
+    fun addCardToDeck(deckId: Int, cardCode: String) {
+        val card = this.cardRepository.getCard(cardCode)
+        checkNotNull(card) {
+            "Card with code $cardCode not found"
+        }
+        val deck = this.decks.find { it.id == deckId }
+        checkNotNull(deck) { "Deck with id $deckId not found" }
+
+        val newDeck = deck.copy(
+            cards = deck.cards + card
+        )
+
+        this.databaseDao.addDeck(newDeck)
+        _state.update { databaseDao.getDecks() }
+    }
+
     suspend fun addDeckById(deckId: Int) {
         val deck = marvelCDbDataSource.getPublicDeckById(deckId) {
             this.cardRepository.getCard(it)
