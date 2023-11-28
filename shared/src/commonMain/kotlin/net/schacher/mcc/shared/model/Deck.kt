@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.model
 
+private const val VALID_DECK_SIZE = 40
 
 data class Deck(
     val id: Int,
@@ -9,7 +10,7 @@ data class Deck(
     val cards: List<Card>
 ) {
     val validDeck: Boolean
-        get() = cards.size == 40
+        get() = cards.size == VALID_DECK_SIZE
 
     val requiredDecksCount = cards.map { it.packCode }.toSet().size
 }
