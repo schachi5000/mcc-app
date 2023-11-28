@@ -44,6 +44,10 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.featured.FeaturedScreen
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckInspector
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
@@ -214,8 +218,8 @@ fun DeckInspectorBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
 
 val MainUiState.MainScreen.tabIndex: Int
     get() = when (this) {
-        MainUiState.MainScreen.Decks -> 0
-        MainUiState.MainScreen.Featured -> 1
-        MainUiState.MainScreen.Search -> 2
-        MainUiState.MainScreen.Settings -> 3
+        Decks -> 0
+        Featured -> 1
+        Search -> 2
+        Settings -> 3
     }
