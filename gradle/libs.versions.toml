@@ -10,7 +10,7 @@ kamel = "0.7.3"
 kermit = "2.0.2"
 koin = "3.5.0"
 koin-compose = "1.1.0"
-activity = "1.8.0"
+activity = "1.8.1"
 serialization = "1.6.0"
 
 [libraries]
