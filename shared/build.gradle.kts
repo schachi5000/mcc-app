@@ -20,6 +20,8 @@ kotlin {
         }
     }
 
+    val composeVersion = extra["compose.version"] as String
+
     sourceSets {
         val commonMain by getting {
             dependencies {
@@ -49,6 +51,7 @@ kotlin {
                 api(libs.androidx.activity)
                 api(libs.androidx.appcompat)
                 api(libs.androidx.core.ktx)
+                api("org.jetbrains.compose.ui:ui-tooling-preview:${composeVersion}")
                 implementation(libs.koin.compose.androidx)
                 implementation(libs.ktor.client.android)
                 implementation(libs.sqldelight.android)

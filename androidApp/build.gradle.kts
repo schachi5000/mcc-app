@@ -72,8 +72,8 @@ android {
     }
 
     dependencies {
-        debugImplementation("androidx.compose.ui:ui-tooling")
-        debugImplementation("androidx.compose.compiler:compiler:1.5.3")
-        implementation("androidx.compose.ui:ui-tooling-preview")
+        debugImplementation("androidx.compose.compiler:compiler:1.5.6")
+        debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
+        implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
     }
 }
