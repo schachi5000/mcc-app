@@ -57,7 +57,11 @@ fun SearchScreen(
 ) {
     val state by searchViewModel.state.collectAsState()
 
-    SearchScreen(state = state, onCardClicked = onCardClicked) { searchViewModel.onSearch(it) }
+    SearchScreen(
+        state = state,
+        onCardClicked = onCardClicked,
+        onSearch = searchViewModel::onSearch
+    )
 }
 
 @Composable
@@ -122,12 +126,12 @@ fun SearchBar(
 ) {
     var input by remember { mutableStateOf("") }
 
-    Row {
+    Row(modifier = Modifier.fillMaxWidth().height(56.dp)) {
         AnimatedVisibility(visible = isKeyboardVisible()) {
             IconButton(
                 modifier = Modifier
                     .padding(end = 8.dp)
-                    .size(48.dp)
+                    .size(56.dp)
                     .background(MaterialTheme.colors.surface, CircleShape),
                 onClick = { onDoneClick() }
             ) {
@@ -142,8 +146,7 @@ fun SearchBar(
 
         Box(
             modifier = Modifier.weight(1f)
-                .fillMaxWidth()
-                .height(48.dp)
+                .fillMaxSize()
                 .background(MaterialTheme.colors.surface, RoundedCornerShape(32.dp))
         ) {
             TextField(
@@ -178,7 +181,7 @@ fun SearchBar(
             IconButton(
                 modifier = Modifier
                     .padding(start = 8.dp)
-                    .size(48.dp)
+                    .size(56.dp)
                     .background(MaterialTheme.colors.surface, CircleShape),
                 onClick = {
                     input = ""

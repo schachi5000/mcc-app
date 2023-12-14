@@ -12,15 +12,6 @@ import net.schacher.mcc.shared.design.compose.OptionsGroup
 import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.design.theme.MccTheme
-import net.schacher.mcc.shared.screens.search.SearchBar
-
-@ThemedPreviews
-@Composable
-fun SearchBarPreview() {
-    MccTheme {
-        SearchBar(onDoneClick = {}, onQueryChange = {})
-    }
-}
 
 
 @ThemedPreviews
