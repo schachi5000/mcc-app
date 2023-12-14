@@ -29,7 +29,7 @@ android {
         versionName = "1.0"
     }
 
-    buildTypes{
+    buildTypes {
         getByName("debug") {
             isMinifyEnabled = false
             versionNameSuffix = "-debug"
@@ -40,7 +40,7 @@ android {
         }
     }
 
-    signingConfigs{
+    signingConfigs {
         create("release") {
             //  keyAlias = ""
             //  keyPassword = ""
@@ -72,8 +72,8 @@ android {
     }
 
     dependencies {
-        debugImplementation("androidx.compose.compiler:compiler:1.5.6")
-        debugImplementation("androidx.compose.ui:ui-tooling:1.5.4")
-        implementation("androidx.compose.ui:ui-tooling-preview:1.5.4")
+        debugImplementation(libs.androidx.compose.compiler)
+        debugImplementation(libs.androidx.compose.tooling)
+        implementation(libs.androidx.compose.preview)
     }
 }

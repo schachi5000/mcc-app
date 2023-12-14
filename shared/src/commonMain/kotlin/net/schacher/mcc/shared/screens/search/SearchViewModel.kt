@@ -11,14 +11,14 @@ import net.schacher.mcc.shared.repositories.CardRepository
 
 class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() {
 
-    private val _state = MutableStateFlow(SearchUiState())
+    private val _state = MutableStateFlow(UiState())
 
     val state = _state.asStateFlow()
 
     fun onSearch(query: String?) {
         if (query.isNullOrEmpty()) {
             _state.update {
-                SearchUiState()
+                UiState()
             }
             return
         }
@@ -42,7 +42,7 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
     }
 }
 
-data class SearchUiState(
+data class UiState(
     val loading: Boolean = false,
     val result: List<Card> = emptyList()
 )

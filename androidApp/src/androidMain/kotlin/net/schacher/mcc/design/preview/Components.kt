@@ -1,10 +1,11 @@
-package net.schacher.mcc.design
+package net.schacher.mcc.design.preview
 
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
+import net.schacher.mcc.design.ThemedPreviews
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
@@ -20,6 +21,7 @@ fun SearchBarPreview() {
         SearchBar(onDoneClick = {}, onQueryChange = {})
     }
 }
+
 
 @ThemedPreviews
 @Composable

@@ -12,8 +12,14 @@ koin = "3.5.0"
 koin-compose = "1.1.0"
 activity = "1.8.1"
 serialization = "1.6.0"
+androidxCompose = "1.5.4"
+androidxComposeCompiler = "1.5.6"
 
 [libraries]
+androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidxComposeCompiler" }
+androidx-compose-tooling = { module = "androidx.compose.ui:ui-tooling", version.ref = "androidxCompose" }
+androidx-compose-preview = { module = "androidx.compose.ui:ui-tooling-preview", version.ref = "androidxCompose" }
+
 androidx-activity = { module = "androidx.activity:activity-compose", version.ref = "activity" }
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "coreKtx" }

@@ -39,6 +39,7 @@ fun OptionsGroup(title: String = "", content: @Composable () -> Unit) {
                 text = title,
                 fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
                 maxLines = 1,
             )
 
@@ -93,6 +94,9 @@ fun OptionsEntry(label: String, icon: @Composable () -> Unit, onClick: (() -> Un
         verticalAlignment = Alignment.CenterVertically
     ) {
         icon()
-        Text(label)
+        Text(
+            text = label,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+        )
     }
 }

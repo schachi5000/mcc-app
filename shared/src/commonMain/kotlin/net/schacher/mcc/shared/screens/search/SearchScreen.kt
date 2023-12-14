@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -48,12 +49,23 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 
+
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel = koinInject(),
     onCardClicked: (Card) -> Unit
 ) {
     val state by searchViewModel.state.collectAsState()
+
+    SearchScreen(state = state, onCardClicked = onCardClicked) { searchViewModel.onSearch(it) }
+}
+
+@Composable
+fun SearchScreen(
+    state: UiState,
+    onCardClicked: (Card) -> Unit,
+    onSearch: (String?) -> Unit
+) {
     val focusManager = LocalFocusManager.current
 
     Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
@@ -95,11 +107,12 @@ fun SearchScreen(
 
         Row(modifier = Modifier.padding(16.dp)) {
             SearchBar(onDoneClick = { focusManager.clearFocus() }) { query ->
-                searchViewModel.onSearch(query)
+                onSearch(query)
             }
         }
     }
 }
+
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -127,31 +140,35 @@ fun SearchBar(
 
         val focusRequester = remember { FocusRequester() }
 
-        TextField(
-            modifier = Modifier
-                .weight(1f)
-                .size(48.dp)
+        Box(
+            modifier = Modifier.weight(1f)
                 .fillMaxWidth()
+                .height(48.dp)
                 .background(MaterialTheme.colors.surface, RoundedCornerShape(32.dp))
-                .focusRequester(focusRequester),
-            value = input,
-            colors = TextFieldDefaults.textFieldColors(
-                backgroundColor = Color.Transparent,
-                cursorColor = MaterialTheme.colors.onSurface,
-                focusedIndicatorColor = Color.Transparent,
-                unfocusedIndicatorColor = Color.Transparent
-            ),
-            keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-            keyboardActions = KeyboardActions(
-                onDone = { onDoneClick() }
-            ),
-            singleLine = true,
-            onValueChange = {
-                input = it
-                onQueryChange(it)
-            },
-            label = null,
-        )
+        ) {
+            TextField(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .focusRequester(focusRequester),
+                value = input,
+                colors = TextFieldDefaults.textFieldColors(
+                    backgroundColor = Color.Transparent,
+                    cursorColor = MaterialTheme.colors.onSurface,
+                    focusedIndicatorColor = Color.Transparent,
+                    unfocusedIndicatorColor = Color.Transparent
+                ),
+                keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
+                keyboardActions = KeyboardActions(
+                    onDone = { onDoneClick() }
+                ),
+                singleLine = true,
+                onValueChange = {
+                    input = it
+                    onQueryChange(it)
+                },
+                label = null,
+            )
+        }
 
         LaunchedEffect(Unit) {
             focusRequester.requestFocus()

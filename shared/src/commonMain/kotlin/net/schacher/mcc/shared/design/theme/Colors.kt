@@ -12,6 +12,7 @@ import net.schacher.mcc.shared.model.Aspect
 val LightColorScheme = lightColors(
     background = Color(0xffededed),
     surface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFF000000),
     primary = Color(0xFF145da1),
     onPrimary = Color(0xFFFFFFFF)
 )
@@ -19,10 +20,10 @@ val LightColorScheme = lightColors(
 val DarkColorScheme = darkColors(
     background = Color(0xFF000005),
     surface = Color(0xFF242424),
+    onSurface = Color(0xFFFFFFFF),
     primary = Color(0xFF145da1),
     onPrimary = Color(0xFFFFFFFF)
 )
-
 
 object SleeveColors {
     val Blue = Color(0xFF185ea4)
