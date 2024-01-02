@@ -124,7 +124,7 @@ private fun LoadingContent() {
         }
 
 
-        for (i in 0..3) {
+        for (i in 0..2) {
             LoadingDeck()
             Spacer(Modifier.height(16.dp))
         }
