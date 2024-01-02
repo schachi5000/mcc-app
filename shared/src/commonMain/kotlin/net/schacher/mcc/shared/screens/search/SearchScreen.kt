@@ -74,7 +74,7 @@ fun SearchScreen(
 ) {
     val focusManager = LocalFocusManager.current
 
-    Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+    Box(modifier = Modifier.fillMaxSize()) {
         val entries = state.result
             .groupBy { it.type }
             .map { Entry("${it.key} (${it.value.size})", it.value) }
@@ -111,7 +111,7 @@ fun SearchScreen(
             }
         }
 
-        Row(modifier = Modifier.padding(vertical = 16.dp)) {
+        Row(modifier = Modifier.statusBarsPadding().padding(vertical = 16.dp)) {
             SearchBar(onDoneClick = { focusManager.clearFocus() }) { query ->
                 onSearch(query)
             }

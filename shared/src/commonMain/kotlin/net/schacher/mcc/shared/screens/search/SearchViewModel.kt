@@ -28,9 +28,9 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
         }
 
         viewModelScope.launch(Dispatchers.Default) {
-            val filteredCards = cardRepository.cards.filter {
-                it.name.lowercase().contains(query.lowercase())
-            }
+            val filteredCards = cardRepository.cards
+                .filter { it.name.lowercase().contains(query.lowercase()) }
+                .distinctBy { it.name }
 
             _state.update {
                 it.copy(
