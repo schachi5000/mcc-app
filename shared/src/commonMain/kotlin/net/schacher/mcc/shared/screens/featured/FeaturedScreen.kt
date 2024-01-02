@@ -42,9 +42,7 @@ fun FeaturedScreen(
     val state by featuredViewModel.state.collectAsState()
 
     Box(
-        modifier = Modifier.fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = 16.dp)
+        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
     ) {
         AnimatedVisibility(
             visible = !state.loading,

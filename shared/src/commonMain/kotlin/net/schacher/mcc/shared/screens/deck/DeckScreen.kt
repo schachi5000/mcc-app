@@ -44,7 +44,6 @@ fun DeckScreen(
 
     Box(
         modifier = Modifier.fillMaxSize()
-            .statusBarsPadding()
             .padding(horizontal = 16.dp)
     ) {
         LazyColumn {
