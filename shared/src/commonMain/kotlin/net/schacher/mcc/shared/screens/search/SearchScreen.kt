@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.screens.search
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -19,6 +20,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Surface
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -109,7 +111,7 @@ fun SearchScreen(
             }
         }
 
-        Row(modifier = Modifier.padding(16.dp)) {
+        Row(modifier = Modifier.padding(vertical = 16.dp)) {
             SearchBar(onDoneClick = { focusManager.clearFocus() }) { query ->
                 onSearch(query)
             }
@@ -125,29 +127,37 @@ fun SearchBar(
     onQueryChange: (String) -> Unit
 ) {
     var input by remember { mutableStateOf("") }
+    val focusRequester = remember { FocusRequester() }
 
     Row(modifier = Modifier.fillMaxWidth().height(56.dp)) {
         AnimatedVisibility(visible = isKeyboardVisible()) {
             IconButton(
                 modifier = Modifier
-                    .padding(end = 8.dp)
                     .size(56.dp)
-                    .background(MaterialTheme.colors.surface, CircleShape),
-                onClick = { onDoneClick() }
+                    .background(Color.Transparent),
+                onClick = {
+                    focusRequester.freeFocus()
+                    onDoneClick()
+                }
             ) {
                 Icon(
-                    painterResource("ic_hide_keyboard.xml"), "Clear",
+                    painterResource("ic_arrow_back.xml"), "Clear",
                     tint = MaterialTheme.colors.onBackground
                 )
             }
         }
 
-        val focusRequester = remember { FocusRequester() }
-
-        Box(
-            modifier = Modifier.weight(1f)
+        Surface(
+            modifier = Modifier
+                .weight(1f)
                 .fillMaxSize()
-                .background(MaterialTheme.colors.surface, RoundedCornerShape(32.dp))
+                .padding(
+                    start = if (isKeyboardVisible()) 0.dp else 16.dp,
+                    end = if (input.isNotEmpty()) 0.dp else 16.dp
+                ),
+            shape = RoundedCornerShape(32.dp),
+            color = MaterialTheme.colors.surface,
+            border = BorderStroke(2.dp, MaterialTheme.colors.primary).takeIf { isKeyboardVisible() },
         ) {
             TextField(
                 modifier = Modifier
@@ -180,7 +190,7 @@ fun SearchBar(
         AnimatedVisibility(visible = input.isNotEmpty()) {
             IconButton(
                 modifier = Modifier
-                    .padding(start = 8.dp)
+                    .padding(start = 8.dp, end = 16.dp)
                     .size(56.dp)
                     .background(MaterialTheme.colors.surface, CircleShape),
                 onClick = {
