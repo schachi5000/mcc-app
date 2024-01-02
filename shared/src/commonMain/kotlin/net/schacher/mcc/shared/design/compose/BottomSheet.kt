@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -17,7 +18,11 @@ import androidx.compose.ui.unit.dp
 
 @Composable
 fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Column(modifier = modifier.fillMaxWidth().background(MaterialTheme.colors.surface)) {
+    Column(
+        modifier = modifier.navigationBarsPadding()
+            .fillMaxWidth()
+            .background(MaterialTheme.colors.surface)
+    ) {
         Spacer(Modifier.height(8.dp))
         Row(
             modifier = Modifier.size(32.dp, 4.dp)
@@ -31,6 +36,5 @@ fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () 
         Spacer(Modifier.height(8.dp))
 
         content()
-        Spacer(Modifier.height(16.dp))
     }
 }

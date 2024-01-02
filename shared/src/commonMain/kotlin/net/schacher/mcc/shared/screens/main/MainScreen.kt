@@ -1,12 +1,14 @@
 package net.schacher.mcc.shared.screens.main
 
+import IS_IOS
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
@@ -149,42 +151,45 @@ fun MainScreen(
 @Composable
 fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     BottomNavigation(
-        modifier = Modifier.fillMaxWidth()
-            .height(72.dp)
+        modifier = Modifier
+            .fillMaxWidth()
+            .heightIn(72.dp)
             .graphicsLayer {
                 clip = true
                 shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
             },
         backgroundColor = MaterialTheme.colors.surface,
     ) {
-        DefaultBottomNavigationItem(
-            label = "My Decks",
-            icon = "ic_deck.xml",
-            color = Decks.tabColor,
-            selected = (selectedTabIndex == 0),
-            onClick = { onTabSelected(0) },
-        )
-        DefaultBottomNavigationItem(
-            label = "Featured",
-            icon = "ic_featured_decks.xml",
-            color = Featured.tabColor,
-            selected = (selectedTabIndex == 1),
-            onClick = { onTabSelected(1) },
-        )
-        DefaultBottomNavigationItem(
-            label = "Search",
-            icon = "ic_search.xml",
-            color = Search.tabColor,
-            selected = (selectedTabIndex == 2),
-            onClick = { onTabSelected(2) },
-        )
-        DefaultBottomNavigationItem(
-            label = "Settings",
-            icon = { Icon(Icons.Rounded.Settings, "Settings") },
-            color = Settings.tabColor,
-            selected = (selectedTabIndex == 3),
-            onClick = { onTabSelected(3) },
-        )
+        Row(Modifier.fillMaxWidth().padding(bottom = if (IS_IOS) 16.dp else 0.dp)) {
+            DefaultBottomNavigationItem(
+                label = "My Decks",
+                icon = "ic_deck.xml",
+                color = Decks.tabColor,
+                selected = (selectedTabIndex == 0),
+                onClick = { onTabSelected(0) },
+            )
+            DefaultBottomNavigationItem(
+                label = "Featured",
+                icon = "ic_featured_decks.xml",
+                color = Featured.tabColor,
+                selected = (selectedTabIndex == 1),
+                onClick = { onTabSelected(1) },
+            )
+            DefaultBottomNavigationItem(
+                label = "Search",
+                icon = "ic_search.xml",
+                color = Search.tabColor,
+                selected = (selectedTabIndex == 2),
+                onClick = { onTabSelected(2) },
+            )
+            DefaultBottomNavigationItem(
+                label = "Settings",
+                icon = { Icon(Icons.Rounded.Settings, "Settings") },
+                color = Settings.tabColor,
+                selected = (selectedTabIndex == 3),
+                onClick = { onTabSelected(3) },
+            )
+        }
     }
 }
 
@@ -222,7 +227,7 @@ val MainUiState.MainScreen.tabColor: Color
         Decks -> Color(0xfff78f3f)
         Featured -> Color(0xff31e29c)
         Search -> Color(0xff518cca)
-        Settings -> Color(0xffe74c3c)
+        Settings -> Color(0xff803ce7)
     }
 val MainUiState.MainScreen.tabIndex: Int
     get() = when (this) {

@@ -50,3 +50,15 @@ fun App(databaseDao: DatabaseDao) {
         }
     }
 }
+
+enum class Platform {
+    ANDROID, IOS;
+}
+
+expect val platform: Platform
+
+val IS_IOS: Boolean
+    get() = platform == Platform.IOS
+
+val IS_ANDROID: Boolean
+    get() = platform == Platform.ANDROID
