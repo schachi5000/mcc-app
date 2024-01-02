@@ -19,7 +19,7 @@ import androidx.compose.ui.unit.dp
 @Composable
 fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Column(
-        modifier = modifier.navigationBarsPadding()
+        modifier = modifier
             .fillMaxWidth()
             .background(MaterialTheme.colors.surface)
     ) {
@@ -34,7 +34,7 @@ fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () 
         ) {}
 
         Spacer(Modifier.height(8.dp))
-
         content()
+        Spacer(Modifier.navigationBarsPadding().height(8.dp))
     }
 }
