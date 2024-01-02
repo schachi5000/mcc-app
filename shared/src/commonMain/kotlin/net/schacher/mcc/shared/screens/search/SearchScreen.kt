@@ -3,7 +3,9 @@ package net.schacher.mcc.shared.screens.search
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -13,14 +15,19 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
+import androidx.compose.material.ChipDefaults
+import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FilterChip
 import androidx.compose.material.Icon
 import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Surface
+import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
@@ -65,6 +72,7 @@ fun SearchScreen(
         onSearch = searchViewModel::onSearch
     )
 }
+
 
 @Composable
 fun SearchScreen(
@@ -112,10 +120,12 @@ fun SearchScreen(
             }
         }
 
-        Row(modifier = Modifier.statusBarsPadding().padding(vertical = 16.dp)) {
+        Column(modifier = Modifier.statusBarsPadding().padding(vertical = 16.dp)) {
             SearchBar(onDoneClick = { focusManager.clearFocus() }) { query ->
                 onSearch(query)
             }
+
+            FilterRow(Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
         }
     }
 }
@@ -202,6 +212,60 @@ fun SearchBar(
                     Icons.Rounded.Clear, "Clear",
                     tint = MaterialTheme.colors.onSurface
                 )
+            }
+        }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun FilterRow(modifier: Modifier = Modifier) {
+    LazyRow(
+        modifier = modifier,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        item {
+            var selected by remember { mutableStateOf(false) }
+
+            FilterChip(
+                onClick = { selected = !selected },
+                selected = selected,
+                colors = ChipDefaults.filterChipColors(
+                    selectedContentColor = Color.White,
+                    selectedBackgroundColor = MaterialTheme.colors.primary
+                )
+            ) {
+                Text("Owned only")
+            }
+        }
+
+        item {
+            var selected by remember { mutableStateOf(false) }
+
+            FilterChip(
+                onClick = { selected = !selected },
+                selected = selected,
+                colors = ChipDefaults.filterChipColors(
+                    selectedContentColor = Color.White,
+                    selectedBackgroundColor = MaterialTheme.colors.primary
+                )
+            ) {
+                Text("Aspects")
+            }
+        }
+
+        item {
+            var selected by remember { mutableStateOf(false) }
+
+            FilterChip(
+                onClick = { selected = !selected },
+                selected = selected,
+                colors = ChipDefaults.filterChipColors(
+                    selectedContentColor = Color.White,
+                    selectedBackgroundColor = MaterialTheme.colors.primary
+                )
+            ) {
+                Text("Types")
             }
         }
     }
