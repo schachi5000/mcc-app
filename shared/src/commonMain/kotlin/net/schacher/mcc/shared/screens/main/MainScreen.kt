@@ -114,7 +114,6 @@ fun MainScreen(
 
                     2 -> SearchScreen {
                         mainViewModel.onCardClicked(it)
-                        scope.launch { snackbarHostState.showSnackbar("${it.name} | ${it.code}") }
                     }
 
                     3 -> SettingsScreen()
@@ -227,7 +226,7 @@ val MainUiState.MainScreen.tabColor: Color
         Decks -> Color(0xfff78f3f)
         Featured -> Color(0xff31e29c)
         Search -> Color(0xff518cca)
-        Settings -> Color(0xff803ce7)
+        Settings -> Color(0xff9957ff)
     }
 val MainUiState.MainScreen.tabIndex: Int
     get() = when (this) {

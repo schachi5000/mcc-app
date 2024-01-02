@@ -103,7 +103,7 @@ fun SearchScreen(
         ) {
             items(entries.count()) { item ->
                 if (item == 0) {
-                    Spacer(Modifier.statusBarsPadding().padding(bottom = 88.dp))
+                    Spacer(Modifier.statusBarsPadding().padding(bottom = 148.dp))
                 }
 
                 EntryRow(
@@ -140,7 +140,7 @@ fun SearchBar(
     var input by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
 
-    Row(modifier = Modifier.fillMaxWidth().height(56.dp)) {
+    Row(modifier = Modifier.fillMaxWidth().height(48.dp)) {
         AnimatedVisibility(visible = isKeyboardVisible()) {
             IconButton(
                 modifier = Modifier
@@ -202,7 +202,7 @@ fun SearchBar(
             IconButton(
                 modifier = Modifier
                     .padding(start = 8.dp, end = 16.dp)
-                    .size(56.dp)
+                    .size(48.dp)
                     .background(MaterialTheme.colors.surface, CircleShape),
                 onClick = {
                     input = ""
@@ -225,48 +225,33 @@ fun FilterRow(modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         item {
-            var selected by remember { mutableStateOf(false) }
-
-            FilterChip(
-                onClick = { selected = !selected },
-                selected = selected,
-                colors = ChipDefaults.filterChipColors(
-                    selectedContentColor = Color.White,
-                    selectedBackgroundColor = MaterialTheme.colors.primary
-                )
-            ) {
-                Text("Owned only")
-            }
+            SearchFilterChip("Owned only")
         }
 
         item {
-            var selected by remember { mutableStateOf(false) }
-
-            FilterChip(
-                onClick = { selected = !selected },
-                selected = selected,
-                colors = ChipDefaults.filterChipColors(
-                    selectedContentColor = Color.White,
-                    selectedBackgroundColor = MaterialTheme.colors.primary
-                )
-            ) {
-                Text("Aspects")
-            }
+            SearchFilterChip("Aspects")
         }
 
         item {
-            var selected by remember { mutableStateOf(false) }
-
-            FilterChip(
-                onClick = { selected = !selected },
-                selected = selected,
-                colors = ChipDefaults.filterChipColors(
-                    selectedContentColor = Color.White,
-                    selectedBackgroundColor = MaterialTheme.colors.primary
-                )
-            ) {
-                Text("Types")
-            }
+            SearchFilterChip("Types")
         }
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun SearchFilterChip(label: String) {
+    var selected by remember { mutableStateOf(false) }
+
+    FilterChip(
+        onClick = { selected = !selected },
+        selected = selected,
+        colors = ChipDefaults.filterChipColors(
+            backgroundColor = MaterialTheme.colors.surface.copy(0.9f),
+            selectedContentColor = Color.White,
+            selectedBackgroundColor = MaterialTheme.colors.primary
+        )
+    ) {
+        Text(label)
     }
 }
