@@ -53,9 +53,10 @@ import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.Entry
 import net.schacher.mcc.shared.design.compose.EntryRow
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
-import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.screens.search.Filter.*
+import net.schacher.mcc.shared.screens.search.Filter.Type.*
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -71,7 +72,8 @@ fun SearchScreen(
     SearchScreen(
         state = state,
         onCardClicked = onCardClicked,
-        onSearch = searchViewModel::onSearch
+        onSearch = searchViewModel::onSearch,
+        onFilterClicked = searchViewModel::onFilterClicked
     )
 }
 
@@ -80,7 +82,8 @@ fun SearchScreen(
 fun SearchScreen(
     state: UiState,
     onCardClicked: (Card) -> Unit,
-    onSearch: (String?) -> Unit
+    onSearch: (String?) -> Unit,
+    onFilterClicked: (Filter) -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
 
@@ -127,7 +130,12 @@ fun SearchScreen(
                 onSearch(query)
             }
 
-            FilterRow(Modifier.padding(horizontal = 16.dp, vertical = 8.dp))
+            FilterRow(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                filters = state.filters
+            ) {
+                onFilterClicked(it)
+            }
         }
     }
 }
@@ -223,32 +231,39 @@ fun SearchBar(
 }
 
 @Composable
-fun FilterRow(modifier: Modifier = Modifier) {
+fun FilterRow(
+    modifier: Modifier = Modifier,
+    filters: Set<Filter>,
+    onFilterClicked: (Filter) -> Unit = {}
+) {
     LazyRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        item {
-            SearchFilterChip("Owned only", MaterialTheme.colors.primary) {
-
-            }
-        }
-
-        Aspect.values().forEach {
+        filters.forEach {
             item {
-                SearchFilterChip(it.toString(), it.color) {
+                SearchFilterChip(it.type.label, selected = it.active) {
+                    onFilterClicked(it)
                 }
             }
         }
     }
 }
 
+private val Type.label: String
+    get() = when (this) {
+        OWNED -> "Owned"
+        AGGRESSION -> Aspect.AGGRESSION.toString()
+        PROTECTION -> Aspect.PROTECTION.toString()
+        JUSTICE -> Aspect.JUSTICE.toString()
+        LEADERSHIP -> Aspect.LEADERSHIP.toString()
+    }
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchFilterChip(
     label: String,
-    color: Color,
     selected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
@@ -258,7 +273,7 @@ fun SearchFilterChip(
         colors = ChipDefaults.filterChipColors(
             backgroundColor = MaterialTheme.colors.surface.copy(0.9f),
             selectedContentColor = Color.White,
-            selectedBackgroundColor = color
+            selectedBackgroundColor = MaterialTheme.colors.primary
         )
     ) {
         Text(label)

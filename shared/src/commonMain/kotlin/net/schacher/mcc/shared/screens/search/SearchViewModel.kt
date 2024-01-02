@@ -8,6 +8,11 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.repositories.CardRepository
+import net.schacher.mcc.shared.screens.search.Filter.Type.AGGRESSION
+import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
+import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
+import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
+import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
 
 class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() {
 
@@ -40,9 +45,46 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
             }
         }
     }
+
+    fun onFilterClicked(filter: Filter) {
+        _state.update { uiState ->
+            val newFilters = uiState.filters.map {
+                if (it.type == filter.type) {
+                    Filter(it.type, !it.active)
+                } else {
+                    it
+                }
+            }.toSet()
+
+
+            uiState.copy(
+                filters = newFilters
+            )
+        }
+    }
 }
 
-data class UiState(
+data class UiState internal constructor(
     val loading: Boolean = false,
-    val result: List<Card> = emptyList()
-)
+    val result: List<Card> = emptyList(),
+    val filters: Set<Filter> = setOf(
+        Filter(OWNED, false),
+        Filter(AGGRESSION, false),
+        Filter(PROTECTION, false),
+        Filter(JUSTICE, false),
+        Filter(LEADERSHIP, false)
+    )
+) {
+    val filtersEnabled: Boolean = filters.any { it.active } || filters.all { !it.active }
+}
+
+data class Filter internal constructor(val type: Type, val active: Boolean) {
+    enum class Type {
+        OWNED,
+        AGGRESSION,
+        PROTECTION,
+        JUSTICE,
+        LEADERSHIP
+    }
+}
+
