@@ -53,6 +53,8 @@ import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.Entry
 import net.schacher.mcc.shared.design.compose.EntryRow
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
+import net.schacher.mcc.shared.design.theme.color
+import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -168,7 +170,10 @@ fun SearchBar(
                 ),
             shape = RoundedCornerShape(32.dp),
             color = MaterialTheme.colors.surface,
-            border = BorderStroke(2.dp, MaterialTheme.colors.primary).takeIf { isKeyboardVisible() },
+            border = BorderStroke(
+                2.dp,
+                MaterialTheme.colors.primary
+            ).takeIf { isKeyboardVisible() },
         ) {
             TextField(
                 modifier = Modifier
@@ -217,39 +222,43 @@ fun SearchBar(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun FilterRow(modifier: Modifier = Modifier) {
     LazyRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-        item {
-            SearchFilterChip("Owned only")
-        }
 
         item {
-            SearchFilterChip("Aspects")
+            SearchFilterChip("Owned only", MaterialTheme.colors.primary) {
+
+            }
         }
 
-        item {
-            SearchFilterChip("Types")
+        Aspect.values().forEach {
+            item {
+                SearchFilterChip(it.toString(), it.color) {
+                }
+            }
         }
     }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
-fun SearchFilterChip(label: String) {
-    var selected by remember { mutableStateOf(false) }
-
+fun SearchFilterChip(
+    label: String,
+    color: Color,
+    selected: Boolean = false,
+    onClick: () -> Unit = {}
+) {
     FilterChip(
-        onClick = { selected = !selected },
+        onClick = onClick,
         selected = selected,
         colors = ChipDefaults.filterChipColors(
             backgroundColor = MaterialTheme.colors.surface.copy(0.9f),
             selectedContentColor = Color.White,
-            selectedBackgroundColor = MaterialTheme.colors.primary
+            selectedBackgroundColor = color
         )
     ) {
         Text(label)
