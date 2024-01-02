@@ -106,6 +106,7 @@ fun SearchScreen(
                         bottom = 16.dp
                     ), entry = entries[item]
                 ) {
+                    focusManager.clearFocus()
                     onCardClicked(it)
                 }
             }
