@@ -41,6 +41,14 @@ fun FeaturedScreen(
 ) {
     val state by featuredViewModel.state.collectAsState()
 
+    FeaturedScreen(state, onDeckClick)
+}
+
+@Composable
+fun FeaturedScreen(
+    state: FeaturedUiState,
+    onDeckClick: (Deck) -> Unit
+) {
     Box(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
     ) {
@@ -105,29 +113,24 @@ private fun Header(label: String) {
 @Composable
 private fun LoadingContent() {
     Column(
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().statusBarsPadding(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
-        Spacer(Modifier.height(16.dp))
-        LoadingHeader()
-        Spacer(Modifier.height(16.dp))
-        LoadingDeck()
-        Spacer(Modifier.height(16.dp))
-        LoadingDeck()
-        Spacer(Modifier.height(16.dp))
-        LoadingDeck()
-        Spacer(Modifier.height(16.dp))
-        LoadingDeck()
-        Spacer(Modifier.height(16.dp))
+        Row(
+            modifier = Modifier.padding(vertical = 24.dp),
+            horizontalArrangement = Arrangement.Center
+        ) {
+            ShimmerBox(Modifier.size(112.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)))
+        }
+
+
+        for (i in 0..3) {
+            LoadingDeck()
+            Spacer(Modifier.height(16.dp))
+        }
     }
 }
 
-@Composable
-private fun LoadingHeader() {
-    ShimmerBox(
-        Modifier.size(112.dp, height = 24.dp).clip(RoundedCornerShape(16.dp))
-    )
-}
 
 private sealed interface ListItem {
     data class DeckItem(val deck: Deck) : ListItem
