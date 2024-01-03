@@ -1,4 +1,4 @@
-package net.schacher.mcc.design.preview.screens
+package net.schacher.mcc.design.preview
 
 import androidx.compose.runtime.Composable
 import net.schacher.mcc.design.ThemedPreviews

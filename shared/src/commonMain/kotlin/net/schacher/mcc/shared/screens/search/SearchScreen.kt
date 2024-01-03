@@ -16,8 +16,6 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
-import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.ChipDefaults
@@ -53,6 +51,7 @@ import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.Entry
 import net.schacher.mcc.shared.design.compose.EntryRow
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.search.Filter.Type
@@ -92,11 +91,6 @@ fun SearchScreen(
     val focusManager = LocalFocusManager.current
 
     Box(modifier = Modifier.fillMaxSize()) {
-        val entries = createEntries(state.result)
-//        state.result
-//            .groupBy { it.type }
-//            .map { Entry("${it.key} (${it.value.size})", it.value) }
-
         val nestedScrollConnection = remember {
             object : NestedScrollConnection {
 
@@ -111,6 +105,7 @@ fun SearchScreen(
             modifier = Modifier.fillMaxWidth()
                 .nestedScroll(nestedScrollConnection)
         ) {
+            val entries = createEntries(state.result)
             items(entries.count()) { item ->
                 if (item == 0) {
                     Spacer(Modifier.statusBarsPadding().padding(bottom = 148.dp))
@@ -136,7 +131,7 @@ fun SearchScreen(
             }
 
             FilterRow(
-                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                modifier = Modifier.padding(vertical = 8.dp),
                 filters = state.filters
             ) {
                 onFilterClicked(it)
@@ -160,7 +155,7 @@ fun SearchBar(
             IconButton(
                 modifier = Modifier
                     .size(56.dp)
-                    .background(Color.Transparent),
+                    .background(Color.Transparent, DefaultShape),
                 onClick = {
                     focusRequester.freeFocus()
                     onDoneClick()
@@ -181,7 +176,7 @@ fun SearchBar(
                     start = if (isKeyboardVisible()) 0.dp else 16.dp,
                     end = if (input.isNotEmpty()) 0.dp else 16.dp
                 ),
-            shape = RoundedCornerShape(32.dp),
+            shape = DefaultShape,
             color = MaterialTheme.colors.surface,
             border = BorderStroke(
                 2.dp,
@@ -221,7 +216,7 @@ fun SearchBar(
                 modifier = Modifier
                     .padding(start = 8.dp, end = 16.dp)
                     .size(48.dp)
-                    .background(MaterialTheme.colors.surface, CircleShape),
+                    .background(MaterialTheme.colors.surface, DefaultShape),
                 onClick = {
                     input = ""
                     onQueryChange("")
@@ -246,10 +241,17 @@ fun FilterRow(
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
 
-        filters.forEach {
+        filters.forEachIndexed { index, filter ->
             item {
-                SearchFilterChip(it.type.label, selected = it.active) {
-                    onFilterClicked(it)
+                SearchFilterChip(
+                    modifier = Modifier.padding(
+                        start = if (index == 0) 16.dp else 0.dp,
+                        end = if (index == filters.count() - 1) 16.dp else 0.dp
+                    ),
+                    label = filter.type.label,
+                    selected = filter.active
+                ) {
+                    onFilterClicked(filter)
                 }
             }
         }
@@ -260,15 +262,18 @@ fun FilterRow(
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchFilterChip(
+    modifier: Modifier = Modifier,
     label: String,
     selected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
     FilterChip(
+        modifier = modifier,
         onClick = onClick,
         selected = selected,
+        shape = DefaultShape,
         colors = ChipDefaults.filterChipColors(
-            backgroundColor = MaterialTheme.colors.surface.copy(0.9f),
+            backgroundColor = MaterialTheme.colors.surface,
             selectedContentColor = Color.White,
             selectedBackgroundColor = MaterialTheme.colors.primary
         )
