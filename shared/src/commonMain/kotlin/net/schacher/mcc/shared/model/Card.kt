@@ -8,6 +8,7 @@ data class Card(
     val name: String,
     val faction: Faction,
     val packCode: String,
+    val packName: String,
     val cost: Int? = null,
     val aspect: Aspect? = null,
     val linkedCard: Card? = null,
@@ -15,7 +16,8 @@ data class Card(
 ) {
     val orientation = when (type) {
         CardType.SIDE_SCHEME,
-        CardType.MAIN_SCHEME -> CardOrientation.LANDSCAPE
+        CardType.MAIN_SCHEME,
+        CardType.PLAYER_SIDE_SCHEME -> CardOrientation.LANDSCAPE
 
         else -> CardOrientation.PORTRAIT
     }
@@ -35,6 +37,7 @@ object CardType {
     const val VILLAIN = "villain"
     const val MAIN_SCHEME = "main_scheme"
     const val SIDE_SCHEME = "side_scheme"
+    const val PLAYER_SIDE_SCHEME = "player_side_scheme"
     const val ATTACHMENT = "attachment"
     const val MINION = "minion"
     const val TREACHERY = "treachery"
@@ -42,7 +45,7 @@ object CardType {
     const val OBLIGATION = "obligation"
 }
 
-enum class Faction{
+enum class Faction {
     AGGRESSION,
     JUSTICE,
     ENCOUNTER,

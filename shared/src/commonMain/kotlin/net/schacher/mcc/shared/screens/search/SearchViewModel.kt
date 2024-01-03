@@ -1,9 +1,12 @@
 package net.schacher.mcc.shared.screens.search
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.repositories.CardRepository
@@ -20,33 +23,28 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
     val state = _state.asStateFlow()
 
     fun onSearch(query: String?) {
-        if (query.isNullOrEmpty()) {
-            _state.update {
-                it.copy(
-                    result = getFilteredCards(it.query, it.filters)
-                )
-            }
-            return
-        }
-
         _state.update {
             it.copy(
                 query = query,
-                loading = true
+                loading = query != null
             )
         }
 
-        _state.update {
-            it.copy(
-                result = getFilteredCards(it.query, it.filters),
-                loading = false
-            )
+        viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    result = getFilteredCards(it.query, it.filters),
+                    loading = false
+                )
+            }
         }
     }
 
     fun onFilterClicked(filter: Filter) {
-        _state.update { uiState ->
-            val newFilters = uiState.filters.map {
+        val value = _state.value
+
+        this.viewModelScope.launch {
+            val newFilters = value.filters.map {
                 if (it.type == filter.type) {
                     Filter(it.type, !it.active)
                 } else {
@@ -54,30 +52,32 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
                 }
             }.toSet()
 
-            val result = getFilteredCards(uiState.query, newFilters)
-
-            uiState.copy(
-                filters = newFilters,
-                result = result
+            _state.emit(
+                value.copy(
+                    filters = newFilters,
+                    result = getFilteredCards(value.query, newFilters)
+                )
             )
         }
     }
 
-    private fun getFilteredCards(query: String?, filters: Set<Filter>): List<Card> {
-        return cardRepository.cards
+    private suspend fun getFilteredCards(query: String?, filters: Set<Filter>) = withContext(Dispatchers.Default) {
+        cardRepository.cards
             .filter { card ->
                 filters.none { it.active } || filters.any { filter ->
                     when (filter.type) {
                         AGGRESSION -> card.aspect == Aspect.AGGRESSION
                         PROTECTION -> card.aspect == Aspect.PROTECTION
                         JUSTICE -> card.aspect == Aspect.JUSTICE
-                        LEADERSHIP -> card.aspect == Aspect.JUSTICE
+                        LEADERSHIP -> card.aspect == Aspect.LEADERSHIP
                         else -> false
                     } && filter.active
                 }
             }
             .filter { card ->
-                query?.let { query -> card.name.lowercase().contains(query.lowercase()) } ?: true
+                query?.lowercase()?.let {
+                    card.name.lowercase().contains(it) or card.packName.lowercase().contains(it)
+                } ?: true
             }
             .distinctBy { it.name }
     }
@@ -88,11 +88,11 @@ data class UiState(
     val query: String? = null,
     val result: List<Card> = emptyList(),
     val filters: Set<Filter> = setOf(
-        Filter(OWNED, false),
         Filter(AGGRESSION, false),
         Filter(PROTECTION, false),
         Filter(JUSTICE, false),
-        Filter(LEADERSHIP, false)
+        Filter(LEADERSHIP, false),
+        Filter(OWNED, false),
     )
 )
 
@@ -102,7 +102,7 @@ data class Filter(val type: Type, val active: Boolean) {
         AGGRESSION,
         PROTECTION,
         JUSTICE,
-        LEADERSHIP
+        LEADERSHIP,
     }
 }
 

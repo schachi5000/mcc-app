@@ -142,6 +142,7 @@ private fun CardDto.toCard() = Card(
     cost = this.cost,
     name = this.name,
     packCode = this.pack_code,
+    packName = this.pack_name,
     aspect = this.faction_code.parseAspect(),
     faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
 )

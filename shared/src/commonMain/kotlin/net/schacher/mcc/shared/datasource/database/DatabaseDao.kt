@@ -28,6 +28,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) : DeckDatabaseDa
             position = card.position.toLong(),
             type = card.type,
             packCode = card.packCode,
+            packName = card.packName,
             name = card.name,
             cost = card.cost?.toLong(),
             aspect = card.aspect?.name,
@@ -103,6 +104,7 @@ private fun database.Card.toCard() = Card(
     imagePath = this.imagePath,
     aspect = this.aspect?.let { Aspect.valueOf(it) },
     packCode = this.packCode,
+    packName = this.packName,
     linkedCard = null,
     faction = Faction.valueOf(this.faction)
 )

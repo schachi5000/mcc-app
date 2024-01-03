@@ -48,10 +48,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.design.compose.Entry
 import net.schacher.mcc.shared.design.compose.EntryRow
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.search.Filter.Type
@@ -89,6 +91,10 @@ fun SearchScreen(
     onFilterClicked: (Filter) -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
+
+    state.result.forEach {
+        Logger.d { it.toString() }
+    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         val nestedScrollConnection = remember {
@@ -248,6 +254,13 @@ fun FilterRow(
                         start = if (index == 0) 16.dp else 0.dp,
                         end = if (index == filters.count() - 1) 16.dp else 0.dp
                     ),
+                    color = when (filter.type) {
+                        AGGRESSION -> Aspect.AGGRESSION.color
+                        PROTECTION -> Aspect.PROTECTION.color
+                        JUSTICE -> Aspect.JUSTICE.color
+                        LEADERSHIP -> Aspect.LEADERSHIP.color
+                        OWNED -> MaterialTheme.colors.primary
+                    },
                     label = filter.type.label,
                     selected = filter.active
                 ) {
@@ -264,6 +277,7 @@ fun FilterRow(
 fun SearchFilterChip(
     modifier: Modifier = Modifier,
     label: String,
+    color: Color,
     selected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
@@ -275,22 +289,22 @@ fun SearchFilterChip(
         colors = ChipDefaults.filterChipColors(
             backgroundColor = MaterialTheme.colors.surface,
             selectedContentColor = Color.White,
-            selectedBackgroundColor = MaterialTheme.colors.primary
+            selectedBackgroundColor = color
         )
     ) {
         Text(label)
     }
 }
 
-private fun createEntries(cards: List<Card>): List<Entry> {
-    return cards.groupBy { it.type }.mapNotNull { (type, cards) ->
-        type?.let {
-            val byAspect = cards.groupBy { it.aspect }.values
-            byAspect.forEach { it.sortedBy { it.cost } }
-            Entry(it, byAspect.flatten())
+private fun createEntries(cards: List<Card>): List<Entry> =
+    cards.groupBy { it.type }
+        .mapNotNull { (type, cards) ->
+            type?.let {
+                val byAspect = cards.groupBy { it.aspect }.values
+                val sortedCards = byAspect.map { it.sortedBy { it.cost } }.flatten()
+                Entry(it, sortedCards)
+            }
         }
-    }
-}
 
 private val Type.label: String
     get() = when (this) {
