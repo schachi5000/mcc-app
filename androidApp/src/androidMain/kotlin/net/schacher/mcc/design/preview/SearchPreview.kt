@@ -12,7 +12,11 @@ import net.schacher.mcc.shared.screens.search.UiState
 fun SearchScreenPreview() {
     MccTheme {
         SearchScreen(
-            state = UiState(true, emptyList()),
+            state = UiState(
+                query = null,
+                loading = true,
+                result = emptyList()
+            ),
             onCardClicked = {},
             onSearch = {}
         )
