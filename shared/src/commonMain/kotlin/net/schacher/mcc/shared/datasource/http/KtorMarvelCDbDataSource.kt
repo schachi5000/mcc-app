@@ -113,8 +113,10 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
 }
 
 private fun LocalDate.toDateString(): String {
-    val dayOfMonth = this.dayOfMonth.let { day -> if (day < 10) "0$day" else day }
-    return "${this.year}-${this.monthNumber}-${dayOfMonth}"
+    val dayOfMonth = this.dayOfMonth.let { if (it < 10) "0$it" else it }
+    val month = this.monthNumber.let { if (it < 10) "0$it" else it }
+
+    return "${this.year}-${month}-${dayOfMonth}"
 }
 
 private const val LEADERSHIP = "leadership"
