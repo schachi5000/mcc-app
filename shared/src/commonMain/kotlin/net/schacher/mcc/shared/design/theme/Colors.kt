@@ -34,7 +34,7 @@ object SleeveColors {
 object AspectColors {
     val Aggression = Color(0xFFd32f2f)
     val Protection = Color(0xFF388e3c)
-    val Justice = Color(0xFFfbc02d)
+    val Justice = Color(0xFFe5cf28)
     val Leadership = Color(0xFF1976d2)
 }
 

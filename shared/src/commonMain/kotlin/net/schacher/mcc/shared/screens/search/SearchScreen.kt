@@ -41,6 +41,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -131,7 +132,11 @@ fun SearchScreen(
             }
         }
 
-        Column(modifier = Modifier.statusBarsPadding().padding(vertical = 16.dp)) {
+        Column(
+            modifier = Modifier.background(shade)
+                .statusBarsPadding()
+                .padding(vertical = 16.dp)
+        ) {
             SearchBar(onDoneClick = { focusManager.clearFocus() }) { query ->
                 onSearch(query)
             }
@@ -146,6 +151,16 @@ fun SearchScreen(
     }
 }
 
+private val shade: Brush
+    @Composable
+    get() = Brush.verticalGradient(
+        colors = listOf(
+            MaterialTheme.colors.background.copy(alpha = 0.9f),
+            MaterialTheme.colors.background.copy(alpha = 0.9f),
+            MaterialTheme.colors.background.copy(alpha = 0.6f),
+            MaterialTheme.colors.background.copy(alpha = 0.0f)
+        )
+    )
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
