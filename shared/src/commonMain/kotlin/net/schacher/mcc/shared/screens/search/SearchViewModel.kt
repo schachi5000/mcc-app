@@ -56,7 +56,6 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
                 }
             }.toSet()
 
-
             uiState.copy(
                 filters = newFilters
             )
@@ -64,7 +63,7 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
     }
 }
 
-data class UiState internal constructor(
+data class UiState(
     val loading: Boolean = false,
     val result: List<Card> = emptyList(),
     val filters: Set<Filter> = setOf(
@@ -78,7 +77,7 @@ data class UiState internal constructor(
     val filtersEnabled: Boolean = filters.any { it.active } || filters.all { !it.active }
 }
 
-data class Filter internal constructor(val type: Type, val active: Boolean) {
+data class Filter(val type: Type, val active: Boolean) {
     enum class Type {
         OWNED,
         AGGRESSION,
