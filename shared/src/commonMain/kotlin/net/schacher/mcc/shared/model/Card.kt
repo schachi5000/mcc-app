@@ -1,5 +1,8 @@
 package net.schacher.mcc.shared.model
 
+import net.schacher.mcc.shared.model.CardOrientation.LANDSCAPE
+import net.schacher.mcc.shared.model.CardOrientation.PORTRAIT
+
 
 data class Card(
     val code: String,
@@ -17,10 +20,18 @@ data class Card(
     val orientation = when (type) {
         CardType.SIDE_SCHEME,
         CardType.MAIN_SCHEME,
-        CardType.PLAYER_SIDE_SCHEME -> CardOrientation.LANDSCAPE
+        CardType.PLAYER_SIDE_SCHEME -> LANDSCAPE
 
-        else -> CardOrientation.PORTRAIT
+        else -> if (ForcedLandscapes.codes.contains(this.code)) {
+            LANDSCAPE
+        } else {
+            PORTRAIT
+        }
     }
+}
+
+private object ForcedLandscapes {
+    val codes = listOf("42001c")
 }
 
 enum class CardOrientation {

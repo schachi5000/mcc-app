@@ -7,7 +7,8 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 
-class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) : DeckDatabaseDao, CardDatabaseDao {
+class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Boolean = false) : DeckDatabaseDao,
+    CardDatabaseDao {
 
     private companion object {
         const val LIST_DELIMITER = ";"
@@ -16,6 +17,13 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) : DeckDatabaseDa
     private val database = AppDatabase(databaseDriverFactory.createDriver())
 
     private val dbQuery = database.appDatabaseQueries
+
+    init {
+        if (wipeDatabase) {
+            this.removeAllCards()
+            this.removeAllDecks()
+        }
+    }
 
     override fun addCards(cards: List<Card>) {
         Logger.d { "Adding ${cards.size} cards to database" }

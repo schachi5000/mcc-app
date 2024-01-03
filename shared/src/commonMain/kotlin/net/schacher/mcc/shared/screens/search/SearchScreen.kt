@@ -54,15 +54,18 @@ import net.schacher.mcc.shared.design.compose.Entry
 import net.schacher.mcc.shared.design.compose.EntryRow
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.TypeColors
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.search.Filter.Type
 import net.schacher.mcc.shared.screens.search.Filter.Type.AGGRESSION
+import net.schacher.mcc.shared.screens.search.Filter.Type.BASIC
 import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
 import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
+import net.schacher.mcc.shared.utils.defaultSort
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -124,7 +127,8 @@ fun SearchScreen(
                         top = if (item == 0) 0.dp else 16.dp,
                         end = 16.dp,
                         bottom = 16.dp
-                    ), entry = entries[item]
+                    ),
+                    entry = entries[item]
                 ) {
                     focusManager.clearFocus()
                     onCardClicked(it)
@@ -270,6 +274,7 @@ fun FilterRow(
                         end = if (index == filters.count() - 1) 16.dp else 0.dp
                     ),
                     color = when (filter.type) {
+                        BASIC -> TypeColors.Basic
                         AGGRESSION -> Aspect.AGGRESSION.color
                         PROTECTION -> Aspect.PROTECTION.color
                         JUSTICE -> Aspect.JUSTICE.color
@@ -315,15 +320,14 @@ private fun createEntries(cards: List<Card>): List<Entry> =
     cards.groupBy { it.type }
         .mapNotNull { (type, cards) ->
             type?.let {
-                val byAspect = cards.groupBy { it.aspect }.values
-                val sortedCards = byAspect.map { it.sortedBy { it.cost } }.flatten()
-                Entry(it, sortedCards)
+                Entry(it, cards.defaultSort())
             }
         }
 
 private val Type.label: String
     get() = when (this) {
         OWNED -> "Owned"
+        BASIC -> "Basis"
         AGGRESSION -> Aspect.AGGRESSION.toString()
         PROTECTION -> Aspect.PROTECTION.toString()
         JUSTICE -> Aspect.JUSTICE.toString()

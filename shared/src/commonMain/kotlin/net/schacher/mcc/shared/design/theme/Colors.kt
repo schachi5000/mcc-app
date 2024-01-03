@@ -14,7 +14,7 @@ val LightColorScheme = lightColors(
     surface = Color(0xFFFFFFFF),
     onSurface = Color(0xFF000000),
     primary = Color(0xFF145da1),
-    onPrimary = Color(0xFFFFFFFF)
+    onPrimary = Color(0xFFFFFFFF),
 )
 
 val DarkColorScheme = darkColors(
@@ -36,6 +36,10 @@ object AspectColors {
     val Protection = Color(0xFF388e3c)
     val Justice = Color(0xFFe5cf28)
     val Leadership = Color(0xFF1976d2)
+}
+
+object TypeColors {
+    val Basic = Color(0xff404040)
 }
 
 val Aspect?.color: Color
