@@ -18,6 +18,7 @@ data class CardDto(
     val faction_name: String,
     val flavor: String?,
     val hand_size: Int?,
+    val cost: Int?,
     val health: Int?,
     val health_per_hero: Boolean,
     val hidden: Boolean,

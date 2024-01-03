@@ -6,7 +6,9 @@ data class Card(
     val position: Int,
     val type: String?,
     val name: String,
+    val faction: Faction,
     val packCode: String,
+    val cost: Int? = null,
     val aspect: Aspect? = null,
     val linkedCard: Card? = null,
     val imagePath: String? = null
@@ -38,4 +40,16 @@ object CardType {
     const val TREACHERY = "treachery"
     const val ENVIRONMENT = "environment"
     const val OBLIGATION = "obligation"
+}
+
+enum class Faction{
+    AGGRESSION,
+    JUSTICE,
+    ENCOUNTER,
+    HERO,
+    BASIC,
+    LEADERSHIP,
+    PROTECTION,
+    CAMPAIGN,
+    POOL,
 }

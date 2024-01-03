@@ -55,8 +55,12 @@ import net.schacher.mcc.shared.design.compose.EntryRow
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.screens.search.Filter.*
-import net.schacher.mcc.shared.screens.search.Filter.Type.*
+import net.schacher.mcc.shared.screens.search.Filter.Type
+import net.schacher.mcc.shared.screens.search.Filter.Type.AGGRESSION
+import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
+import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
+import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
+import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
@@ -88,9 +92,10 @@ fun SearchScreen(
     val focusManager = LocalFocusManager.current
 
     Box(modifier = Modifier.fillMaxSize()) {
-        val entries = state.result
-            .groupBy { it.type }
-            .map { Entry("${it.key} (${it.value.size})", it.value) }
+        val entries = createEntries(state.result)
+//        state.result
+//            .groupBy { it.type }
+//            .map { Entry("${it.key} (${it.value.size})", it.value) }
 
         val nestedScrollConnection = remember {
             object : NestedScrollConnection {
@@ -251,14 +256,6 @@ fun FilterRow(
     }
 }
 
-private val Type.label: String
-    get() = when (this) {
-        OWNED -> "Owned"
-        AGGRESSION -> Aspect.AGGRESSION.toString()
-        PROTECTION -> Aspect.PROTECTION.toString()
-        JUSTICE -> Aspect.JUSTICE.toString()
-        LEADERSHIP -> Aspect.LEADERSHIP.toString()
-    }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -279,3 +276,22 @@ fun SearchFilterChip(
         Text(label)
     }
 }
+
+private fun createEntries(cards: List<Card>): List<Entry> {
+    return cards.groupBy { it.type }.mapNotNull { (type, cards) ->
+        type?.let {
+            val byAspect = cards.groupBy { it.aspect }.values
+            byAspect.forEach { it.sortedBy { it.cost } }
+            Entry(it, byAspect.flatten())
+        }
+    }
+}
+
+private val Type.label: String
+    get() = when (this) {
+        OWNED -> "Owned"
+        AGGRESSION -> Aspect.AGGRESSION.toString()
+        PROTECTION -> Aspect.PROTECTION.toString()
+        JUSTICE -> Aspect.JUSTICE.toString()
+        LEADERSHIP -> Aspect.LEADERSHIP.toString()
+    }

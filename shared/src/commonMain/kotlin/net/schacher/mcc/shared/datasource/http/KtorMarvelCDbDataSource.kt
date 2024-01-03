@@ -8,6 +8,7 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.serialization.kotlinx.json.json
+import io.ktor.util.toUpperCasePreservingASCIIRules
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
@@ -20,6 +21,7 @@ import net.schacher.mcc.shared.datasource.http.dto.PackDto
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.model.Faction
 import kotlin.coroutines.coroutineContext
 
 class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marvelcdb.com/api/public") :
@@ -135,7 +137,9 @@ private fun CardDto.toCard() = Card(
     code = this.code,
     position = this.position,
     type = this.type_code,
+    cost = this.cost,
     name = this.name,
     packCode = this.pack_code,
     aspect = this.faction_code.parseAspect(),
+    faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
 )

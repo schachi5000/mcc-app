@@ -5,6 +5,7 @@ import database.AppDatabase
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.model.Faction
 
 class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) : DeckDatabaseDao, CardDatabaseDao {
 
@@ -28,7 +29,10 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory) : DeckDatabaseDa
             type = card.type,
             packCode = card.packCode,
             name = card.name,
+            cost = card.cost?.toLong(),
+            aspect = card.aspect?.name,
             imagePath = card.imagePath,
+            faction = card.faction.name,
             linkedCardCode = card.linkedCard?.code
         )
     }
@@ -95,7 +99,10 @@ private fun database.Card.toCard() = Card(
     position = this.position.toInt(),
     type = this.type,
     name = this.name,
+    cost = this.cost?.toInt(),
     imagePath = this.imagePath,
+    aspect = this.aspect?.let { Aspect.valueOf(it) },
     packCode = this.packCode,
-    linkedCard = null
+    linkedCard = null,
+    faction = Faction.valueOf(this.faction)
 )
