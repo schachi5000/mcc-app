@@ -3,11 +3,14 @@ package net.schacher.mcc.shared.design.theme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.luminance
 import net.schacher.mcc.shared.design.theme.AspectColors.Aggression
 import net.schacher.mcc.shared.design.theme.AspectColors.Justice
 import net.schacher.mcc.shared.design.theme.AspectColors.Leadership
 import net.schacher.mcc.shared.design.theme.AspectColors.Protection
 import net.schacher.mcc.shared.model.Aspect
+import kotlin.math.max
+import kotlin.math.min
 
 val LightColorScheme = lightColors(
     background = Color(0xffededed),
@@ -25,6 +28,8 @@ val DarkColorScheme = darkColors(
     onPrimary = Color(0xFFFFFFFF)
 )
 
+const val MIN_CONTRAST_RATIO = 4.0f
+
 object SleeveColors {
     val Blue = Color(0xFF185ea4)
     val Yellow = Color(0xFFe98a02)
@@ -38,10 +43,6 @@ object AspectColors {
     val Leadership = Color(0xFF1976d2)
 }
 
-object TypeColors {
-    val Basic = Color(0xff404040)
-}
-
 val Aspect?.color: Color
     get() = when (this) {
         Aspect.AGGRESSION -> Aggression
@@ -50,3 +51,15 @@ val Aspect?.color: Color
         Aspect.LEADERSHIP -> Leadership
         else -> Color(0xffc7c7c7)
     }
+
+fun Color.getContrastRation(foreground: Color): Float {
+    val foregroundLuminance = foreground.luminance() + 0.05f
+    val backgroundLuminance = this.luminance() + 0.05f
+
+    return max(foregroundLuminance, backgroundLuminance) /
+            min(foregroundLuminance, backgroundLuminance)
+}
+
+fun Color.isContrastRatioSufficient(foreground: Color): Boolean {
+    return getContrastRation(foreground) >= MIN_CONTRAST_RATIO
+}

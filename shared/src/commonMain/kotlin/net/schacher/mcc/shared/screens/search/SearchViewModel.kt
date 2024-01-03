@@ -99,11 +99,11 @@ data class UiState(
     val query: String? = null,
     val result: List<Card> = emptyList(),
     val filters: Set<Filter> = setOf(
-        Filter(BASIC, false),
         Filter(AGGRESSION, false),
         Filter(PROTECTION, false),
         Filter(JUSTICE, false),
         Filter(LEADERSHIP, false),
+        Filter(BASIC, false),
         Filter(OWNED, false),
     )
 )

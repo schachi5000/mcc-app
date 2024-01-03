@@ -49,13 +49,12 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.design.compose.Entry
 import net.schacher.mcc.shared.design.compose.EntryRow
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.design.theme.TypeColors
 import net.schacher.mcc.shared.design.theme.color
+import net.schacher.mcc.shared.design.theme.isContrastRatioSufficient
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.search.Filter.Type
@@ -95,10 +94,6 @@ fun SearchScreen(
     onFilterClicked: (Filter) -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
-
-    state.result.forEach {
-        Logger.d { it.toString() }
-    }
 
     Box(modifier = Modifier.fillMaxSize()) {
         val nestedScrollConnection = remember {
@@ -274,11 +269,11 @@ fun FilterRow(
                         end = if (index == filters.count() - 1) 16.dp else 0.dp
                     ),
                     color = when (filter.type) {
-                        BASIC -> TypeColors.Basic
                         AGGRESSION -> Aspect.AGGRESSION.color
                         PROTECTION -> Aspect.PROTECTION.color
                         JUSTICE -> Aspect.JUSTICE.color
                         LEADERSHIP -> Aspect.LEADERSHIP.color
+                        BASIC,
                         OWNED -> MaterialTheme.colors.primary
                     },
                     label = filter.type.label,
@@ -308,7 +303,11 @@ fun SearchFilterChip(
         shape = DefaultShape,
         colors = ChipDefaults.filterChipColors(
             backgroundColor = MaterialTheme.colors.surface,
-            selectedContentColor = Color.White,
+            selectedContentColor = if (color.isContrastRatioSufficient(Color.White)) {
+                Color.White
+            } else {
+                Color.Black
+            },
             selectedBackgroundColor = color
         )
     ) {
@@ -326,7 +325,7 @@ private fun createEntries(cards: List<Card>): List<Entry> =
 
 private val Type.label: String
     get() = when (this) {
-        OWNED -> "Owned"
+        OWNED -> "In Besitz"
         BASIC -> "Basis"
         AGGRESSION -> Aspect.AGGRESSION.toString()
         PROTECTION -> Aspect.PROTECTION.toString()

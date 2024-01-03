@@ -8,8 +8,8 @@ enum class Aspect {
 
     override fun toString(): String = when (this) {
         AGGRESSION -> "Aggression"
-        PROTECTION -> "Protection"
-        JUSTICE -> "Justice"
-        LEADERSHIP -> "Leadership"
+        PROTECTION -> "Schutz"
+        JUSTICE -> "Gerechtigkeit"
+        LEADERSHIP -> "Führung"
     }
 }
