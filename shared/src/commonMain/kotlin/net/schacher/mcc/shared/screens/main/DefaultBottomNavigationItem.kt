@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.design.compose
+package net.schacher.mcc.shared.screens.main
 
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.material.BottomNavigationItem
