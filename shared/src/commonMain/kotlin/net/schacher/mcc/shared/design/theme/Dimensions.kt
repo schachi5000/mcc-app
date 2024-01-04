@@ -9,7 +9,7 @@ import net.schacher.mcc.shared.design.theme.CornerRadius.Default
 object CornerRadius {
     val Card = 16.dp
     val Deck = 16.dp
-    val Default = 20.dp
+    val Default = 16.dp
 }
 
 val CardShape = RoundedCornerShape(Card)

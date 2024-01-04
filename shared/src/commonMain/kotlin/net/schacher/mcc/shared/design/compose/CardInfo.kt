@@ -90,6 +90,15 @@ fun CardInfo(card: Card) {
                     )
                 }
 
+                card.attackText?.let {
+                    Text(
+                        modifier = Modifier.padding(top = 16.dp),
+                        text =it.toAnnotatedString(),
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
+                    )
+                }
+
                 card.boostText?.let {
                     Text(
                         modifier = Modifier.padding(top = 16.dp),
@@ -103,6 +112,8 @@ fun CardInfo(card: Card) {
                         color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
                     )
                 }
+
+
 
                 card.quote?.let {
                     Text(
@@ -144,6 +155,8 @@ private val boldRegex = Regex("<b>(.*?)</b>|\\[\\[(.*?)]]|\\[(.*?)]")
 
 private val italicRegex = Regex("<i>(.*?)</i>")
 
+private const val EMOJI_HERO = "\uD83D\uDE42"
+
 private fun String.toAnnotatedString(): AnnotatedString {
     val value = this
 
@@ -155,6 +168,8 @@ private fun String.toAnnotatedString(): AnnotatedString {
                 .replace("</b>", "")
                 .replace("[", "")
                 .replace("]", "")
+                .replace("per_hero", EMOJI_HERO)
+                .replace("per_player", EMOJI_HERO)
         }
         .toList()
 

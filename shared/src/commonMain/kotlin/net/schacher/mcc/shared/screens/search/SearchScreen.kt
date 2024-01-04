@@ -31,7 +31,6 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -233,10 +232,6 @@ fun SearchBar(
                 },
                 label = null,
             )
-        }
-
-        LaunchedEffect(Unit) {
-            focusRequester.requestFocus()
         }
 
         AnimatedVisibility(visible = input.isNotEmpty()) {
