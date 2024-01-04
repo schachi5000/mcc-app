@@ -4,11 +4,11 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -50,7 +50,7 @@ fun CardInfo(card: Card) {
                 .background(
                     Brush.verticalGradient(
                         colorStops = arrayOf(
-                            0f to MaterialTheme.colors.background.copy(alpha = 0.1f),
+                            0f to MaterialTheme.colors.background.copy(alpha = 0.05f),
                             0.3f to MaterialTheme.colors.background.copy(alpha = 0.8f),
                             0.4f to MaterialTheme.colors.background.copy(alpha = 1f),
                             1f to MaterialTheme.colors.background.copy(alpha = 1f)
@@ -70,15 +70,15 @@ fun CardInfo(card: Card) {
             )
 
 
-            Row(
+            LazyRow(
                 modifier = Modifier.padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                card.traits?.let { Tag(text = it) }
-                card.type?.let { Tag(text = it.localize()) }
-                card.aspect?.let { Tag(text = it.localize(), color = it.color) }
-                Tag(text = card.packName)
-                Tag(text = card.code)
+                item { card.traits?.let { Tag(text = it) } }
+                item { card.type?.let { Tag(text = it.localize()) } }
+                item { card.aspect?.let { Tag(text = it.localize(), color = it.color) } }
+                item { Tag(text = card.packName) }
+                item { Tag(text = card.code) }
             }
 
             Column(
@@ -159,8 +159,8 @@ private fun Tag(
     Text(
         modifier = Modifier
             .widthIn(max = 112.dp)
-            .background(color = color, shape = RoundedCornerShape(8.dp))
-            .padding(horizontal = 4.dp, vertical = 2.dp),
+            .background(color = color, shape = RoundedCornerShape(6.dp))
+            .padding(horizontal = 6.dp, vertical = 2.dp),
         text = text,
         overflow = TextOverflow.Ellipsis,
         maxLines = 1,

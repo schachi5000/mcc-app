@@ -69,10 +69,10 @@ private val previewCard = Card(
     boostText = "Teile dir diese Karte als verdeckte Begegnungskarte zu.",
     attackText = "<b>Erzwungene Reaktion</b>: Nachdem Assassine der Gilde einen Charakter angegriffen und besiegt hat, platziere 1 Bedrohung auf dem Hauptplan.",
     quote = "„Ich habe das Gefühl, dass wir nicht allein sind.“",
-    faction = Faction.HERO,
+    faction = Faction.ENCOUNTER,
     cost = 3,
     traits = "Brute.",
-    type = CardType.HERO,
+    type = CardType.ATTACHMENT,
     aspect = Aspect.LEADERSHIP,
     position = 1
 )

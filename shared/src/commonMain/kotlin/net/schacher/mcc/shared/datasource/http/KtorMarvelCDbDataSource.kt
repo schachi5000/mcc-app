@@ -164,7 +164,7 @@ private fun CardDto.toCard() = Card(
     attackText = this.attack_text?.trim(),
     quote = this.flavor?.trim(),
     aspect = this.faction_code.parseAspect(),
-    traits = this.traits,
+    traits = this.traits?.takeIf { it.isNotEmpty() },
     faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
 )
 

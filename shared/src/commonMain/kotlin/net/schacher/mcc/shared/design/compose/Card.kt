@@ -56,7 +56,7 @@ fun Card(
             modifier = Modifier.aspectRatio(aspectRation).scale(1.025f),
             resource = asyncPainterResource(
                 data = "https://de.marvelcdb.com/bundles/cards/${card.code}.png",
-                filterQuality = FilterQuality.Medium
+                filterQuality = FilterQuality.High
             ),
             contentDescription = card.name,
             contentScale = ContentScale.FillBounds,
