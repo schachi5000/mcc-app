@@ -8,7 +8,7 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.with
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -81,7 +81,7 @@ fun MainScreen(
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        scrimColor = Color.Black.copy(alpha = 0.25f),
+        scrimColor = Color.Black.copy(alpha = 0.35f),
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetBackgroundColor = MaterialTheme.colors.surface,
         sheetContent = {
@@ -112,11 +112,11 @@ fun MainScreen(
                     targetState = state.value.mainScreen.tabIndex,
                     transitionSpec = {
                         if (targetState > initialState) {
-                            slideInHorizontally { width -> width } + fadeIn() with
-                                    slideOutHorizontally { width -> -width } + fadeOut()
+                            (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
+                                slideOutHorizontally { width -> -width } + fadeOut())
                         } else {
-                            slideInHorizontally { width -> -width } + fadeIn() with
-                                    slideOutHorizontally { width -> width } + fadeOut()
+                            (slideInHorizontally { width -> -width } + fadeIn()).togetherWith(
+                                slideOutHorizontally { width -> width } + fadeOut())
                         }
                     }) { state ->
                     when (state) {

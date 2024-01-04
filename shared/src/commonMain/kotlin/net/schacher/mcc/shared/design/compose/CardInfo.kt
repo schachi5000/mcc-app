@@ -15,6 +15,7 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
@@ -35,13 +36,20 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 
 @Composable
-fun CardInfo(card: Card) {
-    Box() {
+fun CardInfo(modifier: Modifier = Modifier, card: Card) {
+    Box(modifier = modifier) {
         Card(
             modifier = Modifier.fillMaxWidth()
-                .blur(2.dp)
+                .blur(0.5.dp)
                 .graphicsLayer { translationY = getTranslationY(card).toPx() },
             card = card
+        )
+
+        Tag(
+            modifier = Modifier.align(Alignment.TopEnd)
+                .padding(16.dp)
+                .alpha(0.8f),
+            text = card.code
         )
 
         Column(
@@ -50,7 +58,8 @@ fun CardInfo(card: Card) {
                 .background(
                     Brush.verticalGradient(
                         colorStops = arrayOf(
-                            0f to MaterialTheme.colors.background.copy(alpha = 0.05f),
+                            0f to MaterialTheme.colors.background.copy(alpha = 0f),
+                            0.15f to MaterialTheme.colors.background.copy(alpha = 0.2f),
                             0.3f to MaterialTheme.colors.background.copy(alpha = 0.8f),
                             0.4f to MaterialTheme.colors.background.copy(alpha = 1f),
                             1f to MaterialTheme.colors.background.copy(alpha = 1f)
@@ -58,14 +67,21 @@ fun CardInfo(card: Card) {
                     )
                 )
                 .padding(top = 200.dp, start = 16.dp, end = 16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally
+            horizontalAlignment = Alignment.Start
         ) {
             Text(
                 text = card.name,
-                textAlign = TextAlign.Center,
                 maxLines = 2,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 28.sp,
+                color = MaterialTheme.colors.onSurface
+            )
+
+            Text(
+                text = card.packName,
+                maxLines = 1,
+                fontWeight = FontWeight.SemiBold,
+                fontSize = 18.sp,
                 color = MaterialTheme.colors.onSurface
             )
 
@@ -74,23 +90,31 @@ fun CardInfo(card: Card) {
                 modifier = Modifier.padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                item { card.traits?.let { Tag(text = it) } }
                 item { card.type?.let { Tag(text = it.localize()) } }
                 item { card.aspect?.let { Tag(text = it.localize(), color = it.color) } }
-                item { Tag(text = card.packName) }
-                item { Tag(text = card.code) }
             }
 
             Column(
-                modifier = Modifier.fillMaxWidth(),
+                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
                 horizontalAlignment = Alignment.Start
             ) {
-                card.text?.let {
+                card.traits?.let {
                     Text(
-                        modifier = Modifier.padding(top = 24.dp),
+                        modifier = Modifier.fillMaxWidth(),
                         text = it.toAnnotatedString(),
                         fontSize = 18.sp,
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
+                        textAlign = TextAlign.Center,
+                        fontWeight = FontWeight.SemiBold,
+                        color = MaterialTheme.colors.onSurface
+                    )
+                }
+
+                card.text?.let {
+                    Text(
+                        modifier = Modifier.padding(top = 16.dp),
+                        text = it.toAnnotatedString(),
+                        fontSize = 18.sp,
+                        color = MaterialTheme.colors.onSurface
                     )
                 }
 
@@ -99,7 +123,7 @@ fun CardInfo(card: Card) {
                         modifier = Modifier.padding(top = 16.dp),
                         text = it.toAnnotatedString(),
                         fontSize = 18.sp,
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
+                        color = MaterialTheme.colors.onSurface
                     )
                 }
 
@@ -113,19 +137,17 @@ fun CardInfo(card: Card) {
                             append(it.toAnnotatedString())
                         },
                         fontSize = 18.sp,
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
+                        color = MaterialTheme.colors.onSurface
                     )
                 }
 
-
-
                 card.quote?.let {
                     Text(
-                        modifier = Modifier.padding(top = 24.dp),
+                        modifier = Modifier.padding(top = 32.dp),
                         text = it,
                         fontSize = 18.sp,
                         fontStyle = FontStyle.Italic,
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
+                        color = MaterialTheme.colors.onSurface
                     )
                 }
             }
@@ -143,22 +165,25 @@ private fun getTranslationY(card: Card): Dp = when (card.type) {
     CardType.ALLY,
     CardType.OBLIGATION,
     CardType.TREACHERY,
-    CardType.HERO -> (-60).dp
+    CardType.HERO -> (-65).dp
 
     else -> 0.dp
 }
 
 @Composable
 private fun Tag(
-    text: String, color: Color = if (MaterialTheme.colors.isLight) {
+    modifier: Modifier = Modifier,
+    text: String,
+    textColor: Color = Color.White,
+    color: Color = if (MaterialTheme.colors.isLight) {
         Color.Gray
     } else {
         Color.DarkGray
     }
 ) {
     Text(
-        modifier = Modifier
-            .widthIn(max = 112.dp)
+        modifier = modifier
+            .widthIn(max = 140.dp)
             .background(color = color, shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 6.dp, vertical = 2.dp),
         text = text,
@@ -166,7 +191,7 @@ private fun Tag(
         maxLines = 1,
         fontWeight = FontWeight.SemiBold,
         fontSize = 14.sp,
-        color = Color.White
+        color = textColor
     )
 }
 
@@ -194,7 +219,7 @@ private fun String.toAnnotatedString(): AnnotatedString {
 
 
     return buildAnnotatedString {
-        value.split(boldRegex).forEachIndexed() { index, s ->
+        value.split(boldRegex).forEachIndexed { index, s ->
             append(s)
 
             if (index < boldStrings.count()) {
