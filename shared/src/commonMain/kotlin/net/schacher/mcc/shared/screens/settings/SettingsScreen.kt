@@ -97,7 +97,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
 
         OptionsGroup("Debug") {
             OptionsEntry(
-                label = "Add Public Decks",
+                label = "Import My Public Decks",
                 imageVector = Icons.Rounded.Add,
                 onClick = {
                     settingsViewModel.addPublicDecksById(

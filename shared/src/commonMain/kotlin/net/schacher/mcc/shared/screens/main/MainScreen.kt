@@ -27,7 +27,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.rememberModalBottomSheetState
@@ -44,6 +43,8 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
+import net.schacher.mcc.shared.design.compose.CardInfo
+import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
 import net.schacher.mcc.shared.design.compose.InspectScreen
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.localization.Localization
@@ -107,7 +108,8 @@ fun MainScreen(
             Box(
                 modifier = Modifier.padding(it)
             ) {
-                AnimatedContent(targetState = state.value.mainScreen.tabIndex,
+                AnimatedContent(
+                    targetState = state.value.mainScreen.tabIndex,
                     transitionSpec = {
                         if (targetState > initialState) {
                             slideInHorizontally { width -> width } + fadeIn() with
@@ -116,8 +118,8 @@ fun MainScreen(
                             slideInHorizontally { width -> -width } + fadeIn() with
                                     slideOutHorizontally { width -> width } + fadeOut()
                         }
-                    }) {
-                    when (it) {
+                    }) { state ->
+                    when (state) {
                         0 -> DeckScreen(
                             onDeckClick = { mainViewModel.onDeckClicked(it) },
                             onAddDeckClick = {}
@@ -213,11 +215,8 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
 
 @Composable
 fun CardMenuBottomSheet(mainViewModel: MainViewModel, card: Card) {
-    BottomSheetContainer {
-        OptionsEntry(
-            label = "Zu Deck hinzufügen",
-            imageVector = Icons.Rounded.Add
-        ) {}
+    FreeBottomSheetContainer(modifier = Modifier.fillMaxHeight(0.75f)) {
+        CardInfo(card = card)
     }
 }
 
@@ -240,14 +239,15 @@ fun DeckInspectorBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
     }
 }
 
-val MainUiState.MainScreen.tabColor: Color
+private val MainUiState.MainScreen.tabColor: Color
     get() = when (this) {
         Decks -> Color(0xfff78f3f)
         Featured -> Color(0xff31e29c)
         Search -> Color(0xff518cca)
         Settings -> Color(0xff9957ff)
     }
-val MainUiState.MainScreen.tabIndex: Int
+
+private val MainUiState.MainScreen.tabIndex: Int
     get() = when (this) {
         Decks -> 0
         Featured -> 1
