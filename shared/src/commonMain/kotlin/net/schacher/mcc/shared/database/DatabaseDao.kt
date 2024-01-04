@@ -45,6 +45,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
             aspect = card.aspect?.name,
             text = card.text,
             boostText = card.boostText,
+            attackText = card.attackText,
+            quote = card.quote,
+            traits = card.traits,
             imagePath = card.imagePath,
             faction = card.faction.name,
             linkedCardCode = card.linkedCard?.code
@@ -135,11 +138,14 @@ private fun database.Card.toCard() = Card(
     name = this.name,
     text = this.text,
     boostText = this.boostText,
+    attackText = this.attackText,
+    quote = this.quote,
     cost = this.cost?.toInt(),
     imagePath = this.imagePath,
     aspect = this.aspect?.let { Aspect.valueOf(it) },
     packCode = this.packCode,
     packName = this.packName,
     linkedCard = null,
+    traits = this.traits,
     faction = Faction.valueOf(this.faction)
 )

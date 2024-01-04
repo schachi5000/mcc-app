@@ -1,3 +1,5 @@
+import com.android.build.gradle.internal.tasks.factory.dependsOn
+
 plugins {
     kotlin("multiplatform")
     kotlin("plugin.serialization").version("1.9.10")
@@ -99,3 +101,5 @@ sqldelight {
         packageName = "database"
     }
 }
+
+tasks.named("build").dependsOn("generateSqlDelightInterface")

@@ -167,7 +167,7 @@ private fun Thumbnail(modifier: Modifier = Modifier, card: Card) {
             )
         },
         onFailure = {
-            Logger.e(throwable = it) { "Failed to load image for card: $card" }
+            Logger.e(throwable = it) { "Failed to load image for card: ${card.name}(${card.code})" }
             Box(
                 Modifier.fillMaxSize().background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)
             ) { }

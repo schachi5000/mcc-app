@@ -159,9 +159,12 @@ private fun CardDto.toCard() = Card(
     name = this.name,
     packCode = this.pack_code,
     packName = this.pack_name,
-    text = this.text,
+    text = this.text?.replace("\n", "\n\n"),
     boostText = this.boost_text,
+    attackText = this.attack_text,
+    quote = this.flavor,
     aspect = this.faction_code.parseAspect(),
+    traits = this.traits,
     faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
 )
 

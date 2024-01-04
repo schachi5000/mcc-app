@@ -15,6 +15,9 @@ data class Card(
     val cost: Int? = null,
     val text: String?,
     val boostText: String?,
+    val attackText: String?,
+    val quote: String?,
+    val traits: String?,
     val aspect: Aspect? = null,
     val linkedCard: Card? = null,
     val imagePath: String? = null

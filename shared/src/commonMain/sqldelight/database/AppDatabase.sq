@@ -14,14 +14,17 @@ CREATE TABLE Card (
     packName TEXT NOT NULL,
     text TEXT,
     boostText TEXT,
+    attackText TEXT,
+    quote TEXT,
+    traits TEXT,
     aspect TEXT,
     imagePath TEXT,
     linkedCardCode TEXT
 );
 
 addCard:
-INSERT OR REPLACE INTO Card(code, position, type, faction, cost, name, packCode, packName, text, boostText, aspect, imagePath, linkedCardCode)
-VALUES(?, ?, ?, ?, ?,?, ?, ?,?,?, ?,?,?);
+INSERT OR REPLACE INTO Card(code, position, type, faction, cost, name, packCode, packName, text, boostText, attackText, quote, traits, aspect, imagePath, linkedCardCode)
+VALUES(?, ?, ?, ?, ?,?, ?, ?,?,?, ?,?,?,?,?,?);
 
 selectCardByCode:
 SELECT *
