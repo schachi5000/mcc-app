@@ -55,6 +55,7 @@ import net.schacher.mcc.shared.design.compose.isKeyboardVisible
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.design.theme.isContrastRatioSufficient
+import net.schacher.mcc.shared.localization.localize
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.search.Filter.Type
@@ -153,13 +154,19 @@ fun SearchScreen(
 private val shade: Brush
     @Composable
     get() = Brush.verticalGradient(
-        colors = listOf(
-            MaterialTheme.colors.background.copy(alpha = 0.9f),
-            MaterialTheme.colors.background.copy(alpha = 0.9f),
-            MaterialTheme.colors.background.copy(alpha = 0.6f),
-            MaterialTheme.colors.background.copy(alpha = 0.0f)
+        colorStops = arrayOf(
+            0f to MaterialTheme.colors.background.copy(alpha = 0.9f),
+            0.8f to MaterialTheme.colors.background.copy(alpha = 0.8f),
+            1f to MaterialTheme.colors.background.copy(alpha = 0.0f)
         )
     )
+
+private fun createEntries(cards: List<Card>): List<Entry> =
+    cards.groupBy { it.type }.mapNotNull { (type, cards) ->
+        type?.let {
+            Entry(it.localize(), cards.defaultSort())
+        }
+    }.sortedBy { it.title }
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
@@ -315,20 +322,13 @@ fun SearchFilterChip(
     }
 }
 
-private fun createEntries(cards: List<Card>): List<Entry> =
-    cards.groupBy { it.type }
-        .mapNotNull { (type, cards) ->
-            type?.let {
-                Entry(it, cards.defaultSort())
-            }
-        }
 
 private val Type.label: String
     get() = when (this) {
         OWNED -> "In Besitz"
         BASIC -> "Basis"
-        AGGRESSION -> Aspect.AGGRESSION.toString()
-        PROTECTION -> Aspect.PROTECTION.toString()
-        JUSTICE -> Aspect.JUSTICE.toString()
-        LEADERSHIP -> Aspect.LEADERSHIP.toString()
+        AGGRESSION -> Aspect.AGGRESSION.localize()
+        PROTECTION -> Aspect.PROTECTION.localize()
+        JUSTICE -> Aspect.JUSTICE.localize()
+        LEADERSHIP -> Aspect.LEADERSHIP.localize()
     }

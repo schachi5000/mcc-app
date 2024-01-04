@@ -7,7 +7,7 @@ import net.schacher.mcc.shared.model.CardOrientation.PORTRAIT
 data class Card(
     val code: String,
     val position: Int,
-    val type: String?,
+    val type: CardType?,
     val name: String,
     val faction: Faction,
     val packCode: String,
@@ -38,22 +38,22 @@ enum class CardOrientation {
     PORTRAIT, LANDSCAPE
 }
 
-object CardType {
-    const val HERO = "hero"
-    const val ALLY = "ally"
-    const val EVENT = "event"
-    const val SUPPORT = "support"
-    const val UPGRADE = "upgrade"
-    const val RESOURCE = "resource"
-    const val VILLAIN = "villain"
-    const val MAIN_SCHEME = "main_scheme"
-    const val SIDE_SCHEME = "side_scheme"
-    const val PLAYER_SIDE_SCHEME = "player_side_scheme"
-    const val ATTACHMENT = "attachment"
-    const val MINION = "minion"
-    const val TREACHERY = "treachery"
-    const val ENVIRONMENT = "environment"
-    const val OBLIGATION = "obligation"
+enum class CardType {
+    HERO,
+    ALLY,
+    EVENT,
+    SUPPORT,
+    UPGRADE,
+    RESOURCE,
+    VILLAIN,
+    MAIN_SCHEME,
+    SIDE_SCHEME,
+    PLAYER_SIDE_SCHEME,
+    ATTACHMENT,
+    MINION,
+    TREACHERY,
+    ENVIRONMENT,
+    OBLIGATION,
 }
 
 enum class Faction {

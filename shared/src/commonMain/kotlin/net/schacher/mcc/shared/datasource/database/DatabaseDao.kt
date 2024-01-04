@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import database.AppDatabase
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 
@@ -34,7 +35,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         this.dbQuery.addCard(
             code = card.code,
             position = card.position.toLong(),
-            type = card.type,
+            type = card.type?.name,
             packCode = card.packCode,
             packName = card.packName,
             name = card.name,
@@ -106,7 +107,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 private fun database.Card.toCard() = Card(
     code = this.code,
     position = this.position.toInt(),
-    type = this.type,
+    type = this.type?.let { CardType.valueOf(it) },
     name = this.name,
     cost = this.cost?.toInt(),
     imagePath = this.imagePath,

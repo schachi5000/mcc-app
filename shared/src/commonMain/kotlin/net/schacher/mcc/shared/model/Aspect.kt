@@ -5,11 +5,4 @@ enum class Aspect {
     PROTECTION,
     JUSTICE,
     LEADERSHIP;
-
-    override fun toString(): String = when (this) {
-        AGGRESSION -> "Aggression"
-        PROTECTION -> "Schutz"
-        JUSTICE -> "Gerechtigkeit"
-        LEADERSHIP -> "Führung"
-    }
 }

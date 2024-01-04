@@ -20,6 +20,22 @@ import net.schacher.mcc.shared.datasource.http.dto.DeckDto
 import net.schacher.mcc.shared.datasource.http.dto.PackDto
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType
+import net.schacher.mcc.shared.model.CardType.ALLY
+import net.schacher.mcc.shared.model.CardType.ATTACHMENT
+import net.schacher.mcc.shared.model.CardType.ENVIRONMENT
+import net.schacher.mcc.shared.model.CardType.EVENT
+import net.schacher.mcc.shared.model.CardType.HERO
+import net.schacher.mcc.shared.model.CardType.MAIN_SCHEME
+import net.schacher.mcc.shared.model.CardType.MINION
+import net.schacher.mcc.shared.model.CardType.OBLIGATION
+import net.schacher.mcc.shared.model.CardType.PLAYER_SIDE_SCHEME
+import net.schacher.mcc.shared.model.CardType.RESOURCE
+import net.schacher.mcc.shared.model.CardType.SIDE_SCHEME
+import net.schacher.mcc.shared.model.CardType.SUPPORT
+import net.schacher.mcc.shared.model.CardType.TREACHERY
+import net.schacher.mcc.shared.model.CardType.UPGRADE
+import net.schacher.mcc.shared.model.CardType.VILLAIN
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import kotlin.coroutines.coroutineContext
@@ -138,7 +154,7 @@ private fun String.parseAspect(): Aspect? = when {
 private fun CardDto.toCard() = Card(
     code = this.code,
     position = this.position,
-    type = this.type_code,
+    type = this.type_code.toCardType(),
     cost = this.cost,
     name = this.name,
     packCode = this.pack_code,
@@ -146,3 +162,22 @@ private fun CardDto.toCard() = Card(
     aspect = this.faction_code.parseAspect(),
     faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
 )
+
+private fun String?.toCardType(): CardType? = when (this) {
+    "hero" -> HERO
+    "ally" -> ALLY
+    "event" -> EVENT
+    "support" -> SUPPORT
+    "upgrade" -> UPGRADE
+    "resource" -> RESOURCE
+    "villain" -> VILLAIN
+    "main_scheme" -> MAIN_SCHEME
+    "side_scheme" -> SIDE_SCHEME
+    "player_side_scheme" -> PLAYER_SIDE_SCHEME
+    "attachment" -> ATTACHMENT
+    "minion" -> MINION
+    "treachery" -> TREACHERY
+    "environment" -> ENVIRONMENT
+    "obligation" -> OBLIGATION
+    else -> null
+}
