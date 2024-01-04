@@ -65,6 +65,7 @@ private val previewCard = Card(
     name = "Preview Card",
     packName = "Preview Pack",
     packCode = "preview",
+    text = "Spinnensinn — <b>Unterbrechung</b>: Sobald der [[Schurke]] einen Angriff gegen dich einleitet, ziehe 1 Karte.",
     faction = Faction.HERO,
     cost = 3,
     type = CardType.HERO,

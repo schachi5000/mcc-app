@@ -13,6 +13,7 @@ data class Card(
     val packCode: String,
     val packName: String,
     val cost: Int? = null,
+    val text: String?,
     val aspect: Aspect? = null,
     val linkedCard: Card? = null,
     val imagePath: String? = null
