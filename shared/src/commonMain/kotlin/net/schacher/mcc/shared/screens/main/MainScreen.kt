@@ -39,7 +39,6 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
-import net.schacher.mcc.shared.design.compose.DefaultBottomNavigationItem
 import net.schacher.mcc.shared.design.compose.InspectScreen
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.localization.Localization

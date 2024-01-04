@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.datasource.database
+package net.schacher.mcc.shared.database
 
 import net.schacher.mcc.shared.model.Deck
 

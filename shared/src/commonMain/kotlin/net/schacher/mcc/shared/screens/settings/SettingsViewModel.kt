@@ -6,18 +6,21 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.database.SettingsDao
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 
 class SettingsViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
+    private val settingsDao: SettingsDao
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
         SettingsUiState(
-            cardRepository.cards.size,
-            deckRepository.state.value.size
+            cardCount = cardRepository.cards.size,
+            deckCount = deckRepository.state.value.size,
+            settingsValues = settingsDao.getAllEntries()
         )
     )
 
@@ -81,4 +84,9 @@ class SettingsViewModel(
     }
 }
 
-data class SettingsUiState(val cardCount: Int, val deckCount: Int, val syncInProgress: Boolean = false)
+data class SettingsUiState(
+    val cardCount: Int,
+    val deckCount: Int,
+    val syncInProgress: Boolean = false,
+    val settingsValues: List<Pair<String, Any>> = emptyList()
+)

@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.datasource.database
+package net.schacher.mcc.shared.database
 
 import co.touchlab.kermit.Logger
 import database.AppDatabase
@@ -8,8 +8,10 @@ import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 
-class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Boolean = false) : DeckDatabaseDao,
-    CardDatabaseDao {
+class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Boolean = false) :
+    DeckDatabaseDao,
+    CardDatabaseDao,
+    SettingsDao {
 
     private companion object {
         const val LIST_DELIMITER = ";"
@@ -102,6 +104,26 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         Logger.d { "Deleting all decks from database" }
         this.dbQuery.removeAllDecks()
     }
+
+    override fun getString(key: String): String? = this.dbQuery.getSetting(key).executeAsOneOrNull()?.value_
+
+    override fun putString(key: String, value: String): Boolean = runCatching {
+        this.dbQuery.addSetting(key, value)
+    }.isSuccess
+
+    override fun getBoolean(key: String): Boolean? =
+        this.dbQuery.getSetting(key).executeAsOneOrNull()?.value_?.toBooleanStrictOrNull()
+
+    override fun putBoolean(key: String, value: Boolean): Boolean = runCatching {
+        this.dbQuery.addSetting(key, value.toString())
+    }.isSuccess
+
+    override fun remove(key: String): Boolean = runCatching {
+        this.dbQuery.removeSetting(key)
+    }.isSuccess
+
+    override fun getAllEntries(): List<Pair<String, Any>> =
+        this.dbQuery.getAllSettings().executeAsList().map { it.key to it.value_ }
 }
 
 private fun database.Card.toCard() = Card(

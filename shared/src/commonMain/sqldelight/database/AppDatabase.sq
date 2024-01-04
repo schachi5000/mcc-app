@@ -61,3 +61,26 @@ WHERE id = ?;
 
 removeAllDecks:
 DELETE FROM Deck;
+
+-- Settings
+CREATE TABLE Settings (
+    key Text NOT NULL PRIMARY KEY,
+    value TEXT NOT NULL
+);
+
+addSetting:
+INSERT OR REPLACE INTO Settings(key, value)
+VALUES(?, ?);
+
+removeSetting:
+DELETE FROM Settings
+WHERE key = ?;
+
+getSetting:
+SELECT *
+FROM Settings
+WHERE key = ?;
+
+getAllSettings:
+SELECT *
+FROM Settings;
