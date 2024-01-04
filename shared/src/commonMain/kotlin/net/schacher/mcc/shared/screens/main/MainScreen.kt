@@ -131,9 +131,6 @@ fun MainScreen(
 
                         2 -> SearchScreen {
                             mainViewModel.onCardClicked(it)
-                            scope.launch {
-                                snackbarHostState.showSnackbar("${it.name} | ${it.code}")
-                            }
                         }
 
                         3 -> SettingsScreen()
