@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -25,18 +26,21 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.localize
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType
 
 @Composable
 fun CardInfo(card: Card) {
-
     Box() {
         Card(
-            modifier = Modifier.fillMaxWidth().blur(2.dp),
+            modifier = Modifier.fillMaxWidth()
+                .blur(2.dp)
+                .graphicsLayer { translationY = getTranslationY(card).toPx() },
             card = card
         )
 
@@ -93,7 +97,7 @@ fun CardInfo(card: Card) {
                 card.attackText?.let {
                     Text(
                         modifier = Modifier.padding(top = 16.dp),
-                        text =it.toAnnotatedString(),
+                        text = it.toAnnotatedString(),
                         fontSize = 18.sp,
                         color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
                     )
@@ -127,6 +131,21 @@ fun CardInfo(card: Card) {
             }
         }
     }
+}
+
+private fun getTranslationY(card: Card): Dp = when (card.type) {
+    CardType.EVENT,
+    CardType.MINION,
+    CardType.VILLAIN,
+    CardType.ENVIRONMENT,
+    CardType.SUPPORT,
+    CardType.UPGRADE,
+    CardType.ALLY,
+    CardType.OBLIGATION,
+    CardType.TREACHERY,
+    CardType.HERO -> (-60).dp
+
+    else -> 0.dp
 }
 
 @Composable
