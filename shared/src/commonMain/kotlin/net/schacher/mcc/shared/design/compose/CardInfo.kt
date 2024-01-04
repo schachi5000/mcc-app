@@ -21,7 +21,6 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
-import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
@@ -69,6 +68,8 @@ fun CardInfo(card: Card) {
                 modifier = Modifier.padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
+                Tag(text = card.code)
+
                 card.type?.let {
                     Tag(text = it.localize())
                 }
@@ -85,9 +86,17 @@ fun CardInfo(card: Card) {
             card.text?.let {
                 Text(
                     modifier = Modifier.padding(top = 24.dp),
-                    text = card.text.toAnnotatedString(),
-                    fontSize = 20.sp,
-                    fontStyle = FontStyle.Italic,
+                    text = it.toAnnotatedString(),
+                    fontSize = 18.sp,
+                    color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
+                )
+            }
+
+            card.boostText?.let {
+                Text(
+                    modifier = Modifier.padding(top = 16.dp),
+                    text = "<b>Boost</b>: $it".toAnnotatedString(),
+                    fontSize = 18.sp,
                     color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
                 )
             }
@@ -117,7 +126,7 @@ private fun Tag(
     )
 }
 
-private val boldRegex = Regex("<b>(.*?)</b>|\\[\\[(.*?)]]")
+private val boldRegex = Regex("<b>(.*?)</b>|\\[\\[(.*?)]]|\\[(.*?)]")
 
 private val italicRegex = Regex("<i>(.*?)</i>")
 
@@ -130,8 +139,8 @@ private fun String.toAnnotatedString(): AnnotatedString {
             it.value
                 .replace("<b>", "")
                 .replace("</b>", "")
-                .replace("[[", "")
-                .replace("]]", "")
+                .replace("[", "")
+                .replace("]", "")
         }
         .toList()
 

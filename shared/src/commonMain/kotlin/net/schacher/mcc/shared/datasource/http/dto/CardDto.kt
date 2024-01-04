@@ -39,6 +39,7 @@ data class CardDto(
     val real_text: String?,
     val real_traits: String?,
     val text: String?,
+    val boost_text: String?,
     val threat_fixed: Boolean,
     val thwart: Int?,
     val traits: String?,

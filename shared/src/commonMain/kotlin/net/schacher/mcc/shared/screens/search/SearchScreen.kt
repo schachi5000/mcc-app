@@ -47,6 +47,7 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.Entry
@@ -318,7 +319,10 @@ fun SearchFilterChip(
             selectedBackgroundColor = color
         )
     ) {
-        Text(label)
+        Text(
+            text = label,
+            fontWeight = FontWeight.SemiBold
+        )
     }
 }
 

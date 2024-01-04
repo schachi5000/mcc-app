@@ -160,6 +160,7 @@ private fun CardDto.toCard() = Card(
     packCode = this.pack_code,
     packName = this.pack_name,
     text = this.text,
+    boostText = this.boost_text,
     aspect = this.faction_code.parseAspect(),
     faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
 )
