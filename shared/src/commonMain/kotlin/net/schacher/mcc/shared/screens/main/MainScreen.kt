@@ -42,6 +42,7 @@ import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.DefaultBottomNavigationItem
 import net.schacher.mcc.shared.design.compose.InspectScreen
 import net.schacher.mcc.shared.design.compose.OptionsEntry
+import net.schacher.mcc.shared.localization.Localization
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreen
@@ -164,28 +165,28 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     ) {
         Row(Modifier.fillMaxWidth().padding(bottom = if (IS_IOS) 16.dp else 0.dp)) {
             DefaultBottomNavigationItem(
-                label = "My Decks",
+                label = Localization.MY_DECKS,
                 icon = "ic_deck.xml",
                 color = Decks.tabColor,
                 selected = (selectedTabIndex == 0),
                 onClick = { onTabSelected(0) },
             )
             DefaultBottomNavigationItem(
-                label = "Featured",
+                label = Localization.SPOTLIGHT,
                 icon = "ic_featured_decks.xml",
                 color = Featured.tabColor,
                 selected = (selectedTabIndex == 1),
                 onClick = { onTabSelected(1) },
             )
             DefaultBottomNavigationItem(
-                label = "Search",
+                label = Localization.SEARCH,
                 icon = "ic_search.xml",
                 color = Search.tabColor,
                 selected = (selectedTabIndex == 2),
                 onClick = { onTabSelected(2) },
             )
             DefaultBottomNavigationItem(
-                label = "Settings",
+                label = Localization.MORE,
                 icon = { Icon(Icons.Rounded.Settings, "Settings") },
                 color = Settings.tabColor,
                 selected = (selectedTabIndex == 3),

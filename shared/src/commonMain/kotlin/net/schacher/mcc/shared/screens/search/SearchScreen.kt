@@ -155,8 +155,8 @@ private val shade: Brush
     @Composable
     get() = Brush.verticalGradient(
         colorStops = arrayOf(
-            0f to MaterialTheme.colors.background.copy(alpha = 0.9f),
-            0.8f to MaterialTheme.colors.background.copy(alpha = 0.8f),
+            0f to MaterialTheme.colors.background.copy(alpha = 0.8f),
+            0.8f to MaterialTheme.colors.background.copy(alpha = 0.7f),
             1f to MaterialTheme.colors.background.copy(alpha = 0.0f)
         )
     )
