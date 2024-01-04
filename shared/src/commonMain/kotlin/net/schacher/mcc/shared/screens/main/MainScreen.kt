@@ -1,8 +1,14 @@
 package net.schacher.mcc.shared.screens.main
 
 import IS_IOS
+import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.ExperimentalAnimationApi
+import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.with
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -36,7 +42,6 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.InspectScreen
@@ -58,7 +63,8 @@ import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.splash.SplashScreen
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterialApi::class)
+
+@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel = koinInject()
@@ -101,25 +107,35 @@ fun MainScreen(
             Box(
                 modifier = Modifier.padding(it)
             ) {
-                Logger.d { "selectedTabIndex: ${state.value.mainScreen.tabIndex}" }
-                when (state.value.mainScreen.tabIndex) {
-                    0 -> DeckScreen(
-                        onDeckClick = { mainViewModel.onDeckClicked(it) },
-                        onAddDeckClick = {}
-                    )
-
-                    1 -> FeaturedScreen {
-                        mainViewModel.onDeckClicked(it)
-                    }
-
-                    2 -> SearchScreen {
-                        mainViewModel.onCardClicked(it)
-                        scope.launch {
-                            snackbarHostState.showSnackbar("${it.name} | ${it.code}")
+                AnimatedContent(targetState = state.value.mainScreen.tabIndex,
+                    transitionSpec = {
+                        if (targetState > initialState) {
+                            slideInHorizontally { width -> width } + fadeIn() with
+                                    slideOutHorizontally { width -> -width } + fadeOut()
+                        } else {
+                            slideInHorizontally { width -> -width } + fadeIn() with
+                                    slideOutHorizontally { width -> width } + fadeOut()
                         }
-                    }
+                    }) {
+                    when (it) {
+                        0 -> DeckScreen(
+                            onDeckClick = { mainViewModel.onDeckClicked(it) },
+                            onAddDeckClick = {}
+                        )
 
-                    3 -> SettingsScreen()
+                        1 -> FeaturedScreen {
+                            mainViewModel.onDeckClicked(it)
+                        }
+
+                        2 -> SearchScreen {
+                            mainViewModel.onCardClicked(it)
+                            scope.launch {
+                                snackbarHostState.showSnackbar("${it.name} | ${it.code}")
+                            }
+                        }
+
+                        3 -> SettingsScreen()
+                    }
                 }
             }
         }
