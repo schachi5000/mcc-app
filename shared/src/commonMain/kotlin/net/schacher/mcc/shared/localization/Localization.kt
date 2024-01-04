@@ -6,7 +6,7 @@ import net.schacher.mcc.shared.model.CardType
 // This is just a premature solution to have the localization in one place.
 // Once MOKO-Resources works as intended, this should be removed
 object Localization {
-    const val MY_DECKS = "Meine Decks"
+    const val MY_DECKS = "Decks"
     const val SPOTLIGHT = "Spotlight"
     const val SEARCH = "Suche"
     const val MORE = "Mehr"
