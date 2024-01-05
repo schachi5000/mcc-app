@@ -160,13 +160,18 @@ private fun CardDto.toCard() = Card(
     packCode = this.pack_code,
     packName = this.pack_name,
     text = this.text?.replace("\n", "\n\n"),
-    boostText = this.boost_text?.trim(),
-    attackText = this.attack_text?.trim(),
-    quote = this.flavor?.trim(),
+    boostText = this.boost_text.cleanUp(),
+    attackText = this.attack_text.cleanUp(),
+    quote = this.flavor.cleanUp(),
     aspect = this.faction_code.parseAspect(),
     traits = this.traits?.takeIf { it.isNotEmpty() },
     faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
 )
+
+private fun String?.cleanUp(): String? = this
+    ?.replace("\n ", "\n")
+    ?.trim()
+    ?.takeIf { it.isNotEmpty() }
 
 private fun String?.toCardType(): CardType? = when (this) {
     "hero" -> HERO
