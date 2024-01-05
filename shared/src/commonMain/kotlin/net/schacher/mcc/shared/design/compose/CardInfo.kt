@@ -82,7 +82,7 @@ fun CardInfo(modifier: Modifier = Modifier, card: Card) {
                 maxLines = 1,
                 fontWeight = FontWeight.SemiBold,
                 fontSize = 18.sp,
-                color = MaterialTheme.colors.onSurface
+                color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
             )
 
 
