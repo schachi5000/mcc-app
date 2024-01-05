@@ -12,6 +12,7 @@ import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.Deck
+import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
 import net.schacher.mcc.shared.design.compose.ShimmerBox
@@ -22,7 +23,6 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
-import java.util.Random
 
 
 @ThemedPreviews
@@ -36,9 +36,17 @@ fun CardPreview() {
 @ThemedPreviews
 @Composable
 fun DeckPreview() {
+    MccTheme {
+        Deck(deck = previewDeck)
+    }
+}
+
+@ThemedPreviews
+@Composable
+fun DeckRowPreview() {
     CompositionLocalProvider(LocalPreview provides true) {
         MccTheme {
-            Deck(deck = previewDeck)
+            DeckRow(deck = previewDeck)
         }
     }
 }
@@ -104,15 +112,7 @@ private val previewCard = Card(
 private val previewDeck = Deck(
     id = 1,
     name = "Preview Deck",
-    heroCard = previewCard,
-    aspect = Random().nextInt(4).let {
-        when (it) {
-            0 -> Aspect.AGGRESSION
-            1 -> Aspect.JUSTICE
-            2 -> Aspect.LEADERSHIP
-            3 -> Aspect.PROTECTION
-            else -> Aspect.AGGRESSION
-        }
-    },
-    cards = listOf(previewCard)
+    hero = previewCard,
+    aspect = Aspect.LEADERSHIP,
+    cards = listOf(previewCard, previewCard, previewCard)
 )

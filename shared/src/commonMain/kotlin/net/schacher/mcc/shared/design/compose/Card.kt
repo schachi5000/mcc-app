@@ -14,6 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
@@ -40,6 +41,7 @@ const val LANDSCAPE_RATIO = 1.396f
 fun Card(
     card: Card,
     modifier: Modifier = Modifier.height(196.dp),
+    shape: Shape = CardShape,
     onClick: () -> Unit = {}
 ) {
     val aspectRation = when (card.orientation) {
@@ -49,7 +51,7 @@ fun Card(
 
     Card(
         modifier = modifier.aspectRatio(aspectRation),
-        shape = CardShape,
+        shape = shape,
         onClick = onClick
     ) {
         KamelImage(

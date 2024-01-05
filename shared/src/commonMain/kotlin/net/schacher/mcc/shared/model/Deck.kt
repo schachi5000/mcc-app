@@ -5,7 +5,7 @@ private const val VALID_DECK_SIZE = 40
 data class Deck(
     val id: Int,
     val name: String,
-    val heroCard: Card,
+    val hero: Card,
     val aspect: Aspect?,
     val cards: List<Card>
 ) {

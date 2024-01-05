@@ -82,7 +82,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
             deck.id.toLong(),
             deck.name,
             deck.aspect?.name,
-            deck.heroCard.code,
+            deck.hero.code,
             deck.cards.joinToString(LIST_DELIMITER) { it.code })
     }
 
@@ -94,7 +94,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         Deck(
             id = it.id.toInt(),
             name = it.name,
-            heroCard = this.getCardByCode(it.heroCardCode),
+            hero = this.getCardByCode(it.heroCardCode),
             aspect = it.aspect?.let { Aspect.valueOf(it) },
             cards = cards
         )

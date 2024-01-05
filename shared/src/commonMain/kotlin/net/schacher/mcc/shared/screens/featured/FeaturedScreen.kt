@@ -26,7 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.schacher.mcc.shared.design.compose.Deck
+import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.compose.LoadingDeck
 import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.model.Deck
@@ -73,7 +73,7 @@ fun FeaturedScreen(
 
                     when (val entry = entries[index]) {
                         is HeaderItem -> Header(entry.header)
-                        is DeckItem -> Deck(entry.deck) {
+                        is DeckItem -> DeckRow(entry.deck) {
                             onDeckClick(entry.deck)
                         }
                     }

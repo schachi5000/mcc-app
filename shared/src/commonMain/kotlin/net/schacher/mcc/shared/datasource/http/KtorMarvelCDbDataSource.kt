@@ -96,7 +96,7 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
                     Deck(
                         id = it.id,
                         name = it.name,
-                        heroCard = getCard(it.investigator_code!!),
+                        hero = getCard(it.investigator_code!!),
                         aspect = it.meta?.parseAspect(),
                         cards = it.slots.entries.map { entry ->
                             List(entry.value) { cardProvider(entry.key) }
@@ -114,7 +114,7 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
             Deck(
                 id = it.id,
                 name = it.name,
-                heroCard = heroCard,
+                hero = heroCard,
                 aspect = it.meta?.parseAspect(),
                 cards = it.slots.entries
                     .map { entry ->
