@@ -16,6 +16,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -35,20 +36,20 @@ import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
+import net.schacher.mcc.shared.design.previewablePainterResource
 import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 
 private val deckHeight = 120.dp
 private val contentPadding = 8.dp
 
 @Composable
 fun Deck(deck: Deck, onClick: () -> Unit = {}) {
-    Box {
+    Box(modifier = Modifier.wrapContentHeight()) {
         Column(
             modifier = Modifier.fillMaxWidth().height(deckHeight)
                 .padding(horizontal = 24.dp)
@@ -179,7 +180,7 @@ private fun Thumbnail(modifier: Modifier = Modifier, card: Card) {
 private fun InfoRow(label: String, iconResource: String) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            painter = painterResource(iconResource),
+            painter = previewablePainterResource(iconResource),
             contentDescription = null,
             Modifier.size(16.dp)
         )

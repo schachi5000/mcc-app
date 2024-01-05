@@ -38,8 +38,8 @@ const val LANDSCAPE_RATIO = 1.396f
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
 @Composable
 fun Card(
-    modifier: Modifier = Modifier.height(196.dp),
     card: Card,
+    modifier: Modifier = Modifier.height(196.dp),
     onClick: () -> Unit = {}
 ) {
     val aspectRation = when (card.orientation) {
