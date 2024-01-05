@@ -3,6 +3,7 @@ package net.schacher.mcc.shared.screens.search
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
+import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -206,9 +207,9 @@ fun SearchBar(
             shape = DefaultShape,
             color = MaterialTheme.colors.surface,
             border = BorderStroke(
-                2.dp,
-                MaterialTheme.colors.primary
-            ).takeIf { isKeyboardVisible() },
+                if (isKeyboardVisible()) 2.dp else 1.dp,
+                if (isKeyboardVisible()) MaterialTheme.colors.primary else MaterialTheme.colors.background
+            )
         ) {
             TextField(
                 modifier = Modifier
@@ -239,7 +240,11 @@ fun SearchBar(
                 modifier = Modifier
                     .padding(start = 8.dp, end = 16.dp)
                     .size(48.dp)
-                    .background(MaterialTheme.colors.surface, DefaultShape),
+                    .background(MaterialTheme.colors.surface, DefaultShape)
+                    .border(
+                        BorderStroke(1.dp, MaterialTheme.colors.background),
+                        DefaultShape
+                    ),
                 onClick = {
                     input = ""
                     onQueryChange("")
@@ -263,7 +268,6 @@ fun FilterRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
-
         filters.forEachIndexed { index, filter ->
             item {
                 SearchFilterChip(
@@ -304,6 +308,10 @@ fun SearchFilterChip(
         onClick = onClick,
         selected = selected,
         shape = DefaultShape,
+        border = BorderStroke(
+            width = 1.dp,
+            color = MaterialTheme.colors.background
+        ),
         colors = ChipDefaults.filterChipColors(
             backgroundColor = MaterialTheme.colors.surface,
             selectedContentColor = if (color.isContrastRatioSufficient(Color.White)) {
