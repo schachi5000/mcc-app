@@ -24,7 +24,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.schacher.mcc.shared.design.compose.Deck
+import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.ListItem.DeckItem
@@ -53,7 +53,7 @@ fun DeckScreen(
                 }
 
                 when (val entry = entries[index]) {
-                    is DeckItem -> Deck(entry.deck) { onDeckClick(entry.deck) }
+                    is DeckItem -> DeckRow(entry.deck) { onDeckClick(entry.deck) }
                     is ListItem.AddDeckItem -> AddDeckButton { onAddDeckClick() }
                 }
 
