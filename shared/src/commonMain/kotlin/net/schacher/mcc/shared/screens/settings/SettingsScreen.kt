@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalResourceApi::class, ExperimentalResourceApi::class)
-
 package net.schacher.mcc.shared.screens.settings
 
 import androidx.compose.animation.AnimatedVisibility
@@ -32,6 +30,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
+@ExperimentalResourceApi
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
     val state by settingsViewModel.state.collectAsState()
