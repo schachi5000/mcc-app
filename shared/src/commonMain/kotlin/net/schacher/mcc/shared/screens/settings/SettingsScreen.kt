@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalResourceApi::class)
+
 package net.schacher.mcc.shared.screens.settings
 
 import androidx.compose.animation.AnimatedVisibility
@@ -23,8 +25,10 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
+import marvelchampionscompanion.shared.generated.resources.Res
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.koin.compose.koinInject
 
 @Composable
@@ -84,12 +88,12 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
 
             OptionsEntry(
                 label = "${state.cardCount} Karten",
-                iconResource = "ic_cards.xml"
+                iconResource = Res.drawable.ic_cards
             )
 
             OptionsEntry(
                 label = "${state.deckCount} Decks",
-                iconResource = "ic_deck.xml"
+                iconResource = Res.drawable.ic_deck
             )
         }
 

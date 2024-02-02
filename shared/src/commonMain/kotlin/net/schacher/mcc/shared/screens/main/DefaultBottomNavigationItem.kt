@@ -7,6 +7,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -14,13 +15,13 @@ import org.jetbrains.compose.resources.painterResource
 @Composable
 fun RowScope.DefaultBottomNavigationItem(
     label: String,
-    icon: String,
+    icon: DrawableResource,
     color: Color,
     selected: Boolean,
     onClick: () -> Unit
 ) {
     BottomNavigationItem(
-        icon = { Icon(painterResource(icon), icon) },
+        icon = { Icon(painterResource(icon), icon.toString()) },
         label = { Text(text = label) },
         selected = selected,
         onClick = { onClick() },

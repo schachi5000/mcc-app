@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalResourceApi::class)
+
 package net.schacher.mcc.shared.screens.main
 
 import IS_IOS
@@ -42,6 +44,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import marvelchampionscompanion.shared.generated.resources.Res
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
@@ -62,6 +65,7 @@ import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.splash.SplashScreen
+import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.koin.compose.koinInject
 
 
@@ -180,21 +184,21 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         Row(Modifier.fillMaxWidth().padding(bottom = if (IS_IOS) 16.dp else 0.dp)) {
             DefaultBottomNavigationItem(
                 label = Localization.MY_DECKS,
-                icon = "ic_deck.xml",
+                icon = Res.drawable.ic_deck,
                 color = Decks.tabColor,
                 selected = (selectedTabIndex == 0),
                 onClick = { onTabSelected(0) },
             )
             DefaultBottomNavigationItem(
                 label = Localization.SPOTLIGHT,
-                icon = "ic_featured_decks.xml",
+                icon = Res.drawable.ic_featured_decks,
                 color = Featured.tabColor,
                 selected = (selectedTabIndex == 1),
                 onClick = { onTabSelected(1) },
             )
             DefaultBottomNavigationItem(
                 label = Localization.SEARCH,
-                icon = "ic_search.xml",
+                icon = Res.drawable.ic_search,
                 color = Search.tabColor,
                 selected = (selectedTabIndex == 2),
                 onClick = { onTabSelected(2) },

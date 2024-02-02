@@ -27,6 +27,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import marvelchampionscompanion.shared.generated.resources.Res
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -46,7 +47,7 @@ fun SplashScreen(preparing: Boolean) {
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
-            painter = painterResource("splash_screen.jpg"),
+            painter = painterResource(Res.drawable.splash_screen),
             contentDescription = "Splash Screen",
             modifier = Modifier.blur(5.dp)
         )
