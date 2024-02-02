@@ -7,6 +7,7 @@ import androidx.compose.runtime.ProvidableCompositionLocal
 import androidx.compose.runtime.compositionLocalOf
 import androidx.compose.ui.graphics.painter.Painter
 import androidx.compose.ui.graphics.vector.rememberVectorPainter
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -18,10 +19,10 @@ val LocalPreview: ProvidableCompositionLocal<Boolean> = compositionLocalOf { fal
 
 @ExperimentalResourceApi
 @Composable
-fun previewablePainterResource(res: String): Painter = if (
+fun previewablePainterResource(drawableResource: DrawableResource): Painter = if (
     LocalPreview.current
 ) {
     rememberVectorPainter(Icons.Default.Warning)
 } else {
-    painterResource(res)
+    painterResource(drawableResource)
 }

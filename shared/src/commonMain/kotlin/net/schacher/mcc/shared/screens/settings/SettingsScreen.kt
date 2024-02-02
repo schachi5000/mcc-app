@@ -23,10 +23,14 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
+import marvelchampionscompanion.shared.generated.resources.Res
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
+@ExperimentalResourceApi
 @Composable
 fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
     val state by settingsViewModel.state.collectAsState()
@@ -48,7 +52,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
     ) {
-        OptionsGroup("Datenbank") {
+        OptionsGroup(stringResource(Res.string.database)) {
             OptionsEntry(label = "Sync with MarvelCDB",
                 imageVector = Icons.Rounded.Refresh,
                 onClick = {
@@ -84,12 +88,12 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
 
             OptionsEntry(
                 label = "${state.cardCount} Karten",
-                iconResource = "ic_cards.xml"
+                iconResource = Res.drawable.ic_cards
             )
 
             OptionsEntry(
                 label = "${state.deckCount} Decks",
-                iconResource = "ic_deck.xml"
+                iconResource = Res.drawable.ic_deck
             )
         }
 

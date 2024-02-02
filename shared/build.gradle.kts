@@ -2,7 +2,7 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization").version("1.9.10")
+    kotlin("plugin.serialization").version("1.9.22")
     id("com.android.library")
     id("org.jetbrains.compose")
     alias(libs.plugins.sqldelight)

@@ -1,3 +1,5 @@
+@file:OptIn(ExperimentalResourceApi::class)
+
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.core.tween
@@ -42,6 +44,7 @@ import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 
 private val deckHeight = 120.dp
@@ -106,9 +109,9 @@ private fun DeckContent(deck: Deck, onClick: () -> Unit = {}) {
                 verticalArrangement = Arrangement.Center
             ) {
 
-                InfoRow("${deck.cards.size} Karten", "ic_cards.xml")
+                InfoRow("${deck.cards.size} Karten", DrawableResource("drawable/ic_cards.xml"))
                 Spacer(Modifier.height(4.dp))
-                InfoRow("${deck.requiredDecks.size} Packs benötigt", "ic_deck.xml")
+                InfoRow("${deck.requiredDecks.size} Packs benötigt", DrawableResource("drawable/ic_deck.xml"))
             }
         }
     }
@@ -178,10 +181,10 @@ private fun Thumbnail(modifier: Modifier = Modifier, card: Card) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-private fun InfoRow(label: String, iconResource: String) {
+private fun InfoRow(label: String, drawableResource: DrawableResource) {
     Row(verticalAlignment = Alignment.CenterVertically) {
         Icon(
-            painter = previewablePainterResource(iconResource),
+            painter = previewablePainterResource(drawableResource),
             contentDescription = null,
             Modifier.size(16.dp)
         )

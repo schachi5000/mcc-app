@@ -50,6 +50,7 @@ import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import marvelchampionscompanion.shared.generated.resources.Res
 import net.schacher.mcc.shared.design.compose.Entry
 import net.schacher.mcc.shared.design.compose.EntryRow
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
@@ -190,7 +191,7 @@ fun SearchBar(
                 }
             ) {
                 Icon(
-                    painterResource("ic_arrow_back.xml"), "Clear",
+                    painterResource(Res.drawable.ic_arrow_back), "Clear",
                     tint = MaterialTheme.colors.onBackground
                 )
             }

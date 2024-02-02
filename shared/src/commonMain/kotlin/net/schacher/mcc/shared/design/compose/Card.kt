@@ -30,6 +30,7 @@ import net.schacher.mcc.shared.model.CardType.OBLIGATION
 import net.schacher.mcc.shared.model.CardType.SIDE_SCHEME
 import net.schacher.mcc.shared.model.CardType.TREACHERY
 import net.schacher.mcc.shared.model.CardType.VILLAIN
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -76,7 +77,7 @@ fun Card(
                     modifier = Modifier.fillMaxSize()
                         .background(card.backSideColor, CardShape)
                         .border(8.dp, card.backSideColor, CardShape),
-                    painter = painterResource(card.getFailureResource()),
+                    painter = painterResource(DrawableResource(card.getFailureResource())),
                     contentDescription = "Placeholder",
                 )
             })
@@ -96,6 +97,6 @@ val Card.backSideColor: Color
     }
 
 private fun Card.getFailureResource(): String = when (this.backSideColor) {
-    SleeveColors.Yellow -> "card_yellow_no_image.png"
-    else -> "card_blue_no_image.png"
+    SleeveColors.Yellow -> "drawable/card_yellow_no_image.png"
+    else -> "drawable/card_blue_no_image.png"
 }

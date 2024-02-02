@@ -20,6 +20,7 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -68,7 +69,7 @@ fun OptionsEntry(label: String, imageVector: ImageVector, onClick: (() -> Unit)?
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun OptionsEntry(label: String, iconResource: String, onClick: (() -> Unit)? = null) {
+fun OptionsEntry(label: String, iconResource: DrawableResource, onClick: (() -> Unit)? = null) {
     OptionsEntry(
         label = label,
         icon = {
