@@ -1,4 +1,4 @@
-@file:OptIn(ExperimentalResourceApi::class)
+@file:OptIn(ExperimentalResourceApi::class, ExperimentalResourceApi::class)
 
 package net.schacher.mcc.shared.screens.settings
 
@@ -29,6 +29,7 @@ import marvelchampionscompanion.shared.generated.resources.Res
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -52,7 +53,7 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
             .padding(16.dp),
         verticalArrangement = Arrangement.Top,
     ) {
-        OptionsGroup("Datenbank") {
+        OptionsGroup(stringResource(Res.string.database)) {
             OptionsEntry(label = "Sync with MarvelCDB",
                 imageVector = Icons.Rounded.Refresh,
                 onClick = {

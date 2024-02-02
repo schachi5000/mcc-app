@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">Marvel Champions Companion</string>
+    <string name="database">Database</string>
+    <string name="delete">Delete</string>
+    <string name="decks">Decks</string>
+    <string name="spotlight">Spotlight</string>
+    <string name="search">Search</string>
+    <string name="more">More</string>
+</resources>
