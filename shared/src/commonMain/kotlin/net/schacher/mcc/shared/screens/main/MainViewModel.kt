@@ -40,7 +40,7 @@ class MainViewModel(
                 delay(2000)
             }
             _state.update {
-                it.copy(splash = null, mainScreen = Featured)
+                it.copy(splash = null, mainScreen = Decks)
             }
         }
     }
