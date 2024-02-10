@@ -62,6 +62,7 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
                             .align(Alignment.CenterHorizontally),
                         text = "${cardRowEntry.cards[it].name}\n",
                         textAlign = TextAlign.Center,
+                        color = MaterialTheme.colors.onBackground,
                         maxLines = 2,
                         fontSize = 15.sp,
                         fontWeight = FontWeight.SemiBold

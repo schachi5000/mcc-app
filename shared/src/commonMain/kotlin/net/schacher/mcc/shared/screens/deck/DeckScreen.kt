@@ -39,6 +39,7 @@ import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.localization.localize
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 
@@ -85,7 +86,7 @@ fun DeckScreen(
                 .background(MaterialTheme.colors.background)
         ) {
             val entries = deck.cards.groupBy { it.type }
-                .map { CardRowEntry("${it.key} (${it.value.size})", it.value) }
+                .map { CardRowEntry("${it.key?.localize()}", it.value) }
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
                 items(entries.count()) { index ->
@@ -99,7 +100,8 @@ fun DeckScreen(
                             top = if (index == 0) 0.dp else 16.dp,
                             end = 16.dp,
                             bottom = 16.dp
-                        ), cardRowEntry = entries[index]
+                        ),
+                        cardRowEntry = entries[index]
                     ) {
                         selectedCard = it
                     }
@@ -110,9 +112,12 @@ fun DeckScreen(
                 onClick = onCloseClick,
                 modifier = Modifier.align(Alignment.BottomStart).navigationBarsPadding()
                     .padding(
-                        start = 16.dp,
-                        bottom = if (IS_ANDROID) 16.dp else 0.dp
-                    ).size(48.dp),
+                        start = 20.dp,
+                        bottom = if (IS_ANDROID) 20.dp else 0.dp
+                    )
+                    .size(48.dp),
+                contentColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = MaterialTheme.colors.primary,
                 shape = DefaultShape
             ) {
                 Icon(

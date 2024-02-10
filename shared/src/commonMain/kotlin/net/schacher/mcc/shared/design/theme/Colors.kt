@@ -14,6 +14,7 @@ import kotlin.math.min
 
 val LightColorScheme = lightColors(
     background = Color(0xffededed),
+    onBackground = Color(0xFF000000),
     surface = Color(0xFFFFFFFF),
     onSurface = Color(0xFF000000),
     primary = Color(0xFF145da1),
@@ -22,8 +23,9 @@ val LightColorScheme = lightColors(
 
 val DarkColorScheme = darkColors(
     background = Color(0xFF000005),
+    onBackground = Color(0xFFf4f4f4),
     surface = Color(0xFF242424),
-    onSurface = Color(0xFFFFFFFF),
+    onSurface = Color(0xFFf0f0f0),
     primary = Color(0xFF145da1),
     onPrimary = Color(0xFFFFFFFF)
 )
