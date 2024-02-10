@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.screens.deck
 
+import IS_ANDROID
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Spacer
@@ -58,7 +59,10 @@ fun DeckScreen(
             onClick = onCloseClick,
             modifier = Modifier.align(Alignment.BottomStart)
                 .navigationBarsPadding()
-                .padding(start = 16.dp),
+                .padding(
+                    start = 16.dp,
+                    bottom = if (IS_ANDROID) 16.dp else 0.dp
+                ),
             shape = DefaultShape
         ) {
             Icon(
