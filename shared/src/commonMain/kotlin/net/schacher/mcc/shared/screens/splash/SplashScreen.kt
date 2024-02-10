@@ -53,8 +53,6 @@ fun SplashScreen(preparing: Boolean) {
         )
 
         if (preparing) {
-
-
             Column(
                 modifier = Modifier.width(200.dp)
                     .align(Alignment.Center)

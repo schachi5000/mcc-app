@@ -51,8 +51,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
-import net.schacher.mcc.shared.design.compose.Entry
-import net.schacher.mcc.shared.design.compose.EntryRow
+import net.schacher.mcc.shared.design.compose.CardRow
+import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.design.theme.color
@@ -119,14 +119,14 @@ fun SearchScreen(
                     Spacer(Modifier.statusBarsPadding().padding(bottom = 148.dp))
                 }
 
-                EntryRow(
+                CardRow(
                     modifier = Modifier.padding(
                         start = 16.dp,
                         top = if (item == 0) 0.dp else 16.dp,
                         end = 16.dp,
                         bottom = 16.dp
                     ),
-                    entry = entries[item]
+                    cardRowEntry = entries[item]
                 ) {
                     focusManager.clearFocus()
                     onCardClicked(it)
@@ -163,10 +163,10 @@ private val shade: Brush
         )
     )
 
-private fun createEntries(cards: List<Card>): List<Entry> =
+private fun createEntries(cards: List<Card>): List<CardRowEntry> =
     cards.groupBy { it.type }.mapNotNull { (type, cards) ->
         type?.let {
-            Entry(it.localize(), cards.defaultSort())
+            CardRowEntry(it.localize(), cards.defaultSort())
         }
     }.sortedBy { it.title }
 

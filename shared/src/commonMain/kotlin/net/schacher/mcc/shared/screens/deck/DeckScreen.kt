@@ -1,97 +1,72 @@
 package net.schacher.mcc.shared.screens.deck
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import net.schacher.mcc.shared.design.compose.DeckRow
-import net.schacher.mcc.shared.design.theme.DeckShape
+import net.schacher.mcc.shared.design.compose.CardRow
+import net.schacher.mcc.shared.design.compose.CardRowEntry
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.screens.deck.ListItem.DeckItem
-import org.koin.compose.koinInject
 
 @Composable
 fun DeckScreen(
-    deckViewModel: DeckViewModel = koinInject(),
-    onDeckClick: (Deck) -> Unit,
-    onAddDeckClick: () -> Unit
+    deck: Deck,
+    onCloseClick: () -> Unit
 ) {
-    val state by deckViewModel.state.collectAsState()
-    val entries = mutableListOf<ListItem>().also {
-        it.addAll(state.decks.map { DeckItem(it) })
-        it.add(ListItem.AddDeckItem)
-    }
-
     Box(
-        modifier = Modifier.fillMaxSize()
-            .padding(horizontal = 16.dp)
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)
     ) {
-        LazyColumn {
-            items(entries.size) { index ->
+        val entries = deck.cards.groupBy { it.type }
+            .map { CardRowEntry("${it.key} (${it.value.size})", it.value) }
+
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            items(entries.count()) { index ->
                 if (index == 0) {
                     Spacer(Modifier.statusBarsPadding().height(16.dp))
                 }
 
-                when (val entry = entries[index]) {
-                    is DeckItem -> DeckRow(entry.deck) { onDeckClick(entry.deck) }
-                    is ListItem.AddDeckItem -> AddDeckButton { onAddDeckClick() }
+                CardRow(
+                    modifier = Modifier.padding(
+                        start = 16.dp,
+                        top = if (index == 0) 0.dp else 16.dp,
+                        end = 16.dp,
+                        bottom = 16.dp
+                    ),
+                    cardRowEntry = entries[index]
+                ) {
+                    // onCardClicked(it)
                 }
-
-                Spacer(Modifier.height(16.dp))
             }
         }
-    }
-}
 
-@Composable
-fun AddDeckButton(onClick: () -> Unit) {
-    Button(
-        onClick = onClick,
-        modifier = Modifier.height(120.dp).fillMaxWidth(),
-        shape = DeckShape,
-        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
-        elevation = null
-    ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
+        FloatingActionButton(
+            onClick = onCloseClick,
+            modifier = Modifier.align(Alignment.BottomStart)
+                .navigationBarsPadding()
+                .padding(start = 16.dp),
+            shape = DefaultShape
         ) {
             Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp)
-                    .align(Alignment.CenterHorizontally),
-                tint = MaterialTheme.colors.onSurface,
-            )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = "Deck hinzufügen",
-                color = MaterialTheme.colors.onSurface
+                imageVector = Icons.AutoMirrored.Rounded.ArrowBack,
+                contentDescription = "Close"
             )
         }
     }
 }
 
-private sealed interface ListItem {
-    data class DeckItem(val deck: Deck) : ListItem
-    data object AddDeckItem : ListItem
-}
+

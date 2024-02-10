@@ -2,7 +2,6 @@ package net.schacher.mcc.shared.screens.main
 
 import IS_IOS
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -45,28 +44,27 @@ import marvelchampionscompanion.shared.generated.resources.Res
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
-import net.schacher.mcc.shared.design.compose.InspectScreen
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.featured.FeaturedScreen
-import net.schacher.mcc.shared.screens.main.Event.CardsDatabaseSynced
 import net.schacher.mcc.shared.screens.main.Event.CardsDatabaseSyncFailed
+import net.schacher.mcc.shared.screens.main.Event.CardsDatabaseSynced
+import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
-import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckInspector
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
+import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.splash.SplashScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
 @Composable
@@ -92,7 +90,6 @@ fun MainScreen(
                 when (it) {
                     is CardMenu -> CardMenuBottomSheet(mainViewModel, it.card)
                     is DeckMenu -> DeckMenuBottomSheet(mainViewModel, it.deck)
-                    is DeckInspector -> DeckInspectorBottomSheet(mainViewModel, it.deck)
                     else -> {}
                 }
             }
@@ -124,7 +121,7 @@ fun MainScreen(
                         }
                     }) { state ->
                     when (state) {
-                        0 -> DeckScreen(
+                        0 -> MyDecksScreen(
                             onDeckClick = { mainViewModel.onDeckClicked(it) },
                             onAddDeckClick = {}
                         )
@@ -169,11 +166,17 @@ fun MainScreen(
         }
     }
 
-    AnimatedVisibility(
-        visible = state.value.splash != null,
-        exit = fadeOut()
+    AnimatedContent(
+        targetState = state.value.fullScreen
     ) {
-        SplashScreen((state.value.splash)?.preparing ?: false)
+        when (it) {
+            is FullScreen.Splash -> SplashScreen(it.preparing)
+            is FullScreen.DeckScreen -> DeckScreen(it.deck) {
+                mainViewModel.onBackPressed()
+            }
+
+            else -> {}
+        }
     }
 }
 
@@ -240,13 +243,6 @@ fun DeckMenuBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
         ) {
             mainViewModel.onRemoveDeckClick(deck)
         }
-    }
-}
-
-@Composable
-fun DeckInspectorBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
-    BottomSheetContainer(modifier = Modifier.fillMaxHeight(0.9f)) {
-        InspectScreen(cards = deck.cards) {}
     }
 }
 

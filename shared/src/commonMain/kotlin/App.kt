@@ -8,10 +8,10 @@ import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.design.theme.MccTheme
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
-import net.schacher.mcc.shared.screens.deck.DeckViewModel
 import net.schacher.mcc.shared.screens.featured.FeaturedViewModel
 import net.schacher.mcc.shared.screens.main.MainScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel
+import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsViewModel
 import org.koin.compose.KoinApplication
@@ -29,7 +29,7 @@ val repositories = module {
 
 val viewModels = module {
     singleOf(::MainViewModel)
-    singleOf(::DeckViewModel)
+    singleOf(::MyDecksViewModel)
     singleOf(::SettingsViewModel)
     singleOf(::SearchViewModel)
     singleOf(::FeaturedViewModel)

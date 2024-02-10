@@ -13,13 +13,13 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.DeckScreen
+import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.Splash
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
-import net.schacher.mcc.shared.screens.main.MainUiState.Splash
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
-import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckInspector
 
 class MainViewModel(
     private val cardRepository: CardRepository,
@@ -30,7 +30,8 @@ class MainViewModel(
         const val SPLASH_DELAY_MS = 2000L
     }
 
-    private val _state = MutableStateFlow(MainUiState(Splash(cardRepository.cards.isEmpty())))
+    private val _state =
+        MutableStateFlow(MainUiState(fullScreen = Splash(cardRepository.cards.isEmpty())))
 
     val state = _state.asStateFlow()
 
@@ -56,7 +57,7 @@ class MainViewModel(
 
             _state.update {
                 it.copy(
-                    splash = null,
+                    fullScreen = null,
                     mainScreen = Decks
                 )
 
@@ -89,7 +90,7 @@ class MainViewModel(
 
     fun onDeckClicked(deck: Deck) {
         this.viewModelScope.launch {
-            _state.update { it.copy(subScreen = DeckInspector(deck)) }
+            _state.update { it.copy(fullScreen = DeckScreen(deck)) }
         }
     }
 
@@ -105,6 +106,17 @@ class MainViewModel(
             _state.update { it.copy(subScreen = null) }
         }
     }
+
+    fun onBackPressed() {
+        this.viewModelScope.launch {
+            _state.update {
+                it.copy(
+                    subScreen = null,
+                    fullScreen = null
+                )
+            }
+        }
+    }
 }
 
 sealed interface Event {
@@ -113,11 +125,10 @@ sealed interface Event {
 }
 
 data class MainUiState(
-    val splash: Splash? = null,
     val mainScreen: MainScreen = Featured,
-    val subScreen: SubScreen? = null
+    val subScreen: SubScreen? = null,
+    val fullScreen: FullScreen? = null
 ) {
-    data class Splash(val preparing: Boolean)
 
     sealed interface MainScreen {
         data object Decks : MainScreen
@@ -131,8 +142,13 @@ data class MainUiState(
 
         data class DeckMenu(val deck: Deck) : SubScreen
 
-        data class DeckInspector(val deck: Deck) : SubScreen
 
         data class CardDetails(val card: Card) : SubScreen
+    }
+
+    sealed interface FullScreen {
+        data class Splash(val preparing: Boolean) : FullScreen
+
+        data class DeckScreen(val deck: Deck) : FullScreen
     }
 }
