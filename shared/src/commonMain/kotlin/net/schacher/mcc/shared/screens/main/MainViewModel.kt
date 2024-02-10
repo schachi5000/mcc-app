@@ -14,11 +14,11 @@ import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.DeckScreen
-import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.Splash
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
+import net.schacher.mcc.shared.screens.main.MainUiState.Splash
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
 
 class MainViewModel(
@@ -31,7 +31,7 @@ class MainViewModel(
     }
 
     private val _state =
-        MutableStateFlow(MainUiState(fullScreen = Splash(cardRepository.cards.isEmpty())))
+        MutableStateFlow(MainUiState(splash = Splash(cardRepository.cards.isEmpty())))
 
     val state = _state.asStateFlow()
 
@@ -57,10 +57,9 @@ class MainViewModel(
 
             _state.update {
                 it.copy(
-                    fullScreen = null,
+                    splash = null,
                     mainScreen = Decks
                 )
-
             }
         }
     }
@@ -125,10 +124,12 @@ sealed interface Event {
 }
 
 data class MainUiState(
+    val splash: Splash? = null,
     val mainScreen: MainScreen = Featured,
     val subScreen: SubScreen? = null,
     val fullScreen: FullScreen? = null
 ) {
+    data class Splash(val preparing: Boolean) : FullScreen
 
     sealed interface MainScreen {
         data object Decks : MainScreen
@@ -147,8 +148,6 @@ data class MainUiState(
     }
 
     sealed interface FullScreen {
-        data class Splash(val preparing: Boolean) : FullScreen
-
         data class DeckScreen(val deck: Deck) : FullScreen
     }
 }

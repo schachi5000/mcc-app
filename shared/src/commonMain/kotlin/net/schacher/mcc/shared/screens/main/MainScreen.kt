@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.screens.main
 
 import IS_IOS
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
@@ -10,6 +11,7 @@ import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -184,17 +186,25 @@ fun MainScreen(
         targetState = state.value.fullScreen,
         transitionSpec = {
             (slideInVertically { height -> height } + fadeIn()).togetherWith(
-                slideOutVertically { height -> -height } + fadeOut())
+                slideOutVertically { height -> height } + fadeOut())
         }
     ) {
         when (it) {
-            is FullScreen.Splash -> SplashScreen(it.preparing)
             is FullScreen.DeckScreen -> DeckScreen(it.deck) {
                 mainViewModel.onBackPressed()
             }
 
-            else -> {}
+            else -> {
+                Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
+            }
         }
+    }
+
+    AnimatedVisibility(
+        visible = state.value.splash != null,
+        exit = fadeOut()
+    ) {
+        SplashScreen((state.value.splash)?.preparing ?: false)
     }
 }
 
