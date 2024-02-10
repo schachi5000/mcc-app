@@ -2,10 +2,13 @@ package net.schacher.mcc.shared.screens.main
 
 import IS_IOS
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideInVertically
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -41,6 +44,7 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
+import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
@@ -66,7 +70,10 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
+@OptIn(
+    ExperimentalMaterialApi::class, ExperimentalResourceApi::class,
+    ExperimentalAnimationApi::class
+)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel = koinInject()
@@ -79,6 +86,13 @@ fun MainScreen(
         skipHalfExpanded = true
     )
     val snackbarHostState = remember { SnackbarHostState() }
+
+    BackHandler(
+        enabled = (state.value.subScreen != null ||
+                state.value.fullScreen != null)
+    ) {
+        mainViewModel.onBackPressed()
+    }
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
@@ -149,7 +163,7 @@ fun MainScreen(
         }
     }
 
-    scope.launch {
+    LaunchedEffect(Unit) {
         mainViewModel.event.collect {
             when (it) {
                 CardsDatabaseSynced -> snackbarHostState.showSnackbar("Database synced!")
@@ -167,7 +181,11 @@ fun MainScreen(
     }
 
     AnimatedContent(
-        targetState = state.value.fullScreen
+        targetState = state.value.fullScreen,
+        transitionSpec = {
+            (slideInVertically { height -> height } + fadeIn()).togetherWith(
+                slideOutVertically { height -> -height } + fadeOut())
+        }
     ) {
         when (it) {
             is FullScreen.Splash -> SplashScreen(it.preparing)
