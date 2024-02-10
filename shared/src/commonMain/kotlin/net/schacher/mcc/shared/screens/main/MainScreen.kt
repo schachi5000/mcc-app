@@ -1,11 +1,8 @@
-@file:OptIn(ExperimentalResourceApi::class, ExperimentalResourceApi::class)
-
 package net.schacher.mcc.shared.screens.main
 
 import IS_IOS
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -54,6 +51,8 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.featured.FeaturedScreen
+import net.schacher.mcc.shared.screens.main.Event.CardsDatabaseSynced
+import net.schacher.mcc.shared.screens.main.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
@@ -69,7 +68,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalAnimationApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel = koinInject()
@@ -100,7 +99,8 @@ fun MainScreen(
         }) {
 
         Scaffold(
-            Modifier.fillMaxSize().blur(if (state.value.subScreen != null) 4.dp else 0.dp),
+            modifier = Modifier.fillMaxSize()
+                .blur(if (state.value.subScreen != null) 4.dp else 0.dp),
             backgroundColor = MaterialTheme.colors.background,
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
@@ -152,6 +152,15 @@ fun MainScreen(
         }
     }
 
+    scope.launch {
+        mainViewModel.event.collect {
+            when (it) {
+                CardsDatabaseSynced -> snackbarHostState.showSnackbar("Database synced!")
+                is CardsDatabaseSyncFailed -> snackbarHostState.showSnackbar("Error syncing database: ${it.exception.message}")
+            }
+        }
+    }
+
     LaunchedEffect(sheetState) {
         snapshotFlow { sheetState.isVisible }.collect { isVisible ->
             if (!isVisible) {
@@ -168,7 +177,7 @@ fun MainScreen(
     }
 }
 
-
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     BottomNavigation(
@@ -221,6 +230,7 @@ fun CardMenuBottomSheet(mainViewModel: MainViewModel, card: Card) {
     }
 }
 
+@ExperimentalResourceApi
 @Composable
 fun DeckMenuBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
     BottomSheetContainer {

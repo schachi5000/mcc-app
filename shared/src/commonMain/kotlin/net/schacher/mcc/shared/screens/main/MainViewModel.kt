@@ -3,7 +3,9 @@ package net.schacher.mcc.shared.screens.main
 import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.delay
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -24,23 +26,40 @@ class MainViewModel(
     private val deckRepository: DeckRepository
 ) : ViewModel() {
 
+    private companion object {
+        const val SPLASH_DELAY_MS = 2000L
+    }
+
     private val _state = MutableStateFlow(MainUiState(Splash(cardRepository.cards.isEmpty())))
 
     val state = _state.asStateFlow()
 
+    private val _event = MutableSharedFlow<Event>()
+
+    val event = _event.asSharedFlow()
+
     init {
         this.viewModelScope.launch {
-            if (cardRepository.cards.isEmpty()) {
-                try {
-                    cardRepository.refresh()
-                } catch (e: Exception) {
-                    Logger.e(e) { "Error refreshing cards" }
-                }
-            } else {
-                delay(2000)
+            try {
+                cardRepository.refresh()
+                _event.emit(Event.CardsDatabaseSynced)
+            } catch (e: Exception) {
+                Logger.e(e) { "Error refreshing cards" }
+                _event.emit(Event.CardsDatabaseSyncFailed(e))
             }
+        }
+
+        this.viewModelScope.launch {
+            if (cardRepository.cards.isEmpty()) {
+                delay(SPLASH_DELAY_MS)
+            }
+
             _state.update {
-                it.copy(splash = null, mainScreen = Decks)
+                it.copy(
+                    splash = null,
+                    mainScreen = Decks
+                )
+
             }
         }
     }
@@ -88,6 +107,10 @@ class MainViewModel(
     }
 }
 
+sealed interface Event {
+    data object CardsDatabaseSynced : Event
+    data class CardsDatabaseSyncFailed(val exception: Exception) : Event
+}
 
 data class MainUiState(
     val splash: Splash? = null,
