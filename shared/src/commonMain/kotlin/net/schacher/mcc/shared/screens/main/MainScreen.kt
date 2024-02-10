@@ -40,7 +40,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
@@ -51,6 +50,7 @@ import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
 import net.schacher.mcc.shared.design.compose.OptionsEntry
+import net.schacher.mcc.shared.design.compose.blurByBottomSheet
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreen
@@ -112,8 +112,7 @@ fun MainScreen(
         }) {
 
         Scaffold(
-            modifier = Modifier.fillMaxSize()
-                .blur(if (state.value.subScreen != null) 4.dp else 0.dp),
+            modifier = Modifier.fillMaxSize().blurByBottomSheet(sheetState),
             backgroundColor = MaterialTheme.colors.background,
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {

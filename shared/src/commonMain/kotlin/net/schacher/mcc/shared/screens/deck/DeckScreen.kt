@@ -31,13 +31,13 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
+import net.schacher.mcc.shared.design.compose.blurByBottomSheet
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.localization.localize
 import net.schacher.mcc.shared.model.Card
@@ -82,28 +82,32 @@ fun DeckScreen(
         }) {
         Box(
             modifier = Modifier.fillMaxSize()
-                .blur(if (sheetState.isVisible) 4.dp else 0.dp) // TODO This could be smoother
+                .blurByBottomSheet(sheetState)
                 .background(MaterialTheme.colors.background)
         ) {
             val entries = deck.cards.groupBy { it.type }
                 .map { CardRowEntry("${it.key?.localize()}", it.value) }
 
             LazyColumn(modifier = Modifier.fillMaxSize()) {
-                items(entries.count()) { index ->
+                items(entries.count() + 1) { index ->
                     if (index == 0) {
                         Spacer(Modifier.statusBarsPadding().height(16.dp))
                     }
 
-                    CardRow(
-                        modifier = Modifier.padding(
-                            start = 16.dp,
-                            top = if (index == 0) 0.dp else 16.dp,
-                            end = 16.dp,
-                            bottom = 16.dp
-                        ),
-                        cardRowEntry = entries[index]
-                    ) {
-                        selectedCard = it
+                    if (index < entries.count()) {
+                        CardRow(
+                            modifier = Modifier.padding(
+                                start = 16.dp,
+                                top = if (index == 0) 0.dp else 16.dp,
+                                end = 16.dp,
+                                bottom = 16.dp
+                            ),
+                            cardRowEntry = entries[index]
+                        ) {
+                            selectedCard = it
+                        }
+                    } else {
+                        Spacer(Modifier.height(32.dp))
                     }
                 }
             }
