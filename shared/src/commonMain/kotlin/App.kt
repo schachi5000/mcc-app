@@ -8,10 +8,12 @@ import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.design.theme.MccTheme
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.featured.FeaturedViewModel
-import net.schacher.mcc.shared.screens.main.MainScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
+import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
+import net.schacher.mcc.shared.screens.packselection.PackSelectionViewModel
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsViewModel
 import org.koin.compose.KoinApplication
@@ -25,6 +27,7 @@ val network = module {
 val repositories = module {
     singleOf(::CardRepository)
     singleOf(::DeckRepository)
+    singleOf(::PackRepository)
 }
 
 val viewModels = module {
@@ -33,6 +36,7 @@ val viewModels = module {
     singleOf(::SettingsViewModel)
     singleOf(::SearchViewModel)
     singleOf(::FeaturedViewModel)
+    singleOf(::PackSelectionViewModel)
 }
 
 @Composable
@@ -48,7 +52,10 @@ fun App(databaseDao: DatabaseDao) {
         )
     }) {
         MccTheme {
-            MainScreen()
+            //  MainScreen()
+            PackSelectionScreen {
+
+            }
         }
     }
 }
