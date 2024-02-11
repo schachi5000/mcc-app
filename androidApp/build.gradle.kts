@@ -65,6 +65,10 @@ android {
     composeOptions {
         kotlinCompilerExtensionVersion = "1.5.3"
     }
+
+    // Kamel Image causes issue if these resource are not excluded
+    packagingOptions.resources.excludes.add("META-INF/versions/9/*")
+
     buildTypes {
         getByName("release") {
             signingConfig = signingConfigs.getByName("release")
