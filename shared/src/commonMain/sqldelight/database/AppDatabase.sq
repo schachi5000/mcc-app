@@ -67,6 +67,29 @@ WHERE id = ?;
 removeAllDecks:
 DELETE FROM Deck;
 
+-- Packs
+CREATE TABLE Pack (
+    code TEXT NOT NULL PRIMARY KEY,
+    name TEXT NOT NULL,
+    cardCodes TEXT NOT NULL,
+    url TEXT NOT NULL,
+    inPosession INTEGER DEFAULT 0
+);
+
+addPack:
+INSERT OR REPLACE INTO Pack(code, name, cardCodes, url, inPosession)
+VALUES(?, ?, ?, ?, ?);
+
+getPack:
+SELECT *
+FROM Pack
+WHERE code = ?;
+
+getAllPacks:
+SELECT *
+FROM Pack;
+
+
 -- Settings
 CREATE TABLE Settings (
     key Text NOT NULL PRIMARY KEY,

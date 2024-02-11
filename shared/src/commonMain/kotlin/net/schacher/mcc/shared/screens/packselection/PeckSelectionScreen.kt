@@ -31,11 +31,8 @@ fun PackSelectionScreen(
     val state by viewModel.state.collectAsState()
 
     Box(
-        modifier = Modifier.fillMaxSize()
-            .background(MaterialTheme.colors.background)
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background)
     ) {
-
-
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -68,7 +65,7 @@ fun PackSelectionScreen(
 fun SelectionEntry(pack: Pack, selected: Boolean, onClick: (String) -> Unit) {
     if (selected) {
         Button(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             onClick = { onClick(pack.code) },
             shape = DefaultShape,
         ) {
@@ -77,7 +74,7 @@ fun SelectionEntry(pack: Pack, selected: Boolean, onClick: (String) -> Unit) {
     } else {
         OutlinedButton(
             onClick = { onClick(pack.code) },
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp),
             shape = DefaultShape,
             colors = ButtonDefaults.outlinedButtonColors()
         ) {

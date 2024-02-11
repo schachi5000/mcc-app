@@ -22,7 +22,7 @@ class SettingsViewModel(
         SettingsUiState(
             cardCount = cardRepository.cards.size,
             deckCount = deckRepository.state.value.size,
-            packCount = packRepository.packs.size,
+            packCount = packRepository.allPacks.size,
             settingsValues = settingsDao.getAllEntries()
         )
     )

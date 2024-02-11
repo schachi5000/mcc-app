@@ -41,12 +41,14 @@ class MainViewModel(
 
     init {
         this.viewModelScope.launch {
-            try {
-                cardRepository.refresh()
-                _event.emit(Event.CardsDatabaseSynced)
-            } catch (e: Exception) {
-                Logger.e(e) { "Error refreshing cards" }
-                _event.emit(Event.CardsDatabaseSyncFailed(e))
+            if (cardRepository.cards.isEmpty()) {
+                try {
+                    cardRepository.refresh()
+                    _event.emit(Event.CardsDatabaseSynced)
+                } catch (e: Exception) {
+                    Logger.e(e) { "Error refreshing cards" }
+                    _event.emit(Event.CardsDatabaseSyncFailed(e))
+                }
             }
         }
 

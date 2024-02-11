@@ -2,6 +2,7 @@ import androidx.compose.runtime.Composable
 import net.schacher.mcc.shared.database.CardDatabaseDao
 import net.schacher.mcc.shared.database.DatabaseDao
 import net.schacher.mcc.shared.database.DeckDatabaseDao
+import net.schacher.mcc.shared.database.PackDatabaseDao
 import net.schacher.mcc.shared.database.SettingsDao
 import net.schacher.mcc.shared.datasource.http.KtorMarvelCDbDataSource
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
@@ -45,6 +46,7 @@ fun App(databaseDao: DatabaseDao) {
         modules(
             module { single<CardDatabaseDao> { databaseDao } },
             module { single<DeckDatabaseDao> { databaseDao } },
+            module { single<PackDatabaseDao> { databaseDao } },
             module { single<SettingsDao> { databaseDao } },
             network,
             repositories,

@@ -7,15 +7,15 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
+import net.schacher.mcc.shared.model.Pack
+
+private const val LIST_DELIMITER = ";"
 
 class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Boolean = false) :
     DeckDatabaseDao,
     CardDatabaseDao,
+    PackDatabaseDao,
     SettingsDao {
-
-    private companion object {
-        const val LIST_DELIMITER = ";"
-    }
 
     private val database = AppDatabase(databaseDriverFactory.createDriver())
 
@@ -54,7 +54,8 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         )
     }
 
-    override fun getCardByCode(cardCode: String): Card = this.dbQuery.selectCardByCode(cardCode).executeAsOne().toCard()
+    override fun getCardByCode(cardCode: String): Card =
+        this.dbQuery.selectCardByCode(cardCode).executeAsOne().toCard()
 
     override fun getAllCards(): List<Card> = this.dbQuery.selectAllCards()
         .executeAsList()
@@ -83,12 +84,13 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
             deck.name,
             deck.aspect?.name,
             deck.hero.code,
-            deck.cards.joinToString(LIST_DELIMITER) { it.code })
+            deck.cards.toCardCodeString()
+        )
     }
 
     override fun getDecks(): List<Deck> = this.dbQuery.selectAllDecks().executeAsList().map {
-        val cards = it.cardCodes.split(LIST_DELIMITER).map {
-            this.dbQuery.selectCardByCode(it).executeAsOne().toCard()
+        val cards = it.cardCodes.toCardCodeList().map {
+            this.getCardByCode(it)
         }
 
         Deck(
@@ -110,7 +112,8 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         this.dbQuery.removeAllDecks()
     }
 
-    override fun getString(key: String): String? = this.dbQuery.getSetting(key).executeAsOneOrNull()?.value_
+    override fun getString(key: String): String? =
+        this.dbQuery.getSetting(key).executeAsOneOrNull()?.value_
 
     override fun putString(key: String, value: String): Boolean = runCatching {
         this.dbQuery.addSetting(key, value)
@@ -129,7 +132,82 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 
     override fun getAllEntries(): List<Pair<String, Any>> =
         this.dbQuery.getAllSettings().executeAsList().map { it.key to it.value_ }
+
+    override fun addPack(pack: Pack) {
+        Logger.d { "Adding pack ${pack.name} to database" }
+        val storedPack = this.dbQuery.getPack(pack.code).executeAsOneOrNull()
+
+        this.dbQuery.addPack(
+            pack.code,
+            pack.name,
+            pack.cards.toCardCodeString(),
+            pack.url,
+            storedPack?.inPosession
+        )
+    }
+
+    override fun addPacks(packs: List<Pack>) {
+        Logger.d { "Adding ${packs.size} packs to database" }
+        packs.forEach { this.addPack(it) }
+    }
+
+    override fun getPack(packCode: String): Pack = this.dbQuery.getPack(packCode)
+        .executeAsOne()
+        .toPack { cardCode -> this.getCardByCode(cardCode) }
+
+
+    override fun getAllPacks(): List<Pack> =
+        this.dbQuery.getAllPacks().executeAsList().map {
+            it.toPack { cardCode -> this.getCardByCode(cardCode) }
+        }
+
+    override fun addPackToCollection(packCode: String) {
+        val pack = this.getPack(packCode)
+
+        this.dbQuery.addPack(
+            pack.code,
+            pack.name,
+            pack.cards.toCardCodeString(),
+            pack.url,
+            true.toLong()
+        )
+    }
+
+    override fun removePackToCollection(packCode: String) {
+        val pack = this.getPack(packCode)
+
+        this.dbQuery.addPack(
+            pack.code,
+            pack.name,
+            pack.cards.toCardCodeString(),
+            pack.url,
+            false.toLong()
+        )
+    }
+
+    override fun getPacksInCollection(): List<String> = this.dbQuery.getAllPacks()
+        .executeAsList()
+        .filter { it.inPosession.toBoolean() }
+        .map {
+            it.code
+        }
 }
+
+private fun String.toCardCodeList() = this.split(LIST_DELIMITER)
+
+private fun List<Card>.toCardCodeString() = this.joinToString(LIST_DELIMITER) { it.code }
+
+private fun Boolean.toLong() = if (this) 1L else 0L
+private fun Long?.toBoolean() = this != 0L
+
+private fun database.Pack.toPack(cardProvider: (String) -> Card) = Pack(
+    name = this.name,
+    code = this.code,
+    cards = this.cardCodes.toCardCodeList().map {
+        cardProvider(it)
+    },
+    url = this.url,
+)
 
 private fun database.Card.toCard() = Card(
     code = this.code,
