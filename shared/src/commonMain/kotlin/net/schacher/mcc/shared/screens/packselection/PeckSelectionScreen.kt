@@ -2,7 +2,7 @@ package net.schacher.mcc.shared.screens.packselection
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
@@ -18,6 +18,7 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Pack
 import org.koin.compose.koinInject
@@ -29,22 +30,27 @@ fun PackSelectionScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    Column(
+    Box(
         modifier = Modifier.fillMaxSize()
-            .statusBarsPadding()
             .background(MaterialTheme.colors.background)
     ) {
-        Text(
-            modifier = Modifier.fillMaxWidth().padding(16.dp),
-            text = "Your Packs",
-            style = MaterialTheme.typography.h2,
-            color = MaterialTheme.colors.onBackground
-        )
+
 
         LazyColumn(
-            modifier = Modifier.fillMaxSize().padding(16.dp),
+            modifier = Modifier.fillMaxSize(),
             verticalArrangement = Arrangement.spacedBy(12.dp)
         ) {
+            item {
+                Text(
+                    modifier = Modifier.fillMaxWidth()
+                        .statusBarsPadding()
+                        .padding(16.dp),
+                    text = "Your Packs",
+                    style = MaterialTheme.typography.h2,
+                    color = MaterialTheme.colors.onBackground
+                )
+            }
+
             state.packs.forEach {
                 item {
                     SelectionEntry(it.pack, it.selected) {
@@ -53,6 +59,8 @@ fun PackSelectionScreen(
                 }
             }
         }
+
+        BackButton(onBackPress)
     }
 }
 
@@ -60,7 +68,7 @@ fun PackSelectionScreen(
 fun SelectionEntry(pack: Pack, selected: Boolean, onClick: (String) -> Unit) {
     if (selected) {
         Button(
-            modifier = Modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth().padding(16.dp),
             onClick = { onClick(pack.code) },
             shape = DefaultShape,
         ) {

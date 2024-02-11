@@ -116,6 +116,12 @@ class MainViewModel(
             }
         }
     }
+
+    fun onPackSelectionClicked() {
+        this._state.update {
+            it.copy(fullScreen = MainUiState.FullScreen.PackSelectionScreen)
+        }
+    }
 }
 
 sealed interface Event {
@@ -143,11 +149,11 @@ data class MainUiState(
 
         data class DeckMenu(val deck: Deck) : SubScreen
 
-
         data class CardDetails(val card: Card) : SubScreen
     }
 
     sealed interface FullScreen {
         data class DeckScreen(val deck: Deck) : FullScreen
+        data object PackSelectionScreen : FullScreen
     }
 }

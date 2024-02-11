@@ -32,7 +32,10 @@ import org.koin.compose.koinInject
 
 @ExperimentalResourceApi
 @Composable
-fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
+fun SettingsScreen(
+    settingsViewModel: SettingsViewModel = koinInject(),
+    onPackSelectionClick: () -> Unit
+) {
     val state by settingsViewModel.state.collectAsState()
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -94,6 +97,12 @@ fun SettingsScreen(settingsViewModel: SettingsViewModel = koinInject()) {
             OptionsEntry(
                 label = "${state.deckCount} Decks",
                 iconResource = Res.drawable.ic_deck
+            )
+
+            OptionsEntry(
+                label = "${state.deckCount} Packs",
+                iconResource = Res.drawable.ic_deck,
+                onClick = { onPackSelectionClick() }
             )
         }
 

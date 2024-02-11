@@ -9,10 +9,12 @@ import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.database.SettingsDao
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.repositories.PackRepository
 
 class SettingsViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
+    private val packRepository: PackRepository,
     private val settingsDao: SettingsDao
 ) : ViewModel() {
 
@@ -20,6 +22,7 @@ class SettingsViewModel(
         SettingsUiState(
             cardCount = cardRepository.cards.size,
             deckCount = deckRepository.state.value.size,
+            packCount = packRepository.packs.size,
             settingsValues = settingsDao.getAllEntries()
         )
     )
@@ -87,6 +90,7 @@ class SettingsViewModel(
 data class SettingsUiState(
     val cardCount: Int,
     val deckCount: Int,
+    val packCount: Int,
     val syncInProgress: Boolean = false,
     val settingsValues: List<Pair<String, Any>> = emptyList()
 )

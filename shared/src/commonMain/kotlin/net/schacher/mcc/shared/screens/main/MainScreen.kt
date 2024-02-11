@@ -3,7 +3,6 @@ package net.schacher.mcc.shared.screens.main
 import IS_IOS
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.ExperimentalAnimationApi
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -65,6 +64,7 @@ import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
+import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.splash.SplashScreen
@@ -72,10 +72,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
-@OptIn(
-    ExperimentalMaterialApi::class, ExperimentalResourceApi::class,
-    ExperimentalAnimationApi::class
-)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
 @Composable
 fun MainScreen(
     mainViewModel: MainViewModel = koinInject()
@@ -149,7 +146,9 @@ fun MainScreen(
                             mainViewModel.onCardClicked(it)
                         }
 
-                        3 -> SettingsScreen()
+                        3 -> SettingsScreen {
+                            mainViewModel.onPackSelectionClicked()
+                        }
                     }
                 }
             }
@@ -190,6 +189,10 @@ fun MainScreen(
     ) {
         when (it) {
             is FullScreen.DeckScreen -> DeckScreen(it.deck) {
+                mainViewModel.onBackPressed()
+            }
+
+            is FullScreen.PackSelectionScreen -> PackSelectionScreen {
                 mainViewModel.onBackPressed()
             }
 
