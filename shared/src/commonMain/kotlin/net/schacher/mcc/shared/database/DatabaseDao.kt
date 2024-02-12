@@ -30,7 +30,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
     }
 
     override fun addCards(cards: List<Card>) {
-        Logger.d { "Adding ${cards.size} cards to database" }
+        Logger.i { "Adding ${cards.size} cards to database" }
         cards.forEach { this.addCard(it) }
     }
 
@@ -75,12 +75,12 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         }
 
     override fun removeAllCards() {
-        Logger.d { "Deleting all cards from database" }
+        Logger.i { "Deleting all cards from database" }
         this.dbQuery.removeAllCards()
     }
 
     override fun addDeck(deck: Deck) {
-        Logger.d { "Adding deck ${deck.name} to database" }
+        Logger.i { "Adding deck ${deck.name} to database" }
         this.dbQuery.addDeck(
             deck.id.toLong(),
             deck.name,
@@ -105,17 +105,17 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
     }
 
     override fun removeDeck(deckId: Int) {
-        Logger.d { "Deleting deck $deckId from database" }
+        Logger.i { "Deleting deck $deckId from database" }
         this.dbQuery.removeDeckById(deckId.toLong())
     }
 
     override fun removeAllDecks() {
-        Logger.d { "Deleting all decks from database" }
+        Logger.i { "Deleting all decks from database" }
         this.dbQuery.removeAllDecks()
     }
 
     override fun removeAllPacks() {
-        Logger.d { "Deleting all decks from database" }
+        Logger.i { "Deleting all decks from database" }
         this.dbQuery.removeAllPacks()
     }
 
@@ -141,7 +141,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         this.dbQuery.getAllSettings().executeAsList().map { it.key to it.value_ }
 
     override fun addPack(pack: Pack) {
-        Logger.d { "Adding pack ${pack.name} to database" }
+        Logger.i { "Adding pack ${pack.name} to database" }
 
         this.dbQuery.addPack(
             pack.code,
@@ -155,7 +155,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
     }
 
     override fun addPacks(packs: List<Pack>) {
-        Logger.d { "Adding ${packs.size} packs to database" }
+        Logger.i { "Adding ${packs.size} packs to database" }
         packs.forEach { this.addPack(it) }
     }
 

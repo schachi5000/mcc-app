@@ -55,7 +55,7 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
         install(Logging) {
             logger = object : io.ktor.client.plugins.logging.Logger {
                 override fun log(message: String) {
-                    Logger.d { message }
+                    Logger.i { message }
                 }
             }
             level = LogLevel.INFO
@@ -75,7 +75,7 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
                 position = it.position
             )
         }.also {
-            Logger.d { "Packs loaded: ${it.size}" }
+            Logger.i { "Packs loaded: ${it.size}" }
         }
 
     override suspend fun getCardPack(packCode: String) = httpClient
@@ -86,9 +86,9 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
     override suspend fun getAllCards() = this.getAllPacks()
         .map {
             CoroutineScope(coroutineContext).async {
-                Logger.d { "Starting download of: ${it.name}" }
+                Logger.i { "Starting download of: ${it.name}" }
                 val result = getCardPack(it.code)
-                Logger.d { "finished download of: ${it.name}" }
+                Logger.i { "finished download of: ${it.name}" }
                 result
             }
         }

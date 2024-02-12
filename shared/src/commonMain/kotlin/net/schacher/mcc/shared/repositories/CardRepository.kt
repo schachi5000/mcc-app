@@ -24,7 +24,7 @@ class CardRepository(
 
     suspend fun refresh() = withContext(Dispatchers.IO) {
         val result = marvelCDbDataSource.getAllCards()
-        Logger.d { "${result.size} cards loaded" }
+        Logger.i { "${result.size} cards loaded" }
         cardDatabaseDao.addCards(result)
 
         _state.emit(cardDatabaseDao.getAllCards())

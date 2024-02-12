@@ -55,10 +55,10 @@ class SettingsViewModel(
         }
 
         viewModelScope.launch {
-            Logger.d { "Wiping database..." }
+            Logger.i { "Wiping database..." }
             cardRepository.deleteAllCards()
             deckRepository.deleteAllDecks()
-            Logger.d { "Wiping complete" }
+            Logger.i { "Wiping complete" }
 
             _state.update { it.copy(cardCount = 0, deckCount = 0) }
         }

@@ -79,18 +79,19 @@ class SearchViewModel(
             val showOnlyOwned = filters.any { it.type == OWNED && it.active }
             cardRepository.cards
                 .filter { card ->
-                    filters.none { it.active } || filters.any { filter ->
-                        when (filter.type) {
-                            BASIC -> card.faction == Faction.BASIC
-                            AGGRESSION -> card.aspect == Aspect.AGGRESSION
-                            PROTECTION -> card.aspect == Aspect.PROTECTION
-                            JUSTICE -> card.aspect == Aspect.JUSTICE
-                            LEADERSHIP -> card.aspect == Aspect.LEADERSHIP
-                            else -> false
-                        } && filter.active
-                    }
+                    filters.none { it.active } ||
+                            filters.any { filter ->
+                                when {
+                                    filter.type == BASIC -> card.faction == Faction.BASIC
+                                    filter.type == AGGRESSION -> card.aspect == Aspect.AGGRESSION
+                                    filter.type == PROTECTION -> card.aspect == Aspect.PROTECTION
+                                    filter.type == JUSTICE -> card.aspect == Aspect.JUSTICE
+                                    filter.type == LEADERSHIP -> card.aspect == Aspect.LEADERSHIP
+                                    showOnlyOwned -> packRepository.hasPackInCollection(card.packCode)
+                                    else -> false
+                                } && filter.active
+                            }
                 }
-                .filter { showOnlyOwned.not() || packRepository.hasPackInCollection(it.packCode) }
                 .filter { card ->
                     query?.lowercase()?.let {
                         card.name.lowercase().contains(it) || card.packName.lowercase().contains(it)
