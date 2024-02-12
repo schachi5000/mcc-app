@@ -12,6 +12,7 @@ import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.repositories.CardRepository
+import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.search.Filter.Type.AGGRESSION
 import net.schacher.mcc.shared.screens.search.Filter.Type.BASIC
 import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
@@ -20,7 +21,10 @@ import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
 import net.schacher.mcc.shared.utils.distinctByName
 
-class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() {
+class SearchViewModel(
+    private val cardRepository: CardRepository,
+    private val packRepository: PackRepository
+) : ViewModel() {
 
     private val _state =
         MutableStateFlow(UiState(result = cardRepository.cards.distinctByName()))
@@ -72,6 +76,7 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
 
     private suspend fun getFilteredCards(query: String?, filters: Set<Filter> = emptySet()) =
         withContext(Dispatchers.Default) {
+            val showOnlyOwned = filters.any { it.type == OWNED && it.active }
             cardRepository.cards
                 .filter { card ->
                     filters.none { it.active } || filters.any { filter ->
@@ -85,6 +90,7 @@ class SearchViewModel(private val cardRepository: CardRepository) : ViewModel() 
                         } && filter.active
                     }
                 }
+                .filter { showOnlyOwned.not() || packRepository.hasPackInCollection(it.packCode) }
                 .filter { card ->
                     query?.lowercase()?.let {
                         card.name.lowercase().contains(it) || card.packName.lowercase().contains(it)
