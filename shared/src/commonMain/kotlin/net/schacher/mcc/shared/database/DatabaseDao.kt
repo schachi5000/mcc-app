@@ -139,7 +139,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 
         this.dbQuery.addPack(
             pack.code,
+            pack.id.toLong(),
             pack.name,
+            pack.position.toLong(),
             pack.cards.toCardCodeString(),
             pack.url,
             storedPack?.inPosession
@@ -166,7 +168,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 
         this.dbQuery.addPack(
             pack.code,
+            pack.id.toLong(),
             pack.name,
+            pack.position.toLong(),
             pack.cards.toCardCodeString(),
             pack.url,
             true.toLong()
@@ -178,7 +182,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 
         this.dbQuery.addPack(
             pack.code,
+            pack.id.toLong(),
             pack.name,
+            pack.position.toLong(),
             pack.cards.toCardCodeString(),
             pack.url,
             false.toLong()
@@ -191,6 +197,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         .map {
             it.code
         }
+
+    override fun hasPackInCollection(packCode: String): Boolean =
+        this.dbQuery.getPack(packCode).executeAsOneOrNull()?.inPosession.toBoolean()
 }
 
 private fun String.toCardCodeList() = this.split(LIST_DELIMITER)
@@ -207,6 +216,8 @@ private fun database.Pack.toPack(cardProvider: (String) -> Card) = Pack(
         cardProvider(it)
     },
     url = this.url,
+    id = this.id.toInt(),
+    position = this.position.toInt()
 )
 
 private fun database.Card.toCard() = Card(

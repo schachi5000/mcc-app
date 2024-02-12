@@ -70,15 +70,17 @@ DELETE FROM Deck;
 -- Packs
 CREATE TABLE Pack (
     code TEXT NOT NULL PRIMARY KEY,
+    id INTEGER NOT NULL,
     name TEXT NOT NULL,
+    position INTEGER NOT NULL,
     cardCodes TEXT NOT NULL,
     url TEXT NOT NULL,
     inPosession INTEGER DEFAULT 0
 );
 
 addPack:
-INSERT OR REPLACE INTO Pack(code, name, cardCodes, url, inPosession)
-VALUES(?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Pack(code, id, name, position, cardCodes, url, inPosession)
+VALUES(?, ?, ?, ?, ?, ?, ?);
 
 getPack:
 SELECT *
@@ -89,6 +91,15 @@ getAllPacks:
 SELECT *
 FROM Pack;
 
+isPackInPossession:
+SELECT 1
+FROM Pack
+WHERE code = ? AND inPosession = 1;
+
+getPacksInPossession:
+SELECT *
+FROM Pack
+WHERE inPosession = 1;
 
 -- Settings
 CREATE TABLE Settings (

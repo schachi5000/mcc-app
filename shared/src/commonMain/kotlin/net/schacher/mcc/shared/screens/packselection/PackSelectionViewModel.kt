@@ -1,12 +1,10 @@
 package net.schacher.mcc.shared.screens.packselection
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.PackRepository
 
@@ -28,12 +26,11 @@ class PackSelectionViewModel(private val packRepository: PackRepository) : ViewM
         }
     }
 
-    suspend fun refresh() {
-        val entries = withContext(Dispatchers.Default) {
-            packRepository.allPacks.map {
-                UiState.Entry(it, packRepository.hasPackInCollection(it.code))
-            }.sortedBy { it.pack.code }
+    private fun refresh() {
+        val entries = packRepository.allPacks.map {
+            UiState.Entry(it, packRepository.hasPackInCollection(it.code))
         }
+
         _state.update {
             UiState(entries)
         }

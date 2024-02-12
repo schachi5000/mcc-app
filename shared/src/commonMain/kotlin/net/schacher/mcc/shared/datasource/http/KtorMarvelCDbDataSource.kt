@@ -70,7 +70,9 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
                 code = it.code,
                 name = it.name,
                 cards = this.getCardPack(it.code),
-                url = it.url
+                url = it.url,
+                id = it.id,
+                position = it.position
             )
         }
 
