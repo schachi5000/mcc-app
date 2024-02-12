@@ -25,6 +25,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         if (wipeDatabase) {
             this.removeAllCards()
             this.removeAllDecks()
+            this.removeAllPacks()
         }
     }
 
@@ -113,6 +114,11 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         this.dbQuery.removeAllDecks()
     }
 
+    override fun removeAllPacks() {
+        Logger.d { "Deleting all decks from database" }
+        this.dbQuery.removeAllPacks()
+    }
+
     override fun getString(key: String): String? =
         this.dbQuery.getSetting(key).executeAsOneOrNull()?.value_
 
@@ -136,7 +142,6 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 
     override fun addPack(pack: Pack) {
         Logger.d { "Adding pack ${pack.name} to database" }
-        val storedPack = this.dbQuery.getPack(pack.code).executeAsOneOrNull()
 
         this.dbQuery.addPack(
             pack.code,
@@ -145,7 +150,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
             pack.position.toLong(),
             pack.cards.toCardCodeString(),
             pack.url,
-            storedPack?.inPosession
+            this.hasPackInCollection(pack.code).toLong()
         )
     }
 

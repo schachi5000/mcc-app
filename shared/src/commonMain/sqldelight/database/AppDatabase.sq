@@ -101,6 +101,9 @@ SELECT *
 FROM Pack
 WHERE inPosession = 1;
 
+removeAllPacks:
+DELETE FROM Pack;
+
 -- Settings
 CREATE TABLE Settings (
     key Text NOT NULL PRIMARY KEY,
