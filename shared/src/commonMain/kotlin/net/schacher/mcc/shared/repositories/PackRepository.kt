@@ -18,9 +18,8 @@ class PackRepository(
     val allPacks: List<Pack>
         get() = _state.value
 
-    init {
-
-    }
+    val packsInCollectionCount: Int
+        get() = this.packDatabaseDao.getPacksInCollection().size
 
     suspend fun refresh() {
         val newPacks = this.marvelCDbDataSource.getAllPacks()
@@ -30,7 +29,7 @@ class PackRepository(
     }
 
     fun hasPackInCollection(packCode: String): Boolean =
-        this.packDatabaseDao.getPacksInCollection().any { it == packCode }
+        this.packDatabaseDao.hasPackInCollection(packCode)
 
     fun addPackToCollection(packCode: String) {
         this.packDatabaseDao.addPackToCollection(packCode)

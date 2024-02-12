@@ -13,6 +13,7 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
@@ -23,7 +24,8 @@ import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
 
 class MainViewModel(
     private val cardRepository: CardRepository,
-    private val deckRepository: DeckRepository
+    private val deckRepository: DeckRepository,
+    private val packRepository: PackRepository
 ) : ViewModel() {
 
     private companion object {
@@ -44,7 +46,8 @@ class MainViewModel(
             if (cardRepository.cards.isEmpty()) {
                 try {
                     cardRepository.refresh()
-                    _event.emit(Event.CardsDatabaseSynced)
+                    packRepository.refresh()
+                    _event.emit(Event.DatabaseSynced)
                 } catch (e: Exception) {
                     Logger.e(e) { "Error refreshing cards" }
                     _event.emit(Event.CardsDatabaseSyncFailed(e))
@@ -127,7 +130,7 @@ class MainViewModel(
 }
 
 sealed interface Event {
-    data object CardsDatabaseSynced : Event
+    data object DatabaseSynced : Event
     data class CardsDatabaseSyncFailed(val exception: Exception) : Event
 }
 

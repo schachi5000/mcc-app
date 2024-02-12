@@ -100,7 +100,7 @@ fun SettingsScreen(
             )
 
             OptionsEntry(
-                label = "${state.deckCount} Packs",
+                label = "${state.packsInCollectionCount} Packs",
                 iconResource = Res.drawable.ic_deck,
                 onClick = { onPackSelectionClick() }
             )

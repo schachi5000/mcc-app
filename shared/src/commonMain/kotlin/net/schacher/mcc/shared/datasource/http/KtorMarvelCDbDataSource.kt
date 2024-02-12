@@ -74,6 +74,8 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
                 id = it.id,
                 position = it.position
             )
+        }.also {
+            Logger.d { "Packs loaded: ${it.size}" }
         }
 
     override suspend fun getCardPack(packCode: String) = httpClient

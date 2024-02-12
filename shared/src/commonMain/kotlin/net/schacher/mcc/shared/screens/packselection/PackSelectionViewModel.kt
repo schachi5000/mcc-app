@@ -27,12 +27,10 @@ class PackSelectionViewModel(private val packRepository: PackRepository) : ViewM
     }
 
     private fun refresh() {
-        val entries = packRepository.allPacks.map {
-            UiState.Entry(it, packRepository.hasPackInCollection(it.code))
-        }
-
         _state.update {
-            UiState(entries)
+            UiState(packRepository.allPacks
+                .map { UiState.Entry(it, packRepository.hasPackInCollection(it.code)) }
+                .sortedBy { it.pack.position })
         }
     }
 

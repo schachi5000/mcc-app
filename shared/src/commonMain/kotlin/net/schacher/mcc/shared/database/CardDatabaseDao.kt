@@ -7,7 +7,7 @@ interface CardDatabaseDao {
 
     fun addCard(card: Card)
 
-    fun getCardByCode(cardCode: String): Card
+    fun getCardByCode(cardCode: String): Card?
 
     fun getAllCards(): List<Card>
 

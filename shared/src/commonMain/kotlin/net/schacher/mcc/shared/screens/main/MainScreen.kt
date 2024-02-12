@@ -55,7 +55,7 @@ import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.featured.FeaturedScreen
 import net.schacher.mcc.shared.screens.main.Event.CardsDatabaseSyncFailed
-import net.schacher.mcc.shared.screens.main.Event.CardsDatabaseSynced
+import net.schacher.mcc.shared.screens.main.Event.DatabaseSynced
 import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
@@ -166,7 +166,7 @@ fun MainScreen(
     LaunchedEffect(Unit) {
         mainViewModel.event.collect {
             when (it) {
-                CardsDatabaseSynced -> snackbarHostState.showSnackbar("Database synced!")
+                DatabaseSynced -> snackbarHostState.showSnackbar("Database synced!")
                 is CardsDatabaseSyncFailed -> snackbarHostState.showSnackbar("Error syncing database: ${it.exception.message}")
             }
         }

@@ -55,7 +55,8 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
     }
 
     override fun getCardByCode(cardCode: String): Card =
-        this.dbQuery.selectCardByCode(cardCode).executeAsOne().toCard()
+        this.dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
+            ?: throw Exception("Card with code $cardCode not found")
 
     override fun getAllCards(): List<Card> = this.dbQuery.selectAllCards()
         .executeAsList()
@@ -158,10 +159,11 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         .toPack { cardCode -> this.getCardByCode(cardCode) }
 
 
-    override fun getAllPacks(): List<Pack> =
+    override fun getAllPacks(): List<Pack> = runCatching {
         this.dbQuery.getAllPacks().executeAsList().map {
             it.toPack { cardCode -> this.getCardByCode(cardCode) }
         }
+    }.getOrElse { emptyList() }
 
     override fun addPackToCollection(packCode: String) {
         val pack = this.getPack(packCode)

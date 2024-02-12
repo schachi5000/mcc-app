@@ -21,8 +21,9 @@ class SettingsViewModel(
     private val _state = MutableStateFlow(
         SettingsUiState(
             cardCount = cardRepository.cards.size,
-            deckCount = deckRepository.state.value.size,
+            deckCount = deckRepository.decks.size,
             packCount = packRepository.allPacks.size,
+            packsInCollectionCount = packRepository.packsInCollectionCount,
             settingsValues = settingsDao.getAllEntries()
         )
     )
@@ -33,6 +34,17 @@ class SettingsViewModel(
         viewModelScope.launch {
             deckRepository.state.collect { value ->
                 _state.update { it.copy(deckCount = value.size) }
+            }
+        }
+
+        viewModelScope.launch {
+            packRepository.state.collect { value ->
+                _state.update {
+                    it.copy(
+                        packCount = value.size,
+                        packsInCollectionCount = packRepository.packsInCollectionCount
+                    )
+                }
             }
         }
     }
@@ -56,12 +68,23 @@ class SettingsViewModel(
         _state.update { it.copy(syncInProgress = true) }
 
         viewModelScope.launch {
-            cardRepository.refresh()
+            try {
+                cardRepository.refresh()
+            } catch (e: Exception) {
+                Logger.e(e) { "Error refreshing cards" }
+            }
+            try {
+                packRepository.refresh()
+            } catch (e: Exception) {
+                Logger.e(e) { "Error refreshing packs" }
+            }
 
             _state.update {
                 it.copy(
                     cardCount = cardRepository.cards.size,
-                    deckCount = deckRepository.state.value.size,
+                    deckCount = deckRepository.decks.size,
+                    packCount = packRepository.allPacks.size,
+                    packsInCollectionCount = packRepository.packsInCollectionCount,
                     syncInProgress = false
                 )
             }
@@ -91,6 +114,7 @@ data class SettingsUiState(
     val cardCount: Int,
     val deckCount: Int,
     val packCount: Int,
+    val packsInCollectionCount: Int,
     val syncInProgress: Boolean = false,
     val settingsValues: List<Pair<String, Any>> = emptyList()
 )
