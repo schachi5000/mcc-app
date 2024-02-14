@@ -4,7 +4,7 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import net.schacher.mcc.shared.database.PackDatabaseDao
+import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Pack
 

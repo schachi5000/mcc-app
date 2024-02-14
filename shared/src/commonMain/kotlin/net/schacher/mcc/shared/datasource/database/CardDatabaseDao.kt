@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.database
+package net.schacher.mcc.shared.datasource.database
 
 import net.schacher.mcc.shared.model.Card
 

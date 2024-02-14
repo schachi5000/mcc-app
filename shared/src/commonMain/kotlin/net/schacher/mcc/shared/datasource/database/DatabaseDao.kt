@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.database
+package net.schacher.mcc.shared.datasource.database
 
 import co.touchlab.kermit.Logger
 import database.AppDatabase
