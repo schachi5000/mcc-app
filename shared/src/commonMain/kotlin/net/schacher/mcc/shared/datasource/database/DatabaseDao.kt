@@ -2,9 +2,9 @@ package net.schacher.mcc.shared.datasource.database
 
 import co.touchlab.kermit.Logger
 import database.AppDatabase
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Aspect
@@ -17,7 +17,11 @@ import net.schacher.mcc.shared.utils.measuringWithContext
 
 private const val LIST_DELIMITER = ";"
 
-class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Boolean = false) :
+class DatabaseDao(
+    databaseDriverFactory: DatabaseDriverFactory,
+    wipeDatabase: Boolean = false,
+    scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+) :
     DeckDatabaseDao,
     CardDatabaseDao,
     PackDatabaseDao,
@@ -29,7 +33,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 
     init {
         if (wipeDatabase) {
-            MainScope().launch {
+            scope.launch {
                 wipeCardTable()
                 wipeDeckTable()
                 wipePackTable()
@@ -97,7 +101,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
             deck.name,
             deck.aspect?.name,
             deck.hero.code,
-            deck.cards.toCardCodeString()
+            deck.cards.map { it.code }.toCardCodeString()
         )
     }
 
@@ -168,7 +172,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
             pack.id.toLong(),
             pack.name,
             pack.position.toLong(),
-            pack.cards.toCardCodeString(),
+            pack.cardCodes.toCardCodeString(),
             pack.url,
             hasPackInCollection(pack.code).toLong()
         )
@@ -183,14 +187,13 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         measuringWithContext(Dispatchers.IO, "getPack") {
             dbQuery.getPack(packCode)
                 .executeAsOne()
-                .toPack { cardCode -> getCardByCode(cardCode) }
+                .toPack()
         }
 
 
     override suspend fun getAllPacks(): List<Pack> =
         measuringWithContext(Dispatchers.IO, "getAllPacks") {
-            dbQuery.getAllPacks().executeAsList()
-                .map { it.toPack { cardCode -> getCardByCode(cardCode) } }
+            dbQuery.getAllPacks().executeAsList().map { it.toPack() }
         }
 
     override suspend fun addPackToCollection(packCode: String) =
@@ -202,7 +205,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
                 pack.id.toLong(),
                 pack.name,
                 pack.position.toLong(),
-                pack.cards.toCardCodeString(),
+                pack.cardCodes.toCardCodeString(),
                 pack.url,
                 true.toLong()
             )
@@ -217,7 +220,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
                 pack.id.toLong(),
                 pack.name,
                 pack.position.toLong(),
-                pack.cards.toCardCodeString(),
+                pack.cardCodes.toCardCodeString(),
                 pack.url,
                 false.toLong()
             )
@@ -241,16 +244,16 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 
 private fun String.toCardCodeList() = this.split(LIST_DELIMITER)
 
-private fun List<Card>.toCardCodeString() = this.joinToString(LIST_DELIMITER) { it.code }
+private fun List<String>.toCardCodeString() = this.joinToString(LIST_DELIMITER)
 
 private fun Boolean.toLong() = if (this) 1L else 0L
 
 private fun Long?.toBoolean() = if (this == null) false else this != 0L
 
-private suspend fun database.Pack.toPack(cardProvider: suspend (String) -> Card) = Pack(
+private suspend fun database.Pack.toPack() = Pack(
     name = this.name,
     code = this.code,
-    cards = this.cardCodes.toCardCodeList().map { cardProvider(it) },
+    cardCodes = this.cardCodes.toCardCodeList(),
     url = this.url,
     id = this.id.toInt(),
     position = this.position.toInt()

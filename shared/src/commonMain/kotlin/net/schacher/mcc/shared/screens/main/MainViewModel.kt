@@ -44,6 +44,7 @@ class MainViewModel(
     init {
         // TODO This needs to be prettier
         this.viewModelScope.launch {
+            delay(1000)
             if (cardRepository.cards.isEmpty()) {
                 try {
                     cardRepository.refreshAllCards()

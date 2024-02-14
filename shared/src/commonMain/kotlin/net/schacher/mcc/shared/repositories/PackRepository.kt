@@ -21,12 +21,12 @@ class PackRepository(
     val allPacks: List<Pack>
         get() = _state.value
 
-    var packsInCollectionCount: Int = 0
+    var packsInCollection: List<String> = emptyList()
         private set
 
     init {
         MainScope().launch {
-            packsInCollectionCount = packDatabaseDao.getPacksInCollection().size
+            packsInCollection = packDatabaseDao.getPacksInCollection()
             _state.emit(packDatabaseDao.getAllPacks())
         }
     }
@@ -41,6 +41,8 @@ class PackRepository(
             Logger.e { "Error adding packs to database: ${e.message}" }
         }
 
+        packsInCollection = packDatabaseDao.getPacksInCollection()
+
         _state.update { newPacks }
     }
 
@@ -50,13 +52,16 @@ class PackRepository(
     }
 
     suspend fun hasPackInCollection(packCode: String): Boolean =
-        this.packDatabaseDao.hasPackInCollection(packCode)
+        this.packsInCollection.contains(packCode)
+
 
     suspend fun addPackToCollection(packCode: String) {
         this.packDatabaseDao.addPackToCollection(packCode)
+        this.packsInCollection = this.packDatabaseDao.getPacksInCollection()
     }
 
     suspend fun removePackFromCollection(packCode: String) {
         this.packDatabaseDao.removePackToCollection(packCode)
+        this.packsInCollection = this.packDatabaseDao.getPacksInCollection()
     }
 }
