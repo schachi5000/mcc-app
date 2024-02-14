@@ -8,6 +8,7 @@ import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
+import net.schacher.mcc.shared.utils.measureAndLogDuration
 
 private const val LIST_DELIMITER = ";"
 
@@ -59,20 +60,22 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         this.dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
             ?: throw Exception("Card with code $cardCode not found")
 
-    override fun getAllCards(): List<Card> = this.dbQuery.selectAllCards()
-        .executeAsList()
-        .map {
-            val card = it.toCard()
-            val linkedCard = it.linkedCardCode?.let {
-                dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
-            }
+    override fun getAllCards(): List<Card> = measureAndLogDuration("getAllCards") {
+        this.dbQuery.selectAllCards()
+            .executeAsList()
+            .map {
+                val card = it.toCard()
+                val linkedCard = it.linkedCardCode?.let {
+                    dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+                }
 
-            card.copy(
-                linkedCard = linkedCard?.copy(
-                    linkedCard = card
+                card.copy(
+                    linkedCard = linkedCard?.copy(
+                        linkedCard = card
+                    )
                 )
-            )
-        }
+            }
+    }
 
     override fun wipeCardTable() {
         Logger.i { "Deleting all cards from database" }
@@ -164,11 +167,13 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         .toPack { cardCode -> this.getCardByCode(cardCode) }
 
 
-    override fun getAllPacks(): List<Pack> = runCatching {
-        this.dbQuery.getAllPacks().executeAsList().map {
-            it.toPack { cardCode -> this.getCardByCode(cardCode) }
-        }
-    }.getOrElse { emptyList() }
+    override fun getAllPacks(): List<Pack> = measureAndLogDuration("getAllPacks") {
+        runCatching {
+            this.dbQuery.getAllPacks().executeAsList().map {
+                it.toPack { cardCode -> this.getCardByCode(cardCode) }
+            }
+        }.getOrElse { emptyList() }
+    }
 
     override fun addPackToCollection(packCode: String) {
         val pack = this.getPack(packCode)
@@ -198,12 +203,14 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         )
     }
 
-    override fun getPacksInCollection(): List<String> = this.dbQuery.getAllPacks()
-        .executeAsList()
-        .filter { it.inPosession.toBoolean() }
-        .map {
-            it.code
-        }
+    override fun getPacksInCollection(): List<String> = measureAndLogDuration {
+        this.dbQuery.getAllPacks()
+            .executeAsList()
+            .filter { it.inPosession.toBoolean() }
+            .map {
+                it.code
+            }
+    }
 
     override fun hasPackInCollection(packCode: String): Boolean =
         this.dbQuery.getPack(packCode).executeAsOneOrNull()?.inPosession.toBoolean()
