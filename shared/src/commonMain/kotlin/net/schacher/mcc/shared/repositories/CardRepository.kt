@@ -36,22 +36,4 @@ class CardRepository(
     }
 
     fun getCard(cardCode: String): Card? = this.cards.firstOrNull { it.code == cardCode }
-
-    suspend fun getAndUpdateCard(cardCode: String): Card? {
-        val card = this.getCard(cardCode)
-        if (card != null) {
-            return card
-        }
-
-        try {
-            this.marvelCDbDataSource.getCard(cardCode).also {
-                cardDatabaseDao.addCard(it)
-                _state.emit(cardDatabaseDao.getAllCards())
-            }
-        } catch (e: Exception) {
-            Logger.e(e) { "Error loading card: $cardCode" }
-        }
-
-        return this.getCard(cardCode)
-    }
 }
