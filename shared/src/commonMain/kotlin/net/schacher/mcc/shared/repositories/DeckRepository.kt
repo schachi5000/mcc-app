@@ -69,8 +69,8 @@ class DeckRepository(
         _state.emit(deckDatabaseDao.getDecks())
     }
 
-    suspend fun deleteAllDecks() = withContext(Dispatchers.IO) {
-        deckDatabaseDao.removeAllDecks()
+    suspend fun deleteAllDeckData() = withContext(Dispatchers.IO) {
+        deckDatabaseDao.wipeDeckTable()
         _state.emit(deckDatabaseDao.getDecks())
     }
 }

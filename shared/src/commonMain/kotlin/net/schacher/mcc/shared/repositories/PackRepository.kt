@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.repositories
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -19,13 +20,28 @@ class PackRepository(
         get() = _state.value
 
     val packsInCollectionCount: Int
-        get() = this.packDatabaseDao.getPacksInCollection().size
+        get() = runCatching {
+            this.packDatabaseDao.getPacksInCollection().size
+        }.getOrElse { 0 }
 
     suspend fun refresh() {
         val newPacks = this.marvelCDbDataSource.getAllPacks()
 
-        this.packDatabaseDao.addPacks(newPacks)
+        Logger.i { "${newPacks.size} packs loaded" }
+        try {
+            this.packDatabaseDao.addPacks(newPacks)
+        } catch (e: Exception) {
+            Logger.e { "Error adding packs to database: ${e.message}" }
+        }
+
         _state.update { newPacks }
+    }
+
+    fun deleteAllPackData() {
+        this.packDatabaseDao.wipePackTable()
+        _state.update {
+            emptyList()
+        }
     }
 
     fun hasPackInCollection(packCode: String): Boolean =

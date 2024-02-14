@@ -30,8 +30,8 @@ class CardRepository(
         _state.emit(cardDatabaseDao.getAllCards())
     }
 
-    suspend fun deleteAllCards() = withContext(Dispatchers.IO) {
-        cardDatabaseDao.removeAllCards()
+    suspend fun deleteAllCardData() = withContext(Dispatchers.IO) {
+        cardDatabaseDao.wipeCardTable()
         _state.emit(cardDatabaseDao.getAllCards())
     }
 

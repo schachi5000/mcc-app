@@ -23,9 +23,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 
     init {
         if (wipeDatabase) {
-            this.removeAllCards()
-            this.removeAllDecks()
-            this.removeAllPacks()
+            this.wipeCardTable()
+            this.wipeDeckTable()
+            this.wipePackTable()
         }
     }
 
@@ -74,7 +74,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
             )
         }
 
-    override fun removeAllCards() {
+    override fun wipeCardTable() {
         Logger.i { "Deleting all cards from database" }
         this.dbQuery.removeAllCards()
     }
@@ -109,12 +109,12 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         this.dbQuery.removeDeckById(deckId.toLong())
     }
 
-    override fun removeAllDecks() {
+    override fun wipeDeckTable() {
         Logger.i { "Deleting all decks from database" }
         this.dbQuery.removeAllDecks()
     }
 
-    override fun removeAllPacks() {
+    override fun wipePackTable() {
         Logger.i { "Deleting all decks from database" }
         this.dbQuery.removeAllPacks()
     }
@@ -141,7 +141,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         this.dbQuery.getAllSettings().executeAsList().map { it.key to it.value_ }
 
     override fun addPack(pack: Pack) {
-        Logger.i { "Adding pack ${pack.name} to database" }
+        Logger.i { "Adding pack ${pack.name} to database ${this.hasPackInCollection(pack.code)}" }
 
         this.dbQuery.addPack(
             pack.code,
@@ -214,7 +214,8 @@ private fun String.toCardCodeList() = this.split(LIST_DELIMITER)
 private fun List<Card>.toCardCodeString() = this.joinToString(LIST_DELIMITER) { it.code }
 
 private fun Boolean.toLong() = if (this) 1L else 0L
-private fun Long?.toBoolean() = this != 0L
+private fun Long?.toBoolean() = if (this == null) false else this != 0L
+
 
 private fun database.Pack.toPack(cardProvider: (String) -> Card) = Pack(
     name = this.name,

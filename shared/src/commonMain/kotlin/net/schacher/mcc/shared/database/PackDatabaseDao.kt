@@ -18,5 +18,6 @@ interface PackDatabaseDao {
     fun getPacksInCollection(): List<String>
 
     fun hasPackInCollection(packCode: String): Boolean
-    fun removeAllPacks()
+
+    fun wipePackTable()
 }

@@ -11,5 +11,5 @@ interface CardDatabaseDao {
 
     fun getAllCards(): List<Card>
 
-    fun removeAllCards()
+    fun wipeCardTable()
 }
