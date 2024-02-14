@@ -44,10 +44,12 @@ val viewModels = module {
 fun App(databaseDao: DatabaseDao) {
     KoinApplication(application = {
         modules(
-            module { single<CardDatabaseDao> { databaseDao } },
-            module { single<DeckDatabaseDao> { databaseDao } },
-            module { single<PackDatabaseDao> { databaseDao } },
-            module { single<SettingsDao> { databaseDao } },
+            module {
+                single<CardDatabaseDao> { databaseDao }
+                single<DeckDatabaseDao> { databaseDao }
+                single<PackDatabaseDao> { databaseDao }
+                single<SettingsDao> { databaseDao }
+            },
             network,
             repositories,
             viewModels
