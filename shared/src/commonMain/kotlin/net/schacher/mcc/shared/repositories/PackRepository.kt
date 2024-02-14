@@ -37,11 +37,9 @@ class PackRepository(
         _state.update { newPacks }
     }
 
-    fun deleteAllPackData() {
+    suspend fun deleteAllPackData() {
         this.packDatabaseDao.wipePackTable()
-        _state.update {
-            emptyList()
-        }
+        _state.update { emptyList() }
     }
 
     fun hasPackInCollection(packCode: String): Boolean =

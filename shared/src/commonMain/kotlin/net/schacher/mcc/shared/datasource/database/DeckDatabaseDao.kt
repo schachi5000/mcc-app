@@ -6,9 +6,9 @@ interface DeckDatabaseDao {
     fun addDeck(deck: Deck)
 
 
-    fun getDecks(): List<Deck>
+    suspend fun getDecks(): List<Deck>
 
     fun removeDeck(deckId: Int)
 
-    fun wipeDeckTable()
+    suspend fun wipeDeckTable()
 }

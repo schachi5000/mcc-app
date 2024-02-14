@@ -62,10 +62,8 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
         }
     }
 
-    override suspend fun getAllPacks() = httpClient
-        .get("$serviceUrl/packs")
-        .body<List<PackDto>>()
-        .map {
+    override suspend fun getAllPacks() =
+        httpClient.get("$serviceUrl/packs").body<List<PackDto>>().map {
             Pack(
                 code = it.code,
                 name = it.name,
@@ -78,71 +76,57 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
             Logger.i { "Packs loaded: ${it.size}" }
         }
 
-    override suspend fun getCardPack(packCode: String) = httpClient
-        .get("$serviceUrl/cards/$packCode")
-        .body<List<CardDto>>()
-        .map { it.toCard() }
+    override suspend fun getCardPack(packCode: String) =
+        httpClient.get("$serviceUrl/cards/$packCode").body<List<CardDto>>().map { it.toCard() }
 
-    override suspend fun getAllCards() = this.getAllPacks()
-        .map {
-            CoroutineScope(coroutineContext).async {
-                Logger.i { "Starting download of: ${it.name}" }
-                val result = getCardPack(it.code)
-                Logger.i { "finished download of: ${it.name}" }
-                result
-            }
+    override suspend fun getAllCards() = this.getAllPacks().map {
+        CoroutineScope(coroutineContext).async {
+            Logger.i { "Starting download of: ${it.name}" }
+            val result = getCardPack(it.code)
+            Logger.i { "finished download of: ${it.name}" }
+            result
         }
-        .awaitAll()
-        .flatten()
+    }.awaitAll().flatten()
 
-    override suspend fun getCard(cardCode: String) = httpClient
-        .get("$serviceUrl/card/$cardCode")
-        .body<CardDto>()
-        .toCard()
+    override suspend fun getCard(cardCode: String) =
+        httpClient.get("$serviceUrl/card/$cardCode").body<CardDto>().toCard()
 
     override suspend fun getFeaturedDecksByDate(
-        date: LocalDate,
-        cardProvider: suspend (String) -> Card?
-    ) =
-        runCatching {
-            this.httpClient
-                .get("$serviceUrl/decklists/by_date/${date.toDateString()}")
-                .body<List<DeckDto>>()
-                .map {
-                    Deck(
-                        id = it.id,
-                        name = it.name,
-                        hero = getCard(it.investigator_code!!),
-                        aspect = it.meta?.parseAspect(),
-                        cards = it.slots.entries.map { entry ->
-                            List(entry.value) { cardProvider(entry.key) }
-                        }.flatten().filterNotNull()
-                    )
-                }
-        }
-
-    override suspend fun getPublicDeckById(deckId: Int, cardProvider: (String) -> Card?) =
-        httpClient
-            .get("$serviceUrl/deck/$deckId")
-            .body<DeckDto>()
-            .let {
-                val heroCard = getCard(it.investigator_code!!)
-
+        date: LocalDate, cardProvider: suspend (String) -> Card
+    ) = runCatching {
+        this.httpClient.get("$serviceUrl/decklists/by_date/${date.toDateString()}")
+            .body<List<DeckDto>>().map {
                 Deck(
                     id = it.id,
                     name = it.name,
-                    hero = heroCard,
+                    hero = getCard(it.investigator_code!!),
                     aspect = it.meta?.parseAspect(),
                     cards = it.slots.entries
                         .map { entry ->
-                            List(entry.value) { cardProvider(entry.key) }
+                            List(entry.value) {
+                                runCatching {
+                                    cardProvider(entry.key)
+                                }.getOrNull()
+                            }
                         }
                         .flatten()
                         .filterNotNull()
-                        .toMutableList()
-                        .also { it.add(0, heroCard) }
                 )
             }
+    }
+
+    override suspend fun getPublicDeckById(deckId: Int, cardProvider: suspend (String) -> Card) =
+        httpClient.get("$serviceUrl/deck/$deckId").body<DeckDto>().let {
+            val heroCard = cardProvider(it.investigator_code!!)
+
+            Deck(id = it.id,
+                name = it.name,
+                hero = heroCard,
+                aspect = it.meta?.parseAspect(),
+                cards = it.slots.entries.map { entry ->
+                    List(entry.value) { cardProvider(entry.key) }
+                }.flatten().filterNotNull().toMutableList().also { it.add(0, heroCard) })
+        }
 }
 
 private fun LocalDate.toDateString(): String {
@@ -185,10 +169,8 @@ private fun CardDto.toCard() = Card(
     faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
 )
 
-private fun String?.cleanUp(): String? = this
-    ?.replace("\n ", "\n")
-    ?.trim()
-    ?.takeIf { it.isNotEmpty() }
+private fun String?.cleanUp(): String? =
+    this?.replace("\n ", "\n")?.trim()?.takeIf { it.isNotEmpty() }
 
 private fun String?.toCardType(): CardType? = when (this) {
     "hero" -> HERO

@@ -2,6 +2,11 @@ package net.schacher.mcc.shared.datasource.database
 
 import co.touchlab.kermit.Logger
 import database.AppDatabase
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
@@ -24,9 +29,11 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
 
     init {
         if (wipeDatabase) {
-            this.wipeCardTable()
-            this.wipeDeckTable()
-            this.wipePackTable()
+            MainScope().launch {
+                wipeCardTable()
+                wipeDeckTable()
+                wipePackTable()
+            }
         }
     }
 
@@ -77,9 +84,9 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
             }
     }
 
-    override fun wipeCardTable() {
+    override suspend fun wipeCardTable() = withContext(Dispatchers.IO) {
         Logger.i { "Deleting all cards from database" }
-        this.dbQuery.removeAllCards()
+        dbQuery.removeAllCards()
     }
 
     override fun addDeck(deck: Deck) {
@@ -93,18 +100,20 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         )
     }
 
-    override fun getDecks(): List<Deck> = this.dbQuery.selectAllDecks().executeAsList().map {
-        val cards = it.cardCodes.toCardCodeList().map {
-            this.getCardByCode(it)
-        }
+    override suspend fun getDecks(): List<Deck> = withContext(Dispatchers.IO) {
+        dbQuery.selectAllDecks().executeAsList().map {
+            val cards = it.cardCodes.toCardCodeList().map {
+                getCardByCode(it)
+            }
 
-        Deck(
-            id = it.id.toInt(),
-            name = it.name,
-            hero = this.getCardByCode(it.heroCardCode),
-            aspect = it.aspect?.let { Aspect.valueOf(it) },
-            cards = cards
-        )
+            Deck(
+                id = it.id.toInt(),
+                name = it.name,
+                hero = getCardByCode(it.heroCardCode),
+                aspect = it.aspect?.let { Aspect.valueOf(it) },
+                cards = cards
+            )
+        }
     }
 
     override fun removeDeck(deckId: Int) {
@@ -112,14 +121,14 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         this.dbQuery.removeDeckById(deckId.toLong())
     }
 
-    override fun wipeDeckTable() {
+    override suspend fun wipeDeckTable() = withContext(Dispatchers.IO) {
         Logger.i { "Deleting all decks from database" }
-        this.dbQuery.removeAllDecks()
+        dbQuery.removeAllDecks()
     }
 
-    override fun wipePackTable() {
+    override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
         Logger.i { "Deleting all decks from database" }
-        this.dbQuery.removeAllPacks()
+        dbQuery.removeAllPacks()
     }
 
     override fun getString(key: String): String? =

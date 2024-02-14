@@ -12,8 +12,8 @@ interface MarvelCDbDataSource {
     suspend fun getCard(cardCode: String): Card
     suspend fun getFeaturedDecksByDate(
         date: LocalDate,
-        cardProvider: suspend (String) -> Card?
+        cardProvider: suspend (String) -> Card
     ): Result<List<Deck>>
 
-    suspend fun getPublicDeckById(deckId: Int, cardProvider: (String) -> Card?): Deck
+    suspend fun getPublicDeckById(deckId: Int, cardProvider: suspend (String) -> Card): Deck
 }

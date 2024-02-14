@@ -2,9 +2,11 @@ package net.schacher.mcc.shared.repositories
 
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
@@ -19,17 +21,23 @@ class DeckRepository(
     private val marvelCDbDataSource: MarvelCDbDataSource,
     private val deckDatabaseDao: DeckDatabaseDao
 ) {
-    private val _state = MutableStateFlow(deckDatabaseDao.getDecks())
+    private val _state = MutableStateFlow<List<Deck>>(emptyList())
 
     val state = _state.asStateFlow()
 
     val decks: List<Deck>
         get() = this.state.value
 
+    init {
+        MainScope().launch {
+            _state.emit(deckDatabaseDao.getDecks())
+        }
+    }
+
     private val randomDeckNumber: Int
         get() = Random.nextInt(Int.MAX_VALUE) * -1
 
-    fun createDeck(label: String, aspect: Aspect, heroCard: Card) {
+    suspend fun createDeck(label: String, aspect: Aspect, heroCard: Card) {
         if (heroCard.type != HERO) {
             throw Exception("Hero card must be of type HERO - $heroCard")
         }
@@ -39,16 +47,14 @@ class DeckRepository(
         _state.update { deckDatabaseDao.getDecks() }
     }
 
-    fun removeDeck(deck: Deck) {
+    suspend fun removeDeck(deck: Deck) {
         this.deckDatabaseDao.removeDeck(deck.id)
+
         _state.update { deckDatabaseDao.getDecks() }
     }
 
-    fun addCardToDeck(deckId: Int, cardCode: String) {
+    suspend fun addCardToDeck(deckId: Int, cardCode: String) {
         val card = this.cardRepository.getCard(cardCode)
-        checkNotNull(card) {
-            "Card with code $cardCode not found"
-        }
         val deck = this.decks.find { it.id == deckId }
         checkNotNull(deck) { "Deck with id $deckId not found" }
 
@@ -57,6 +63,7 @@ class DeckRepository(
         )
 
         this.deckDatabaseDao.addDeck(newDeck)
+
         _state.update { deckDatabaseDao.getDecks() }
     }
 
