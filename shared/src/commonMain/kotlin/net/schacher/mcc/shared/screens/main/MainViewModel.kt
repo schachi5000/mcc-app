@@ -42,11 +42,12 @@ class MainViewModel(
     val event = _event.asSharedFlow()
 
     init {
+        // TODO This needs to be prettier
         this.viewModelScope.launch {
             if (cardRepository.cards.isEmpty()) {
                 try {
-                    cardRepository.refresh()
-                    packRepository.refresh()
+                    cardRepository.refreshAllCards()
+                    packRepository.refreshAllPacks()
                     _event.emit(Event.DatabaseSynced)
                 } catch (e: Exception) {
                     Logger.e(e) { "Error refreshing cards" }

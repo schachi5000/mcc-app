@@ -3,21 +3,17 @@ package net.schacher.mcc.shared.datasource.database
 import net.schacher.mcc.shared.model.Pack
 
 interface PackDatabaseDao {
-    fun addPack(pack: Pack)
+    suspend fun addPacks(packs: List<Pack>)
 
-    fun addPacks(packs: List<Pack>)
+    suspend fun getAllPacks(): List<Pack>
 
-    fun getPack(packCode: String): Pack
+    suspend fun addPackToCollection(packCode: String)
 
-    fun getAllPacks(): List<Pack>
+    suspend fun removePackToCollection(packCode: String)
 
-    fun addPackToCollection(packCode: String)
+    suspend fun getPacksInCollection(): List<String>
 
-    fun removePackToCollection(packCode: String)
-
-    fun getPacksInCollection(): List<String>
-
-    fun hasPackInCollection(packCode: String): Boolean
+    suspend fun hasPackInCollection(packCode: String): Boolean
 
     suspend fun wipePackTable()
 }

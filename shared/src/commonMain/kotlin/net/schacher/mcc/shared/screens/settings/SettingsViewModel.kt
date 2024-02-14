@@ -70,12 +70,12 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             try {
-                cardRepository.refresh()
+                cardRepository.refreshAllCards()
             } catch (e: Exception) {
                 Logger.e(e) { "Error refreshing cards" }
             }
             try {
-                packRepository.refresh()
+                packRepository.refreshAllPacks()
             } catch (e: Exception) {
                 Logger.e(e) { "Error refreshing packs" }
             }

@@ -1,11 +1,10 @@
 package net.schacher.mcc.shared.repositories
 
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.withContext
+import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Card
@@ -15,24 +14,30 @@ class CardRepository(
     private val marvelCDbDataSource: MarvelCDbDataSource
 ) {
 
-    private val _state = MutableStateFlow(this.cardDatabaseDao.getAllCards())
+    private val _state = MutableStateFlow<List<Card>>(emptyList())
 
     val state = _state.asStateFlow()
 
     val cards: List<Card>
         get() = this.state.value
 
-    suspend fun refresh() = withContext(Dispatchers.IO) {
-        val result = marvelCDbDataSource.getAllCards()
+    init {
+        MainScope().launch {
+            _state.emit(cardDatabaseDao.getAllCards())
+        }
+    }
+
+    suspend fun refreshAllCards() {
+        val result = this.marvelCDbDataSource.getAllCards()
         Logger.i { "${result.size} cards loaded" }
-        cardDatabaseDao.addCards(result)
+        this.cardDatabaseDao.addCards(result)
 
         _state.emit(cardDatabaseDao.getAllCards())
     }
 
-    suspend fun deleteAllCardData() = withContext(Dispatchers.IO) {
-        cardDatabaseDao.wipeCardTable()
-        _state.emit(cardDatabaseDao.getAllCards())
+    suspend fun deleteAllCardData() {
+        this.cardDatabaseDao.wipeCardTable()
+        _state.emit(this.cardDatabaseDao.getAllCards())
     }
 
     suspend fun getCard(cardCode: String): Card {
