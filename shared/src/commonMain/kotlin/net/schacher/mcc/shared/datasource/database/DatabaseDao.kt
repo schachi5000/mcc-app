@@ -37,36 +37,39 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         }
     }
 
-    override suspend fun addCards(cards: List<Card>) {
-        Logger.i { "Adding ${cards.size} cards to database" }
-        cards.forEach { this.addCard(it) }
-    }
+    override suspend fun addCards(cards: List<Card>) =
+        measuringWithContext(Dispatchers.IO, "addCards") {
+            Logger.i { "Adding ${cards.size} cards to database" }
+            cards.forEach { addCard(it) }
+        }
 
-    override suspend fun addCard(card: Card) = withContext(Dispatchers.IO) {
-        dbQuery.addCard(
-            code = card.code,
-            position = card.position.toLong(),
-            type = card.type?.name,
-            packCode = card.packCode,
-            packName = card.packName,
-            name = card.name,
-            cost = card.cost?.toLong(),
-            aspect = card.aspect?.name,
-            text = card.text,
-            boostText = card.boostText,
-            attackText = card.attackText,
-            quote = card.quote,
-            traits = card.traits,
-            imagePath = card.imagePath,
-            faction = card.faction.name,
-            linkedCardCode = card.linkedCard?.code
-        )
-    }
+    override suspend fun addCard(card: Card) =
+        measuringWithContext(Dispatchers.IO, "addCard") {
+            dbQuery.addCard(
+                code = card.code,
+                position = card.position.toLong(),
+                type = card.type?.name,
+                packCode = card.packCode,
+                packName = card.packName,
+                name = card.name,
+                cost = card.cost?.toLong(),
+                aspect = card.aspect?.name,
+                text = card.text,
+                boostText = card.boostText,
+                attackText = card.attackText,
+                quote = card.quote,
+                traits = card.traits,
+                imagePath = card.imagePath,
+                faction = card.faction.name,
+                linkedCardCode = card.linkedCard?.code
+            )
+        }
 
-    override suspend fun getCardByCode(cardCode: String): Card = withContext(Dispatchers.IO) {
-        dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
-            ?: throw Exception("Card with code $cardCode not found")
-    }
+    override suspend fun getCardByCode(cardCode: String): Card =
+        measuringWithContext(Dispatchers.IO, "getCardByCode") {
+            dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
+                ?: throw Exception("Card with code $cardCode not found")
+        }
 
     override suspend fun getAllCards(): List<Card> =
         measuringWithContext(Dispatchers.IO, "getAllCards") {
@@ -88,9 +91,7 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         }
 
 
-    override suspend fun addDeck(deck: Deck) = withContext(Dispatchers.IO) {
-        Logger.i { "Adding deck ${deck.name} to database" }
-
+    override suspend fun addDeck(deck: Deck) = measuringWithContext(Dispatchers.IO, "addDeck") {
         dbQuery.addDeck(
             deck.id.toLong(),
             deck.name,
@@ -100,26 +101,28 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         )
     }
 
-    override suspend fun getDecks(): List<Deck> = withContext(Dispatchers.IO) {
-        dbQuery.selectAllDecks().executeAsList().map {
-            val cards = it.cardCodes.toCardCodeList().map {
-                getCardByCode(it)
+    override suspend fun getDecks(): List<Deck> =
+        measuringWithContext(Dispatchers.IO, "getDecks") {
+            dbQuery.selectAllDecks().executeAsList().map {
+                val cards = it.cardCodes.toCardCodeList().map {
+                    getCardByCode(it)
+                }
+
+                Deck(
+                    id = it.id.toInt(),
+                    name = it.name,
+                    hero = getCardByCode(it.heroCardCode),
+                    aspect = it.aspect?.let { Aspect.valueOf(it) },
+                    cards = cards
+                )
             }
-
-            Deck(
-                id = it.id.toInt(),
-                name = it.name,
-                hero = getCardByCode(it.heroCardCode),
-                aspect = it.aspect?.let { Aspect.valueOf(it) },
-                cards = cards
-            )
         }
-    }
 
-    override suspend fun removeDeck(deckId: Int) = withContext(Dispatchers.IO) {
-        Logger.i { "Deleting deck $deckId from database" }
-        dbQuery.removeDeckById(deckId.toLong())
-    }
+    override suspend fun removeDeck(deckId: Int) =
+        measuringWithContext(Dispatchers.IO, "removeDeck") {
+            Logger.i { "Deleting deck $deckId from database" }
+            dbQuery.removeDeckById(deckId.toLong())
+        }
 
     override suspend fun wipeDeckTable() = withContext(Dispatchers.IO) {
         Logger.i { "Deleting all decks from database" }
@@ -176,45 +179,49 @@ class DatabaseDao(databaseDriverFactory: DatabaseDriverFactory, wipeDatabase: Bo
         packs.forEach { this.addPack(it) }
     }
 
-    private suspend fun getPack(packCode: String): Pack = withContext(Dispatchers.IO) {
-        dbQuery.getPack(packCode)
-            .executeAsOne()
-            .toPack { cardCode -> getCardByCode(cardCode) }
-    }
+    private suspend fun getPack(packCode: String): Pack =
+        measuringWithContext(Dispatchers.IO, "getPack") {
+            dbQuery.getPack(packCode)
+                .executeAsOne()
+                .toPack { cardCode -> getCardByCode(cardCode) }
+        }
 
 
-    override suspend fun getAllPacks(): List<Pack> = withContext(Dispatchers.IO) {
-        dbQuery.getAllPacks().executeAsList()
-            .map { it.toPack { cardCode -> getCardByCode(cardCode) } }
-    }
+    override suspend fun getAllPacks(): List<Pack> =
+        measuringWithContext(Dispatchers.IO, "getAllPacks") {
+            dbQuery.getAllPacks().executeAsList()
+                .map { it.toPack { cardCode -> getCardByCode(cardCode) } }
+        }
 
-    override suspend fun addPackToCollection(packCode: String) = withContext(Dispatchers.IO) {
-        val pack = getPack(packCode)
+    override suspend fun addPackToCollection(packCode: String) =
+        measuringWithContext(Dispatchers.IO, "addPackToCollection") {
+            val pack = getPack(packCode)
 
-        dbQuery.addPack(
-            pack.code,
-            pack.id.toLong(),
-            pack.name,
-            pack.position.toLong(),
-            pack.cards.toCardCodeString(),
-            pack.url,
-            true.toLong()
-        )
-    }
+            dbQuery.addPack(
+                pack.code,
+                pack.id.toLong(),
+                pack.name,
+                pack.position.toLong(),
+                pack.cards.toCardCodeString(),
+                pack.url,
+                true.toLong()
+            )
+        }
 
-    override suspend fun removePackToCollection(packCode: String) = withContext(Dispatchers.IO) {
-        val pack = getPack(packCode)
+    override suspend fun removePackToCollection(packCode: String) =
+        measuringWithContext(Dispatchers.IO, "removePackToCollection") {
+            val pack = getPack(packCode)
 
-        dbQuery.addPack(
-            pack.code,
-            pack.id.toLong(),
-            pack.name,
-            pack.position.toLong(),
-            pack.cards.toCardCodeString(),
-            pack.url,
-            false.toLong()
-        )
-    }
+            dbQuery.addPack(
+                pack.code,
+                pack.id.toLong(),
+                pack.name,
+                pack.position.toLong(),
+                pack.cards.toCardCodeString(),
+                pack.url,
+                false.toLong()
+            )
+        }
 
     override suspend fun getPacksInCollection(): List<String> =
         measuringWithContext(Dispatchers.IO, "getPacksInCollection") {
@@ -237,8 +244,8 @@ private fun String.toCardCodeList() = this.split(LIST_DELIMITER)
 private fun List<Card>.toCardCodeString() = this.joinToString(LIST_DELIMITER) { it.code }
 
 private fun Boolean.toLong() = if (this) 1L else 0L
-private fun Long?.toBoolean() = if (this == null) false else this != 0L
 
+private fun Long?.toBoolean() = if (this == null) false else this != 0L
 
 private suspend fun database.Pack.toPack(cardProvider: suspend (String) -> Card) = Pack(
     name = this.name,
