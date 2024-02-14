@@ -44,7 +44,7 @@ class FeaturedViewModel(
         this.viewModelScope.launch {
             dates.forEach { date ->
                 val result = marvelCDbDataSource.getFeaturedDecksByDate(date) {
-                    cardRepository.getAndUpdateCard(it)
+                    cardRepository.getCard(it)
                 }
 
                 val decks = result.getOrNull() ?: emptyList()
