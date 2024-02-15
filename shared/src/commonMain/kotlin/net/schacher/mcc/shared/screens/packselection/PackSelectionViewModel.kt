@@ -27,21 +27,25 @@ class PackSelectionViewModel(private val packRepository: PackRepository) : ViewM
     }
 
     private fun refresh() {
-        _state.update {
-            UiState(packRepository.allPacks
+        this.viewModelScope.launch {
+            val packs = packRepository.allPacks
                 .map { UiState.Entry(it, packRepository.hasPackInCollection(it.code)) }
-                .sortedBy { it.pack.position })
+                .sortedBy { it.pack.position }
+
+            _state.update { UiState(packs) }
         }
     }
 
     fun onPackClicked(packCode: String) {
-        if (this.packRepository.hasPackInCollection(packCode)) {
-            this.packRepository.removePackFromCollection(packCode)
-        } else {
-            this.packRepository.addPackToCollection(packCode)
-        }
+        this.viewModelScope.launch {
+            if (packRepository.hasPackInCollection(packCode)) {
+                packRepository.removePackFromCollection(packCode)
+            } else {
+                packRepository.addPackToCollection(packCode)
+            }
 
-        viewModelScope.launch { refresh() }
+            refresh()
+        }
     }
 }
 

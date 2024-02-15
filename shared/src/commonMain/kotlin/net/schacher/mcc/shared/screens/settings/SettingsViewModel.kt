@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.schacher.mcc.shared.database.SettingsDao
+import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
@@ -23,7 +23,7 @@ class SettingsViewModel(
             cardCount = cardRepository.cards.size,
             deckCount = deckRepository.decks.size,
             packCount = packRepository.allPacks.size,
-            packsInCollectionCount = packRepository.packsInCollectionCount,
+            packsInCollectionCount = packRepository.packsInCollection.size,
             settingsValues = settingsDao.getAllEntries()
         )
     )
@@ -42,7 +42,7 @@ class SettingsViewModel(
                 _state.update {
                     it.copy(
                         packCount = value.size,
-                        packsInCollectionCount = packRepository.packsInCollectionCount
+                        packsInCollectionCount = packRepository.packsInCollection.size
                     )
                 }
             }
@@ -70,12 +70,12 @@ class SettingsViewModel(
 
         viewModelScope.launch {
             try {
-                cardRepository.refresh()
+                cardRepository.refreshAllCards()
             } catch (e: Exception) {
                 Logger.e(e) { "Error refreshing cards" }
             }
             try {
-                packRepository.refresh()
+                packRepository.refreshAllPacks()
             } catch (e: Exception) {
                 Logger.e(e) { "Error refreshing packs" }
             }
@@ -85,7 +85,7 @@ class SettingsViewModel(
                     cardCount = cardRepository.cards.size,
                     deckCount = deckRepository.decks.size,
                     packCount = packRepository.allPacks.size,
-                    packsInCollectionCount = packRepository.packsInCollectionCount,
+                    packsInCollectionCount = packRepository.packsInCollection.size,
                     syncInProgress = false
                 )
             }
