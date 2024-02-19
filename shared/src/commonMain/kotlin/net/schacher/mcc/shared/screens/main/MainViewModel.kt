@@ -33,7 +33,12 @@ class MainViewModel(
     }
 
     private val _state =
-        MutableStateFlow(MainUiState(splash = Splash(cardRepository.cards.isEmpty())))
+        MutableStateFlow(
+            MainUiState(
+                mainScreen = Decks,
+                splash = Splash(cardRepository.cards.isEmpty())
+            )
+        )
 
     val state = _state.asStateFlow()
 
@@ -63,10 +68,7 @@ class MainViewModel(
             }
 
             _state.update {
-                it.copy(
-                    splash = null,
-                    mainScreen = Decks
-                )
+                it.copy(splash = null)
             }
         }
     }
@@ -138,7 +140,7 @@ sealed interface Event {
 
 data class MainUiState(
     val splash: Splash? = null,
-    val mainScreen: MainScreen = Spotlight,
+    val mainScreen: MainScreen,
     val subScreen: SubScreen? = null,
     val fullScreen: FullScreen? = null
 ) {

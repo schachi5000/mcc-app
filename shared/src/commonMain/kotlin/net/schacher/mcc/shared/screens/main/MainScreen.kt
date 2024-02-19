@@ -42,6 +42,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.decks
@@ -76,6 +77,7 @@ import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.splash.SplashScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
+import net.schacher.mcc.shared.utils.debug
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -132,6 +134,8 @@ fun MainScreen(
                 AnimatedContent(
                     targetState = state.value.mainScreen.tabIndex,
                     transitionSpec = {
+                        Logger.debug { "Transitioning from ${state.value.mainScreen.tabIndex} to $it" }
+
                         if (targetState > initialState) {
                             (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
                                 slideOutHorizontally { width -> -width } + fadeOut())
@@ -212,7 +216,7 @@ fun MainScreen(
 
     AnimatedVisibility(
         visible = state.value.splash != null,
-        exit = fadeOut()
+        exit = fadeOut() + slideOutVertically { fullHeight -> fullHeight },
     ) {
         SplashScreen((state.value.splash)?.preparing ?: false)
     }
