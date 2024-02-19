@@ -49,6 +49,20 @@ fun MyDecksScreen(
     onAddDeckClick: () -> Unit
 ) {
     val state by myDecksViewModel.state.collectAsState()
+
+    MyDecksScreen(
+        state = state,
+        onDeckClick = onDeckClick,
+        onAddDeckClick = onAddDeckClick
+    )
+}
+
+@Composable
+fun MyDecksScreen(
+    state: MyDecksViewModel.UiState,
+    onDeckClick: (Deck) -> Unit,
+    onAddDeckClick: () -> Unit
+) {
     val entries = mutableListOf<ListItem>().also {
         it.addAll(state.decks.map { DeckItem(it) })
     }

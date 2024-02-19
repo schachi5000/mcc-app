@@ -13,14 +13,14 @@ class MyDecksViewModel(
     private val cardRepository: CardRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(DeckUiState(this.deckRepository.state.value))
+    private val _state = MutableStateFlow(UiState(this.deckRepository.state.value))
 
     val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
             deckRepository.state.collect { value ->
-                _state.value = DeckUiState(value)
+                _state.value = UiState(value)
             }
         }
     }
@@ -28,7 +28,8 @@ class MyDecksViewModel(
     fun onCreateDeckClick() {
 
     }
+
+    data class UiState internal constructor(val decks: List<Deck> = emptyList())
 }
 
-data class DeckUiState(val decks: List<Deck> = emptyList())
 
