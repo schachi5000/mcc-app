@@ -51,6 +51,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.ic_arrow_back
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible

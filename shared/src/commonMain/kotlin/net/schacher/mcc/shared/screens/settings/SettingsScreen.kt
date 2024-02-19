@@ -24,6 +24,9 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.database
+import marvelchampionscompanion.shared.generated.resources.ic_cards
+import marvelchampionscompanion.shared.generated.resources.ic_deck
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
 import org.jetbrains.compose.resources.ExperimentalResourceApi

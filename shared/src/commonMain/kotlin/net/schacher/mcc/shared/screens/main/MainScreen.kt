@@ -44,6 +44,14 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.decks
+import marvelchampionscompanion.shared.generated.resources.delete
+import marvelchampionscompanion.shared.generated.resources.ic_deck
+import marvelchampionscompanion.shared.generated.resources.ic_featured_decks
+import marvelchampionscompanion.shared.generated.resources.ic_search
+import marvelchampionscompanion.shared.generated.resources.more
+import marvelchampionscompanion.shared.generated.resources.search
+import marvelchampionscompanion.shared.generated.resources.spotlight
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.CardInfo
