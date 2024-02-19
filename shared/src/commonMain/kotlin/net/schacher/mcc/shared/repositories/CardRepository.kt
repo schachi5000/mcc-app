@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
@@ -45,14 +46,13 @@ class CardRepository(
             return it
         }
 
-        val card = this.cardDatabaseDao.getCardByCode(cardCode)
-        if (card != null) {
+        this.cardDatabaseDao.getCardByCode(cardCode)?.let { card ->
+            _state.update { it.toMutableMap().apply { put(cardCode, card) } }
             return card
         }
 
         return this.marvelCDbDataSource.getCard(cardCode).also {
             this.cardDatabaseDao.addCard(it)
-
             _state.emit(this.cardDatabaseDao.getAllCards().toMap())
         }
     }

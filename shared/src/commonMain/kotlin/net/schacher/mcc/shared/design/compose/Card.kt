@@ -70,9 +70,7 @@ fun Card(
                 ShimmerBox(modifier = Modifier.fillMaxSize())
             },
             onFailure = {
-                Logger.e(throwable = it) {
-                    "Failed to load image for card: $card"
-                }
+                Logger.e { "Failed to load image for card: ${card.name}(${card.code}) - ${it.message}" }
                 Image(
                     modifier = Modifier.fillMaxSize()
                         .background(card.backSideColor, CardShape)

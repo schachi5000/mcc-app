@@ -1,5 +1,3 @@
-@file:OptIn(ExperimentalResourceApi::class)
-
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.core.tween
@@ -73,6 +71,7 @@ fun DeckRow(deck: Deck, onClick: () -> Unit = {}) {
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun DeckContent(deck: Deck, onClick: () -> Unit = {}) {
     BackgroundImage(
@@ -171,7 +170,7 @@ private fun Thumbnail(modifier: Modifier = Modifier, card: Card) {
             )
         },
         onFailure = {
-            Logger.e(throwable = it) { "Failed to load image for card: ${card.name}(${card.code})" }
+            Logger.e { "Failed to load image for card: ${card.name}(${card.code}) - ${it.message}" }
             Box(
                 Modifier.fillMaxSize()
                     .background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)

@@ -36,10 +36,8 @@ class FeaturedViewModel(
         this.onRefresh()
     }
 
-    fun onRefresh() {
-        _state.update {
-            it.copy(loading = true)
-        }
+    private fun onRefresh() {
+        _state.update { it.copy(loading = true) }
 
         this.viewModelScope.launch {
             dates.forEach { date ->
