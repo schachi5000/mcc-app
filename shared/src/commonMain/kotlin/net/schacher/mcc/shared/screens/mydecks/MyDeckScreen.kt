@@ -1,12 +1,14 @@
 package net.schacher.mcc.shared.screens.mydecks
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
@@ -19,12 +21,15 @@ import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -83,39 +88,58 @@ fun MyDecksScreen(
             }
         }
 
-        AddDeckButton(expanded) { onAddDeckClick() }
+        AddDeckButton(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            expanded = expanded
+        ) { onAddDeckClick() }
     }
 }
 
 @Composable
-fun BoxScope.AddDeckButton(expanded: Boolean, onClick: () -> Unit) {
-    FloatingActionButton(
-        onClick = onClick,
-        modifier = Modifier.align(Alignment.BottomEnd)
-            .padding(24.dp)
-            .sizeIn(maxHeight = 48.dp, minWidth = 48.dp),
-        contentColor = MaterialTheme.colors.onPrimary,
-        backgroundColor = MaterialTheme.colors.primary,
-        shape = DefaultShape
-    ) {
-        Row(
-            modifier = Modifier.fillMaxHeight()
-                .padding(8.dp),
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = "Create deck"
-            )
+fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
+    var horizontalBias by remember { mutableStateOf(1f) }
+    val alignment by animateHorizontalAlignmentAsState(horizontalBias)
 
-            AnimatedVisibility(visible = expanded) {
-                Text(
-                    modifier = Modifier.padding(start = 4.dp),
-                    text = "Create deck"
+    horizontalBias = if (expanded) 0f else 1f
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = alignment
+    ) {
+        FloatingActionButton(
+            onClick = onClick,
+            modifier = Modifier
+                .padding(24.dp)
+                .sizeIn(maxHeight = 48.dp, minWidth = 48.dp),
+            contentColor = MaterialTheme.colors.onPrimary,
+            backgroundColor = MaterialTheme.colors.primary,
+            shape = DefaultShape
+        ) {
+            Row(
+                modifier = Modifier.fillMaxHeight()
+                    .padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = "Create deck"
                 )
+
+                AnimatedVisibility(visible = expanded) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 4.dp),
+                        text = "Create deck"
+                    )
+                }
             }
         }
     }
+}
+
+@Composable
+private fun animateHorizontalAlignmentAsState(targetBiasValue: Float): State<BiasAlignment.Horizontal> {
+    val bias by animateFloatAsState(targetBiasValue)
+    return derivedStateOf { BiasAlignment.Horizontal(bias) }
 }
 
 private sealed interface ListItem {
