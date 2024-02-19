@@ -14,16 +14,16 @@ class CardRepository(
     private val marvelCDbDataSource: MarvelCDbDataSource
 ) {
 
-    private val _state = MutableStateFlow<List<Card>>(emptyList())
+    private val _state = MutableStateFlow<Map<String, Card>>(emptyMap())
 
     val state = _state.asStateFlow()
 
     val cards: List<Card>
-        get() = this.state.value
+        get() = this.state.value.values.toList()
 
     init {
         MainScope().launch {
-            _state.emit(cardDatabaseDao.getAllCards())
+            _state.emit(cardDatabaseDao.getAllCards().toMap())
         }
     }
 
@@ -32,15 +32,19 @@ class CardRepository(
         Logger.i { "${result.size} cards loaded" }
         this.cardDatabaseDao.addCards(result)
 
-        _state.emit(cardDatabaseDao.getAllCards())
+        _state.emit(cardDatabaseDao.getAllCards().toMap())
     }
 
     suspend fun deleteAllCardData() {
         this.cardDatabaseDao.wipeCardTable()
-        _state.emit(this.cardDatabaseDao.getAllCards())
+        _state.emit(this.cardDatabaseDao.getAllCards().toMap())
     }
 
     suspend fun getCard(cardCode: String): Card {
+        this.state.value[cardCode]?.let {
+            return it
+        }
+
         val card = this.cardDatabaseDao.getCardByCode(cardCode)
         if (card != null) {
             return card
@@ -49,7 +53,9 @@ class CardRepository(
         return this.marvelCDbDataSource.getCard(cardCode).also {
             this.cardDatabaseDao.addCard(it)
 
-            _state.emit(this.cardDatabaseDao.getAllCards())
+            _state.emit(this.cardDatabaseDao.getAllCards().toMap())
         }
     }
 }
+
+private fun List<Card>.toMap(): Map<String, Card> = this.associateBy { it.code }
