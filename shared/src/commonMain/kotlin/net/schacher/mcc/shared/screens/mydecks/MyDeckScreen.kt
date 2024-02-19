@@ -142,7 +142,7 @@ fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
                 AnimatedVisibility(visible = expanded) {
                     Text(
                         modifier = Modifier.padding(horizontal = 4.dp),
-                        text = "Create deck"
+                        text = "Create new deck"
                     )
                 }
             }
