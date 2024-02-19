@@ -12,6 +12,7 @@ class MyDecksViewModel(
     private val deckRepository: DeckRepository,
     private val cardRepository: CardRepository
 ) : ViewModel() {
+
     private val _state = MutableStateFlow(DeckUiState(this.deckRepository.state.value))
 
     val state = _state.asStateFlow()
@@ -22,6 +23,10 @@ class MyDecksViewModel(
                 _state.value = DeckUiState(value)
             }
         }
+    }
+
+    fun onCreateDeckClick() {
+
     }
 }
 

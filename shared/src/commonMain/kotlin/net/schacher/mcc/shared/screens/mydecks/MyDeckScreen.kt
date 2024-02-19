@@ -1,18 +1,18 @@
 package net.schacher.mcc.shared.screens.mydecks
 
-import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.BoxScope
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.material.Button
-import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -21,11 +21,18 @@ import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
+import androidx.compose.ui.input.nestedscroll.NestedScrollSource
+import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.DeckRow
-import net.schacher.mcc.shared.design.theme.DeckShape
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
 import org.koin.compose.koinInject
@@ -39,14 +46,30 @@ fun MyDecksScreen(
     val state by myDecksViewModel.state.collectAsState()
     val entries = mutableListOf<ListItem>().also {
         it.addAll(state.decks.map { DeckItem(it) })
-        it.add(ListItem.AddDeckItem)
     }
 
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .padding(horizontal = 16.dp)
-    ) {
-        LazyColumn {
+    var expanded by remember { mutableStateOf(false) }
+    val nestedScrollConnection = remember {
+        object : NestedScrollConnection {
+
+            override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                expanded = if (expanded) {
+                    available.y > -10
+                } else {
+                    available.y > 1
+                }
+
+                return Offset.Zero
+            }
+        }
+    }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .nestedScroll(nestedScrollConnection)
+        ) {
             items(entries.size) { index ->
                 if (index == 0) {
                     Spacer(Modifier.statusBarsPadding().height(16.dp))
@@ -54,44 +77,47 @@ fun MyDecksScreen(
 
                 when (val entry = entries[index]) {
                     is DeckItem -> DeckRow(entry.deck) { onDeckClick(entry.deck) }
-                    is ListItem.AddDeckItem -> AddDeckButton { onAddDeckClick() }
                 }
 
                 Spacer(Modifier.height(16.dp))
             }
         }
+
+        AddDeckButton(expanded) { onAddDeckClick() }
     }
 }
 
 @Composable
-fun AddDeckButton(onClick: () -> Unit) {
-    Button(
+fun BoxScope.AddDeckButton(expanded: Boolean, onClick: () -> Unit) {
+    FloatingActionButton(
         onClick = onClick,
-        modifier = Modifier.height(120.dp).fillMaxWidth(),
-        shape = DeckShape,
-        colors = ButtonDefaults.buttonColors(backgroundColor = MaterialTheme.colors.surface),
-        elevation = null
+        modifier = Modifier.align(Alignment.BottomEnd)
+            .padding(24.dp)
+            .sizeIn(maxHeight = 48.dp, minWidth = 48.dp),
+        contentColor = MaterialTheme.colors.onPrimary,
+        backgroundColor = MaterialTheme.colors.primary,
+        shape = DefaultShape
     ) {
-        Column(
-            verticalArrangement = Arrangement.Center,
+        Row(
+            modifier = Modifier.fillMaxHeight()
+                .padding(8.dp),
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Icon(
                 imageVector = Icons.Rounded.Add,
-                contentDescription = null,
-                modifier = Modifier.size(32.dp)
-                    .align(Alignment.CenterHorizontally),
-                tint = MaterialTheme.colors.onSurface,
+                contentDescription = "Create deck"
             )
-            Spacer(Modifier.height(4.dp))
-            Text(
-                text = "Deck hinzufügen",
-                color = MaterialTheme.colors.onSurface
-            )
+
+            AnimatedVisibility(visible = expanded) {
+                Text(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = "Create deck"
+                )
+            }
         }
     }
 }
 
 private sealed interface ListItem {
     data class DeckItem(val deck: Deck) : ListItem
-    data object AddDeckItem : ListItem
 }
