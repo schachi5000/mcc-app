@@ -10,7 +10,7 @@ interface MarvelCDbDataSource {
     suspend fun getCardPack(packCode: String): List<Card>
     suspend fun getAllCards(): List<Card>
     suspend fun getCard(cardCode: String): Card
-    suspend fun getFeaturedDecksByDate(
+    suspend fun getSpotlightDecksByDate(
         date: LocalDate,
         cardProvider: suspend (String) -> Card
     ): Result<List<Deck>>

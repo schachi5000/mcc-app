@@ -3,15 +3,15 @@ package net.schacher.mcc.design.preview
 import androidx.compose.runtime.Composable
 import net.schacher.mcc.design.ThemedPreviews
 import net.schacher.mcc.shared.design.theme.MccTheme
-import net.schacher.mcc.shared.screens.featured.FeaturedScreen
-import net.schacher.mcc.shared.screens.featured.FeaturedUiState
+import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
+import net.schacher.mcc.shared.screens.spotlight.SpotlightUiState
 
 @ThemedPreviews
 @Composable
-fun FeaturedScreenPreview() {
+fun SpotlightScreenPreview() {
     MccTheme {
-        FeaturedScreen(
-            FeaturedUiState(emptyMap(), true)
+        SpotlightScreen(
+            SpotlightUiState(emptyMap(), true)
         ) {}
     }
 }

@@ -47,8 +47,8 @@ import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.decks
 import marvelchampionscompanion.shared.generated.resources.delete
 import marvelchampionscompanion.shared.generated.resources.ic_deck
-import marvelchampionscompanion.shared.generated.resources.ic_featured_decks
 import marvelchampionscompanion.shared.generated.resources.ic_search
+import marvelchampionscompanion.shared.generated.resources.ic_spotlight
 import marvelchampionscompanion.shared.generated.resources.more
 import marvelchampionscompanion.shared.generated.resources.search
 import marvelchampionscompanion.shared.generated.resources.spotlight
@@ -61,14 +61,13 @@ import net.schacher.mcc.shared.design.compose.blurByBottomSheet
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreen
-import net.schacher.mcc.shared.screens.featured.FeaturedScreen
 import net.schacher.mcc.shared.screens.main.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.Event.DatabaseSynced
 import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
@@ -76,6 +75,7 @@ import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.splash.SplashScreen
+import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -146,7 +146,7 @@ fun MainScreen(
                             onAddDeckClick = {}
                         )
 
-                        1 -> FeaturedScreen {
+                        1 -> SpotlightScreen {
                             mainViewModel.onDeckClicked(it)
                         }
 
@@ -241,8 +241,8 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
             )
             DefaultBottomNavigationItem(
                 label = stringResource(Res.string.spotlight),
-                icon = Res.drawable.ic_featured_decks,
-                color = Featured.tabColor,
+                icon = Res.drawable.ic_spotlight,
+                color = Spotlight.tabColor,
                 selected = (selectedTabIndex == 1),
                 onClick = { onTabSelected(1) },
             )
@@ -287,7 +287,7 @@ fun DeckMenuBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
 private val MainUiState.MainScreen.tabColor: Color
     get() = when (this) {
         Decks -> Color(0xfff78f3f)
-        Featured -> Color(0xff31e29c)
+        Spotlight -> Color(0xff31e29c)
         Search -> Color(0xff518cca)
         Settings -> Color(0xff9957ff)
     }
@@ -295,7 +295,7 @@ private val MainUiState.MainScreen.tabColor: Color
 private val MainUiState.MainScreen.tabIndex: Int
     get() = when (this) {
         Decks -> 0
-        Featured -> 1
+        Spotlight -> 1
         Search -> 2
         Settings -> 3
     }

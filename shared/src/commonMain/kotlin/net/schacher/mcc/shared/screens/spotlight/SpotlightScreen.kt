@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.screens.featured
+package net.schacher.mcc.shared.screens.spotlight
 
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -30,23 +30,23 @@ import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.compose.LoadingDeck
 import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.screens.featured.ListItem.DeckItem
-import net.schacher.mcc.shared.screens.featured.ListItem.HeaderItem
+import net.schacher.mcc.shared.screens.spotlight.ListItem.DeckItem
+import net.schacher.mcc.shared.screens.spotlight.ListItem.HeaderItem
 import org.koin.compose.koinInject
 
 @Composable
-fun FeaturedScreen(
-    featuredViewModel: FeaturedViewModel = koinInject(),
+fun SpotlightScreen(
+    spotlightViewModel: SpotlightViewModel = koinInject(),
     onDeckClick: (Deck) -> Unit
 ) {
-    val state by featuredViewModel.state.collectAsState()
+    val state by spotlightViewModel.state.collectAsState()
 
-    FeaturedScreen(state, onDeckClick)
+    SpotlightScreen(state, onDeckClick)
 }
 
 @Composable
-fun FeaturedScreen(
-    state: FeaturedUiState,
+fun SpotlightScreen(
+    state: SpotlightUiState,
     onDeckClick: (Deck) -> Unit
 ) {
     Box(

@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.screens.featured
+package net.schacher.mcc.shared.screens.spotlight
 
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -14,12 +14,12 @@ import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 
-class FeaturedViewModel(
+class SpotlightViewModel(
     private val cardRepository: CardRepository,
     private val marvelCDbDataSource: MarvelCDbDataSource
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(FeaturedUiState())
+    private val _state = MutableStateFlow(SpotlightUiState())
 
     val state = _state.asStateFlow()
 
@@ -41,7 +41,7 @@ class FeaturedViewModel(
 
         this.viewModelScope.launch {
             dates.forEach { date ->
-                val result = marvelCDbDataSource.getFeaturedDecksByDate(date) {
+                val result = marvelCDbDataSource.getSpotlightDecksByDate(date) {
                     cardRepository.getCard(it)
                 }
 
@@ -63,7 +63,7 @@ class FeaturedViewModel(
     }
 }
 
-data class FeaturedUiState(
+data class SpotlightUiState(
     val decks: Map<LocalDate, List<Deck>> = emptyMap(),
     val loading: Boolean = false
 )

@@ -16,9 +16,9 @@ import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Featured
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
+import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainUiState.Splash
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
 
@@ -75,7 +75,7 @@ class MainViewModel(
         this.viewModelScope.launch {
             val mainScreen = when (tabIndex) {
                 0 -> Decks
-                1 -> Featured
+                1 -> Spotlight
                 2 -> Search
                 3 -> Settings
                 else -> return@launch
@@ -138,7 +138,7 @@ sealed interface Event {
 
 data class MainUiState(
     val splash: Splash? = null,
-    val mainScreen: MainScreen = Featured,
+    val mainScreen: MainScreen = Spotlight,
     val subScreen: SubScreen? = null,
     val fullScreen: FullScreen? = null
 ) {
@@ -146,7 +146,7 @@ data class MainUiState(
 
     sealed interface MainScreen {
         data object Decks : MainScreen
-        data object Featured : MainScreen
+        data object Spotlight : MainScreen
         data object Search : MainScreen
         data object Settings : MainScreen
     }

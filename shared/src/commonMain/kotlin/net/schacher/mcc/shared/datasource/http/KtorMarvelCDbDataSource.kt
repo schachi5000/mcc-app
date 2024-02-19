@@ -91,7 +91,7 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
     override suspend fun getCard(cardCode: String) =
         httpClient.get("$serviceUrl/card/$cardCode").body<CardDto>().toCard()
 
-    override suspend fun getFeaturedDecksByDate(
+    override suspend fun getSpotlightDecksByDate(
         date: LocalDate, cardProvider: suspend (String) -> Card
     ) = runCatching {
         this.httpClient.get("$serviceUrl/decklists/by_date/${date.toDateString()}")

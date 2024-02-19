@@ -10,13 +10,13 @@ import net.schacher.mcc.shared.design.theme.MccTheme
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
-import net.schacher.mcc.shared.screens.featured.FeaturedViewModel
 import net.schacher.mcc.shared.screens.main.MainScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.screens.packselection.PackSelectionViewModel
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsViewModel
+import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
 import org.koin.compose.KoinApplication
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
@@ -36,7 +36,7 @@ val viewModels = module {
     singleOf(::MyDecksViewModel)
     singleOf(::SettingsViewModel)
     singleOf(::SearchViewModel)
-    singleOf(::FeaturedViewModel)
+    singleOf(::SpotlightViewModel)
     singleOf(::PackSelectionViewModel)
 }
 
