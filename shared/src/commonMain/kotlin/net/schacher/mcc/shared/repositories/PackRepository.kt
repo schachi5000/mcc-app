@@ -4,7 +4,6 @@ import co.touchlab.kermit.Logger
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
@@ -14,20 +13,18 @@ class PackRepository(
     private val packDatabaseDao: PackDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource
 ) {
-    private val _state = MutableStateFlow<List<Pack>>(emptyList())
+    private val _packs = MutableStateFlow<List<Pack>>(emptyList())
 
-    val state = _state.asStateFlow()
+    val packs = _packs.asStateFlow()
 
-    val allPacks: List<Pack>
-        get() = _state.value
+    private val _packsInCollection = MutableStateFlow<List<String>>(emptyList())
 
-    var packsInCollection: List<String> = emptyList()
-        private set
+    val packsInCollection = _packsInCollection.asStateFlow()
 
     init {
         MainScope().launch {
-            packsInCollection = packDatabaseDao.getPacksInCollection()
-            _state.emit(packDatabaseDao.getAllPacks())
+            _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
+            _packs.emit(packDatabaseDao.getAllPacks())
         }
     }
 
@@ -41,27 +38,25 @@ class PackRepository(
             Logger.e { "Error adding packs to database: ${e.message}" }
         }
 
-        packsInCollection = packDatabaseDao.getPacksInCollection()
-
-        _state.update { newPacks }
+        _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
+        _packs.emit(newPacks)
     }
 
     suspend fun deleteAllPackData() {
         this.packDatabaseDao.wipePackTable()
-        _state.update { emptyList() }
+        _packsInCollection.emit(emptyList())
+        _packs.emit(emptyList())
     }
 
-    suspend fun hasPackInCollection(packCode: String): Boolean =
-        this.packsInCollection.contains(packCode)
-
+    fun hasPackInCollection(packCode: String) = this.packsInCollection.value.contains(packCode)
 
     suspend fun addPackToCollection(packCode: String) {
         this.packDatabaseDao.addPackToCollection(packCode)
-        this.packsInCollection = this.packDatabaseDao.getPacksInCollection()
+        _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
     }
 
     suspend fun removePackFromCollection(packCode: String) {
         this.packDatabaseDao.removePackToCollection(packCode)
-        this.packsInCollection = this.packDatabaseDao.getPacksInCollection()
+        _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
     }
 }

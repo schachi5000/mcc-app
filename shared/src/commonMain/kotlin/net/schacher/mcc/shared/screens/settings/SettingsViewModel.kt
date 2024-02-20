@@ -22,8 +22,8 @@ class SettingsViewModel(
         SettingsUiState(
             cardCount = cardRepository.cards.size,
             deckCount = deckRepository.decks.size,
-            packCount = packRepository.allPacks.size,
-            packsInCollectionCount = packRepository.packsInCollection.size,
+            packCount = packRepository.packs.value.size,
+            packsInCollectionCount = packRepository.packsInCollection.value.size,
             settingsValues = settingsDao.getAllEntries()
         )
     )
@@ -38,11 +38,17 @@ class SettingsViewModel(
         }
 
         viewModelScope.launch {
-            packRepository.state.collect { value ->
+            packRepository.packsInCollection.collect { value ->
+                _state.update { it.copy(packsInCollectionCount = value.size) }
+            }
+        }
+
+        viewModelScope.launch {
+            packRepository.packs.collect { value ->
                 _state.update {
                     it.copy(
                         packCount = value.size,
-                        packsInCollectionCount = packRepository.packsInCollection.size
+                        packsInCollectionCount = packRepository.packsInCollection.value.size
                     )
                 }
             }
@@ -84,8 +90,8 @@ class SettingsViewModel(
                 it.copy(
                     cardCount = cardRepository.cards.size,
                     deckCount = deckRepository.decks.size,
-                    packCount = packRepository.allPacks.size,
-                    packsInCollectionCount = packRepository.packsInCollection.size,
+                    packCount = packRepository.packs.value.size,
+                    packsInCollectionCount = packRepository.packsInCollection.value.size,
                     syncInProgress = false
                 )
             }

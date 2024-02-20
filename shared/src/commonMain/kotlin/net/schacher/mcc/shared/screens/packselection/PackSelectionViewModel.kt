@@ -11,7 +11,7 @@ import net.schacher.mcc.shared.repositories.PackRepository
 class PackSelectionViewModel(private val packRepository: PackRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(
-        UiState(this.packRepository.allPacks.map {
+        UiState(this.packRepository.packs.value.map {
             UiState.Entry(it, false)
         })
     )
@@ -20,7 +20,7 @@ class PackSelectionViewModel(private val packRepository: PackRepository) : ViewM
 
     init {
         this.viewModelScope.launch {
-            packRepository.state.collect {
+            packRepository.packs.collect {
                 refresh()
             }
         }
@@ -28,7 +28,7 @@ class PackSelectionViewModel(private val packRepository: PackRepository) : ViewM
 
     private fun refresh() {
         this.viewModelScope.launch {
-            val packs = packRepository.allPacks
+            val packs = packRepository.packs.value
                 .map { UiState.Entry(it, packRepository.hasPackInCollection(it.code)) }
                 .sortedBy { it.pack.position }
 
