@@ -13,6 +13,6 @@ fun List<Card>.defaultSort(): List<Card> {
     }.flatten()
 }
 
-fun List<Card>.distinctByName(): List<Card> {
+fun Collection<Card>.distinctByName(): List<Card> {
     return this.distinctBy { "${it.name} ${it.aspect}" }
 }

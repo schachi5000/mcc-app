@@ -20,8 +20,8 @@ class SettingsViewModel(
 
     private val _state = MutableStateFlow(
         SettingsUiState(
-            cardCount = cardRepository.cards.size,
-            deckCount = deckRepository.decks.size,
+            cardCount = cardRepository.cards.value.size,
+            deckCount = deckRepository.decks.value.size,
             packCount = packRepository.packs.value.size,
             packsInCollectionCount = packRepository.packsInCollection.value.size,
             settingsValues = settingsDao.getAllEntries()
@@ -32,7 +32,7 @@ class SettingsViewModel(
 
     init {
         viewModelScope.launch {
-            deckRepository.state.collect { value ->
+            deckRepository.decks.collect { value ->
                 _state.update { it.copy(deckCount = value.size) }
             }
         }
@@ -88,8 +88,8 @@ class SettingsViewModel(
 
             _state.update {
                 it.copy(
-                    cardCount = cardRepository.cards.size,
-                    deckCount = deckRepository.decks.size,
+                    cardCount = cardRepository.cards.value.size,
+                    deckCount = deckRepository.decks.value.size,
                     packCount = packRepository.packs.value.size,
                     packsInCollectionCount = packRepository.packsInCollection.value.size,
                     syncInProgress = false
@@ -106,8 +106,8 @@ class SettingsViewModel(
                 deckRepository.addDeckById(it.toInt())
                 _state.update {
                     it.copy(
-                        cardCount = cardRepository.cards.size,
-                        deckCount = deckRepository.state.value.size,
+                        cardCount = cardRepository.cards.value.size,
+                        deckCount = deckRepository.decks.value.size,
                     )
                 }
             }

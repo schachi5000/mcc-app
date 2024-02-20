@@ -27,7 +27,7 @@ class SearchViewModel(
 ) : ViewModel() {
 
     private val _state =
-        MutableStateFlow(UiState(result = cardRepository.cards.distinctByName()))
+        MutableStateFlow(UiState(result = cardRepository.cards.value.values.distinctByName()))
 
     val state = _state.asStateFlow()
 
@@ -77,7 +77,7 @@ class SearchViewModel(
     private suspend fun getFilteredCards(query: String?, filters: Set<Filter> = emptySet()) =
         withContext(Dispatchers.Default) {
             val showOnlyOwned = filters.any { it.type == OWNED && it.active }
-            cardRepository.cards
+            cardRepository.cards.value.values
                 .filter { card ->
                     filters.none { it.active } ||
                             filters.any { filter ->

@@ -21,16 +21,13 @@ class DeckRepository(
     private val marvelCDbDataSource: MarvelCDbDataSource,
     private val deckDatabaseDao: DeckDatabaseDao
 ) {
-    private val _state = MutableStateFlow<List<Deck>>(emptyList())
+    private val _decks = MutableStateFlow<List<Deck>>(emptyList())
 
-    val state = _state.asStateFlow()
-
-    val decks: List<Deck>
-        get() = this.state.value
+    val decks = _decks.asStateFlow()
 
     init {
         MainScope().launch {
-            _state.emit(deckDatabaseDao.getDecks())
+            _decks.emit(deckDatabaseDao.getDecks())
         }
     }
 
@@ -44,18 +41,18 @@ class DeckRepository(
 
         val deck = Deck(randomDeckNumber, label, heroCard, aspect, listOf(heroCard))
         this.deckDatabaseDao.addDeck(deck)
-        _state.update { deckDatabaseDao.getDecks() }
+        _decks.update { deckDatabaseDao.getDecks() }
     }
 
     suspend fun removeDeck(deck: Deck) {
         this.deckDatabaseDao.removeDeck(deck.id)
 
-        _state.update { deckDatabaseDao.getDecks() }
+        _decks.update { deckDatabaseDao.getDecks() }
     }
 
     suspend fun addCardToDeck(deckId: Int, cardCode: String) {
         val card = this.cardRepository.getCard(cardCode)
-        val deck = this.decks.find { it.id == deckId }
+        val deck = this.decks.value.find { it.id == deckId }
         checkNotNull(deck) { "Deck with id $deckId not found" }
 
         val newDeck = deck.copy(
@@ -64,7 +61,7 @@ class DeckRepository(
 
         this.deckDatabaseDao.addDeck(newDeck)
 
-        _state.update { deckDatabaseDao.getDecks() }
+        _decks.update { deckDatabaseDao.getDecks() }
     }
 
     suspend fun addDeckById(deckId: Int) {
@@ -73,11 +70,11 @@ class DeckRepository(
         }
 
         this.deckDatabaseDao.addDeck(deck)
-        _state.emit(deckDatabaseDao.getDecks())
+        _decks.emit(deckDatabaseDao.getDecks())
     }
 
     suspend fun deleteAllDeckData() = withContext(Dispatchers.IO) {
         deckDatabaseDao.wipeDeckTable()
-        _state.emit(deckDatabaseDao.getDecks())
+        _decks.emit(deckDatabaseDao.getDecks())
     }
 }

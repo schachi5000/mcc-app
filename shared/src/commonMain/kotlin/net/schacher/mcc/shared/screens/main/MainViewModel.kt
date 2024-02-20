@@ -36,7 +36,7 @@ class MainViewModel(
         MutableStateFlow(
             MainUiState(
                 mainScreen = Decks,
-                splash = Splash(cardRepository.cards.isEmpty())
+                splash = Splash(cardRepository.cards.value.isEmpty())
             )
         )
 
@@ -50,7 +50,7 @@ class MainViewModel(
         // TODO This needs to be prettier
         this.viewModelScope.launch {
             delay(1000)
-            if (cardRepository.cards.isEmpty()) {
+            if (cardRepository.cards.value.isEmpty()) {
                 try {
                     cardRepository.refreshAllCards()
                     packRepository.refreshAllPacks()
@@ -63,7 +63,7 @@ class MainViewModel(
         }
 
         this.viewModelScope.launch {
-            if (cardRepository.cards.isEmpty()) {
+            if (cardRepository.cards.value.isEmpty()) {
                 delay(SPLASH_DELAY_MS)
             }
 
