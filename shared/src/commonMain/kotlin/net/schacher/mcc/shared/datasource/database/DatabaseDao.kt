@@ -53,6 +53,8 @@ class DatabaseDao(
                 code = card.code,
                 position = card.position.toLong(),
                 type = card.type?.name,
+                cardSetCode = card.setCode,
+                cardSetName = card.setName,
                 packCode = card.packCode,
                 packName = card.packName,
                 name = card.name,
@@ -275,5 +277,7 @@ private fun database.Card.toCard() = Card(
     packName = this.packName,
     linkedCard = null,
     traits = this.traits,
-    faction = Faction.valueOf(this.faction)
+    faction = Faction.valueOf(this.faction),
+    setCode = this.cardSetCode,
+    setName = this.cardSetName
 )

@@ -10,6 +10,8 @@ data class Card(
     val type: CardType?,
     val name: String,
     val faction: Faction,
+    val setCode: String? = null,
+    val setName: String? = null,
     val packCode: String,
     val packName: String,
     val cost: Int? = null,

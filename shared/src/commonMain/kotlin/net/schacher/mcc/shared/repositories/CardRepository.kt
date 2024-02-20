@@ -53,6 +53,10 @@ class CardRepository(
             _cards.emit(this.cardDatabaseDao.getAllCards().toMap())
         }
     }
+
+    fun getCardsBySetCode(setCode: String): List<Card> =
+        this.cards.value.values.filter { it.setCode == setCode }
+            .distinctBy { it.code }
 }
 
 private fun List<Card>.toMap(): Map<String, Card> = this.associateBy { it.code }

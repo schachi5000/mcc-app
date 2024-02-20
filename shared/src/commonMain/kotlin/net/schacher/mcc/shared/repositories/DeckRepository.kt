@@ -40,10 +40,12 @@ class DeckRepository(
         }
 
         val deckLabel = label ?: "${heroCard.name} ${aspect?.name ?: ""}"
+        val defaultCards =
+            heroCard.setCode?.let { cardRepository.getCardsBySetCode(it) } ?: emptyList()
 
-        val deck = Deck(randomDeckNumber, deckLabel, heroCard, aspect, listOf(heroCard))
+        val deck = Deck(randomDeckNumber, deckLabel, heroCard, aspect, defaultCards)
+
         this.deckDatabaseDao.addDeck(deck)
-
         _decks.update { deckDatabaseDao.getDecks() }
     }
 
