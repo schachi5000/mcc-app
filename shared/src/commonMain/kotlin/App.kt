@@ -13,6 +13,7 @@ import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
+import net.schacher.mcc.shared.screens.newdeck.NewDeckViewModel
 import net.schacher.mcc.shared.screens.packselection.PackSelectionViewModel
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsViewModel
@@ -34,6 +35,7 @@ val repositories = module {
 val viewModels = module {
     singleOf(::MainViewModel)
     singleOf(::MyDecksViewModel)
+    singleOf(::NewDeckViewModel)
     singleOf(::SettingsViewModel)
     singleOf(::SearchViewModel)
     singleOf(::SpotlightViewModel)

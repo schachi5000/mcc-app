@@ -13,7 +13,7 @@ import org.jetbrains.compose.resources.painterResource
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun RowScope.DefaultBottomNavigationItem(
+internal fun RowScope.DefaultBottomNavigationItem(
     label: String,
     icon: DrawableResource,
     color: Color,
@@ -31,7 +31,7 @@ fun RowScope.DefaultBottomNavigationItem(
 }
 
 @Composable
-fun RowScope.DefaultBottomNavigationItem(
+internal fun RowScope.DefaultBottomNavigationItem(
     label: String,
     icon: @Composable () -> Unit,
     color: Color,

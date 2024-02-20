@@ -10,10 +10,12 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
+import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.CreateDeck
 import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
 import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
@@ -115,6 +117,17 @@ class MainViewModel(
         }
     }
 
+    fun onCreateDeckClick() {
+        this.viewModelScope.launch {
+            _state.update {
+                val values = cardRepository.cards.value.values
+                    .filter { it.type == CardType.HERO }.toSet()
+
+                it.copy(fullScreen = CreateDeck(values))
+            }
+        }
+    }
+
     fun onBackPressed() {
         this.viewModelScope.launch {
             _state.update {
@@ -158,11 +171,13 @@ data class MainUiState(
 
         data class DeckMenu(val deck: Deck) : SubScreen
 
-        data class CardDetails(val card: Card) : SubScreen
     }
 
     sealed interface FullScreen {
         data class DeckScreen(val deck: Deck) : FullScreen
+
         data object PackSelectionScreen : FullScreen
+
+        data class CreateDeck(val heroCodes: Set<Card>) : FullScreen
     }
 }

@@ -4,19 +4,27 @@ import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
 import io.kamel.image.KamelImage
 import io.kamel.image.asyncPainterResource
@@ -36,6 +44,29 @@ import org.jetbrains.compose.resources.painterResource
 
 const val PORTRAIT_RATIO = 0.715f
 const val LANDSCAPE_RATIO = 1.396f
+
+@Composable
+fun LabeledCard(
+    card: Card,
+    modifier: Modifier = Modifier.height(196.dp),
+    shape: Shape = CardShape,
+    onClick: () -> Unit = {}
+) {
+    Column {
+        Card(card, modifier, shape, onClick)
+        Text(
+            modifier = Modifier
+                .sizeIn(maxWidth = 128.dp)
+                .align(Alignment.CenterHorizontally),
+            text = card.name,
+            textAlign = TextAlign.Center,
+            color = MaterialTheme.colors.onBackground,
+            maxLines = 2,
+            fontSize = 15.sp,
+            fontWeight = FontWeight.SemiBold
+        )
+    }
+}
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
 @Composable

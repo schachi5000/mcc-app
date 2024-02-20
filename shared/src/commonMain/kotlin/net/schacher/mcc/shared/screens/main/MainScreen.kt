@@ -71,6 +71,7 @@ import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
+import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
 import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
@@ -143,7 +144,7 @@ fun MainScreen(
                     when (state) {
                         0 -> MyDecksScreen(
                             onDeckClick = { mainViewModel.onDeckClicked(it) },
-                            onAddDeckClick = {}
+                            onAddDeckClick = { mainViewModel.onCreateDeckClick() }
                         )
 
                         1 -> SpotlightScreen {
@@ -201,6 +202,10 @@ fun MainScreen(
             }
 
             is FullScreen.PackSelectionScreen -> PackSelectionScreen {
+                mainViewModel.onBackPressed()
+            }
+
+            is FullScreen.CreateDeck -> NewDeckScreen {
                 mainViewModel.onBackPressed()
             }
 
