@@ -42,7 +42,7 @@ class SearchViewModel(
         }
 
         this.lastSearchJob?.cancel()
-        this.lastSearchJob = viewModelScope.launch {
+        this.lastSearchJob = this.viewModelScope.launch {
             _state.update {
                 it.copy(
                     result = getFilteredCards(it.query, it.filters),
