@@ -61,15 +61,19 @@ import net.schacher.mcc.shared.design.compose.blurByBottomSheet
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreen
-import net.schacher.mcc.shared.screens.main.Event.CardsDatabaseSyncFailed
-import net.schacher.mcc.shared.screens.main.Event.DatabaseSynced
-import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Spotlight
-import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
-import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.DeckMenu
+import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
+import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DatabaseSynced
+import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DeckCreated
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CreateDeck
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.PackSelectionScreen
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Decks
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Search
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
 import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
 import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
@@ -83,10 +87,8 @@ import org.koin.compose.koinInject
 
 @OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
 @Composable
-fun MainScreen(
-    mainViewModel: MainViewModel = koinInject()
-) {
-    val state = mainViewModel.state.collectAsState()
+fun MainScreen(viewModel: MainViewModel = koinInject()) {
+    val state = viewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
 
     val sheetState = rememberModalBottomSheetState(
@@ -99,7 +101,7 @@ fun MainScreen(
         enabled = (state.value.subScreen != null ||
                 state.value.fullScreen != null)
     ) {
-        mainViewModel.onBackPressed()
+        viewModel.onBackPressed()
     }
 
     ModalBottomSheetLayout(
@@ -110,8 +112,8 @@ fun MainScreen(
         sheetContent = {
             state.value.subScreen?.let {
                 when (it) {
-                    is CardMenu -> CardMenuBottomSheet(mainViewModel, it.card)
-                    is DeckMenu -> DeckMenuBottomSheet(mainViewModel, it.deck)
+                    is CardMenu -> CardMenuBottomSheet(viewModel, it.card)
+                    is DeckMenu -> DeckMenuBottomSheet(viewModel, it.deck)
                     else -> {}
                 }
             }
@@ -123,7 +125,7 @@ fun MainScreen(
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
                 BottomBar(state.value.mainScreen.tabIndex) {
-                    mainViewModel.onTabSelected(it)
+                    viewModel.onTabSelected(it)
                 }
             }
         ) {
@@ -143,20 +145,20 @@ fun MainScreen(
                     }) { state ->
                     when (state) {
                         0 -> MyDecksScreen(
-                            onDeckClick = { mainViewModel.onDeckClicked(it) },
-                            onAddDeckClick = { mainViewModel.onCreateDeckClick() }
+                            onDeckClick = { viewModel.onDeckClicked(it) },
+                            onAddDeckClick = { viewModel.onNewDeckClicked() }
                         )
 
                         1 -> SpotlightScreen {
-                            mainViewModel.onDeckClicked(it)
+                            viewModel.onDeckClicked(it)
                         }
 
                         2 -> SearchScreen {
-                            mainViewModel.onCardClicked(it)
+                            viewModel.onCardClicked(it)
                         }
 
                         3 -> SettingsScreen {
-                            mainViewModel.onPackSelectionClicked()
+                            viewModel.onPackSelectionClicked()
                         }
                     }
                 }
@@ -173,10 +175,11 @@ fun MainScreen(
     }
 
     LaunchedEffect(Unit) {
-        mainViewModel.event.collect {
+        viewModel.event.collect {
             when (it) {
                 DatabaseSynced -> snackbarHostState.showSnackbar("Database synced!")
                 is CardsDatabaseSyncFailed -> snackbarHostState.showSnackbar("Error syncing database: ${it.exception.message}")
+                is DeckCreated -> snackbarHostState.showSnackbar("Deck created! ${it.deckName}")
             }
         }
     }
@@ -184,7 +187,7 @@ fun MainScreen(
     LaunchedEffect(sheetState) {
         snapshotFlow { sheetState.isVisible }.collect { isVisible ->
             if (!isVisible) {
-                mainViewModel.onContextMenuClosed()
+                viewModel.onContextMenuClosed()
             }
         }
     }
@@ -197,17 +200,20 @@ fun MainScreen(
         }
     ) {
         when (it) {
-            is FullScreen.DeckScreen -> DeckScreen(it.deck) {
-                mainViewModel.onBackPressed()
+            is DeckScreen -> DeckScreen(it.deck) {
+                viewModel.onBackPressed()
             }
 
-            is FullScreen.PackSelectionScreen -> PackSelectionScreen {
-                mainViewModel.onBackPressed()
+            is PackSelectionScreen -> PackSelectionScreen {
+                viewModel.onBackPressed()
             }
 
-            is FullScreen.CreateDeck -> NewDeckScreen {
-                mainViewModel.onBackPressed()
-            }
+            is CreateDeck -> NewDeckScreen(
+                onBackPress = { viewModel.onBackPressed() },
+                onNewDeckSelected = { card, aspect ->
+                    viewModel.onNewDeckHeroSelected(card, aspect)
+                }
+            )
 
             else -> {
                 Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
@@ -289,7 +295,7 @@ fun DeckMenuBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
     }
 }
 
-private val MainUiState.MainScreen.tabColor: Color
+private val MainScreen.tabColor: Color
     get() = when (this) {
         Decks -> Color(0xfff78f3f)
         Spotlight -> Color(0xff31e29c)
@@ -297,7 +303,7 @@ private val MainUiState.MainScreen.tabColor: Color
         Settings -> Color(0xff9957ff)
     }
 
-private val MainUiState.MainScreen.tabIndex: Int
+private val MainScreen.tabIndex: Int
     get() = when (this) {
         Decks -> 0
         Spotlight -> 1

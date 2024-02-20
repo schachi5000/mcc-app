@@ -3,6 +3,7 @@ package net.schacher.mcc.shared.screens.newdeck
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
@@ -29,10 +30,28 @@ class NewDeckViewModel(
         }
     }
 
-    fun onHeroCardSelected(card: Card) {
+    fun onHeroCardSelected(hero: Card) {
+        _state.update {
+            it.copy(selectedHero = hero)
+        }
     }
 
-    data class UiState internal constructor(val heros: Set<Card> = emptySet())
+    fun onBackPress() {
+        _state.update {
+            it.copy(selectedHero = null)
+        }
+    }
+
+    fun onCreateDeckClicked(hero: Card) {
+        this.viewModelScope.launch {
+            deckRepository.createDeck(heroCard = hero)
+        }
+    }
+
+    data class UiState(
+        val allHeroes: Set<Card> = emptySet(),
+        val selectedHero: Card? = null
+    )
 }
 
 

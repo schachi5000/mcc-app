@@ -20,29 +20,34 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.LabeledCard
+import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import org.koin.compose.koinInject
-
 
 @Composable
 fun NewDeckScreen(
     viewModel: NewDeckViewModel = koinInject(),
+    onNewDeckSelected: (Card, Aspect?) -> Unit,
     onBackPress: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
     NewDeckScreen(
-        cards = state.heros,
+        state = state,
         onCardSelected = { viewModel.onHeroCardSelected(it) },
-        onBackPress = onBackPress
+        onBackPress = { onBackPress() },
+        onNewDeckSelected = onNewDeckSelected,
+        onDialogDismissed = { viewModel.onBackPress() }
     )
 }
 
 @Composable
 fun NewDeckScreen(
-    cards: Set<Card>,
+    state: NewDeckViewModel.UiState,
     onCardSelected: (Card) -> Unit,
-    onBackPress: () -> Unit
+    onBackPress: () -> Unit,
+    onNewDeckSelected: (Card, Aspect?) -> Unit,
+    onDialogDismissed: () -> Unit
 ) {
     Box(
         modifier = Modifier
@@ -64,16 +69,16 @@ fun NewDeckScreen(
                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                 verticalArrangement = Arrangement.spacedBy(8.dp),
             ) {
-                cards.forEach { card ->
+                state.allHeroes.forEach { card ->
                     item {
                         LabeledCard(
                             card = card,
-                            onClick = { onCardSelected(card) }
+                            onClick = { onNewDeckSelected(card, null) }
                         )
                     }
                 }
                 item {
-                    Spacer(Modifier.height(64.dp))
+                    Spacer(Modifier.height(72.dp))
                 }
             }
         }

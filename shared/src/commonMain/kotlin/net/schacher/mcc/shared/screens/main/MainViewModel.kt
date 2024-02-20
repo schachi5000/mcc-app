@@ -9,20 +9,20 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
-import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.CreateDeck
-import net.schacher.mcc.shared.screens.main.MainUiState.FullScreen.DeckScreen
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Decks
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Search
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Settings
-import net.schacher.mcc.shared.screens.main.MainUiState.MainScreen.Spotlight
-import net.schacher.mcc.shared.screens.main.MainUiState.Splash
-import net.schacher.mcc.shared.screens.main.MainUiState.SubScreen.CardMenu
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CreateDeck
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Decks
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Search
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.Splash
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
 
 class MainViewModel(
     private val cardRepository: CardRepository,
@@ -34,13 +34,12 @@ class MainViewModel(
         const val SPLASH_DELAY_MS = 2000L
     }
 
-    private val _state =
-        MutableStateFlow(
-            MainUiState(
-                mainScreen = Decks,
-                splash = Splash(cardRepository.cards.value.isEmpty())
-            )
+    private val _state = MutableStateFlow(
+        UiState(
+            mainScreen = Decks,
+            splash = Splash(cardRepository.cards.value.isEmpty())
         )
+    )
 
     val state = _state.asStateFlow()
 
@@ -79,7 +78,7 @@ class MainViewModel(
         this.viewModelScope.launch {
             val mainScreen = when (tabIndex) {
                 0 -> Decks
-                1 -> Spotlight
+                1 -> UiState.MainScreen.Spotlight
                 2 -> Search
                 3 -> Settings
                 else -> return@launch
@@ -117,13 +116,27 @@ class MainViewModel(
         }
     }
 
-    fun onCreateDeckClick() {
+    fun onNewDeckClicked() {
         this.viewModelScope.launch {
             _state.update {
                 val values = cardRepository.cards.value.values
                     .filter { it.type == CardType.HERO }.toSet()
 
                 it.copy(fullScreen = CreateDeck(values))
+            }
+        }
+    }
+
+    fun onNewDeckHeroSelected(hero: Card, aspect: Aspect? = null) {
+        this.viewModelScope.launch {
+            try {
+                deckRepository.createDeck(heroCard = hero, aspect = aspect)
+                _state.update {
+                    it.copy(fullScreen = null)
+                }
+                _event.emit(Event.DeckCreated(hero.name))
+            } catch (e: Exception) {
+                Logger.e(e) { "Error creating deck" }
             }
         }
     }
@@ -141,43 +154,45 @@ class MainViewModel(
 
     fun onPackSelectionClicked() {
         this._state.update {
-            it.copy(fullScreen = MainUiState.FullScreen.PackSelectionScreen)
+            it.copy(fullScreen = UiState.FullScreen.PackSelectionScreen)
         }
     }
-}
 
-sealed interface Event {
-    data object DatabaseSynced : Event
-    data class CardsDatabaseSyncFailed(val exception: Exception) : Event
-}
+    sealed interface Event {
+        data object DatabaseSynced : Event
+        data class DeckCreated(val deckName: String) : Event
 
-data class MainUiState(
-    val splash: Splash? = null,
-    val mainScreen: MainScreen,
-    val subScreen: SubScreen? = null,
-    val fullScreen: FullScreen? = null
-) {
-    data class Splash(val preparing: Boolean) : FullScreen
-
-    sealed interface MainScreen {
-        data object Decks : MainScreen
-        data object Spotlight : MainScreen
-        data object Search : MainScreen
-        data object Settings : MainScreen
+        data class CardsDatabaseSyncFailed(val exception: Exception) : Event
     }
 
-    sealed interface SubScreen {
-        data class CardMenu(val card: Card) : SubScreen
+    data class UiState internal constructor(
+        val splash: Splash? = null,
+        val mainScreen: MainScreen,
+        val subScreen: SubScreen? = null,
+        val fullScreen: FullScreen? = null
+    ) {
+        data class Splash(val preparing: Boolean) : FullScreen
 
-        data class DeckMenu(val deck: Deck) : SubScreen
+        sealed interface MainScreen {
+            data object Decks : MainScreen
+            data object Spotlight : MainScreen
+            data object Search : MainScreen
+            data object Settings : MainScreen
+        }
 
-    }
+        sealed interface SubScreen {
+            data class CardMenu(val card: Card) : SubScreen
 
-    sealed interface FullScreen {
-        data class DeckScreen(val deck: Deck) : FullScreen
+            data class DeckMenu(val deck: Deck) : SubScreen
 
-        data object PackSelectionScreen : FullScreen
+        }
 
-        data class CreateDeck(val heroCodes: Set<Card>) : FullScreen
+        sealed interface FullScreen {
+            data class DeckScreen(val deck: Deck) : FullScreen
+
+            data object PackSelectionScreen : FullScreen
+
+            data class CreateDeck(val heroCodes: Set<Card>) : FullScreen
+        }
     }
 }

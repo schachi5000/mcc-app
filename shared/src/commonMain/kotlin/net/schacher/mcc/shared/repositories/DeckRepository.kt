@@ -34,13 +34,16 @@ class DeckRepository(
     private val randomDeckNumber: Int
         get() = Random.nextInt(Int.MAX_VALUE) * -1
 
-    suspend fun createDeck(label: String, aspect: Aspect, heroCard: Card) {
+    suspend fun createDeck(heroCard: Card, label: String? = null, aspect: Aspect? = null) {
         if (heroCard.type != HERO) {
             throw Exception("Hero card must be of type HERO - $heroCard")
         }
 
-        val deck = Deck(randomDeckNumber, label, heroCard, aspect, listOf(heroCard))
+        val deckLabel = label ?: "${heroCard.name} ${aspect?.name ?: ""}"
+
+        val deck = Deck(randomDeckNumber, deckLabel, heroCard, aspect, listOf(heroCard))
         this.deckDatabaseDao.addDeck(deck)
+
         _decks.update { deckDatabaseDao.getDecks() }
     }
 
