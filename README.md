@@ -6,16 +6,26 @@
 ![badge-ios](http://img.shields.io/badge/platform-ios-CDCDCD.svg?style=flat)
 
 ## Project Description
-The Marvel Champions Companion App is a cross-platform application developed with [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) by JetBrains for Android and iOS. This app provides comprehensive support and resources for the Marvel Champions card game, helping players enhance their gaming experience. The app utilizes the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data and information.
+
+The Marvel Champions Companion App is a cross-platform application developed
+with [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) by JetBrains for
+Android and iOS. This app provides comprehensive support and resources for the Marvel Champions card
+game, helping players enhance their gaming experience. The app utilizes
+the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data and information.
+
+## Screenshots
 
 ## Features
-- Card Database: Browse an extensive database of Marvel Champions game cards, updated through the [marvelcdb.com](https://marvelcdb.com/api/) API.
+
+- Card Database: Browse an extensive database of Marvel Champions game cards, updated through
+  the [marvelcdb.com](https://marvelcdb.com/api/) API.
 - Decks and Strategy: Create decks, share them with others, and find strategy tips.
 - Game Guide: Get rules, tips, and instructions for Marvel Champions.
 - Community: Connect with other Marvel Champions players and share your experiences.
 
 ## Technologies & Frameworks
-- UI Framework: [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/) 
+
+- UI Framework: [Compose Multiplatform](https://www.jetbrains.com/lp/compose-multiplatform/)
 - ViewModel: [moko-mvvm](https://github.com/icerockdev/moko-mvvm)
 - Image Loading: [Kamel](https://github.com/Kamel-Media/Kamel)
 - HTTP Client: [Ktor](https://ktor.io/docs/getting-started-ktor-client-multiplatform-mobile.html)
@@ -23,9 +33,10 @@ The Marvel Champions Companion App is a cross-platform application developed wit
 - Logging: [Kermit](https://github.com/touchlab/Kermit)
 
 ## Mockups
-![Start Screen](docs/mockups/start.png)
-![Deck Screen](docs/mockups/deck.png)
-![Search](docs/mockups/search.png)
+
+![Card Screen](docs/screenshots/card_view.png)
+![Deck Screen](docs/screenshots/my_decks.png)
+![Search](docs/screenshots/search.png)
 
 ## Installation
 The app can be installed on Android devices via the Google Play Store and on iOS devices via the Apple App Store. Alternatively, you can download and manually install the app from this repository.
