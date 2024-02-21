@@ -29,7 +29,6 @@ import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Settings
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
@@ -45,7 +44,6 @@ import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.decks
-import marvelchampionscompanion.shared.generated.resources.delete
 import marvelchampionscompanion.shared.generated.resources.ic_deck
 import marvelchampionscompanion.shared.generated.resources.ic_search
 import marvelchampionscompanion.shared.generated.resources.ic_spotlight
@@ -53,13 +51,10 @@ import marvelchampionscompanion.shared.generated.resources.more
 import marvelchampionscompanion.shared.generated.resources.search
 import marvelchampionscompanion.shared.generated.resources.spotlight
 import net.schacher.mcc.shared.design.compose.BackHandler
-import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
-import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.blurByBottomSheet
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DatabaseSynced
@@ -73,7 +68,6 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Sea
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.DeckMenu
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
 import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
 import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
@@ -113,7 +107,6 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
             state.value.subScreen?.let {
                 when (it) {
                     is CardMenu -> CardMenuBottomSheet(viewModel, it.card)
-                    is DeckMenu -> DeckMenuBottomSheet(viewModel, it.deck)
                     else -> {}
                 }
             }
@@ -200,9 +193,11 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
         }
     ) {
         when (it) {
-            is DeckScreen -> DeckScreen(it.deck) {
-                viewModel.onBackPressed()
-            }
+            is DeckScreen -> DeckScreen(
+                it.deck,
+                onCloseClick = { viewModel.onBackPressed() },
+                onDeleteDeckClick = { viewModel.onRemoveDeckClick(it) }
+            )
 
             is PackSelectionScreen -> PackSelectionScreen {
                 viewModel.onBackPressed()
@@ -279,19 +274,6 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
 fun CardMenuBottomSheet(mainViewModel: MainViewModel, card: Card) {
     FreeBottomSheetContainer(modifier = Modifier.fillMaxHeight(0.75f)) {
         CardInfo(card = card)
-    }
-}
-
-@ExperimentalResourceApi
-@Composable
-fun DeckMenuBottomSheet(mainViewModel: MainViewModel, deck: Deck) {
-    BottomSheetContainer {
-        OptionsEntry(
-            label = stringResource(Res.string.delete),
-            imageVector = Icons.Rounded.Delete
-        ) {
-            mainViewModel.onRemoveDeckClick(deck)
-        }
     }
 }
 

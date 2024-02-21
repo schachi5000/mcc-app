@@ -49,10 +49,14 @@ class DeckRepository(
         _decks.update { deckDatabaseDao.getDecks() }
     }
 
-    suspend fun removeDeck(deck: Deck) {
-        this.deckDatabaseDao.removeDeck(deck.id)
+    suspend fun removeDeck(deckId: Int) {
+        this.deckDatabaseDao.removeDeck(deckId)
 
-        _decks.update { deckDatabaseDao.getDecks() }
+        _decks.update {
+            it.toMutableList().also {
+                it.removeAll { it.id == deckId }
+            }
+        }
     }
 
     suspend fun addCardToDeck(deckId: Int, cardCode: String) {

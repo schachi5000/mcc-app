@@ -109,10 +109,10 @@ class MainViewModel(
         }
     }
 
-    fun onRemoveDeckClick(deck: Deck) {
+    fun onRemoveDeckClick(deckId: Int) {
         this.viewModelScope.launch {
-            deckRepository.removeDeck(deck)
-            _state.update { it.copy(subScreen = null) }
+            deckRepository.removeDeck(deckId)
+            _state.update { it.copy(fullScreen = null) }
         }
     }
 
@@ -182,8 +182,6 @@ class MainViewModel(
 
         sealed interface SubScreen {
             data class CardMenu(val card: Card) : SubScreen
-
-            data class DeckMenu(val deck: Deck) : SubScreen
 
         }
 
