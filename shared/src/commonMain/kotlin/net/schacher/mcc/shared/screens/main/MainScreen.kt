@@ -222,6 +222,8 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
     ) {
         SplashScreen((state.value.splash)?.preparing ?: false)
     }
+
+
 }
 
 @OptIn(ExperimentalResourceApi::class)

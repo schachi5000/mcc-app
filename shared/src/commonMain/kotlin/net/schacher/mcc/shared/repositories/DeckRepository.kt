@@ -18,8 +18,8 @@ import kotlin.random.Random
 
 class DeckRepository(
     private val cardRepository: CardRepository,
+    private val deckDatabaseDao: DeckDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource,
-    private val deckDatabaseDao: DeckDatabaseDao
 ) {
     private val _decks = MutableStateFlow<List<Deck>>(emptyList())
 
