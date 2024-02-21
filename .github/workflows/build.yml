@@ -1,5 +1,5 @@
 name:
-  Build Android debug app
+  Build
 
 on:
   push

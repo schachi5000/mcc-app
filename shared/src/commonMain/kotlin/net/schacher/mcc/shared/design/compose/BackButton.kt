@@ -22,8 +22,8 @@ fun BoxScope.BackButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier.align(Alignment.BottomStart).navigationBarsPadding()
             .padding(
-                start = 24.dp,
-                bottom = if (IS_ANDROID) 24.dp else 0.dp
+                start = 16.dp,
+                bottom = if (IS_ANDROID) 16.dp else 0.dp
             )
             .size(48.dp),
         contentColor = MaterialTheme.colors.onPrimary,

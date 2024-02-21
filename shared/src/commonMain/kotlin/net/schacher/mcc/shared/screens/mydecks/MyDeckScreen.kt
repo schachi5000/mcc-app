@@ -123,7 +123,7 @@ fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
         FloatingActionButton(
             onClick = onClick,
             modifier = Modifier
-                .padding(24.dp)
+                .padding(16.dp)
                 .sizeIn(maxHeight = 48.dp, minWidth = 48.dp),
             contentColor = MaterialTheme.colors.onPrimary,
             backgroundColor = MaterialTheme.colors.primary,
