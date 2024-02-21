@@ -15,10 +15,9 @@ the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data a
 
 ## Screenshots
 
-<p style="text-align: center;">
-  <img src="docs/screenshots/card_view.png" width="200" alt="Card Screen"/> 
-  <img src="docs/screenshots/my_decks.png" width="200" alt="Deck Screen"/>
-  <img src="docs/screenshots/search.png" width="200" alt="Search"/>
+<img src="docs/screenshots/my_decks.png" width="200" alt="Deck Screen"/>
+<img src="docs/screenshots/search.png" width="200" alt="Search"/>
+<img src="docs/screenshots/card_view.png" width="200" alt="Card Screen"/> 
 
 ## Features
 
@@ -38,24 +37,28 @@ the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data a
 - Logging: [Kermit](https://github.com/touchlab/Kermit)
 
 ## Installation
-The app can be installed on Android devices via the Google Play Store and on iOS devices via the Apple App Store. Alternatively, you can download and manually install the app from this repository.
 
-## Usage
-1. Launch the app on your device.
-2. Sign in or create an account to access all features.
-3. Utilize the various app functions to optimize your Marvel Champions gaming experience.
+The app can be installed on Android devices via the Google Play Store and on iOS devices via the
+Apple App Store. Alternatively, you can download and manually install the app from this repository.
 
 ## Contributors
-We welcome contributions from developers and Marvel Champions enthusiasts. 
-If you'd like to contribute to the development of the app, follow the guidelines in our [Contributing Guide](CONTRIBUTING.md).
+
+We welcome contributions from developers and Marvel Champions enthusiasts.
+If you'd like to contribute to the development of the app, follow the guidelines in
+our [Contributing Guide](CONTRIBUTING.md).
 
 ## License
+
 This project is licensed under the [GPL License](LICENSE.txt).
 
 ## Disclaimer
-This project is not affiliated with or endorsed by Marvel Champions or its respective owners. Marvel Champions is a registered trademark of its respective owners. This project is non-profit and created for the benefit of the Marvel Champions community.
+
+This project is not affiliated with or endorsed by Marvel Champions or its respective owners. Marvel
+Champions is a registered trademark of its respective owners. This project is non-profit and created
+for the benefit of the Marvel Champions community.
 
 ## Author
+
 This project is developed by Alexander Schacher.
 
 Thank you for using the Marvel Champions Companion App!
