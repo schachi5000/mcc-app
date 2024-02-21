@@ -15,9 +15,10 @@ the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data a
 
 ## Screenshots
 
-![Card Screen](docs/screenshots/card_view.png)
-![Deck Screen](docs/screenshots/my_decks.png)
-![Search](docs/screenshots/search.png)
+<p style="text-align: center;">
+  <img src="docs/screenshots/card_view.png" width="200" alt="Card Screen"/> 
+  <img src="docs/screenshots/my_decks.png" width="200" alt="Deck Screen"/>
+  <img src="docs/screenshots/search.png" width="200" alt="Search"/>
 
 ## Features
 
