@@ -1,6 +1,9 @@
 # Marvel Champions Companion
 
 [![Build](https://github.com/schachi5000/marvel-champions-companion/actions/workflows/build.yml/badge.svg)](https://github.com/schachi5000/marvel-champions-companion/actions/workflows/build.yml)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.20-blue.svg?style=flat&logo=kotlin)](https://kotlinlang.org)
+![badge-android](http://img.shields.io/badge/platform-android-6EDB8D.svg?style=flat)
+![badge-ios](http://img.shields.io/badge/platform-ios-CDCDCD.svg?style=flat)
 
 ## Project Description
 The Marvel Champions Companion App is a cross-platform application developed with [Compose Multiplatform](https://github.com/JetBrains/compose-multiplatform) by JetBrains for Android and iOS. This app provides comprehensive support and resources for the Marvel Champions card game, helping players enhance their gaming experience. The app utilizes the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data and information.
