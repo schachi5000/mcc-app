@@ -1,7 +1,7 @@
 # Marvel Champions Companion
 
 [![Build](https://github.com/schachi5000/marvel-champions-companion/actions/workflows/build.yml/badge.svg)](https://github.com/schachi5000/marvel-champions-companion/actions/workflows/build.yml)
-[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.20-blue.svg?style=flat&logo=kotlin)](https://kotlinlang.org)
+[![Kotlin](https://img.shields.io/badge/Kotlin-1.9.22-blue.svg?style=flat&logo=kotlin)](https://kotlinlang.org)
 ![badge-android](http://img.shields.io/badge/platform-android-6EDB8D.svg?style=flat)
 ![badge-ios](http://img.shields.io/badge/platform-ios-CDCDCD.svg?style=flat)
 
