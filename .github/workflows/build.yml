@@ -19,5 +19,5 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '17'
-      - name: Build Android debug app
+      - name: Build Android
         run: ./gradlew androidApp:assembleDebug

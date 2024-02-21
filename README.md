@@ -15,6 +15,10 @@ the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data a
 
 ## Screenshots
 
+![Card Screen](docs/screenshots/card_view.png)
+![Deck Screen](docs/screenshots/my_decks.png)
+![Search](docs/screenshots/search.png)
+
 ## Features
 
 - Card Database: Browse an extensive database of Marvel Champions game cards, updated through
@@ -31,12 +35,6 @@ the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data a
 - HTTP Client: [Ktor](https://ktor.io/docs/getting-started-ktor-client-multiplatform-mobile.html)
 - DI: [Koin](https://insert-koin.io/docs/reference/koin-mp/kmp)
 - Logging: [Kermit](https://github.com/touchlab/Kermit)
-
-## Mockups
-
-![Card Screen](docs/screenshots/card_view.png)
-![Deck Screen](docs/screenshots/my_decks.png)
-![Search](docs/screenshots/search.png)
 
 ## Installation
 The app can be installed on Android devices via the Google Play Store and on iOS devices via the Apple App Store. Alternatively, you can download and manually install the app from this repository.
