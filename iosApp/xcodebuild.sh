@@ -1,0 +1,1 @@
+xcodebuild -workspace iosApp/iosApp.xcodeproj/project.xcworkspace -scheme iosApp -sdk iphoneos -archivePath $RUNNER_TEMP/iosApp.xcarchive -configuration Debug -destination generic/platform=iOS clean archive
