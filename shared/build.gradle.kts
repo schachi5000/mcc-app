@@ -30,10 +30,8 @@ kotlin {
                 api(compose.runtime)
                 api(compose.foundation)
                 api(compose.material)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
-                implementation(compose.components.resources)
-                implementation(libs.koin.core)
                 api(libs.koin.compose)
+                implementation(libs.koin.core)
                 implementation(libs.kermit)
                 implementation(libs.kamel)
                 implementation(libs.ktor.client.core)
@@ -45,6 +43,8 @@ kotlin {
                 implementation(libs.sqldelight)
                 implementation(libs.moko.mvvm.core)
                 implementation(libs.moko.mvvm.compose)
+                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
+                implementation(compose.components.resources)
             }
         }
         val androidMain by getting {

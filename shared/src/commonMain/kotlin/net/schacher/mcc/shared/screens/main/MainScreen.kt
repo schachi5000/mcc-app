@@ -237,6 +237,7 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
                 clip = true
                 shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
             },
+        elevation = 0.dp,
         backgroundColor = MaterialTheme.colors.surface,
     ) {
         Row(Modifier.fillMaxWidth().padding(bottom = if (IS_IOS) 16.dp else 0.dp)) {

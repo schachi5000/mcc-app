@@ -12,7 +12,7 @@ import net.schacher.mcc.shared.model.Aspect
 import kotlin.math.max
 import kotlin.math.min
 
-private val primary = Color(0xFF185ea4)
+private val primary = Color(0xFF0074df)
 
 val LightColorScheme = lightColors(
     primary = primary,
@@ -26,9 +26,9 @@ val LightColorScheme = lightColors(
 val DarkColorScheme = darkColors(
     primary = primary,
     onPrimary = Color(0xFFFFFFFF),
-    background = Color(0xFF000005),
+    background = Color(0xFF15161d),
     onBackground = Color(0xFFf4f4f4),
-    surface = Color(0xFF242424),
+    surface = Color(0xFF121d2c),
     onSurface = Color(0xFFf0f0f0),
 )
 
