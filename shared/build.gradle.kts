@@ -45,6 +45,7 @@ kotlin {
                 implementation(libs.sqldelight)
                 implementation(libs.moko.mvvm.core)
                 implementation(libs.moko.mvvm.compose)
+                implementation("io.github.aakira:napier:2.7.1")
             }
         }
         val androidMain by getting {
