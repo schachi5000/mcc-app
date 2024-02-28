@@ -39,6 +39,7 @@ import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
+import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
 import net.schacher.mcc.shared.design.compose.blurByBottomSheet
 import net.schacher.mcc.shared.design.theme.DefaultShape
@@ -54,6 +55,7 @@ fun DeckScreen(
     onCloseClick: () -> Unit
 ) {
     var selectedCard by remember { mutableStateOf<Card?>(null) }
+    var deleteDeckShowing by remember { mutableStateOf(false) }
 
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true,
@@ -134,7 +136,9 @@ fun DeckScreen(
             BackButton(onCloseClick)
 
             FloatingActionButton(
-                onClick = { onDeleteDeckClick(deck.id) },
+                onClick = {
+                    deleteDeckShowing = true
+                },
                 modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding()
                     .padding(
                         end = 16.dp,
@@ -151,6 +155,18 @@ fun DeckScreen(
                 )
             }
         }
+    }
+
+    if (deleteDeckShowing) {
+        ConfirmationDialog(
+            title = "Delete deck",
+            message = "Are you sure you want to delete this deck?",
+            onConfirm = {
+                deleteDeckShowing = false
+                onDeleteDeckClick(deck.id)
+            },
+            onDismiss = { deleteDeckShowing = false }
+        )
     }
 }
 

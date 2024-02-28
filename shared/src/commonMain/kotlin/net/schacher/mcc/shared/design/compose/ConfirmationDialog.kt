@@ -37,8 +37,7 @@ fun ConfirmationDialog(
             Column(modifier = Modifier.padding(16.dp)) {
                 Text(
                     text = title,
-                    modifier = Modifier
-                        .wrapContentSize(Alignment.Center),
+                    modifier = Modifier.fillMaxWidth(),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.h6,
                 )

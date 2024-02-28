@@ -30,6 +30,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.localize
 import net.schacher.mcc.shared.model.Card
@@ -37,6 +38,8 @@ import net.schacher.mcc.shared.model.CardType
 
 @Composable
 fun CardInfo(modifier: Modifier = Modifier, card: Card) {
+    Logger.i { card.toString() }
+
     Box(modifier = modifier) {
         Card(
             modifier = Modifier.fillMaxWidth()
