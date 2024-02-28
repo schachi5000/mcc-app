@@ -49,6 +49,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
+import androidx.compose.ui.text.style.BaselineShift
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.ic_arrow_back
@@ -216,8 +217,12 @@ fun SearchBar(
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
+                    .padding(vertical = 0.dp)
                     .focusRequester(focusRequester),
                 value = input,
+                textStyle = MaterialTheme.typography.body1.copy(
+                    baselineShift = BaselineShift.Subscript
+                ),
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent,
                     cursorColor = MaterialTheme.colors.onSurface,
