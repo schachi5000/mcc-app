@@ -20,6 +20,9 @@ import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.unit.dp
@@ -27,6 +30,7 @@ import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.database
 import marvelchampionscompanion.shared.generated.resources.ic_cards
 import marvelchampionscompanion.shared.generated.resources.ic_deck
+import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -40,6 +44,7 @@ fun SettingsScreen(
     onPackSelectionClick: () -> Unit
 ) {
     val state by settingsViewModel.state.collectAsState()
+    var deleteDatabaseDialog by remember { mutableStateOf(false) }
 
     val infiniteTransition = rememberInfiniteTransition()
     val angle by infiniteTransition.animateFloat(
@@ -68,9 +73,7 @@ fun SettingsScreen(
             OptionsEntry(
                 label = "Alle Einträge löschen",
                 imageVector = Icons.Rounded.Delete,
-                onClick = {
-                    settingsViewModel.onWipeDatabaseClick()
-                })
+                onClick = { deleteDatabaseDialog = true })
         }
 
         Spacer(Modifier.size(16.dp))
@@ -135,5 +138,17 @@ fun SettingsScreen(
                 }
             )
         }
+    }
+
+    if (deleteDatabaseDialog) {
+        ConfirmationDialog(
+            title = "Datenbank löschen",
+            message = "Möchtest du wirklich alle Einträge löschen?",
+            onDismiss = { deleteDatabaseDialog = false },
+            onConfirm = {
+                settingsViewModel.onWipeDatabaseClick()
+                deleteDatabaseDialog = false
+            }
+        )
     }
 }
