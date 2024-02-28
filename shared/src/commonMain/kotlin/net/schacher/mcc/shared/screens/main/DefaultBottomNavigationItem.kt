@@ -16,7 +16,7 @@ import org.jetbrains.compose.resources.painterResource
 internal fun RowScope.DefaultBottomNavigationItem(
     label: String,
     icon: DrawableResource,
-    color: Color,
+    color: Color = MaterialTheme.colors.primary,
     selected: Boolean,
     onClick: () -> Unit
 ) {
@@ -34,7 +34,7 @@ internal fun RowScope.DefaultBottomNavigationItem(
 internal fun RowScope.DefaultBottomNavigationItem(
     label: String,
     icon: @Composable () -> Unit,
-    color: Color,
+    color: Color = MaterialTheme.colors.primary,
     selected: Boolean = false,
     onClick: () -> Unit
 ) {

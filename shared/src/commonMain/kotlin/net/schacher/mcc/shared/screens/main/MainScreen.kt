@@ -244,28 +244,24 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
             DefaultBottomNavigationItem(
                 label = stringResource(Res.string.decks),
                 icon = Res.drawable.ic_deck,
-                color = Decks.tabColor,
                 selected = (selectedTabIndex == 0),
                 onClick = { onTabSelected(0) },
             )
             DefaultBottomNavigationItem(
                 label = stringResource(Res.string.spotlight),
                 icon = Res.drawable.ic_spotlight,
-                color = Spotlight.tabColor,
                 selected = (selectedTabIndex == 1),
                 onClick = { onTabSelected(1) },
             )
             DefaultBottomNavigationItem(
                 label = stringResource(Res.string.search),
                 icon = Res.drawable.ic_search,
-                color = Search.tabColor,
                 selected = (selectedTabIndex == 2),
                 onClick = { onTabSelected(2) },
             )
             DefaultBottomNavigationItem(
                 label = stringResource(Res.string.more),
                 icon = { Icon(Icons.Rounded.Settings, "Settings") },
-                color = Settings.tabColor,
                 selected = (selectedTabIndex == 3),
                 onClick = { onTabSelected(3) },
             )
@@ -279,14 +275,6 @@ fun CardMenuBottomSheet(mainViewModel: MainViewModel, card: Card) {
         CardInfo(card = card)
     }
 }
-
-private val MainScreen.tabColor: Color
-    get() = when (this) {
-        Decks -> Color(0xfff78f3f)
-        Spotlight -> Color(0xff31e29c)
-        Search -> Color(0xff518cca)
-        Settings -> Color(0xff9957ff)
-    }
 
 private val MainScreen.tabIndex: Int
     get() = when (this) {
