@@ -19,6 +19,7 @@ import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetState
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
@@ -87,74 +88,13 @@ fun DeckScreen(
                 }
             }
         }) {
-        Box(
-            modifier = Modifier.fillMaxSize()
-                .blurByBottomSheet(sheetState)
-                .background(MaterialTheme.colors.background)
-        ) {
 
-            LazyColumn(modifier = Modifier.fillMaxSize()) {
-                item {
-                    Spacer(Modifier.statusBarsPadding().height(16.dp))
-                }
-                item {
-                    Row(modifier = Modifier.padding(16.dp)) {
-                        Card(deck.hero) {
-                            selectedCard = deck.hero
-                        }
-                    }
-                }
-
-                val heroCards = CardRowEntry("Hero cards", deck.cards
-                    .filter { it.type != CardType.HERO && it.setCode == deck.hero.setCode }
-                    .distinctBy { it.name }
-                    .sortedBy { it.cost ?: 0 })
-
-                item {
-                    CardRow(
-                        modifier = Modifier.padding(16.dp),
-                        cardRowEntry = heroCards
-                    ) {
-                        selectedCard = it
-                    }
-                }
-                val otherCards = CardRowEntry("Other cards", deck.cards
-                    .filter { it.setCode != deck.hero.setCode }
-                    .distinctBy { it.name }
-                    .sortedBy { it.cost ?: 0 })
-
-                item {
-                    CardRow(
-                        modifier = Modifier.padding(16.dp),
-                        cardRowEntry = otherCards
-                    ) {
-                        selectedCard = it
-                    }
-                }
-            }
-
-            BackButton(onCloseClick)
-
-            FloatingActionButton(
-                onClick = {
-                    deleteDeckShowing = true
-                },
-                modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding()
-                    .padding(
-                        end = 16.dp,
-                        bottom = if (IS_ANDROID) 16.dp else 0.dp
-                    )
-                    .size(48.dp),
-                contentColor = MaterialTheme.colors.onPrimary,
-                backgroundColor = MaterialTheme.colors.primary,
-                shape = DefaultShape
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Delete,
-                    contentDescription = "Delete"
-                )
-            }
-        }
+        Content(
+            sheetState = sheetState,
+            deck = deck,
+            onCloseClick = onCloseClick,
+            onDeleteDeckClick = { deleteDeckShowing = true },
+            onCardClick = { selectedCard = it })
     }
 
     if (deleteDeckShowing) {
@@ -167,6 +107,85 @@ fun DeckScreen(
             },
             onDismiss = { deleteDeckShowing = false }
         )
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+private fun Content(
+    sheetState: ModalBottomSheetState,
+    deck: Deck,
+    onCloseClick: () -> Unit,
+    onDeleteDeckClick: (Int) -> Unit,
+    onCardClick: (Card) -> Unit
+) {
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .blurByBottomSheet(sheetState)
+            .background(MaterialTheme.colors.background)
+    ) {
+
+        LazyColumn(modifier = Modifier.fillMaxSize()) {
+            item {
+                Spacer(Modifier.statusBarsPadding().height(16.dp))
+            }
+            item {
+                Row(modifier = Modifier.padding(16.dp)) {
+                    Card(deck.hero) {
+                        onCardClick(deck.hero)
+                    }
+                }
+            }
+
+            val heroCards = CardRowEntry("Hero cards", deck.cards
+                .filter { it.type != CardType.HERO && it.setCode == deck.hero.setCode }
+                .distinctBy { it.name }
+                .sortedBy { it.cost ?: 0 })
+
+            item {
+                CardRow(
+                    modifier = Modifier.padding(16.dp),
+                    cardRowEntry = heroCards
+                ) {
+                    onCardClick(it)
+                }
+            }
+            val otherCards = CardRowEntry("Other cards", deck.cards
+                .filter { it.setCode != deck.hero.setCode }
+                .distinctBy { it.name }
+                .sortedBy { it.cost ?: 0 })
+
+            item {
+                CardRow(
+                    modifier = Modifier.padding(16.dp),
+                    cardRowEntry = otherCards
+                ) {
+                    onCardClick(it)
+                }
+            }
+        }
+
+        BackButton(onCloseClick)
+
+        FloatingActionButton(
+            onClick = {
+                onDeleteDeckClick(deck.id)
+            },
+            modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding()
+                .padding(
+                    end = 16.dp,
+                    bottom = if (IS_ANDROID) 16.dp else 0.dp
+                )
+                .size(48.dp),
+            contentColor = MaterialTheme.colors.onPrimary,
+            backgroundColor = MaterialTheme.colors.primary,
+            shape = DefaultShape
+        ) {
+            Icon(
+                imageVector = Icons.Rounded.Delete,
+                contentDescription = "Delete"
+            )
+        }
     }
 }
 
