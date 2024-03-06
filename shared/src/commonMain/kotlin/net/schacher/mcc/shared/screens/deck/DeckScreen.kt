@@ -1,12 +1,14 @@
 package net.schacher.mcc.shared.screens.deck
 
 import IS_ANDROID
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -33,8 +35,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import io.kamel.image.KamelImage
+import io.kamel.image.asyncPainterResource
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardInfo
@@ -124,6 +132,10 @@ private fun Content(
             .blurByBottomSheet(sheetState)
             .background(MaterialTheme.colors.background)
     ) {
+        BackgroundImage(
+            modifier = Modifier.fillMaxWidth(),
+            deck = deck,
+        )
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
@@ -189,4 +201,40 @@ private fun Content(
     }
 }
 
+@Composable
+private fun BackgroundImage(
+    modifier: Modifier = Modifier.fillMaxWidth(),
+    background: Color = MaterialTheme.colors.background,
+    deck: Deck
+) {
+    Box(
+        modifier = modifier.height(340.dp)
+    ) {
+        KamelImage(
+            modifier = Modifier.fillMaxSize()
+                .blur(30.dp)
+                .background(MaterialTheme.colors.surface),
+            resource = asyncPainterResource(
+                data = "https://de.marvelcdb.com/bundles/cards/${deck.hero.code}.png",
+                filterQuality = FilterQuality.Low,
+            ),
+            contentDescription = deck.name,
+            contentScale = ContentScale.Crop,
+            animationSpec = tween(
+                durationMillis = 500
+            ),
+            onLoading = {},
+            onFailure = {})
 
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    colorStops = arrayOf(
+                        0f to background.copy(alpha = 0f),
+                        1f to background.copy(alpha = 1f)
+                    )
+                )
+            )
+        )
+    }
+}

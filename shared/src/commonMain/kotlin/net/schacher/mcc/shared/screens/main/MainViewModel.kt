@@ -136,7 +136,7 @@ class MainViewModel(
                 }
                 _event.emit(Event.DeckCreated(hero.name))
             } catch (e: Exception) {
-                Logger.e(e) { "Error creating deck" }
+                Logger.e(e) { "Error creating deck for card $hero" }
             }
         }
     }
