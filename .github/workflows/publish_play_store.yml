@@ -34,4 +34,4 @@ jobs:
           packageName: net.schacher.mcc
           releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
           track: internal
-          status: draft # Only for now until we are ready to publish
+          status: inProgress # Only for now until we are ready to publish
