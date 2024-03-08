@@ -10,5 +10,5 @@ build/
 #iosApp/iosApp.xcworkspace/*
 #iosApp/iosApp.xcodeproj/*
 !iosApp/iosApp.xcodeproj/project.pbxproj
-/iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/*
-/iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/*
+iosApp/iosApp.xcodeproj/project.xcworkspace/xcuserdata/
