@@ -24,7 +24,7 @@ jobs:
       - name: Build Android
         run: ./gradlew androidApp:assembleDebug
   build_ios:
-    runs-on: macos-latest
+    runs-on: macos-14
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
@@ -34,4 +34,4 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
       - name: Build iOS
-        run: xcodebuild -allowProvisioningUpdates -workspace /iosApp/iosApp.xcodeproj/project.xcworkspace -configuration Debug -scheme iosApp -sdk iphoneos -destination name='iPhone 14' build
+        run: xcodebuild -allowProvisioningUpdates -workspace iosApp/iosApp.xcodeproj/project.xcworkspace -configuration Debug -scheme iosApp -sdk iphoneos -destination name='iPhone 14' build
