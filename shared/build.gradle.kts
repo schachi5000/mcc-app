@@ -2,10 +2,11 @@ import com.android.build.gradle.internal.tasks.factory.dependsOn
 
 plugins {
     kotlin("multiplatform")
-    kotlin("plugin.serialization").version("1.9.22")
+    kotlin("plugin.serialization").version(libs.versions.kotlin)
     id("com.android.library")
     id("org.jetbrains.compose")
     alias(libs.plugins.sqldelight)
+    alias(libs.plugins.kotlinNativeCocoapods)
 }
 
 kotlin {
