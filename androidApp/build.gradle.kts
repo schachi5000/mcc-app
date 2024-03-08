@@ -26,7 +26,7 @@ android {
         minSdk = (findProperty("android.minSdk") as String).toInt()
         targetSdk = (findProperty("android.targetSdk") as String).toInt()
         versionCode = 3
-        versionName = "1.0-pre-alpha"
+        versionName = "1.0-alpha"
     }
 
     buildTypes {

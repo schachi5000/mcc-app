@@ -34,4 +34,3 @@ jobs:
           packageName: net.schacher.mcc
           releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
           track: internal
-          changesNotSentForReview: true
