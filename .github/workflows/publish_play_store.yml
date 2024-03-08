@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  build_android:
+  publish_to_play_store:
     runs-on: ubuntu-latest
     env:
       KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
