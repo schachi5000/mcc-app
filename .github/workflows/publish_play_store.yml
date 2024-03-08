@@ -13,6 +13,10 @@ concurrency:
 jobs:
   build_android:
     runs-on: ubuntu-latest
+    env:
+      KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
+      KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
+      STORE_PASSWORD: ${{ secrets.STORE_PASSWORD }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
