@@ -10,11 +10,12 @@ concurrency:
   group: ${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+
 jobs:
   build_android:
     runs-on: ubuntu-latest
-    env:
-      SERVICE_ACCOUNT_JSON: ${{ secrets.SERVICE_ACCOUNT_JSON }}
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
