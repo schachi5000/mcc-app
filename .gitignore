@@ -8,5 +8,5 @@ build/
 .externalNativeBuild
 .cxx
 #iosApp/iosApp.xcworkspace/*
-iosApp/iosApp.xcodeproj/*
+#iosApp/iosApp.xcodeproj/*
 !iosApp/iosApp.xcodeproj/project.pbxproj
