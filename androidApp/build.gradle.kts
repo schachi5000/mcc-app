@@ -25,8 +25,8 @@ android {
         applicationId = "net.schacher.mcc"
         minSdk = (findProperty("android.minSdk") as String).toInt()
         targetSdk = (findProperty("android.targetSdk") as String).toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 3
+        versionName = "1.0-alpha"
     }
 
     buildTypes {
@@ -42,10 +42,10 @@ android {
 
     signingConfigs {
         create("release") {
-            //  keyAlias = ""
-            //  keyPassword = ""
-            //  storeFile = file("../androidApp/src/androidMain/signing/release.keystore")
-            //  storePassword = ""
+            storeFile = file("../androidApp/src/androidMain/signing/release.keystore")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+            storePassword = System.getenv("STORE_PASSWORD")
         }
     }
 
