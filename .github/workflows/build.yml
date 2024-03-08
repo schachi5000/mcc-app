@@ -24,7 +24,7 @@ jobs:
       - name: Build Android
         run: ./gradlew androidApp:assembleDebug
   build_ios:
-    runs-on: macos-14
+    runs-on: macos-latest
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
