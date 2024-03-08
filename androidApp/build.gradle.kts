@@ -25,8 +25,8 @@ android {
         applicationId = "net.schacher.mcc"
         minSdk = (findProperty("android.minSdk") as String).toInt()
         targetSdk = (findProperty("android.targetSdk") as String).toInt()
-        versionCode = 1
-        versionName = "1.0"
+        versionCode = 2
+        versionName = "1.0-pre-alpha"
     }
 
     buildTypes {
