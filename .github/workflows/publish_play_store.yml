@@ -1,5 +1,5 @@
 name:
-  Build
+  Publish to Google Play Store
 
 on:
   push:
