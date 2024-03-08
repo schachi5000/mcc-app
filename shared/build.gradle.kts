@@ -6,7 +6,6 @@ plugins {
     id("com.android.library")
     id("org.jetbrains.compose")
     alias(libs.plugins.sqldelight)
-    alias(libs.plugins.kotlinNativeCocoapods)
 }
 
 kotlin {
