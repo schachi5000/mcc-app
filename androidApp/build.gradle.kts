@@ -42,10 +42,10 @@ android {
 
     signingConfigs {
         create("release") {
-            //  keyAlias = ""
-            //  keyPassword = ""
-            //  storeFile = file("../androidApp/src/androidMain/signing/release.keystore")
-            //  storePassword = ""
+            storeFile = file("../androidApp/src/androidMain/signing/release.keystore")
+            keyAlias = System.getenv("KEY_ALIAS")
+            keyPassword = System.getenv("KEY_PASSWORD")
+            storePassword = System.getenv("STORE_PASSWORD")
         }
     }
 
