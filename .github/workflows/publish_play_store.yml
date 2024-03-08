@@ -4,7 +4,7 @@ name:
 on:
   push:
     branches:
-      - play-store-publish-test
+      - main
 
 concurrency:
   group: ${{ github.ref }}
