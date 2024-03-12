@@ -26,6 +26,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.splash_screen
@@ -50,6 +51,7 @@ fun SplashScreen(preparing: Boolean) {
         Image(
             painter = painterResource(Res.drawable.splash_screen),
             contentDescription = "Splash Screen",
+            contentScale = ContentScale.Crop,
             modifier = Modifier.blur(5.dp)
         )
 
