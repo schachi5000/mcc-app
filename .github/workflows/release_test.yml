@@ -27,7 +27,6 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
       - name: Create Version
-        id: date
         run: echo "$(date "+%Y%m%d").${{ github.run_number }}" >> $VERSION_NAME
       - name: Print Version
         run: |
