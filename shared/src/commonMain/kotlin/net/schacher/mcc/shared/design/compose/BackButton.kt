@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.design.compose
 
-import IS_ANDROID
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
@@ -15,6 +14,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.platform.isAndroid
 
 @Composable
 fun BoxScope.BackButton(onClick: () -> Unit) {
@@ -23,7 +23,7 @@ fun BoxScope.BackButton(onClick: () -> Unit) {
         modifier = Modifier.align(Alignment.BottomStart).navigationBarsPadding()
             .padding(
                 start = 16.dp,
-                bottom = if (IS_ANDROID) 16.dp else 0.dp
+                bottom = if (isAndroid()) 16.dp else 0.dp
             )
             .size(48.dp),
         contentColor = MaterialTheme.colors.onPrimary,

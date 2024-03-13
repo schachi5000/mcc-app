@@ -7,6 +7,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.SettingsDao
+import net.schacher.mcc.shared.platform.PlatformInfo
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
@@ -15,16 +16,18 @@ class SettingsViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
-    private val settingsDao: SettingsDao
+    settingsDao: SettingsDao,
+    platformInfo: PlatformInfo
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
-        SettingsUiState(
+        UiState(
             cardCount = cardRepository.cards.value.size,
             deckCount = deckRepository.decks.value.size,
             packCount = packRepository.packs.value.size,
             packsInCollectionCount = packRepository.packsInCollection.value.size,
-            settingsValues = settingsDao.getAllEntries()
+            settingsValues = settingsDao.getAllEntries(),
+            versionName = platformInfo.version
         )
     )
 
@@ -115,13 +118,15 @@ class SettingsViewModel(
             _state.update { it.copy(syncInProgress = false) }
         }
     }
+
+    data class UiState(
+        val cardCount: Int,
+        val deckCount: Int,
+        val packCount: Int,
+        val packsInCollectionCount: Int,
+        val syncInProgress: Boolean = false,
+        val settingsValues: List<Pair<String, Any>> = emptyList(),
+        val versionName: String
+    )
 }
 
-data class SettingsUiState(
-    val cardCount: Int,
-    val deckCount: Int,
-    val packCount: Int,
-    val packsInCollectionCount: Int,
-    val syncInProgress: Boolean = false,
-    val settingsValues: List<Pair<String, Any>> = emptyList()
-)

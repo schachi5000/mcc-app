@@ -26,13 +26,13 @@ android {
         minSdk = (findProperty("android.minSdk") as String).toInt()
         targetSdk = (findProperty("android.targetSdk") as String).toInt()
         versionCode = 4
-        versionName = "1.0.1-alpha"
+        versionName = "1.0.0-alpha"
     }
 
     buildTypes {
         getByName("debug") {
             isMinifyEnabled = false
-            versionNameSuffix = "-debug"
+            versionNameSuffix = " (debug)"
             applicationIdSuffix = ".debug"
         }
         getByName("release") {
