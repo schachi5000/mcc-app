@@ -5,7 +5,6 @@ on:
   push:
     branches:
       - main
-      - 31-*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -40,13 +39,13 @@ jobs:
           versionName: ${{ env.VERSION_NAME }}
       - name: Build bundle
         run: ./gradlew androidApp:bundleRelease
-      #      - name: Upload to Google Play
-      #        uses: r0adkll/upload-google-play@v1
-      #        with:
-      #          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-      #          packageName: net.schacher.mcc
-      #          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
-      #          track: internal
+      - name: Upload to Google Play
+        uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+          packageName: net.schacher.mcc
+          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
+          track: internal
       - name: Create tag
         env:
           CI_COMMIT_MESSAGE: ":bookmark: Created release tag"
