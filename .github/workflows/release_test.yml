@@ -27,19 +27,19 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
       - name: Create Version
-        run: echo "$(date "+%Y%m%d").${{ github.run_number }}" >> $VERSION_NAME
+        run: echo "$VERSION_NAME=$(date "+%Y%m%d").${{ github.run_number }}" >> $GITHUB_ENV
       - name: Print Version
         run: |
           data=$(date "+%Y%m%d")
           echo "Version: ${data}.${{ github.run_number }} "
           echo "Version: $(date "+%Y%m%d").${{ github.run_number }} "
-          echo $VERSION_NAME
+          echo ${{ env.$VERSION_NAME }}
       - name: Apply version
         uses: chkfung/android-version-actions@v1.2.2
         with:
           gradlePath: androidApp/build.gradle.kts
           versionCode: ${{github.run_number}}
-          versionName: $VERSION_NAME
+          versionName: ${{ env.$VERSION_NAME }}
       - name: Print Build Gradle
         run: |
           cat androidApp/build.gradle.kts
