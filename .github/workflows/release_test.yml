@@ -37,8 +37,6 @@ jobs:
           echo $VERSION_NAME
       - name: Apply version
         uses: chkfung/android-version-actions@v1.2.2
-        env:
-          VERSION_NAME: "Version: $(date "+%Y%m%d").${{ github.run_number }} "
         with:
           gradlePath: androidApp/build.gradle.kts
           versionCode: ${{github.run_number}}
