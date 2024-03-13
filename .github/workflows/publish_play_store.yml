@@ -43,8 +43,6 @@ jobs:
           gradlePath: androidApp/build.gradle.kts
           versionCode: ${{ steps.buildnumber.outputs.build_number }}
           versionName: ${{ env.VERSION_NAME }}
-      - name: Fail
-        run: exit 1
       - name: Build bundle
         run: ./gradlew androidApp:bundleRelease
       - name: Upload to Google Play

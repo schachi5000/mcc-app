@@ -5,7 +5,6 @@ on:
   push:
     branches-ignore:
       - main
-      - 33-*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
