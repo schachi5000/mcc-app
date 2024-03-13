@@ -42,8 +42,8 @@ jobs:
           gradlePath: androidApp/build.gradle.kts
           versionCode: ${{github.run_number}}
           versionName: ${{ env.VERSION_NAME }}
-      - name: Build Bundle
-        run: ./gradlew androidApp:bundleRelease
+      #      - name: Build Bundle
+      #        run: ./gradlew androidApp:bundleRelease
       #      - name: Upload to Google Play
       #        uses: r0adkll/upload-google-play@v1
       #        with:
