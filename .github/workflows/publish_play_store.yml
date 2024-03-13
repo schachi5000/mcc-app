@@ -11,6 +11,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+permissions:
+  contents: write
+
 jobs:
   publish_to_play_store:
     runs-on: ubuntu-latest
@@ -49,8 +52,8 @@ jobs:
       #          track: internal
       - name: Create tag
         run: |
-          git config --global user.name "foobar joe"
-          git config --global user.email "foobar@joe.com"
+          git config user.name github-actions
+          git config user.email github-actions@github.com
           git tag -a ${{ env.VERSION_NAME }} -m "Creating tag ${{ env.VERSION_NAME }}"
           git push origin ${{ env.VERSION_NAME }}
       - name: Build Changelog
