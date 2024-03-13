@@ -28,5 +28,6 @@ jobs:
           java-version: '17'
       - name: Print Version
         run: |
-          date "+%Y%m%d" 
-          echo "Version: ${{ github.run_number }}"
+          data=$(date "+%Y%m%d")
+          echo "Version: ${data}.${{ github.run_number }} "
+          echo "Version: $(date "+%Y%m%d").${{ github.run_number }} "
