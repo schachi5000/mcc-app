@@ -49,6 +49,8 @@ jobs:
       #          track: internal
       - name: Create tag
         run: |
+          git config --global user.name "foobar joe"
+          git config --global user.email "foobar@joe.com"
           git tag -a ${{ env.VERSION_NAME }} -m "Creating tag ${{ env.VERSION_NAME }}"
           git push origin ${{ env.VERSION_NAME }}
       - name: Build Changelog
