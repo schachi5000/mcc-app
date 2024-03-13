@@ -65,9 +65,9 @@ jobs:
       - name: Create Release
         uses: softprops/action-gh-release@v2.0.2
         with:
+          token: ${{ secrets.PAT }}
           name: ${{ env.VERSION_NAME }}
           tag_name: ${{ env.VERSION_NAME }}
-          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
             androidApp-release.aab
 #          body: ${{ steps.github_release.outputs.changelog }}
