@@ -11,12 +11,11 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
-permissions: write-all
-
 jobs:
   publish_to_play_store:
     runs-on: ubuntu-latest
     permissions:
+      contents: write
       actions: write
     env:
       KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
@@ -40,8 +39,8 @@ jobs:
           gradlePath: androidApp/build.gradle.kts
           versionCode: ${{ github.run_number }}
           versionName: ${{ env.VERSION_NAME }}
-      - name: Build bundle
-        run: ./gradlew androidApp:bundleRelease
+      #      - name: Build bundle
+      #        run: ./gradlew androidApp:bundleRelease
       #      - name: Upload to Google Play
       #        uses: r0adkll/upload-google-play@v1
       #        with:
