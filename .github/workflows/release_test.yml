@@ -26,12 +26,18 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '17'
-      - name: Bump version
+      - name: Print Version
+        run: |
+          data=$(date "+%Y%m%d")
+          echo "Version: ${data}.${{ github.run_number }} "
+          echo "Version: $(date "+%Y%m%d").${{ github.run_number }} "
+      - name: Apply version
         uses: chkfung/android-version-actions@v1.2.2
         with:
           gradlePath: androidApp/build.gradle.kts
           versionCode: ${{github.run_number}}
-          versionName: "${(date "+%Y%m%d")}.${{ github.run_number }}"
+          versionName: "Version: $(date "+%Y%m%d").${{ github.run_number }} "
       - name: Print Build Gradle
         run: |
           cat androidApp/build.gradle.kts
+      
