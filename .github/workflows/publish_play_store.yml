@@ -53,9 +53,9 @@ jobs:
       #          track: internal
       - name: Create tag
         run: |
-          git config user.name "github-actions"
-          git config user.email "github-actions@github.com"
-          git tag -a ${{ env.VERSION_NAME }} -m "Creating tag ${{ env.VERSION_NAME }}"
+          git config --global user.name "github-actions"
+          git config --global user.email "github-actions@github.com"
+          git tag -a ${{ env.VERSION_NAME }}
           git push origin --tags
       - name: Build Changelog
         id: github_release
@@ -68,6 +68,6 @@ jobs:
           token: ${{ secrets.PAT }}
           name: ${{ env.VERSION_NAME }}
           tag_name: ${{ env.VERSION_NAME }}
+          body: ${{ steps.build_changelog.outputs.changelog }}
           files: |
             androidApp/build/outputs/bundle/release/androidApp-release.aab
-#          body: ${{ steps.github_release.outputs.changelog }}
