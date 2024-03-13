@@ -27,7 +27,7 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
       - name: Create Version
-        run: echo "VERSION_NAME=$(date "+%Y%m%d").${{ github.run_number }}.${{ github.sha }:5}" >> $GITHUB_ENV
+        run: echo "VERSION_NAME=$(date "+%Y%m%d").${{ github.run_number }}.${{ github.sha }:0:5}" >> $GITHUB_ENV
       - name: Apply version
         uses: chkfung/android-version-actions@v1.2.2
         with:
