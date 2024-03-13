@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - 33-*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,16 +28,23 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '17'
+      - name: Generate build number
+        id: buildnumber
+        uses: onyxmueller/build-tag-number@v1
+        with:
+          token: ${{secrets.GITHUB_TOKEN}}
       - name: Create short SHA
         run: echo "SHA_SHORT=`echo ${GITHUB_SHA} | cut -c1-5`" >> $GITHUB_ENV
       - name: Assemble version name
-        run: echo "VERSION_NAME=$(date "+%y%m%d").${{ github.run_number }}.${{ env.SHA_SHORT }}" >> $GITHUB_ENV
+        run: echo "VERSION_NAME=$(date "+%y%m%d").${{ steps.buildnumber.outputs.build_number }} (${{ env.SHA_SHORT }})" >> $GITHUB_ENV
       - name: Apply version properties to build.gradle
         uses: chkfung/android-version-actions@v1.2.2
         with:
           gradlePath: androidApp/build.gradle.kts
-          versionCode: ${{ github.run_number }}
+          versionCode: ${{ steps.buildnumber.outputs.build_number }}
           versionName: ${{ env.VERSION_NAME }}
+      - name: Fail
+        run: exit 1
       - name: Build bundle
         run: ./gradlew androidApp:bundleRelease
       - name: Upload to Google Play
