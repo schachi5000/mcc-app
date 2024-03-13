@@ -1,5 +1,5 @@
 name:
-  Publish to Google Play Store
+  Release test
 
 on:
   push:
