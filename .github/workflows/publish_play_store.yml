@@ -56,14 +56,16 @@ jobs:
           git config user.name "github-actions"
           git config user.email "github-actions@github.com"
           git tag -a "v${{ env.VERSION_NAME }}" -m "Creating tag ${{ env.VERSION_NAME }}"
-          git push origin ${{ env.VERSION_NAME }}
+          git push origin --tags
       - name: Build Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
       - name: Create Release
-        uses: mikepenz/action-gh-release@v0.2.0-a03 #softprops/action-gh-release
+        uses: softprops/action-gh-release@v2.0.2
         with:
           name: ${{ env.VERSION_NAME }}
+          files: |
+            androidApp/build/outputs/bundle/release/androidApp-release.aab
 #          body: ${{ steps.github_release.outputs.changelog }}
