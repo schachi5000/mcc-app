@@ -36,13 +36,13 @@ jobs:
         run: echo "SHA_SHORT=`echo ${GITHUB_SHA} | cut -c1-5`" >> $GITHUB_ENV
       - name: Assemble version name
         run: echo "VERSION_NAME=$(date "+%y%m%d").${{ github.run_number }}.${{ env.SHA_SHORT }}" >> $GITHUB_ENV
-      - name: Apply version
+      - name: Apply version properties to build.gradle
         uses: chkfung/android-version-actions@v1.2.2
         with:
           gradlePath: androidApp/build.gradle.kts
           versionCode: ${{ github.run_number }}
           versionName: ${{ env.VERSION_NAME }}
-      - name: Build Bundle
+      - name: Build bundle
         run: ./gradlew androidApp:bundleRelease
       #      - name: Upload to Google Play
       #        uses: r0adkll/upload-google-play@v1
@@ -52,17 +52,21 @@ jobs:
       #          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
       #          track: internal
       - name: Create tag
+        env:
+          CI_COMMIT_MESSAGE: ":bookmark: Created release tag"
+          CI_COMMIT_AUTHOR: github-action
+          CI_COMMIT_EMAIL: github-actions@schacher.pro
         run: |
-          git config --global user.name "github-actions"
-          git config --global user.email "github-actions@github.com"
+          git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
+          git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
           git tag -a ${{ env.VERSION_NAME }}
           git push origin --tags
-      - name: Build Changelog
+      - name: Build changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create Release
+      - name: Create release
         uses: softprops/action-gh-release@v2.0.2
         with:
           token: ${{ secrets.PAT }}
