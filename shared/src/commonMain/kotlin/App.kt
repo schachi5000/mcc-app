@@ -19,8 +19,12 @@ import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsViewModel
 import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
 import org.koin.compose.KoinApplication
+import org.koin.core.KoinApplication
+import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+
+internal expect val platformModule: Module
 
 val network = module {
     singleOf<MarvelCDbDataSource>(::KtorMarvelCDbDataSource)
@@ -43,20 +47,26 @@ val viewModels = module {
 }
 
 @Composable
-fun App(databaseDao: DatabaseDao) {
-    KoinApplication(application = {
-        modules(
-            module {
-                single<CardDatabaseDao> { databaseDao }
-                single<DeckDatabaseDao> { databaseDao }
-                single<PackDatabaseDao> { databaseDao }
-                single<SettingsDao> { databaseDao }
-            },
-            network,
-            repositories,
-            viewModels
-        )
-    }) {
+fun App(
+    databaseDao: DatabaseDao,
+    onKoinStart: KoinApplication.() -> Unit = {}
+) {
+    KoinApplication(
+        application = {
+            onKoinStart()
+            modules(
+                platformModule,
+                module {
+                    single<CardDatabaseDao> { databaseDao }
+                    single<DeckDatabaseDao> { databaseDao }
+                    single<PackDatabaseDao> { databaseDao }
+                    single<SettingsDao> { databaseDao }
+                },
+                network,
+                repositories,
+                viewModels
+            )
+        }) {
         MccTheme {
             MainScreen()
         }
@@ -68,6 +78,11 @@ enum class Platform {
 }
 
 expect val platform: Platform
+
+interface PlatformInfo {
+    val platform: Platform
+    val version: String
+}
 
 val IS_IOS: Boolean
     get() = platform == Platform.IOS
