@@ -47,12 +47,10 @@ jobs:
       #          packageName: net.schacher.mcc
       #          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
       #          track: internal
-      - uses: rickstaa/action-create-tag@v1
-
-        id: "tag_create"
-        with:
-          tag: ${{ env.VERSION_NAME }}
-          tag_exists_error: true
+      - name: Create tag
+        run: |
+          git tag -a ${{ env.VERSION_NAME }} -m "Creating tag ${{ env.VERSION_NAME }}"
+          git push origin ${{ env.VERSION_NAME }}
       - name: Build Changelog
         id: github_release
         uses: mikepenz/release-changelog-builder-action@v4
