@@ -40,7 +40,7 @@ jobs:
         uses: chkfung/android-version-actions@v1.2.2
         with:
           gradlePath: androidApp/build.gradle.kts
-          versionCode: ${{github.run_number}}
+          versionCode: ${{ github.run_number }}
           versionName: ${{ env.VERSION_NAME }}
       #      - name: Build Bundle
       #        run: ./gradlew androidApp:bundleRelease
@@ -67,6 +67,7 @@ jobs:
         with:
           name: ${{ env.VERSION_NAME }}
           tag_name: ${{ env.VERSION_NAME }}
+          token: ${{ secrets.GITHUB_TOKEN }}
           files: |
-            androidApp/build/outputs/bundle/release/androidApp-release.aab
+            androidApp-release.aab
 #          body: ${{ steps.github_release.outputs.changelog }}
