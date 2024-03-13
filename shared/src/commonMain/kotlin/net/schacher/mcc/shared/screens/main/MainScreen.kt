@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.screens.main
 
-import IS_IOS
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
@@ -55,6 +54,7 @@ import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
 import net.schacher.mcc.shared.design.compose.blurByBottomSheet
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.platform.isIOs
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DatabaseSynced
@@ -238,7 +238,7 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         elevation = 0.dp,
         backgroundColor = MaterialTheme.colors.surface,
     ) {
-        Row(Modifier.fillMaxWidth().padding(bottom = if (IS_IOS) 16.dp else 0.dp)) {
+        Row(Modifier.fillMaxWidth().padding(bottom = if (isIOs()) 16.dp else 0.dp)) {
             DefaultBottomNavigationItem(
                 label = stringResource(Res.string.decks),
                 icon = Res.drawable.ic_deck,

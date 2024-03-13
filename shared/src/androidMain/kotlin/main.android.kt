@@ -2,10 +2,12 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.platform.LocalContext
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
 import net.schacher.mcc.shared.datasource.database.DatabaseDriverFactory
-
-actual val platform: Platform = Platform.ANDROID
+import org.koin.android.ext.koin.androidContext
 
 @Composable
 fun MainView() {
-    App(DatabaseDao(DatabaseDriverFactory(LocalContext.current)))
+    val context = LocalContext.current
+    App(DatabaseDao(DatabaseDriverFactory(LocalContext.current))) {
+        androidContext(context)
+    }
 }
