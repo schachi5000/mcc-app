@@ -27,7 +27,7 @@ jobs:
           distribution: 'corretto'
           java-version: '17'
       - name: Create Version
-        run: echo "$VERSION_NAME=$(date "+%Y%m%d").${{ github.run_number }}" >> $GITHUB_ENV
+        run: echo "VERSION_NAME=$(date "+%Y%m%d").${{ github.run_number }}" >> $GITHUB_ENV
       - name: Print Version
         run: |
           data=$(date "+%Y%m%d")
