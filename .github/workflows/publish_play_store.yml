@@ -36,12 +36,23 @@ jobs:
           gradlePath: androidApp/build.gradle.kts
           versionCode: ${{github.run_number}}
           versionName: ${{ env.VERSION_NAME }}
-      - name: Build Bundle
-        run: ./gradlew androidApp:bundleRelease
-#      - name: Upload to Google Play
-#        uses: r0adkll/upload-google-play@v1
-#        with:
-#          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-#          packageName: net.schacher.mcc
-#          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
-#          track: internal
+      #      - name: Build Bundle
+      #        run: ./gradlew androidApp:bundleRelease
+      #      - name: Upload to Google Play
+      #        uses: r0adkll/upload-google-play@v1
+      #        with:
+      #          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+      #          packageName: net.schacher.mcc
+      #          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
+      #          track: internal
+      - name: Build Changelog
+        id: github_release
+        uses: mikepenz/release-changelog-builder-action@v4
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Create Release
+        uses: mikepenz/action-gh-release@v0.2.0-a03 #softprops/action-gh-release
+        with:
+          name: ${{ env.VERSION_NAME }}
+          body: ${{ steps.github_release.outputs.changelog }}
