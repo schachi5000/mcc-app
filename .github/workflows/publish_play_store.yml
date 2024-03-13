@@ -14,6 +14,8 @@ concurrency:
 jobs:
   publish_to_play_store:
     runs-on: ubuntu-latest
+    permissions:
+      actions: write
     env:
       KEY_ALIAS: ${{ secrets.KEY_ALIAS }}
       KEY_PASSWORD: ${{ secrets.KEY_PASSWORD }}
@@ -46,6 +48,7 @@ jobs:
       #          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
       #          track: internal
       - uses: rickstaa/action-create-tag@v1
+
         id: "tag_create"
         with:
           tag: ${{ env.VERSION_NAME }}
