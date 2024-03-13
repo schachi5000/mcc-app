@@ -59,7 +59,7 @@ jobs:
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
-          git tag -a ${{ env.VERSION_NAME }}
+          git tag -a ${{ env.VERSION_NAME }} -m "${{ env.CI_COMMIT_MESSAGE }}"
           git push origin --tags
       - name: Build changelog
         id: github_release
