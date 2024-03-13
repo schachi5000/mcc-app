@@ -34,8 +34,10 @@ jobs:
           token: ${{secrets.GITHUB_TOKEN}}
       - name: Create short SHA
         run: echo "SHA_SHORT=`echo ${GITHUB_SHA} | cut -c1-5`" >> $GITHUB_ENV
-      - name: Assemble version name
-        run: echo "VERSION_NAME=$(date "+%y%m%d").${{ steps.buildnumber.outputs.build_number }} (${{ env.SHA_SHORT }})" >> $GITHUB_ENV
+      - name: Create release name
+        run: echo "RELEASE_NAME=$(date "+%y%m%d").${{ steps.buildnumber.outputs.build_number }}" >> $GITHUB_ENV
+      - name: Create version name
+        run: echo "VERSION_NAME=${{ env.RELEASE_NAME }} (${{ env.SHA_SHORT }})" >> $GITHUB_ENV
       - name: Apply version properties to build.gradle
         uses: chkfung/android-version-actions@v1.2.2
         with:
@@ -53,13 +55,13 @@ jobs:
           track: internal
       - name: Create tag
         env:
-          CI_COMMIT_MESSAGE: ":bookmark: Created release tag"
+          CI_COMMIT_MESSAGE: "Created release tag"
           CI_COMMIT_AUTHOR: github-action
           CI_COMMIT_EMAIL: github-actions@schacher.pro
         run: |
           git config --global user.name "${{ env.CI_COMMIT_AUTHOR }}"
           git config --global user.email "${{ env.CI_COMMIT_EMAIL }}"
-          git tag -a ${{ env.VERSION_NAME }} -m "${{ env.CI_COMMIT_MESSAGE }}"
+          git tag -a "${{ env.RELEASE_NAME }}" -m "${{ env.CI_COMMIT_MESSAGE }}"
           git push origin --tags
       - name: Build changelog
         id: github_release
@@ -70,8 +72,8 @@ jobs:
         uses: softprops/action-gh-release@v2.0.2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ env.VERSION_NAME }}
-          tag_name: ${{ env.VERSION_NAME }}
+          name: ${{ env.RELEASE_NAME }}
+          tag_name: ${{ env.RELEASE_NAME }}
           body: ${{ steps.build_changelog.outputs.changelog }}
           files: |
             androidApp/build/outputs/bundle/release/androidApp-release.aab
