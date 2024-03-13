@@ -7,6 +7,7 @@ import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.datasource.http.KtorMarvelCDbDataSource
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.design.theme.MccTheme
+import net.schacher.mcc.shared.platform.platformModule
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
@@ -20,11 +21,8 @@ import net.schacher.mcc.shared.screens.settings.SettingsViewModel
 import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
-import org.koin.core.module.Module
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
-
-internal expect val platformModule: Module
 
 val network = module {
     singleOf<MarvelCDbDataSource>(::KtorMarvelCDbDataSource)
@@ -72,20 +70,3 @@ fun App(
         }
     }
 }
-
-enum class Platform {
-    ANDROID, IOS;
-}
-
-expect val platform: Platform
-
-interface PlatformInfo {
-    val platform: Platform
-    val version: String
-}
-
-val IS_IOS: Boolean
-    get() = platform == Platform.IOS
-
-val IS_ANDROID: Boolean
-    get() = platform == Platform.ANDROID

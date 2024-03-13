@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.screens.deck
 
-import IS_ANDROID
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -55,6 +54,7 @@ import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.platform.isAndroid
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
@@ -186,7 +186,7 @@ private fun Content(
             modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding()
                 .padding(
                     end = 16.dp,
-                    bottom = if (IS_ANDROID) 16.dp else 0.dp
+                    bottom = if (isAndroid()) 16.dp else 0.dp
                 )
                 .size(48.dp),
             contentColor = MaterialTheme.colors.onPrimary,
