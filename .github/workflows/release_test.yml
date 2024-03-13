@@ -26,8 +26,10 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '17'
-      - name: Create Version
-        run: echo "VERSION_NAME=$(date "+%Y%m%d").${{ github.run_number }}.${{ github.sha }:0:5}" >> $GITHUB_ENV
+      - name: Create short SHA
+        run: echo "SHORT_SHA=`echo ${GITHUB_SHA} | cut -c1-8`" >> $GITHUB_ENV
+      - name: Assemble version name
+        run: echo "VERSION_NAME=$(date "+%Y%m%d").${{ github.run_number }}.$SHORT_SHA" >> $GITHUB_ENV
       - name: Apply version
         uses: chkfung/android-version-actions@v1.2.2
         with:
