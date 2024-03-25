@@ -17,6 +17,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.AccountCircle
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Refresh
@@ -29,8 +30,10 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.database
 import marvelchampionscompanion.shared.generated.resources.ic_cards
@@ -41,12 +44,12 @@ import net.schacher.mcc.shared.design.compose.OptionsGroup
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import pro.schacher.mcc.BuildConfig
 
 @ExperimentalResourceApi
 @Composable
 fun SettingsScreen(
-    settingsViewModel: SettingsViewModel = koinInject(),
-    onPackSelectionClick: () -> Unit
+    settingsViewModel: SettingsViewModel = koinInject(), onPackSelectionClick: () -> Unit
 ) {
     val state by settingsViewModel.state.collectAsState()
     var deleteDatabaseDialog by remember { mutableStateOf(false) }
@@ -55,21 +58,18 @@ fun SettingsScreen(
     val angle by infiniteTransition.animateFloat(
         initialValue = 0f,
         targetValue = 360f,
-        animationSpec = infiniteRepeatable(
-            animation = keyframes {
-                durationMillis = 1000
-            }
-        )
+        animationSpec = infiniteRepeatable(animation = keyframes {
+            durationMillis = 1000
+        })
     )
 
     Column(
-        modifier = Modifier.fillMaxSize()
-            .statusBarsPadding()
-            .padding(16.dp),
+        modifier = Modifier.fillMaxSize().statusBarsPadding().padding(16.dp),
         verticalArrangement = Arrangement.Top,
     ) {
         OptionsGroup(stringResource(Res.string.database)) {
-            OptionsEntry(label = "Sync with MarvelCDB",
+            OptionsEntry(
+                label = "Sync with MarvelCDB",
                 imageVector = Icons.Rounded.Refresh,
                 onClick = {
                     settingsViewModel.onSyncClick()
@@ -85,43 +85,40 @@ fun SettingsScreen(
 
         OptionsGroup("Einträge") {
             AnimatedVisibility(state.syncInProgress) {
-                OptionsEntry(
-                    label = "Aktualisieren Datenbank",
-                    icon = {
-                        Icon(
-                            imageVector = Icons.Rounded.Refresh,
-                            contentDescription = "",
-                            modifier = Modifier
-                                .padding(end = 16.dp)
-                                .rotate(angle)
-                                .size(18.dp)
-                        )
-                    }
-                )
+                OptionsEntry(label = "Aktualisieren Datenbank", icon = {
+                    Icon(
+                        imageVector = Icons.Rounded.Refresh,
+                        contentDescription = "",
+                        modifier = Modifier.padding(end = 16.dp).rotate(angle).size(18.dp)
+                    )
+                })
             }
 
             OptionsEntry(
-                label = "${state.cardCount} Karten",
-                iconResource = Res.drawable.ic_cards
+                label = "${state.cardCount} Karten", iconResource = Res.drawable.ic_cards
             )
 
             OptionsEntry(
-                label = "${state.deckCount} Decks",
-                iconResource = Res.drawable.ic_deck
+                label = "${state.deckCount} Decks", iconResource = Res.drawable.ic_deck
             )
 
-            OptionsEntry(
-                label = "${state.packsInCollectionCount} of ${state.packCount} Packs",
+            OptionsEntry(label = "${state.packsInCollectionCount} of ${state.packCount} Packs",
                 iconResource = Res.drawable.ic_deck,
-                onClick = { onPackSelectionClick() }
-            )
+                onClick = { onPackSelectionClick() })
         }
 
         Spacer(Modifier.size(16.dp))
 
+        val uriHandler = LocalUriHandler.current
         OptionsGroup("Debug") {
             OptionsEntry(
-                label = "Import My Public Decks",
+                label = "Login to MarvelCDB",
+                imageVector = Icons.Rounded.AccountCircle,
+                onClick = {
+                    Logger.i("Open OAuth URL: ${BuildConfig.OAUTH_URL}")
+                    uriHandler.openUri(BuildConfig.OAUTH_URL)
+                })
+            OptionsEntry(label = "Import My Public Decks",
                 imageVector = Icons.Rounded.Add,
                 onClick = {
                     settingsViewModel.addPublicDecksById(
@@ -140,16 +137,13 @@ fun SettingsScreen(
                             "511045"
                         )
                     )
-                }
-            )
+                })
         }
 
         Spacer(Modifier.size(16.dp))
 
         Text(
-            modifier = Modifier.padding(16.dp)
-                .fillMaxWidth()
-                .alpha(0.5f),
+            modifier = Modifier.padding(16.dp).fillMaxWidth().alpha(0.5f),
             textAlign = TextAlign.Center,
             color = MaterialTheme.colors.onBackground,
             text = state.versionName
@@ -157,14 +151,12 @@ fun SettingsScreen(
     }
 
     if (deleteDatabaseDialog) {
-        ConfirmationDialog(
-            title = "Datenbank löschen",
+        ConfirmationDialog(title = "Datenbank löschen",
             message = "Möchtest du wirklich alle Einträge löschen?",
             onDismiss = { deleteDatabaseDialog = false },
             onConfirm = {
                 settingsViewModel.onWipeDatabaseClick()
                 deleteDatabaseDialog = false
-            }
-        )
+            })
     }
 }

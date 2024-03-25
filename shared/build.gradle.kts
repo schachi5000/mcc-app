@@ -24,8 +24,34 @@ kotlin {
 
     val composeVersion = extra["compose.version"] as String
 
+    //Generating BuildConfig for multiplatform
+    val buildConfigGenerator by tasks.registering(Sync::class) {
+        println("Generating BuildConfig for multiplatform")
+        val packageName = "pro.schacher.mcc"
+        from(
+            resources.text.fromString(
+                """
+        |package $packageName
+        |
+        |object BuildConfig {
+        |  const val OAUTH_URL = "${System.getenv("MCC_OAUTH_URL")}"
+        |}
+        |
+      """.trimMargin()
+            )
+        )
+        {
+            rename { "BuildConfig.kt" } // set the file name
+            into(packageName) // change the directory to match the package
+        }
+        into(layout.buildDirectory.dir("generated/kotlin/"))
+    }
+
     sourceSets {
         val commonMain by getting {
+            kotlin.srcDir(
+                // convert the task to a file-provider
+                buildConfigGenerator.map { it.destinationDir })
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
