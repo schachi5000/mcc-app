@@ -2,6 +2,7 @@ package net.schacher.mcc
 
 import MainView
 import android.os.Bundle
+import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
@@ -14,6 +15,15 @@ class MainActivity : AppCompatActivity() {
         setContent {
             MainView()
         }
+    }
+
+    override fun onResume() {
+        super.onResume()
+
+        Log.d(
+            "MainActivity",
+            "onNewIntent: ${intent.data}"
+        )
     }
 }
 
