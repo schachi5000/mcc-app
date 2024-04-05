@@ -74,7 +74,7 @@ class DeckRepository(
     }
 
     suspend fun addDeckById(deckId: Int) {
-        val deck = marvelCDbDataSource.getPublicDeckById(deckId) {
+        val deck = marvelCDbDataSource.getDeckById(deckId) {
             this.cardRepository.getCard(it)
         }
 

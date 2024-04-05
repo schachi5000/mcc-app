@@ -6,7 +6,7 @@ struct iOSApp: App {
 	var body: some Scene {
 		WindowGroup {
             ContentView().onOpenURL(perform: { url in
-                TestClass.shared.test(text: url.absoluteString)
+                AuthHandler.shared.handleCallbackUrl(callbackUrl: url.absoluteString)
             })
         }
 	}

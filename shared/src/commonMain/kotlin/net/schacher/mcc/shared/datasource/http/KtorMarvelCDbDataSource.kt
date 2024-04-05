@@ -7,6 +7,7 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
+import io.ktor.client.request.headers
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
 import kotlinx.coroutines.CoroutineScope
@@ -15,6 +16,7 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.datasource.http.dto.CardDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
 import net.schacher.mcc.shared.datasource.http.dto.PackDto
@@ -115,8 +117,15 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
             }
     }
 
-    override suspend fun getPublicDeckById(deckId: Int, cardProvider: suspend (String) -> Card) =
-        httpClient.get("$serviceUrl/deck/$deckId").body<DeckDto>().let {
+    override suspend fun getDeckById(deckId: Int, cardProvider: suspend (String) -> Card) =
+        httpClient.get("$serviceUrl/deck/$deckId") {
+            headers {
+                append(
+                    "Bearer",
+                    AuthHandler.accessToken?.token ?: throw Exception("No token found")
+                )
+            }
+        }.body<DeckDto>().let {
             val heroCard = cardProvider(it.investigator_code!!)
 
             Deck(id = it.id,
