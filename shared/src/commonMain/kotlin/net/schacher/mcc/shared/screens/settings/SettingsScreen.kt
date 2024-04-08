@@ -121,22 +121,7 @@ fun SettingsScreen(
             OptionsEntry(label = "Import My Public Decks",
                 imageVector = Icons.Rounded.Add,
                 onClick = {
-                    settingsViewModel.addPublicDecksById(
-                        listOf(
-                            "511044",
-                            "533658",
-                            "533636",
-                            "511177",
-                            "519524",
-                            "511180",
-                            "511046",
-                            "516826",
-                            "516215",
-                            "516215",
-                            "516216",
-                            "511045"
-                        )
-                    )
+                    settingsViewModel.addPublicDecksById(listOf())
                 })
         }
 

@@ -105,14 +105,12 @@ class SettingsViewModel(
         _state.update { it.copy(syncInProgress = false) }
 
         this.viewModelScope.launch {
-            deckId.forEach {
-                deckRepository.addDeckById(it.toInt())
-                _state.update {
-                    it.copy(
-                        cardCount = cardRepository.cards.value.size,
-                        deckCount = deckRepository.decks.value.size,
-                    )
-                }
+            deckRepository.refreshAllUserDecks()
+            _state.update {
+                it.copy(
+                    cardCount = cardRepository.cards.value.size,
+                    deckCount = deckRepository.decks.value.size,
+                )
             }
 
             _state.update { it.copy(syncInProgress = false) }

@@ -8,13 +8,25 @@ import kotlin.time.Duration.Companion.seconds
 
 object AuthHandler {
 
+    val authHeader: String
+        get() = "Bearer ${this.accessToken?.token ?: throw IllegalStateException("No access token available")}"
+
     var accessToken: AccessToken? = null
-        private set
+        private set(value) {
+            field = value
+            Logger.d { "Access token set to $value" }
+        }
 
 
     fun handleCallbackUrl(callbackUrl: String) {
-        Logger.debug { "Handling callback url: $callbackUrl" }
-        this.accessToken = TokenUtils.parseData(callbackUrl)
+        val fixedCallbackUrl = callbackUrl.replace("#", "?")
+        Logger.debug { "Handling callback url: $fixedCallbackUrl" }
+        this.accessToken = try {
+            TokenUtils.parseData(fixedCallbackUrl)
+        } catch (e: Exception) {
+            Logger.e(e) { "Error parsing access token from $fixedCallbackUrl" }
+            null
+        }
     }
 }
 

@@ -43,7 +43,7 @@ import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import kotlin.coroutines.coroutineContext
 
-class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marvelcdb.com/api/public") :
+class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marvelcdb.com/api") :
     MarvelCDbDataSource {
 
     @OptIn(ExperimentalSerializationApi::class)
@@ -65,7 +65,7 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
     }
 
     override suspend fun getAllPacks() =
-        httpClient.get("$serviceUrl/packs").body<List<PackDto>>().map {
+        httpClient.get("$serviceUrl/public/packs").body<List<PackDto>>().map {
             Pack(
                 code = it.code,
                 name = it.name,
@@ -79,7 +79,8 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
         }
 
     override suspend fun getCardPack(packCode: String) =
-        httpClient.get("$serviceUrl/cards/$packCode").body<List<CardDto>>().map { it.toCard() }
+        httpClient.get("$serviceUrl/public/cards/$packCode").body<List<CardDto>>()
+            .map { it.toCard() }
 
     override suspend fun getAllCards() = this.getAllPacks().map {
         CoroutineScope(coroutineContext).async {
@@ -91,12 +92,12 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
     }.awaitAll().flatten()
 
     override suspend fun getCard(cardCode: String) =
-        httpClient.get("$serviceUrl/card/$cardCode").body<CardDto>().toCard()
+        httpClient.get("$serviceUrl/public/card/$cardCode").body<CardDto>().toCard()
 
     override suspend fun getSpotlightDecksByDate(
         date: LocalDate, cardProvider: suspend (String) -> Card
     ) = runCatching {
-        this.httpClient.get("$serviceUrl/decklists/by_date/${date.toDateString()}")
+        this.httpClient.get("$serviceUrl/public/decklists/by_date/${date.toDateString()}")
             .body<List<DeckDto>>().map {
                 Deck(
                     id = it.id,
@@ -117,13 +118,27 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
             }
     }
 
-    override suspend fun getDeckById(deckId: Int, cardProvider: suspend (String) -> Card) =
-        httpClient.get("$serviceUrl/deck/$deckId") {
+    override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
+        httpClient.get("$serviceUrl/oauth2/decks") {
             headers {
-                append(
-                    "Bearer",
-                    AuthHandler.accessToken?.token ?: throw Exception("No token found")
-                )
+                append("Authorization", AuthHandler.authHeader)
+            }
+        }.body<List<DeckDto>>().map {
+            val heroCard = cardProvider(it.investigator_code!!)
+
+            Deck(id = it.id,
+                name = it.name,
+                hero = heroCard,
+                aspect = it.meta?.parseAspect(),
+                cards = it.slots.entries.map { entry ->
+                    List(entry.value) { cardProvider(entry.key) }
+                }.flatten().toMutableList().also { it.add(0, heroCard) })
+        }
+
+    override suspend fun getUserDeckById(deckId: Int, cardProvider: suspend (String) -> Card) =
+        httpClient.get("$serviceUrl/oauth2/deck/$deckId") {
+            headers {
+                append("Authorization", AuthHandler.authHeader)
             }
         }.body<DeckDto>().let {
             val heroCard = cardProvider(it.investigator_code!!)
@@ -134,7 +149,7 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
                 aspect = it.meta?.parseAspect(),
                 cards = it.slots.entries.map { entry ->
                     List(entry.value) { cardProvider(entry.key) }
-                }.flatten().filterNotNull().toMutableList().also { it.add(0, heroCard) })
+                }.flatten().toMutableList().also { it.add(0, heroCard) })
         }
 }
 
