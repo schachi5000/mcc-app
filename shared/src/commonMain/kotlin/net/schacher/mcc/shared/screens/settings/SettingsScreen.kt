@@ -111,18 +111,23 @@ fun SettingsScreen(
 
         val uriHandler = LocalUriHandler.current
         OptionsGroup("Debug") {
-            OptionsEntry(
-                label = "Login to MarvelCDB",
-                imageVector = Icons.Rounded.AccountCircle,
-                onClick = {
-                    Logger.i("Open OAuth URL: ${BuildConfig.OAUTH_URL}")
-                    uriHandler.openUri(BuildConfig.OAUTH_URL)
-                })
-            OptionsEntry(label = "Import My Public Decks",
-                imageVector = Icons.Rounded.Add,
-                onClick = {
-                    settingsViewModel.addPublicDecksById(listOf())
-                })
+            AnimatedVisibility(!state.loggedIn) {
+                OptionsEntry(
+                    label = "Login to MarvelCDB",
+                    imageVector = Icons.Rounded.AccountCircle,
+                    onClick = {
+                        Logger.i("Open OAuth URL: ${BuildConfig.OAUTH_URL}")
+                        uriHandler.openUri(BuildConfig.OAUTH_URL)
+                    })
+            }
+
+            AnimatedVisibility(state.loggedIn) {
+                OptionsEntry(label = "Import My Public Decks",
+                    imageVector = Icons.Rounded.Add,
+                    onClick = {
+                        settingsViewModel.addPublicDecksById(listOf())
+                    })
+            }
         }
 
         Spacer(Modifier.size(16.dp))

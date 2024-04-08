@@ -8,6 +8,11 @@ import kotlin.time.Duration.Companion.seconds
 
 object AuthHandler {
 
+
+    val loggedIn: Boolean
+        get() = this.accessToken != null &&
+                (this.accessToken?.expiresAt ?: 0) > Time.currentTimeMillis
+
     val authHeader: String
         get() = "Bearer ${this.accessToken?.token ?: throw IllegalStateException("No access token available")}"
 
