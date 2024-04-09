@@ -23,35 +23,44 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
+
       - name: Setup Java 17
         uses: actions/setup-java@v3
         with:
           distribution: 'corretto'
           java-version: '17'
-      - name: Write Property File
+
+      - name: Write property file
         uses: christian-draeger/write-properties@1.1.0
         with:
           path: 'local.properties'
           property: 'oauth.url'
           value: ${{ secrets.OAUTH_URL }}
+
       - name: Generate build number
         id: buildnumber
         uses: onyxmueller/build-tag-number@v1
         with:
           token: ${{secrets.GITHUB_TOKEN}}
-      - name: Assemble version properties
-        run: |
-          echo "SHA_SHORT=`echo ${GITHUB_SHA} | cut -c1-5`" >> $GITHUB_ENV
-          echo "RELEASE_NAME=$(date "+%y%m%d").${{ steps.buildnumber.outputs.build_number }}" >> $GITHUB_ENV
-          echo "VERSION_NAME=${{ env.RELEASE_NAME }} (${{ env.SHA_SHORT }})" >> $GITHUB_ENV
-      - name: Apply version properties to build.gradle
-        uses: chkfung/android-version-actions@v1.2.2
-        with:
-          gradlePath: androidApp/build.gradle.kts
-          versionCode: ${{ steps.buildnumber.outputs.build_number }}
-          versionName: ${{ env.VERSION_NAME }}
-      - name: Build bundle
-        run: ./gradlew androidApp:bundleRelease
+
+      - name: Print property file
+        run: cat local.properties
+
+#      - name: Assemble version properties
+#        run: |
+#          echo "SHA_SHORT=`echo ${GITHUB_SHA} | cut -c1-5`" >> $GITHUB_ENV
+#          echo "RELEASE_NAME=$(date "+%y%m%d").${{ steps.buildnumber.outputs.build_number }}" >> $GITHUB_ENV
+#          echo "VERSION_NAME=${{ env.RELEASE_NAME }} (${{ env.SHA_SHORT }})" >> $GITHUB_ENV
+#
+#      - name: Apply version properties to build.gradle
+#        uses: chkfung/android-version-actions@v1.2.2
+#        with:
+#          gradlePath: androidApp/build.gradle.kts
+#          versionCode: ${{ steps.buildnumber.outputs.build_number }}
+#          versionName: ${{ env.VERSION_NAME }}
+#
+#      - name: Build bundle
+#        run: ./gradlew androidApp:bundleRelease
 #      - name: Upload to Google Play
 #        uses: r0adkll/upload-google-play@v1
 #        with:
