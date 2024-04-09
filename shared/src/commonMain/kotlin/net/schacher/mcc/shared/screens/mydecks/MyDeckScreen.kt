@@ -122,6 +122,8 @@ fun MyDecksScreen(
             modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),
             refreshing = state.refreshing,
             state = pullRefreshState,
+            contentColor = MaterialTheme.colors.primary,
+            backgroundColor = MaterialTheme.colors.background
         )
     }
 }
