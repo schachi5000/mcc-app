@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.platform.PlatformInfo
 import net.schacher.mcc.shared.repositories.CardRepository
@@ -105,14 +106,12 @@ class SettingsViewModel(
         _state.update { it.copy(syncInProgress = false) }
 
         this.viewModelScope.launch {
-            deckId.forEach {
-                deckRepository.addDeckById(it.toInt())
-                _state.update {
-                    it.copy(
-                        cardCount = cardRepository.cards.value.size,
-                        deckCount = deckRepository.decks.value.size,
-                    )
-                }
+            deckRepository.refreshAllUserDecks()
+            _state.update {
+                it.copy(
+                    cardCount = cardRepository.cards.value.size,
+                    deckCount = deckRepository.decks.value.size,
+                )
             }
 
             _state.update { it.copy(syncInProgress = false) }
@@ -126,7 +125,10 @@ class SettingsViewModel(
         val packsInCollectionCount: Int,
         val syncInProgress: Boolean = false,
         val settingsValues: List<Pair<String, Any>> = emptyList(),
-        val versionName: String
-    )
+        val versionName: String,
+    ) {
+        val loggedIn: Boolean
+            get() = AuthHandler.loggedIn
+    }
 }
 

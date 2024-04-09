@@ -73,8 +73,20 @@ class DeckRepository(
         _decks.update { deckDatabaseDao.getDecks() }
     }
 
+    suspend fun refreshAllUserDecks() {
+        val decks = marvelCDbDataSource.getUserDecks {
+            this.cardRepository.getCard(it)
+        }
+
+        decks.forEach {
+            this.deckDatabaseDao.addDeck(it)
+        }
+
+        _decks.emit(deckDatabaseDao.getDecks())
+    }
+
     suspend fun addDeckById(deckId: Int) {
-        val deck = marvelCDbDataSource.getPublicDeckById(deckId) {
+        val deck = marvelCDbDataSource.getUserDeckById(deckId) {
             this.cardRepository.getCard(it)
         }
 

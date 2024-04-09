@@ -19,13 +19,12 @@ the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data a
  <img src="docs/screenshots/search.png" width="200" alt="Search"/>
  <img src="docs/screenshots/card_view.png" width="200" alt="Card Screen"/> 
 
-## Features
+## Planned Features
 
 - Card Database: Browse an extensive database of Marvel Champions game cards, updated through
   the [marvelcdb.com](https://marvelcdb.com/api/) API.
 - Decks and Strategy: Create decks, share them with others, and find strategy tips.
 - Game Guide: Get rules, tips, and instructions for Marvel Champions.
-- Community: Connect with other Marvel Champions players and share your experiences.
 
 ## Technologies & Frameworks
 
@@ -35,11 +34,6 @@ the [marvelcdb.com](https://marvelcdb.com) API to provide up-to-date card data a
 - HTTP Client: [Ktor](https://ktor.io/docs/getting-started-ktor-client-multiplatform-mobile.html)
 - DI: [Koin](https://insert-koin.io/docs/reference/koin-mp/kmp)
 - Logging: [Kermit](https://github.com/touchlab/Kermit)
-
-## Installation
-
-The app can be installed on Android devices via the Google Play Store and on iOS devices via the
-Apple App Store. Alternatively, you can download and manually install the app from this repository.
 
 ## Contributors
 
