@@ -14,12 +14,16 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
@@ -36,30 +40,37 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.create_new_deck
 import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
 fun MyDecksScreen(
-    myDecksViewModel: MyDecksViewModel = koinInject(),
+    viewModel: MyDecksViewModel = koinInject(),
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit
 ) {
-    val state by myDecksViewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     MyDecksScreen(
         state = state,
         onDeckClick = onDeckClick,
-        onAddDeckClick = onAddDeckClick
+        onAddDeckClick = onAddDeckClick,
+        onRefresh = { viewModel.onRefreshClicked() }
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MyDecksScreen(
     state: MyDecksViewModel.UiState,
+    onRefresh: () -> Unit,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit
 ) {
@@ -83,7 +94,9 @@ fun MyDecksScreen(
         }
     }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    val pullRefreshState = rememberPullRefreshState(state.refreshing, { onRefresh() })
+
+    Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
         LazyColumn(
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 16.dp)
@@ -95,7 +108,9 @@ fun MyDecksScreen(
                 }
 
                 when (val entry = entries[index]) {
-                    is DeckItem -> DeckRow(entry.deck) { onDeckClick(entry.deck) }
+                    is DeckItem -> DeckRow(entry.deck) {
+                        onDeckClick(entry.deck)
+                    }
                 }
 
                 Spacer(Modifier.height(16.dp))
@@ -106,9 +121,18 @@ fun MyDecksScreen(
             modifier = Modifier.align(Alignment.BottomCenter),
             expanded = expanded
         ) { onAddDeckClick() }
+
+        PullRefreshIndicator(
+            modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),
+            refreshing = state.refreshing,
+            state = pullRefreshState,
+            contentColor = MaterialTheme.colors.primary,
+            backgroundColor = MaterialTheme.colors.background
+        )
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
     var horizontalBias by remember { mutableStateOf(1f) }
@@ -136,13 +160,13 @@ fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
-                    contentDescription = "Create deck"
+                    contentDescription = stringResource(Res.string.create_new_deck)
                 )
 
                 AnimatedVisibility(visible = expanded) {
                     Text(
                         modifier = Modifier.padding(horizontal = 4.dp),
-                        text = "Create new deck"
+                        text = stringResource(Res.string.create_new_deck)
                     )
                 }
             }
