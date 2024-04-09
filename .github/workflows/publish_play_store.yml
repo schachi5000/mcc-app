@@ -42,11 +42,14 @@ jobs:
         with:
           token: ${{secrets.GITHUB_TOKEN}}
 
-      - name: Assemble version properties
-        run: |
-          echo "SHA_SHORT=`echo ${GITHUB_SHA} | cut -c1-5`" >> $GITHUB_ENV
-          echo "RELEASE_NAME=$(date "+%y%m%d").${{ steps.buildnumber.outputs.build_number }}" >> $GITHUB_ENV
-          echo "VERSION_NAME=${{ env.RELEASE_NAME }} (${{ env.SHA_SHORT }})" >> $GITHUB_ENV
+      - name: Create short SHA
+        run: echo "SHA_SHORT=`echo ${GITHUB_SHA} | cut -c1-5`" >> $GITHUB_ENV
+
+      - name: Create release name
+        run: echo "RELEASE_NAME=$(date "+%y%m%d").${{ steps.buildnumber.outputs.build_number }}" >> $GITHUB_ENV
+
+      - name: Create version name
+        run: echo "VERSION_NAME=${{ env.RELEASE_NAME }} (${{ env.SHA_SHORT }})" >> $GITHUB_ENV
 
       - name: Apply version properties to build.gradle
         uses: chkfung/android-version-actions@v1.2.2
