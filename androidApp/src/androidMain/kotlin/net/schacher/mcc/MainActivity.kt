@@ -2,11 +2,12 @@ package net.schacher.mcc
 
 import MainView
 import android.os.Bundle
-import android.util.Log
 import androidx.activity.compose.setContent
 import androidx.appcompat.app.AppCompatActivity
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
+import net.schacher.mcc.shared.auth.AuthHandler
+import net.schacher.mcc.shared.auth.AuthHandler.APP_SCHEME
 
 class MainActivity : AppCompatActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -20,10 +21,10 @@ class MainActivity : AppCompatActivity() {
     override fun onResume() {
         super.onResume()
 
-        Log.d(
-            "MainActivity",
-            "onNewIntent: ${intent.data}"
-        )
+        if (intent.data.toString().startsWith(APP_SCHEME)) {
+            AuthHandler.handleCallbackUrl(intent.data.toString())
+            intent.data = null
+        }
     }
 }
 

@@ -8,6 +8,7 @@ import kotlin.time.Duration.Companion.seconds
 
 object AuthHandler {
 
+    const val APP_SCHEME = "mccapp"
 
     val loggedIn: Boolean
         get() = this.accessToken != null &&

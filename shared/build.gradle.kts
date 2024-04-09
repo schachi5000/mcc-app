@@ -1,4 +1,7 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
+import org.jetbrains.kotlin.org.jline.utils.InputStreamReader
+import java.io.FileInputStream
+import java.util.Properties
 
 plugins {
     kotlin("multiplatform")
@@ -34,7 +37,7 @@ kotlin {
         |package $packageName
         |
         |object BuildConfig {
-        |  const val OAUTH_URL = "${System.getenv("MCC_OAUTH_URL")}"
+        |  const val OAUTH_URL = "${getLocalProperty("oauth.url")}"
         |}
         |
       """.trimMargin()
@@ -100,6 +103,21 @@ kotlin {
             }
         }
     }
+}
+
+fun getLocalProperty(key: String, file: String = "local.properties"): Any {
+    val properties = Properties()
+    val localProperties = File(file)
+    if (localProperties.isFile) {
+        InputStreamReader(
+            FileInputStream(localProperties),
+            Charsets.UTF_8.toString()
+        ).use { properties.load(it) }
+    } else {
+        error("File from not found")
+    }
+
+    return properties.getProperty(key)
 }
 
 android {
