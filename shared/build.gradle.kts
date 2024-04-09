@@ -114,7 +114,7 @@ fun getLocalProperty(key: String, file: String = "local.properties"): Any {
             Charsets.UTF_8.toString()
         ).use { properties.load(it) }
     } else {
-        error("File from not found")
+        return ""
     }
 
     return properties.getProperty(key)
