@@ -2,7 +2,7 @@ package net.schacher.mcc.shared.utils
 
 import net.schacher.mcc.shared.model.Card
 
-fun List<Card>.defaultSort(): List<Card> {
+fun Collection<Card>.defaultSort(): List<Card> {
     val byAspect = this.groupBy { it.aspect ?: it.type }.values
 
     return byAspect.map {
