@@ -37,11 +37,11 @@ jobs:
           property: 'oauth.url'
           value: ${{ secrets.OAUTH_URL }}
 
-      - name: Generate build number
-        id: buildnumber
-        uses: onyxmueller/build-tag-number@v1
-        with:
-          token: ${{secrets.GITHUB_TOKEN}}
+      #      - name: Generate build number
+      #        id: buildnumber
+      #        uses: onyxmueller/build-tag-number@v1
+      #        with:
+      #          token: ${{secrets.GITHUB_TOKEN}}
 
       - name: Print property file
         run: |
