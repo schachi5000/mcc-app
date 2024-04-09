@@ -5,6 +5,7 @@ on:
   push:
     branches:
       - main
+      - 41-*
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
@@ -27,6 +28,12 @@ jobs:
         with:
           distribution: 'corretto'
           java-version: '17'
+      - name: Write Property File
+        uses: christian-draeger/write-properties@1.1.0
+        with:
+          path: 'local.properties'
+          property: 'oauth.url'
+          value: ${{ secrets.OAUTH_URL }}
       - name: Generate build number
         id: buildnumber
         uses: onyxmueller/build-tag-number@v1
@@ -45,30 +52,30 @@ jobs:
           versionName: ${{ env.VERSION_NAME }}
       - name: Build bundle
         run: ./gradlew androidApp:bundleRelease
-      - name: Upload to Google Play
-        uses: r0adkll/upload-google-play@v1
-        with:
-          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
-          packageName: net.schacher.mcc
-          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
-          track: internal
-      - name: Create tag
-        run: |
-          git config --global user.name "github-action"
-          git config --global user.email "github-actions@schacher.pro"
-          git tag -a "${{ env.RELEASE_NAME }}" -m "Created release tag"
-          git push origin --tags
-      - name: Build changelog
-        id: github_release
-        uses: mikepenz/release-changelog-builder-action@v4
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-      - name: Create release
-        uses: softprops/action-gh-release@v2.0.2
-        with:
-          token: ${{ secrets.GITHUB_TOKEN }}
-          name: ${{ env.RELEASE_NAME }}
-          tag_name: ${{ env.RELEASE_NAME }}
-          body: ${{ steps.build_changelog.outputs.changelog }}
-          files: |
-            androidApp/build/outputs/bundle/release/androidApp-release.aab
+#      - name: Upload to Google Play
+#        uses: r0adkll/upload-google-play@v1
+#        with:
+#          serviceAccountJsonPlainText: ${{ secrets.SERVICE_ACCOUNT_JSON }}
+#          packageName: net.schacher.mcc
+#          releaseFiles: androidApp/build/outputs/bundle/release/androidApp-release.aab
+#          track: internal
+#      - name: Create tag
+#        run: |
+#          git config --global user.name "github-action"
+#          git config --global user.email "github-actions@schacher.pro"
+#          git tag -a "${{ env.RELEASE_NAME }}" -m "Created release tag"
+#          git push origin --tags
+#      - name: Build changelog
+#        id: github_release
+#        uses: mikepenz/release-changelog-builder-action@v4
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#      - name: Create release
+#        uses: softprops/action-gh-release@v2.0.2
+#        with:
+#          token: ${{ secrets.GITHUB_TOKEN }}
+#          name: ${{ env.RELEASE_NAME }}
+#          tag_name: ${{ env.RELEASE_NAME }}
+#          body: ${{ steps.build_changelog.outputs.changelog }}
+#          files: |
+#            androidApp/build/outputs/bundle/release/androidApp-release.aab
