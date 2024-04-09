@@ -40,25 +40,29 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.create_new_deck
 import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
 fun MyDecksScreen(
-    myDecksViewModel: MyDecksViewModel = koinInject(),
+    viewModel: MyDecksViewModel = koinInject(),
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit
 ) {
-    val state by myDecksViewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     MyDecksScreen(
         state = state,
         onDeckClick = onDeckClick,
         onAddDeckClick = onAddDeckClick,
-        onRefresh = { myDecksViewModel.onRefreshClicked() }
+        onRefresh = { viewModel.onRefreshClicked() }
     )
 }
 
@@ -128,6 +132,7 @@ fun MyDecksScreen(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
     var horizontalBias by remember { mutableStateOf(1f) }
@@ -155,13 +160,13 @@ fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
             ) {
                 Icon(
                     imageVector = Icons.Rounded.Add,
-                    contentDescription = "Create deck"
+                    contentDescription = stringResource(Res.string.create_new_deck)
                 )
 
                 AnimatedVisibility(visible = expanded) {
                     Text(
                         modifier = Modifier.padding(horizontal = 4.dp),
-                        text = "Create new deck"
+                        text = stringResource(Res.string.create_new_deck)
                     )
                 }
             }
