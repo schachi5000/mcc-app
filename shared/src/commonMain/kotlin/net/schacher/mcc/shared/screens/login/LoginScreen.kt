@@ -64,7 +64,9 @@ import pro.schacher.mcc.BuildConfig
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun LoginScreen(onGuestLoginClick: () -> Unit) {
+fun LoginScreen(
+    onGuestLogin: () -> Unit,
+) {
     var loginBottomSheetShowing by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -112,7 +114,7 @@ fun LoginScreen(onGuestLoginClick: () -> Unit) {
 
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onGuestLoginClick() },
+                onClick = { onGuestLogin() },
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = MaterialTheme.colors.background
@@ -129,7 +131,6 @@ fun LoginScreen(onGuestLoginClick: () -> Unit) {
 
     if (loginBottomSheetShowing) {
         ModalBottomLoginSheet(
-            onLoggedIn = onGuestLoginClick,
             onDismiss = {
                 Logger.debug { "Dismiss bottom sheet" }
                 loginBottomSheetShowing = false
@@ -141,7 +142,6 @@ fun LoginScreen(onGuestLoginClick: () -> Unit) {
 @Composable
 fun ModalBottomLoginSheet(
     modifier: Modifier = Modifier,
-    onLoggedIn: () -> Unit,
     onDismiss: () -> Unit,
 ) {
     var webViewShowing by remember { mutableStateOf(false) }
@@ -162,11 +162,8 @@ fun ModalBottomLoginSheet(
         sheetContent = {
             LoginWebView(
                 modifier = modifier.heightIn(min = 300.dp, max = 600.dp).imePadding(),
-                onAccessGranted = {
-                    onLoggedIn()
-                },
+                onAccessGranted = { },
                 onAccessDenied = {
-                    Logger.d { "Access denied" }
                     webViewShowing = false
                     onDismiss()
                 })

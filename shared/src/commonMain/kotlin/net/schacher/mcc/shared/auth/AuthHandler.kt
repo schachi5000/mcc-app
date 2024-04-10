@@ -11,4 +11,6 @@ interface AuthHandler {
     fun isLoggedIn(): Boolean
 
     fun handleCallbackUrl(callbackUrl: String): Boolean
+
+    fun logout()
 }

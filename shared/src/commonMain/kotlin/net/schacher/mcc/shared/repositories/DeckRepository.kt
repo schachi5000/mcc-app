@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.repositories
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.MainScope
@@ -9,19 +8,20 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType.HERO
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.utils.e
 import kotlin.random.Random
 
 class DeckRepository(
     private val cardRepository: CardRepository,
     private val deckDatabaseDao: DeckDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource,
+    private val authHandler: AuthHandler
 ) {
     private val _decks = MutableStateFlow<List<Deck>>(emptyList())
 
@@ -29,10 +29,12 @@ class DeckRepository(
 
     init {
         MainScope().launch {
-            try {
-                refreshAllUserDecks()
-            } catch (e: Exception) {
-                Logger.e(e)
+            authHandler.loginState.collect { loggedIn ->
+                if (loggedIn) {
+                    runCatching { refreshAllUserDecks() }
+                } else {
+                    _decks.emit(emptyList())
+                }
             }
         }
     }

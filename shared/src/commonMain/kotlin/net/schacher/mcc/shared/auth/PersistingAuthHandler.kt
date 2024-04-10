@@ -29,15 +29,15 @@ class PersistingAuthHandler(private val settingsDao: SettingsDao) : AuthHandler 
 
     override val loginState: StateFlow<Boolean> = _loginState.asStateFlow()
 
+    init {
+        this.restoreAccessToken()
+    }
+
     override fun isLoggedIn(): Boolean = this.accessToken != null &&
             (this.accessToken?.expiresAt ?: 0) > Time.currentTimeMillis
 
     override val authHeader: String
         get() = "Bearer ${this.accessToken?.token ?: throw IllegalStateException("No access token available")}"
-
-    init {
-        this.restoreAccessToken()
-    }
 
     private fun restoreAccessToken() {
         val token = this.settingsDao.getString(ACCESS_TOKEN)
@@ -74,10 +74,17 @@ class PersistingAuthHandler(private val settingsDao: SettingsDao) : AuthHandler 
         )
     }
 
+    override fun logout() {
+        this.accessToken = null
+
+        this.settingsDao.remove(ACCESS_TOKEN)
+        this.settingsDao.remove(EXPIRES_AT)
+    }
+
+
     private fun storeAccessToken(accessToken: AccessToken) {
         this.settingsDao.putString(ACCESS_TOKEN, accessToken.token)
         this.settingsDao.putString(EXPIRES_AT, accessToken.expiresAt.toString())
-
     }
 }
 

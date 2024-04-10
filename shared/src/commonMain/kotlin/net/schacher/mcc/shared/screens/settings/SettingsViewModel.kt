@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.platform.PlatformInfo
 import net.schacher.mcc.shared.repositories.CardRepository
@@ -16,6 +17,7 @@ class SettingsViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
+    private val authHandler: AuthHandler,
     settingsDao: SettingsDao,
     platformInfo: PlatformInfo
 ) : ViewModel() {
@@ -27,7 +29,8 @@ class SettingsViewModel(
             packCount = packRepository.packs.value.size,
             packsInCollectionCount = packRepository.packsInCollection.value.size,
             settingsValues = settingsDao.getAllEntries(),
-            versionName = platformInfo.version
+            versionName = platformInfo.version,
+            canLogout = authHandler.isLoggedIn()
         )
     )
 
@@ -37,6 +40,12 @@ class SettingsViewModel(
         viewModelScope.launch {
             deckRepository.decks.collect { value ->
                 _state.update { it.copy(deckCount = value.size) }
+            }
+        }
+
+        viewModelScope.launch {
+            authHandler.loginState.collect { loggedIn ->
+                _state.update { it.copy(canLogout = loggedIn) }
             }
         }
 
@@ -101,6 +110,10 @@ class SettingsViewModel(
         }
     }
 
+    fun onLogoutClicked() {
+        this.authHandler.logout()
+    }
+
     data class UiState(
         val cardCount: Int,
         val deckCount: Int,
@@ -109,6 +122,7 @@ class SettingsViewModel(
         val syncInProgress: Boolean = false,
         val settingsValues: List<Pair<String, Any>> = emptyList(),
         val versionName: String,
+        val canLogout: Boolean
     )
 }
 

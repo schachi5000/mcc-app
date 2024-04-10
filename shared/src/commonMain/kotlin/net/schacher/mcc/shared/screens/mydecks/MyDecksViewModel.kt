@@ -8,13 +8,10 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
-import net.schacher.mcc.shared.utils.debug
 
 class MyDecksViewModel(
     private val deckRepository: DeckRepository,
-    private val cardRepository: CardRepository,
     private val authHandler: AuthHandler
 ) : ViewModel() {
 
@@ -41,26 +38,14 @@ class MyDecksViewModel(
 
         viewModelScope.launch {
             authHandler.loginState.collect { loggedIn ->
-                Logger.debug { "Login state changed to $loggedIn" }
-                _state.update { it.copy(canCreateDecks = loggedIn) }
+                _state.update {
+                    it.copy(canCreateDecks = loggedIn)
+                }
             }
         }
 
         viewModelScope.launch {
-            _state.update { it.copy(refreshing = true) }
-
-            try {
-                deckRepository.refreshAllUserDecks()
-            } catch (e: Exception) {
-                Logger.e(e.toString())
-            }
-
-            _state.update {
-                it.copy(
-                    decks = deckRepository.decks.value,
-                    refreshing = false
-                )
-            }
+            refreshDecks()
         }
     }
 
@@ -69,20 +54,25 @@ class MyDecksViewModel(
     }
 
     fun onRefreshClicked() {
-        _state.update {
-            it.copy(refreshing = true)
+        viewModelScope.launch {
+            refreshDecks()
+        }
+    }
+
+    private suspend fun refreshDecks() {
+        _state.update { it.copy(refreshing = true) }
+
+        try {
+            deckRepository.refreshAllUserDecks()
+        } catch (e: Exception) {
+            Logger.e(e.toString())
         }
 
-        viewModelScope.launch {
-            try {
-                deckRepository.refreshAllUserDecks()
-            } catch (e: Exception) {
-                Logger.e(e.toString())
-            }
-
-            _state.update {
-                it.copy(refreshing = false)
-            }
+        _state.update {
+            it.copy(
+                decks = deckRepository.decks.value,
+                refreshing = false
+            )
         }
     }
 

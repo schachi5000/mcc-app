@@ -4,6 +4,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.auth.PersistingAuthHandler
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
@@ -27,6 +28,7 @@ import net.schacher.mcc.shared.screens.packselection.PackSelectionViewModel
 import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.SettingsViewModel
 import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
+import net.schacher.mcc.shared.utils.debug
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
@@ -81,10 +83,13 @@ fun App(
             val loggedIn = authHandler.loginState.collectAsState()
             var guessedLogin by remember { mutableStateOf(false) }
 
+            Logger.debug { "loggedIn: $loggedIn guessedLogin: $guessedLogin" }
             if (loggedIn.value || guessedLogin) {
                 MainScreen()
             } else {
-                LoginScreen { guessedLogin = true }
+                LoginScreen {
+                    guessedLogin = true
+                }
             }
         }
     }

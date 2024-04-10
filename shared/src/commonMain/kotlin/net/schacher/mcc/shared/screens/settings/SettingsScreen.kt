@@ -13,9 +13,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Refresh
@@ -37,6 +39,7 @@ import marvelchampionscompanion.shared.generated.resources.ic_deck
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -102,6 +105,24 @@ fun SettingsScreen(
                 iconResource = Res.drawable.ic_deck,
                 onClick = { onPackSelectionClick() })
         }
+
+        if (state.canLogout) {
+            TextButton(
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                onClick = { settingsViewModel.onLogoutClicked() },
+                shape = DefaultShape,
+                colors = ButtonDefaults.textButtonColors(
+                    backgroundColor = MaterialTheme.colors.surface
+                )
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = MaterialTheme.colors.primary,
+                    text = "Logout"
+                )
+            }
+        }
+
 
         Spacer(Modifier.size(16.dp))
 
