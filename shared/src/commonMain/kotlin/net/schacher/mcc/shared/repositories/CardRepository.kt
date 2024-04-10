@@ -25,6 +25,13 @@ class CardRepository(
         }
     }
 
+    suspend fun hasCards(): Boolean = try {
+        cardDatabaseDao.getAllCards().isNotEmpty()
+    } catch (e: Exception) {
+        Logger.e(e) { "Error checking for cards" }
+        false
+    }
+
     suspend fun refreshAllCards() {
         val result = this.marvelCDbDataSource.getAllCards()
         Logger.i { "${result.size} cards loaded" }

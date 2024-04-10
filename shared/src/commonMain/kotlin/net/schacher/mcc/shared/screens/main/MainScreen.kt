@@ -1,7 +1,6 @@
 package net.schacher.mcc.shared.screens.main
 
 import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
@@ -73,7 +72,6 @@ import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
 import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
-import net.schacher.mcc.shared.screens.splash.SplashScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
@@ -214,13 +212,6 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                 Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
             }
         }
-    }
-
-    AnimatedVisibility(
-        visible = state.value.splash != null,
-        exit = fadeOut() + slideOutVertically { fullHeight -> fullHeight },
-    ) {
-        SplashScreen((state.value.splash)?.preparing ?: false)
     }
 }
 

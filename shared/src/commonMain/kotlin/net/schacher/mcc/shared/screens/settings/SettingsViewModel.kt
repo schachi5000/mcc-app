@@ -17,6 +17,7 @@ class SettingsViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
+    private val authHandler: AuthHandler,
     settingsDao: SettingsDao,
     platformInfo: PlatformInfo
 ) : ViewModel() {
@@ -28,7 +29,8 @@ class SettingsViewModel(
             packCount = packRepository.packs.value.size,
             packsInCollectionCount = packRepository.packsInCollection.value.size,
             settingsValues = settingsDao.getAllEntries(),
-            versionName = platformInfo.version
+            versionName = platformInfo.version,
+            canLogout = authHandler.isLoggedIn()
         )
     )
 
@@ -38,6 +40,12 @@ class SettingsViewModel(
         viewModelScope.launch {
             deckRepository.decks.collect { value ->
                 _state.update { it.copy(deckCount = value.size) }
+            }
+        }
+
+        viewModelScope.launch {
+            authHandler.loginState.collect { loggedIn ->
+                _state.update { it.copy(canLogout = loggedIn) }
             }
         }
 
@@ -102,20 +110,8 @@ class SettingsViewModel(
         }
     }
 
-    fun addPublicDecksById(deckId: List<String>) {
-        _state.update { it.copy(syncInProgress = false) }
-
-        this.viewModelScope.launch {
-            deckRepository.refreshAllUserDecks()
-            _state.update {
-                it.copy(
-                    cardCount = cardRepository.cards.value.size,
-                    deckCount = deckRepository.decks.value.size,
-                )
-            }
-
-            _state.update { it.copy(syncInProgress = false) }
-        }
+    fun onLogoutClicked() {
+        this.authHandler.logout()
     }
 
     data class UiState(
@@ -126,9 +122,7 @@ class SettingsViewModel(
         val syncInProgress: Boolean = false,
         val settingsValues: List<Pair<String, Any>> = emptyList(),
         val versionName: String,
-    ) {
-        val loggedIn: Boolean
-            get() = AuthHandler.loggedIn
-    }
+        val canLogout: Boolean
+    )
 }
 

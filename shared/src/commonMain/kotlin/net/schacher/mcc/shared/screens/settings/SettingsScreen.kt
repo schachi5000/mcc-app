@@ -13,12 +13,12 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
@@ -30,10 +30,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.database
 import marvelchampionscompanion.shared.generated.resources.ic_cards
@@ -41,15 +39,16 @@ import marvelchampionscompanion.shared.generated.resources.ic_deck
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import pro.schacher.mcc.BuildConfig
 
 @ExperimentalResourceApi
 @Composable
 fun SettingsScreen(
-    settingsViewModel: SettingsViewModel = koinInject(), onPackSelectionClick: () -> Unit
+    settingsViewModel: SettingsViewModel = koinInject(),
+    onPackSelectionClick: () -> Unit
 ) {
     val state by settingsViewModel.state.collectAsState()
     var deleteDatabaseDialog by remember { mutableStateOf(false) }
@@ -107,28 +106,23 @@ fun SettingsScreen(
                 onClick = { onPackSelectionClick() })
         }
 
-        Spacer(Modifier.size(16.dp))
-
-        val uriHandler = LocalUriHandler.current
-        OptionsGroup("Debug") {
-            AnimatedVisibility(!state.loggedIn) {
-                OptionsEntry(
-                    label = "Login to MarvelCDB",
-                    imageVector = Icons.Rounded.AccountCircle,
-                    onClick = {
-                        Logger.i("Open OAuth URL: ${BuildConfig.OAUTH_URL}")
-                        uriHandler.openUri(BuildConfig.OAUTH_URL)
-                    })
-            }
-
-            AnimatedVisibility(state.loggedIn) {
-                OptionsEntry(label = "Import My Public Decks",
-                    imageVector = Icons.Rounded.Add,
-                    onClick = {
-                        settingsViewModel.addPublicDecksById(listOf())
-                    })
+        if (state.canLogout) {
+            TextButton(
+                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                onClick = { settingsViewModel.onLogoutClicked() },
+                shape = DefaultShape,
+                colors = ButtonDefaults.textButtonColors(
+                    backgroundColor = MaterialTheme.colors.surface
+                )
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = MaterialTheme.colors.primary,
+                    text = "Logout"
+                )
             }
         }
+
 
         Spacer(Modifier.size(16.dp))
 
