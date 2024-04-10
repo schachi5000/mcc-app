@@ -17,8 +17,6 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.AccountCircle
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
@@ -30,10 +28,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
-import androidx.compose.ui.platform.LocalUriHandler
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.database
 import marvelchampionscompanion.shared.generated.resources.ic_cards
@@ -44,7 +40,6 @@ import net.schacher.mcc.shared.design.compose.OptionsGroup
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
-import pro.schacher.mcc.BuildConfig
 
 @ExperimentalResourceApi
 @Composable
@@ -106,29 +101,6 @@ fun SettingsScreen(
             OptionsEntry(label = "${state.packsInCollectionCount} of ${state.packCount} Packs",
                 iconResource = Res.drawable.ic_deck,
                 onClick = { onPackSelectionClick() })
-        }
-
-        Spacer(Modifier.size(16.dp))
-
-        val uriHandler = LocalUriHandler.current
-        OptionsGroup("Debug") {
-            AnimatedVisibility(!state.loggedIn) {
-                OptionsEntry(
-                    label = "Login to MarvelCDB",
-                    imageVector = Icons.Rounded.AccountCircle,
-                    onClick = {
-                        Logger.i("Open OAuth URL: ${BuildConfig.OAUTH_URL}")
-                        uriHandler.openUri(BuildConfig.OAUTH_URL)
-                    })
-            }
-
-            AnimatedVisibility(state.loggedIn) {
-                OptionsEntry(label = "Import My Public Decks",
-                    imageVector = Icons.Rounded.Add,
-                    onClick = {
-                        settingsViewModel.addPublicDecksById(listOf())
-                    })
-            }
         }
 
         Spacer(Modifier.size(16.dp))

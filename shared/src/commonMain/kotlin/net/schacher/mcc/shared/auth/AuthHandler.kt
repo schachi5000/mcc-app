@@ -2,9 +2,12 @@ package net.schacher.mcc.shared.auth
 
 import co.touchlab.kermit.Logger
 import io.ktor.http.Url
+import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.time.Time
 import net.schacher.mcc.shared.utils.debug
 import kotlin.time.Duration.Companion.seconds
+
+class NewAuthHandler(private val settingsDao: SettingsDao)
 
 object AuthHandler {
 
@@ -24,21 +27,22 @@ object AuthHandler {
         }
 
 
-    fun handleCallbackUrl(callbackUrl: String) {
+    fun handleCallbackUrl(callbackUrl: String): Boolean {
         val fixedCallbackUrl = callbackUrl.replace("#", "?")
         Logger.debug { "Handling callback url: $fixedCallbackUrl" }
         this.accessToken = try {
             TokenUtils.parseData(fixedCallbackUrl)
         } catch (e: Exception) {
-            Logger.e(e) { "Error parsing access token from $fixedCallbackUrl" }
+            Logger.e(throwable = e) { "Error parsing access token from $fixedCallbackUrl" }
             null
         }
+
+        return this.accessToken != null
     }
 }
 
 
 object TokenUtils {
-
     fun parseData(callbackUrl: String): AccessToken = Url(callbackUrl).let {
         AccessToken(
             token = it.parameters["access_token"]

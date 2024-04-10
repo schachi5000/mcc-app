@@ -1,10 +1,9 @@
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Modifier
-import com.multiplatform.webview.web.WebView
-import com.multiplatform.webview.web.rememberWebViewNavigator
-import com.multiplatform.webview.web.rememberWebViewState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
 import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
@@ -12,12 +11,12 @@ import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.datasource.http.KtorMarvelCDbDataSource
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
-import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.theme.MccTheme
 import net.schacher.mcc.shared.platform.platformModule
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
+import net.schacher.mcc.shared.screens.login.LoginScreen
 import net.schacher.mcc.shared.screens.main.MainScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
@@ -30,7 +29,6 @@ import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
-import pro.schacher.mcc.BuildConfig
 
 val network = module {
     singleOf<MarvelCDbDataSource>(::KtorMarvelCDbDataSource)
@@ -74,21 +72,12 @@ fun App(
             )
         }) {
         MccTheme {
-            MainScreen()
+            var loggedIn by remember { mutableStateOf(AuthHandler.loggedIn) }
 
-            val state = rememberWebViewState(BuildConfig.OAUTH_URL)
-            val navigator = rememberWebViewNavigator()
-
-            Box(Modifier.fillMaxSize()) {
-                WebView(
-                    state = state,
-                    modifier = Modifier.fillMaxSize(),
-                    navigator = navigator
-                )
-
-                BackButton {
-                    navigator.navigateBack()
-                }
+            if (!loggedIn) {
+                LoginScreen { loggedIn = true }
+            } else {
+                MainScreen()
             }
         }
     }

@@ -102,22 +102,6 @@ class SettingsViewModel(
         }
     }
 
-    fun addPublicDecksById(deckId: List<String>) {
-        _state.update { it.copy(syncInProgress = false) }
-
-        this.viewModelScope.launch {
-            deckRepository.refreshAllUserDecks()
-            _state.update {
-                it.copy(
-                    cardCount = cardRepository.cards.value.size,
-                    deckCount = deckRepository.decks.value.size,
-                )
-            }
-
-            _state.update { it.copy(syncInProgress = false) }
-        }
-    }
-
     data class UiState(
         val cardCount: Int,
         val deckCount: Int,
