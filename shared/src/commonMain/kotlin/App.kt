@@ -4,6 +4,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import net.schacher.mcc.shared.auth.AuthHandler
+import net.schacher.mcc.shared.auth.PersistingAuthHandler
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
 import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
@@ -31,7 +32,7 @@ import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 
 val network = module {
-    singleOf<MarvelCDbDataSource>(::KtorMarvelCDbDataSource)
+    single<MarvelCDbDataSource> { KtorMarvelCDbDataSource(get()) }
 }
 
 val repositories = module {
@@ -55,6 +56,7 @@ fun App(
     databaseDao: DatabaseDao,
     onKoinStart: KoinApplication.() -> Unit = {}
 ) {
+    val authHandler = PersistingAuthHandler(databaseDao as SettingsDao)
     KoinApplication(
         application = {
             onKoinStart()
@@ -66,18 +68,20 @@ fun App(
                     single<PackDatabaseDao> { databaseDao }
                     single<SettingsDao> { databaseDao }
                 },
+                module {
+                    single<AuthHandler> { authHandler }
+                },
                 network,
                 repositories,
                 viewModels
             )
         }) {
         MccTheme {
-            var loggedIn by remember { mutableStateOf(AuthHandler.loggedIn) }
-
-            if (!loggedIn) {
-                LoginScreen { loggedIn = true }
-            } else {
+            var loggedIn by remember { mutableStateOf(authHandler.loggedIn) }
+            if (loggedIn) {
                 MainScreen()
+            } else {
+                LoginScreen { loggedIn = true }
             }
         }
     }

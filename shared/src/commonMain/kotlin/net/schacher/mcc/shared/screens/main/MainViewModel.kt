@@ -2,13 +2,13 @@ package net.schacher.mcc.shared.screens.main
 
 import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
@@ -21,24 +21,18 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.Dec
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Decks
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Search
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.Splash
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
 
 class MainViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
-    private val packRepository: PackRepository
+    private val packRepository: PackRepository,
+    authHandler: AuthHandler
 ) : ViewModel() {
 
-    private companion object {
-        const val SPLASH_DELAY_MS = 2000L
-    }
-
     private val _state = MutableStateFlow(
-        UiState(
-            mainScreen = Decks,
-            splash = Splash(cardRepository.cards.value.isEmpty())
-        )
+        UiState(mainScreen = if (authHandler.loggedIn) Decks else Spotlight)
     )
 
     val state = _state.asStateFlow()
@@ -48,10 +42,8 @@ class MainViewModel(
     val event = _event.asSharedFlow()
 
     init {
-        // TODO This needs to be prettier
         this.viewModelScope.launch {
-            delay(1000)
-            if (cardRepository.cards.value.isEmpty()) {
+            if (!cardRepository.hasCards()) {
                 try {
                     cardRepository.refreshAllCards()
                     packRepository.refreshAllPacks()
@@ -62,23 +54,13 @@ class MainViewModel(
                 }
             }
         }
-
-        this.viewModelScope.launch {
-            if (cardRepository.cards.value.isEmpty()) {
-                delay(SPLASH_DELAY_MS)
-            }
-
-            _state.update {
-                it.copy(splash = null)
-            }
-        }
     }
 
     fun onTabSelected(tabIndex: Int) {
         this.viewModelScope.launch {
             val mainScreen = when (tabIndex) {
                 0 -> Decks
-                1 -> UiState.MainScreen.Spotlight
+                1 -> Spotlight
                 2 -> Search
                 3 -> Settings
                 else -> return@launch
@@ -166,13 +148,10 @@ class MainViewModel(
     }
 
     data class UiState internal constructor(
-        val splash: Splash? = null,
         val mainScreen: MainScreen,
         val subScreen: SubScreen? = null,
         val fullScreen: FullScreen? = null
     ) {
-        data class Splash(val preparing: Boolean) : FullScreen
-
         sealed interface MainScreen {
             data object Decks : MainScreen
             data object Spotlight : MainScreen

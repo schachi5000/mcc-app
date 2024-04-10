@@ -5,9 +5,12 @@ import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -48,9 +51,12 @@ import com.multiplatform.webview.web.rememberWebViewState
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.splash_screen
 import net.schacher.mcc.shared.auth.AuthHandler
+import net.schacher.mcc.shared.auth.PersistingAuthHandler
+import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.koin.compose.koinInject
 import pro.schacher.mcc.BuildConfig
 
 @OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
@@ -61,18 +67,26 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
         initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true,
     )
 
-    ModalBottomSheetLayout(sheetState = sheetState,
+    BackHandler(webViewShowing || sheetState.isVisible) {
+        webViewShowing = false
+    }
+
+    ModalBottomSheetLayout(
+        sheetState = sheetState,
         scrimColor = Color.Black.copy(alpha = 0.35f),
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetBackgroundColor = MaterialTheme.colors.surface,
         sheetGesturesEnabled = false,
         sheetContent = {
-            LoginWebView(modifier = Modifier.heightIn(max = 500.dp), onAccessGranted = {
-                onLoggedIn()
-            }, onAccessDenied = {
-                Logger.d { "Access denied" }
-                webViewShowing = false
-            })
+            LoginWebView(
+                modifier = Modifier.heightIn(min = 300.dp, max = 500.dp).imePadding(),
+                onAccessGranted = {
+                    onLoggedIn()
+                },
+                onAccessDenied = {
+                    Logger.d { "Access denied" }
+                    webViewShowing = false
+                })
         }) {
 
         Box(modifier = Modifier.fillMaxSize()) {
@@ -96,21 +110,44 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
                 )
             )
 
-            TextButton(
+            Column(
                 modifier = Modifier.align(Alignment.BottomCenter)
-                    .padding(horizontal = 16.dp, vertical = 96.dp),
-                onClick = { webViewShowing = true },
-                shape = DefaultShape,
-                colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = MaterialTheme.colors.background
-                )
+                    .fillMaxWidth()
+                    .padding(horizontal = 32.dp, vertical = 96.dp),
             ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = MaterialTheme.colors.primary,
-                    text = "Login with MarvelCDB"
-                )
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { webViewShowing = true },
+                    shape = DefaultShape,
+                    colors = ButtonDefaults.textButtonColors(
+                        backgroundColor = MaterialTheme.colors.primary
+                    )
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = MaterialTheme.colors.onPrimary,
+                        text = "Login with MarvelCDB"
+                    )
+                }
+
+                Spacer(Modifier.height(16.dp))
+
+                TextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    onClick = { onLoggedIn() },
+                    shape = DefaultShape,
+                    colors = ButtonDefaults.textButtonColors(
+                        backgroundColor = MaterialTheme.colors.background
+                    )
+                ) {
+                    Text(
+                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                        color = MaterialTheme.colors.primary,
+                        text = "Continue as Guest"
+                    )
+                }
             }
+
         }
     }
 
@@ -130,8 +167,9 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
 }
 
 @Composable
-private fun LoginWebView(
+fun LoginWebView(
     modifier: Modifier = Modifier,
+    authHandler: AuthHandler = koinInject(),
     onAccessGranted: () -> Unit,
     onAccessDenied: () -> Unit
 ) {
@@ -143,8 +181,8 @@ private fun LoginWebView(
         Logger.i { "${it.code} - ${it.description}" }
     }
 
-    if (webViewState.lastLoadedUrl?.startsWith(AuthHandler.APP_SCHEME) == true) {
-        if (AuthHandler.handleCallbackUrl(webViewState.lastLoadedUrl!!)) {
+    if (webViewState.lastLoadedUrl?.startsWith(PersistingAuthHandler.APP_SCHEME) == true) {
+        if (authHandler.handleCallbackUrl(webViewState.lastLoadedUrl!!)) {
             onAccessGranted()
         } else {
             onAccessDenied()
