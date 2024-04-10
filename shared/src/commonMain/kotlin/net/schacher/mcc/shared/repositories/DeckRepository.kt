@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.repositories
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.MainScope
@@ -14,6 +15,7 @@ import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType.HERO
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.utils.e
 import kotlin.random.Random
 
 class DeckRepository(
@@ -27,7 +29,11 @@ class DeckRepository(
 
     init {
         MainScope().launch {
-            _decks.emit(deckDatabaseDao.getDecks())
+            try {
+                refreshAllUserDecks()
+            } catch (e: Exception) {
+                Logger.e(e)
+            }
         }
     }
 
@@ -78,11 +84,11 @@ class DeckRepository(
             this.cardRepository.getCard(it)
         }
 
-        decks.forEach {
-            this.deckDatabaseDao.addDeck(it)
-        }
+//        decks.forEach {
+//            this.deckDatabaseDao.addDeck(it)
+//        }
 
-        _decks.emit(deckDatabaseDao.getDecks())
+        _decks.emit(decks)
     }
 
     suspend fun addDeckById(deckId: Int) {

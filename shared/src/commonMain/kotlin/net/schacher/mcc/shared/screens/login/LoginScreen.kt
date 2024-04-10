@@ -64,7 +64,7 @@ import pro.schacher.mcc.BuildConfig
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun LoginScreen(onLoggedIn: () -> Unit) {
+fun LoginScreen(onGuestLoginClick: () -> Unit) {
     var loginBottomSheetShowing by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
@@ -112,7 +112,7 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
 
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onLoggedIn() },
+                onClick = { onGuestLoginClick() },
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = MaterialTheme.colors.background
@@ -129,7 +129,7 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
 
     if (loginBottomSheetShowing) {
         ModalBottomLoginSheet(
-            onLoggedIn = onLoggedIn,
+            onLoggedIn = onGuestLoginClick,
             onDismiss = {
                 Logger.debug { "Dismiss bottom sheet" }
                 loginBottomSheetShowing = false

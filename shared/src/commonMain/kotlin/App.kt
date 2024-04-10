@@ -1,4 +1,5 @@
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -77,11 +78,13 @@ fun App(
             )
         }) {
         MccTheme {
-            var loggedIn by remember { mutableStateOf(authHandler.isLoggedIn()) }
-            if (loggedIn) {
+            val loggedIn = authHandler.loginState.collectAsState()
+            var guessedLogin by remember { mutableStateOf(false) }
+
+            if (loggedIn.value || guessedLogin) {
                 MainScreen()
             } else {
-                LoginScreen { loggedIn = true }
+                LoginScreen { guessedLogin = true }
             }
         }
     }
