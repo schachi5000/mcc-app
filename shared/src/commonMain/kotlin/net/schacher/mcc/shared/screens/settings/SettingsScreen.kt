@@ -49,7 +49,8 @@ import pro.schacher.mcc.BuildConfig
 @ExperimentalResourceApi
 @Composable
 fun SettingsScreen(
-    settingsViewModel: SettingsViewModel = koinInject(), onPackSelectionClick: () -> Unit
+    settingsViewModel: SettingsViewModel = koinInject(),
+    onPackSelectionClick: () -> Unit
 ) {
     val state by settingsViewModel.state.collectAsState()
     var deleteDatabaseDialog by remember { mutableStateOf(false) }
