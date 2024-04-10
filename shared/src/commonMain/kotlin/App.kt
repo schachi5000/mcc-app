@@ -77,7 +77,7 @@ fun App(
             )
         }) {
         MccTheme {
-            var loggedIn by remember { mutableStateOf(authHandler.loggedIn) }
+            var loggedIn by remember { mutableStateOf(authHandler.isLoggedIn()) }
             if (loggedIn) {
                 MainScreen()
             } else {

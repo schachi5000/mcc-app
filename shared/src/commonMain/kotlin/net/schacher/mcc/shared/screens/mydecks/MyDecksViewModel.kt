@@ -2,7 +2,6 @@ package net.schacher.mcc.shared.screens.mydecks
 
 import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -11,7 +10,7 @@ import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
-import kotlin.time.Duration.Companion.seconds
+import net.schacher.mcc.shared.utils.debug
 
 class MyDecksViewModel(
     private val deckRepository: DeckRepository,
@@ -22,7 +21,7 @@ class MyDecksViewModel(
     private val _state = MutableStateFlow(
         UiState(
             decks = this.deckRepository.decks.value,
-            canCreateDecks = authHandler.loggedIn
+            canCreateDecks = authHandler.isLoggedIn()
         )
     )
 
@@ -30,16 +29,26 @@ class MyDecksViewModel(
 
     init {
         viewModelScope.launch {
-            deckRepository.decks.collect { value ->
-                _state.value = UiState(value)
+            deckRepository.decks.collect {
+                _state.update {
+                    it.copy(
+                        decks = it.decks,
+                        refreshing = false
+                    )
+                }
             }
         }
 
         viewModelScope.launch {
-            _state.update {
-                it.copy(refreshing = true)
-
+            authHandler.loginState.collect { loggedIn ->
+                Logger.debug { "Login state changed to $loggedIn" }
+                _state.update { it.copy(canCreateDecks = loggedIn) }
             }
+        }
+
+        viewModelScope.launch {
+            _state.update { it.copy(refreshing = true) }
+
             try {
                 deckRepository.refreshAllUserDecks()
             } catch (e: Exception) {
@@ -65,7 +74,6 @@ class MyDecksViewModel(
         }
 
         viewModelScope.launch {
-            delay(2.seconds)
             try {
                 deckRepository.refreshAllUserDecks()
             } catch (e: Exception) {
@@ -81,7 +89,7 @@ class MyDecksViewModel(
     data class UiState internal constructor(
         val decks: List<Deck> = emptyList(),
         val refreshing: Boolean = false,
-        val canCreateDecks: Boolean = false
+        val canCreateDecks: Boolean
     )
 }
 

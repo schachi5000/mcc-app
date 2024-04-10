@@ -34,6 +34,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
@@ -48,27 +49,109 @@ import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewNavigator
 import com.multiplatform.webview.web.rememberWebViewState
+import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.splash_screen
 import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.auth.PersistingAuthHandler
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.utils.debug
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import pro.schacher.mcc.BuildConfig
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun LoginScreen(onLoggedIn: () -> Unit) {
+    var loginBottomSheetShowing by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        Image(
+            painter = painterResource(Res.drawable.splash_screen),
+            contentDescription = "Splash Screen",
+            contentScale = ContentScale.Crop,
+            modifier = Modifier.blur(6.dp)
+        )
+
+        Box(
+            modifier = Modifier.fillMaxSize().background(
+                Brush.verticalGradient(
+                    colorStops = arrayOf(
+                        0f to MaterialTheme.colors.surface.copy(alpha = 0.1f),
+                        0.4f to MaterialTheme.colors.surface.copy(alpha = 0.8f),
+                        0.6f to MaterialTheme.colors.surface.copy(alpha = 1f),
+                        1f to MaterialTheme.colors.surface.copy(alpha = 1f)
+                    )
+                )
+            )
+        )
+
+        Column(
+            modifier = Modifier.align(Alignment.BottomCenter)
+                .fillMaxWidth()
+                .padding(horizontal = 32.dp, vertical = 96.dp),
+        ) {
+            TextButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { loginBottomSheetShowing = true },
+                shape = DefaultShape,
+                colors = ButtonDefaults.textButtonColors(
+                    backgroundColor = MaterialTheme.colors.primary
+                )
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = MaterialTheme.colors.onPrimary,
+                    text = "Login with MarvelCDB"
+                )
+            }
+
+            Spacer(Modifier.height(16.dp))
+
+            TextButton(
+                modifier = Modifier.fillMaxWidth(),
+                onClick = { onLoggedIn() },
+                shape = DefaultShape,
+                colors = ButtonDefaults.textButtonColors(
+                    backgroundColor = MaterialTheme.colors.background
+                )
+            ) {
+                Text(
+                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                    color = MaterialTheme.colors.primary,
+                    text = "Continue as Guest"
+                )
+            }
+        }
+    }
+
+    if (loginBottomSheetShowing) {
+        ModalBottomLoginSheet(
+            onLoggedIn = onLoggedIn,
+            onDismiss = {
+                Logger.debug { "Dismiss bottom sheet" }
+                loginBottomSheetShowing = false
+            })
+    }
+}
+
+@OptIn(ExperimentalMaterialApi::class)
+@Composable
+fun ModalBottomLoginSheet(
+    modifier: Modifier = Modifier,
+    onLoggedIn: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     var webViewShowing by remember { mutableStateOf(false) }
+
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true,
     )
 
     BackHandler(webViewShowing || sheetState.isVisible) {
-        webViewShowing = false
+        onDismiss()
     }
 
     ModalBottomSheetLayout(
@@ -76,82 +159,23 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
         scrimColor = Color.Black.copy(alpha = 0.35f),
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetBackgroundColor = MaterialTheme.colors.surface,
-        sheetGesturesEnabled = false,
         sheetContent = {
             LoginWebView(
-                modifier = Modifier.heightIn(min = 300.dp, max = 500.dp).imePadding(),
+                modifier = modifier.heightIn(min = 300.dp, max = 600.dp).imePadding(),
                 onAccessGranted = {
                     onLoggedIn()
                 },
                 onAccessDenied = {
                     Logger.d { "Access denied" }
                     webViewShowing = false
+                    onDismiss()
                 })
         }) {
-
-        Box(modifier = Modifier.fillMaxSize()) {
-            Image(
-                painter = painterResource(Res.drawable.splash_screen),
-                contentDescription = "Splash Screen",
-                contentScale = ContentScale.Crop,
-                modifier = Modifier.blur(6.dp)
-            )
-
-            Box(
-                modifier = Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0f to MaterialTheme.colors.surface.copy(alpha = 0.1f),
-                            0.4f to MaterialTheme.colors.surface.copy(alpha = 0.8f),
-                            0.6f to MaterialTheme.colors.surface.copy(alpha = 1f),
-                            1f to MaterialTheme.colors.surface.copy(alpha = 1f)
-                        )
-                    )
-                )
-            )
-
-            Column(
-                modifier = Modifier.align(Alignment.BottomCenter)
-                    .fillMaxWidth()
-                    .padding(horizontal = 32.dp, vertical = 96.dp),
-            ) {
-                TextButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { webViewShowing = true },
-                    shape = DefaultShape,
-                    colors = ButtonDefaults.textButtonColors(
-                        backgroundColor = MaterialTheme.colors.primary
-                    )
-                ) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        color = MaterialTheme.colors.onPrimary,
-                        text = "Login with MarvelCDB"
-                    )
-                }
-
-                Spacer(Modifier.height(16.dp))
-
-                TextButton(
-                    modifier = Modifier.fillMaxWidth(),
-                    onClick = { onLoggedIn() },
-                    shape = DefaultShape,
-                    colors = ButtonDefaults.textButtonColors(
-                        backgroundColor = MaterialTheme.colors.background
-                    )
-                ) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                        color = MaterialTheme.colors.primary,
-                        text = "Continue as Guest"
-                    )
-                }
-            }
-
-        }
+        Box(modifier = modifier.fillMaxSize().background(Color.Transparent))
     }
 
-    LaunchedEffect(webViewShowing) {
+    val scope = rememberCoroutineScope()
+    scope.launch {
         if (webViewShowing) {
             sheetState.show()
         } else {
@@ -161,13 +185,20 @@ fun LoginScreen(onLoggedIn: () -> Unit) {
 
     LaunchedEffect(sheetState) {
         snapshotFlow { sheetState.isVisible }.collect { isVisible ->
+            if (!isVisible && webViewShowing) {
+                onDismiss()
+            }
             webViewShowing = isVisible
         }
+    }
+
+    LaunchedEffect(Unit) {
+        webViewShowing = true
     }
 }
 
 @Composable
-fun LoginWebView(
+private fun LoginWebView(
     modifier: Modifier = Modifier,
     authHandler: AuthHandler = koinInject(),
     onAccessGranted: () -> Unit,
@@ -176,13 +207,9 @@ fun LoginWebView(
     val webViewState = rememberWebViewState(BuildConfig.OAUTH_URL)
     val navigator = rememberWebViewNavigator()
 
-    webViewState.errorsForCurrentRequest.forEach {
-        webViewState.lastLoadedUrl?.let { Logger.d { "Last loaded URL: $it" } }
-        Logger.i { "${it.code} - ${it.description}" }
-    }
-
-    if (webViewState.lastLoadedUrl?.startsWith(PersistingAuthHandler.APP_SCHEME) == true) {
-        if (authHandler.handleCallbackUrl(webViewState.lastLoadedUrl!!)) {
+    val lastLoadedUrl = webViewState.lastLoadedUrl
+    if (lastLoadedUrl != null && lastLoadedUrl.startsWith(PersistingAuthHandler.APP_SCHEME)) {
+        if (authHandler.handleCallbackUrl(lastLoadedUrl)) {
             onAccessGranted()
         } else {
             onAccessDenied()

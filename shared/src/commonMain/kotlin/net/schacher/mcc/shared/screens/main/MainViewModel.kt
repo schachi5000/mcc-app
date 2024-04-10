@@ -32,7 +32,13 @@ class MainViewModel(
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(
-        UiState(mainScreen = if (authHandler.loggedIn) Decks else Spotlight)
+        UiState(
+            mainScreen = if (authHandler.isLoggedIn()) {
+                Decks
+            } else {
+                Spotlight
+            }
+        )
     )
 
     val state = _state.asStateFlow()

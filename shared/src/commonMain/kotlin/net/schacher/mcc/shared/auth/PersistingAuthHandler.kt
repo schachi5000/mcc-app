@@ -2,6 +2,9 @@ package net.schacher.mcc.shared.auth
 
 import co.touchlab.kermit.Logger
 import io.ktor.http.Url
+import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.StateFlow
+import kotlinx.coroutines.flow.asStateFlow
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.time.Time
 import net.schacher.mcc.shared.utils.debug
@@ -14,12 +17,23 @@ class PersistingAuthHandler(private val settingsDao: SettingsDao) : AuthHandler 
         private const val EXPIRES_AT = "access_token_expires_at"
     }
 
-    override val authHeader: String
-        get() = "Bearer ${TokenHolder.accessToken?.token ?: throw IllegalStateException("No access token available")}"
+    private var accessToken: AccessToken? = null
+        set(value) {
+            field = value
+            Logger.debug { "Access token set to $value" }
 
-    override val loggedIn: Boolean
-        get() = TokenHolder.accessToken != null &&
-                (TokenHolder.accessToken?.expiresAt ?: 0) > Time.currentTimeMillis
+            this._loginState.value = this.isLoggedIn()
+        }
+
+    private val _loginState = MutableStateFlow(this.isLoggedIn())
+
+    override val loginState: StateFlow<Boolean> = _loginState.asStateFlow()
+
+    override fun isLoggedIn(): Boolean = this.accessToken != null &&
+            (this.accessToken?.expiresAt ?: 0) > Time.currentTimeMillis
+
+    override val authHeader: String
+        get() = "Bearer ${this.accessToken?.token ?: throw IllegalStateException("No access token available")}"
 
     init {
         this.restoreAccessToken()
@@ -30,7 +44,7 @@ class PersistingAuthHandler(private val settingsDao: SettingsDao) : AuthHandler 
         val expiresAt = this.settingsDao.getString(EXPIRES_AT)?.toLongOrNull()
 
         if (token != null && expiresAt != null) {
-            TokenHolder.accessToken = AccessToken(token, expiresAt)
+            this.accessToken = AccessToken(token, expiresAt)
         }
     }
 
@@ -38,7 +52,7 @@ class PersistingAuthHandler(private val settingsDao: SettingsDao) : AuthHandler 
         val fixedCallbackUrl = callbackUrl.replace("#", "?")
         Logger.debug { "Handling callback url: $fixedCallbackUrl" }
 
-        TokenHolder.accessToken = try {
+        this.accessToken = try {
             this.parseData(fixedCallbackUrl)
         } catch (e: Exception) {
             Logger.e(throwable = e) { "Error parsing access token from $fixedCallbackUrl" }
@@ -47,7 +61,7 @@ class PersistingAuthHandler(private val settingsDao: SettingsDao) : AuthHandler 
             this.storeAccessToken(it)
         }
 
-        return TokenHolder.accessToken != null
+        return this.accessToken != null
     }
 
     private fun parseData(callbackUrl: String): AccessToken = Url(callbackUrl).let {
@@ -65,14 +79,6 @@ class PersistingAuthHandler(private val settingsDao: SettingsDao) : AuthHandler 
         this.settingsDao.putString(EXPIRES_AT, accessToken.expiresAt.toString())
 
     }
-}
-
-object TokenHolder {
-    var accessToken: AccessToken? = null
-        internal set(value) {
-            field = value
-            Logger.d { "Access token set to $value" }
-        }
 }
 
 data class AccessToken(
