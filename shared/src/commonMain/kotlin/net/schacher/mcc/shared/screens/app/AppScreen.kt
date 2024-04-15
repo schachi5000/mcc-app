@@ -11,22 +11,27 @@ import net.schacher.mcc.shared.screens.login.LoginScreen
 import net.schacher.mcc.shared.screens.main.MainScreen
 import org.koin.compose.koinInject
 
-private const val ANIMATION_DURATION_MILLIS = 500
+private const val LOG_IN_MILLIS = 500
+
+private const val LOG_OUT_MILLIS = 350
 
 @Composable
 fun AppScreen(appViewModel: AppViewModel = koinInject()) {
     val loggedIn = appViewModel.state.collectAsState()
     AnimatedContent(targetState = loggedIn.value, transitionSpec = {
         if (targetState) {
-            slideInVertically(tween(ANIMATION_DURATION_MILLIS),
+            slideInVertically(
+                tween(LOG_IN_MILLIS),
                 initialOffsetY = { fillHeight -> fillHeight }) togetherWith
                     slideOutVertically(tween(
-                        ANIMATION_DURATION_MILLIS
+                        LOG_IN_MILLIS
                     ), targetOffsetY = { fillHeight -> -fillHeight })
         } else {
-            slideInVertically(tween(ANIMATION_DURATION_MILLIS),
+            slideInVertically(
+                tween(LOG_OUT_MILLIS),
                 initialOffsetY = { fillHeight -> -fillHeight }) togetherWith
-                    slideOutVertically(tween(ANIMATION_DURATION_MILLIS),
+                    slideOutVertically(
+                        tween(LOG_OUT_MILLIS),
                         targetOffsetY = { fillHeight -> fillHeight })
         }
     }) {
