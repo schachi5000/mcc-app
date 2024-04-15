@@ -60,6 +60,20 @@ class MainViewModel(
                 }
             }
         }
+
+        this.viewModelScope.launch {
+            authHandler.loginState.collect {
+                _state.update {
+                    it.copy(
+                        mainScreen = if (authHandler.isLoggedIn()) {
+                            Decks
+                        } else {
+                            Spotlight
+                        }
+                    )
+                }
+            }
+        }
     }
 
     fun onTabSelected(tabIndex: Int) {
