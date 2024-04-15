@@ -11,9 +11,9 @@ import net.schacher.mcc.shared.screens.login.LoginScreen
 import net.schacher.mcc.shared.screens.main.MainScreen
 import org.koin.compose.koinInject
 
-private const val LOG_IN_MILLIS = 500
+private const val LOG_IN_MILLIS = 450
 
-private const val LOG_OUT_MILLIS = 350
+private const val LOG_OUT_MILLIS = 450
 
 @Composable
 fun AppScreen(appViewModel: AppViewModel = koinInject()) {
