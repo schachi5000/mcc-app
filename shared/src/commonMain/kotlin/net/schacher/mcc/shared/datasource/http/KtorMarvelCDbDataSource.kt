@@ -43,8 +43,11 @@ import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import kotlin.coroutines.coroutineContext
 
-class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marvelcdb.com/api") :
-    MarvelCDbDataSource {
+class KtorMarvelCDbDataSource(
+    private val authHandler: AuthHandler
+) : MarvelCDbDataSource {
+
+    private val serviceUrl: String = "https://de.marvelcdb.com/api"
 
     @OptIn(ExperimentalSerializationApi::class)
     private val httpClient = HttpClient {
@@ -121,7 +124,7 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
         httpClient.get("$serviceUrl/oauth2/decks") {
             headers {
-                append("Authorization", AuthHandler.authHeader)
+                append("Authorization", authHandler.authHeader)
             }
         }.body<List<DeckDto>>().map {
             val heroCard = cardProvider(it.investigator_code!!)
@@ -138,7 +141,7 @@ class KtorMarvelCDbDataSource(private val serviceUrl: String = "https://de.marve
     override suspend fun getUserDeckById(deckId: Int, cardProvider: suspend (String) -> Card) =
         httpClient.get("$serviceUrl/oauth2/deck/$deckId") {
             headers {
-                append("Authorization", AuthHandler.authHeader)
+                append("Authorization", authHandler.authHeader)
             }
         }.body<DeckDto>().let {
             val heroCard = cardProvider(it.investigator_code!!)

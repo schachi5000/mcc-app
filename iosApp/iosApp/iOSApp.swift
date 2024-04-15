@@ -5,9 +5,7 @@ import shared
 struct iOSApp: App {
 	var body: some Scene {
 		WindowGroup {
-            ContentView().onOpenURL(perform: { url in
-                AuthHandler.shared.handleCallbackUrl(callbackUrl: url.absoluteString)
-            })
+            ContentView()
         }
 	}
 }

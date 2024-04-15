@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Aspect
@@ -20,6 +21,7 @@ class DeckRepository(
     private val cardRepository: CardRepository,
     private val deckDatabaseDao: DeckDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource,
+    private val authHandler: AuthHandler
 ) {
     private val _decks = MutableStateFlow<List<Deck>>(emptyList())
 
@@ -27,7 +29,13 @@ class DeckRepository(
 
     init {
         MainScope().launch {
-            _decks.emit(deckDatabaseDao.getDecks())
+            authHandler.loginState.collect { loggedIn ->
+                if (loggedIn) {
+                    runCatching { refreshAllUserDecks() }
+                } else {
+                    _decks.emit(emptyList())
+                }
+            }
         }
     }
 
@@ -78,11 +86,11 @@ class DeckRepository(
             this.cardRepository.getCard(it)
         }
 
-        decks.forEach {
-            this.deckDatabaseDao.addDeck(it)
-        }
+//        decks.forEach {
+//            this.deckDatabaseDao.addDeck(it)
+//        }
 
-        _decks.emit(deckDatabaseDao.getDecks())
+        _decks.emit(decks)
     }
 
     suspend fun addDeckById(deckId: Int) {

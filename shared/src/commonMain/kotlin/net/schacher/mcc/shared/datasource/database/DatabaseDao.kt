@@ -47,29 +47,28 @@ class DatabaseDao(
             cards.forEach { addCard(it) }
         }
 
-    override suspend fun addCard(card: Card) =
-        measuringWithContext(Dispatchers.IO, "addCard") {
-            dbQuery.addCard(
-                code = card.code,
-                position = card.position.toLong(),
-                type = card.type?.name,
-                cardSetCode = card.setCode,
-                cardSetName = card.setName,
-                packCode = card.packCode,
-                packName = card.packName,
-                name = card.name,
-                cost = card.cost?.toLong(),
-                aspect = card.aspect?.name,
-                text = card.text,
-                boostText = card.boostText,
-                attackText = card.attackText,
-                quote = card.quote,
-                traits = card.traits,
-                imagePath = card.imagePath,
-                faction = card.faction.name,
-                linkedCardCode = card.linkedCard?.code
-            )
-        }
+    override suspend fun addCard(card: Card) = measuringWithContext(Dispatchers.IO, "addCard") {
+        dbQuery.addCard(
+            code = card.code,
+            position = card.position.toLong(),
+            type = card.type?.name,
+            cardSetCode = card.setCode,
+            cardSetName = card.setName,
+            packCode = card.packCode,
+            packName = card.packName,
+            name = card.name,
+            cost = card.cost?.toLong(),
+            aspect = card.aspect?.name,
+            text = card.text,
+            boostText = card.boostText,
+            attackText = card.attackText,
+            quote = card.quote,
+            traits = card.traits,
+            imagePath = card.imagePath,
+            faction = card.faction.name,
+            linkedCardCode = card.linkedCard?.code
+        )
+    }
 
     override suspend fun getCardByCode(cardCode: String): Card =
         measuringWithContext(Dispatchers.IO, "getCardByCode") {
@@ -252,7 +251,7 @@ private fun Boolean.toLong() = if (this) 1L else 0L
 
 private fun Long?.toBoolean() = if (this == null) false else this != 0L
 
-private suspend fun database.Pack.toPack() = Pack(
+private fun database.Pack.toPack() = Pack(
     name = this.name,
     code = this.code,
     cardCodes = this.cardCodes.toCardCodeList(),

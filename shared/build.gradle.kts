@@ -74,6 +74,7 @@ kotlin {
                 implementation(libs.moko.mvvm.compose)
                 @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
+                api("io.github.kevinnzou:compose-webview-multiplatform:1.9.2")
             }
         }
         val androidMain by getting {
