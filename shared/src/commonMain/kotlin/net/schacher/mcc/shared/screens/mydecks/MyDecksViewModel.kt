@@ -6,20 +6,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.DeckRepository
 
-class MyDecksViewModel(
-    private val deckRepository: DeckRepository,
-    private val authHandler: AuthHandler
-) : ViewModel() {
+class MyDecksViewModel(private val deckRepository: DeckRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(
-        UiState(
-            decks = this.deckRepository.decks.value,
-            canCreateDecks = authHandler.isLoggedIn()
-        )
+        UiState(decks = this.deckRepository.decks.value)
     )
 
     val state = _state.asStateFlow()
@@ -32,14 +25,6 @@ class MyDecksViewModel(
                         decks = it.decks,
                         refreshing = false
                     )
-                }
-            }
-        }
-
-        viewModelScope.launch {
-            authHandler.loginState.collect { loggedIn ->
-                _state.update {
-                    it.copy(canCreateDecks = loggedIn)
                 }
             }
         }
@@ -78,8 +63,7 @@ class MyDecksViewModel(
 
     data class UiState internal constructor(
         val decks: List<Deck> = emptyList(),
-        val refreshing: Boolean = false,
-        val canCreateDecks: Boolean
+        val refreshing: Boolean = false
     )
 }
 

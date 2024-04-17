@@ -117,26 +117,18 @@ fun MyDecksScreen(
             }
         }
 
-        if (state.canCreateDecks) {
-            AddDeckButton(
-                modifier = Modifier.align(Alignment.BottomCenter),
-                expanded = expanded
-            ) { onAddDeckClick() }
+        AddDeckButton(
+            modifier = Modifier.align(Alignment.BottomCenter),
+            expanded = expanded
+        ) { onAddDeckClick() }
 
-            PullRefreshIndicator(
-                modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),
-                refreshing = state.refreshing,
-                state = pullRefreshState,
-                contentColor = MaterialTheme.colors.primary,
-                backgroundColor = MaterialTheme.colors.background
-            )
-        } else {
-            Text(
-                modifier = Modifier.align(Alignment.Center),
-                color = MaterialTheme.colors.onBackground,
-                text = "Please login to create decks"
-            )
-        }
+        PullRefreshIndicator(
+            modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),
+            refreshing = state.refreshing,
+            state = pullRefreshState,
+            contentColor = MaterialTheme.colors.primary,
+            backgroundColor = MaterialTheme.colors.background
+        )
     }
 }
 

@@ -4,25 +4,25 @@ import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
-import net.schacher.mcc.shared.auth.AuthHandler
+import net.schacher.mcc.shared.repositories.AuthRepository
 
 class AppViewModel(
-    private val authHandler: AuthHandler
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(this.authHandler.isLoggedIn())
+    private val _state = MutableStateFlow(this.authRepository.loggedIn)
 
     val state = _state.asStateFlow()
 
     init {
         viewModelScope.launch {
-            authHandler.loginState.collect {
+            authRepository.loginState.collect {
                 _state.value = it
             }
         }
     }
 
     fun onGuestLoginClicked() {
-        _state.value = true
+        this.authRepository.loginAsGuest()
     }
 }

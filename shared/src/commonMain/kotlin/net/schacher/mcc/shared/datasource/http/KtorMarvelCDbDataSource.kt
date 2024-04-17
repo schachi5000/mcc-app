@@ -16,7 +16,6 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
-import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.datasource.http.dto.CardDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
 import net.schacher.mcc.shared.datasource.http.dto.PackDto
@@ -41,13 +40,16 @@ import net.schacher.mcc.shared.model.CardType.VILLAIN
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
+import net.schacher.mcc.shared.repositories.AuthRepository
 import kotlin.coroutines.coroutineContext
 
 class KtorMarvelCDbDataSource(
-    private val authHandler: AuthHandler
+    private val authRepository: AuthRepository
 ) : MarvelCDbDataSource {
 
     private val serviceUrl: String = "https://de.marvelcdb.com/api"
+    private val authHeader: String
+        get() = "Bearer ${this.authRepository.accessToken?.token ?: throw IllegalStateException("No access token available")}"
 
     @OptIn(ExperimentalSerializationApi::class)
     private val httpClient = HttpClient {
@@ -123,9 +125,7 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
         httpClient.get("$serviceUrl/oauth2/decks") {
-            headers {
-                append("Authorization", authHandler.authHeader)
-            }
+            headers { append("Authorization", authHeader) }
         }.body<List<DeckDto>>().map {
             val heroCard = cardProvider(it.investigator_code!!)
 
@@ -140,9 +140,7 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getUserDeckById(deckId: Int, cardProvider: suspend (String) -> Card) =
         httpClient.get("$serviceUrl/oauth2/deck/$deckId") {
-            headers {
-                append("Authorization", authHandler.authHeader)
-            }
+            headers { append("Authorization", authHeader) }
         }.body<DeckDto>().let {
             val heroCard = cardProvider(it.investigator_code!!)
 

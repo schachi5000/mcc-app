@@ -52,10 +52,9 @@ import com.multiplatform.webview.web.rememberWebViewState
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.splash_screen
-import net.schacher.mcc.shared.auth.AuthHandler
-import net.schacher.mcc.shared.auth.PersistingAuthHandler
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.utils.debug
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -197,7 +196,7 @@ fun ModalBottomLoginSheet(
 @Composable
 private fun LoginWebView(
     modifier: Modifier = Modifier,
-    authHandler: AuthHandler = koinInject(),
+    authRepository: AuthRepository = koinInject(), // TODO move to ViewModel
     onAccessGranted: () -> Unit,
     onAccessDenied: () -> Unit
 ) {
@@ -205,8 +204,8 @@ private fun LoginWebView(
     val navigator = rememberWebViewNavigator()
 
     val lastLoadedUrl = webViewState.lastLoadedUrl
-    if (lastLoadedUrl != null && lastLoadedUrl.startsWith(PersistingAuthHandler.APP_SCHEME)) {
-        if (authHandler.handleCallbackUrl(lastLoadedUrl)) {
+    if (lastLoadedUrl != null && lastLoadedUrl.startsWith(AuthRepository.APP_SCHEME)) {
+        if (authRepository.handleCallbackUrl(lastLoadedUrl)) {
             onAccessGranted()
         } else {
             onAccessDenied()

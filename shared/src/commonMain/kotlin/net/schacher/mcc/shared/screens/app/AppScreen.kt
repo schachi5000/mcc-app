@@ -18,6 +18,7 @@ private const val LOG_OUT_MILLIS = 450
 @Composable
 fun AppScreen(appViewModel: AppViewModel = koinInject()) {
     val loggedIn = appViewModel.state.collectAsState()
+
     AnimatedContent(targetState = loggedIn.value, transitionSpec = {
         if (targetState) {
             slideInVertically(

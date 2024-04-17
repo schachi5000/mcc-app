@@ -48,7 +48,8 @@ import org.koin.compose.koinInject
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel = koinInject(),
-    onPackSelectionClick: () -> Unit
+    onPackSelectionClick: () -> Unit,
+    onLogoutClicked: () -> Unit
 ) {
     val state by settingsViewModel.state.collectAsState()
     var deleteDatabaseDialog by remember { mutableStateOf(false) }
@@ -106,23 +107,20 @@ fun SettingsScreen(
                 onClick = { onPackSelectionClick() })
         }
 
-        if (state.canLogout) {
-            TextButton(
-                modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-                onClick = { settingsViewModel.onLogoutClicked() },
-                shape = DefaultShape,
-                colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = MaterialTheme.colors.surface
-                )
-            ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = MaterialTheme.colors.primary,
-                    text = "Logout"
-                )
-            }
+        TextButton(
+            modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+            onClick = { onLogoutClicked() },
+            shape = DefaultShape,
+            colors = ButtonDefaults.textButtonColors(
+                backgroundColor = MaterialTheme.colors.surface
+            )
+        ) {
+            Text(
+                modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
+                color = MaterialTheme.colors.primary,
+                text = if (state.guestLogin) "Login" else "Logout"
+            )
         }
-
 
         Spacer(Modifier.size(16.dp))
 
