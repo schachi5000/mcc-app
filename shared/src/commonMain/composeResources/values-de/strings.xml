@@ -7,4 +7,7 @@
     <string name="search">Suche</string>
     <string name="more">Mehr</string>
     <string name="create_new_deck">Neues Deck erstellen</string>
+    <string name="login_with_marvelcdb">Anmelden mit MarvelCDB</string>
+    <string name="login_as_guest">Weiter als Gast</string>
+    <string name="login">Anmelden</string>
 </resources>
