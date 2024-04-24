@@ -41,13 +41,15 @@ import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.AuthRepository
+import pro.schacher.mcc.BuildConfig
 import kotlin.coroutines.coroutineContext
 
 class KtorMarvelCDbDataSource(
     private val authRepository: AuthRepository
 ) : MarvelCDbDataSource {
 
-    private val serviceUrl: String = "https://de.marvelcdb.com/api"
+    private val serviceUrl: String = BuildConfig.PROXY_URL
+
     private val authHeader: String
         get() = "Bearer ${this.authRepository.accessToken?.token ?: throw IllegalStateException("No access token available")}"
 
@@ -102,8 +104,9 @@ class KtorMarvelCDbDataSource(
     override suspend fun getSpotlightDecksByDate(
         date: LocalDate, cardProvider: suspend (String) -> Card
     ) = runCatching {
-        this.httpClient.get("$serviceUrl/public/decklists/by_date/${date.toDateString()}")
-            .body<List<DeckDto>>().map {
+        this.httpClient.get("$serviceUrl/spotlight/${date.toDateString()}")
+            .body<List<DeckDto>>()
+            .map {
                 Deck(
                     id = it.id,
                     name = it.name,
@@ -121,6 +124,8 @@ class KtorMarvelCDbDataSource(
                         .filterNotNull()
                 )
             }
+    }.onFailure {
+        Logger.e { it.message.toString() }
     }
 
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
