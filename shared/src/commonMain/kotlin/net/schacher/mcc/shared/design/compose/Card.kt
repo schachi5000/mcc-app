@@ -18,7 +18,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
@@ -26,8 +25,6 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
-import io.kamel.image.KamelImage
-import io.kamel.image.asyncPainterResource
 import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.design.theme.SleeveColors
 import net.schacher.mcc.shared.model.Card
@@ -86,12 +83,9 @@ fun Card(
         shape = shape,
         onClick = onClick
     ) {
-        KamelImage(
+        CardImage(
             modifier = Modifier.aspectRatio(aspectRation).scale(1.025f),
-            resource = asyncPainterResource(
-                data = "https://de.marvelcdb.com/bundles/cards/${card.code}.png",
-                filterQuality = FilterQuality.High
-            ),
+            cardCode = card.code,
             contentDescription = card.name,
             contentScale = ContentScale.FillBounds,
             animationSpec = tween(

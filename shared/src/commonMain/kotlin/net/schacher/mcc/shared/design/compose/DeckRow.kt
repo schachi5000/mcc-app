@@ -34,8 +34,6 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
-import io.kamel.image.KamelImage
-import io.kamel.image.asyncPainterResource
 import net.schacher.mcc.shared.design.previewablePainterResource
 import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.design.theme.DeckShape
@@ -110,7 +108,10 @@ private fun DeckContent(deck: Deck, onClick: () -> Unit = {}) {
 
                 InfoRow("${deck.cards.size} Karten", DrawableResource("drawable/ic_cards.xml"))
                 Spacer(Modifier.height(4.dp))
-                InfoRow("${deck.requiredDecks.size} Packs benötigt", DrawableResource("drawable/ic_deck.xml"))
+                InfoRow(
+                    "${deck.requiredDecks.size} Packs benötigt",
+                    DrawableResource("drawable/ic_deck.xml")
+                )
             }
         }
     }
@@ -121,7 +122,7 @@ private fun BackgroundImage(modifier: Modifier = Modifier, deck: Deck) {
     Box(
         modifier = modifier.fillMaxSize().clip(DeckShape)
     ) {
-        KamelImage(
+        CardImage(
             modifier = Modifier.fillMaxSize()
                 .blur(6.dp)
                 .background(MaterialTheme.colors.surface)
@@ -129,18 +130,15 @@ private fun BackgroundImage(modifier: Modifier = Modifier, deck: Deck) {
                     scaleX = 1.6f
                     scaleY = 1.6f
                 },
-            resource = asyncPainterResource(
-                data = "https://de.marvelcdb.com/bundles/cards/${deck.hero.code}.png",
-                filterQuality = FilterQuality.Low,
-            ),
+            cardCode = deck.hero.code,
+            filterQuality = FilterQuality.Low,
             contentDescription = deck.name,
             contentScale = ContentScale.Crop,
             animationSpec = tween(
                 durationMillis = 500
             ),
-            colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) }),
-            onLoading = {},
-            onFailure = {})
+            colorFilter = ColorFilter.colorMatrix(ColorMatrix().apply { setToSaturation(0f) })
+        )
         Column(
             modifier = modifier.fillMaxSize()
                 .clip(DeckShape)
@@ -151,15 +149,13 @@ private fun BackgroundImage(modifier: Modifier = Modifier, deck: Deck) {
 
 @Composable
 private fun Thumbnail(modifier: Modifier = Modifier, card: Card) {
-    KamelImage(
+    CardImage(
         modifier = modifier.clip(CardShape)
             .aspectRatio(1f)
             .scale(1.7f)
             .graphicsLayer { translationY = 20.dp.toPx() },
-        resource = asyncPainterResource(
-            data = "https://de.marvelcdb.com/bundles/cards/${card.code}.png",
-            filterQuality = FilterQuality.Low
-        ),
+        cardCode = card.code,
+        filterQuality = FilterQuality.Low,
         contentDescription = card.name,
         contentScale = ContentScale.Crop,
         animationSpec = tween(durationMillis = 500),
