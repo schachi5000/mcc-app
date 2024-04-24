@@ -75,7 +75,7 @@ fun LoginScreen(
             painter = painterResource(Res.drawable.splash_screen),
             contentDescription = "Splash Screen",
             contentScale = ContentScale.Crop,
-            modifier = Modifier.blur(6.dp)
+            modifier = Modifier.blur(12.dp)
         )
 
         Box(
