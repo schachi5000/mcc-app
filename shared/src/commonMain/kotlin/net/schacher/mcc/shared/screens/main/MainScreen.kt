@@ -62,7 +62,7 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.Cre
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.PackSelectionScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Decks
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.MyDecks
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Search
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
@@ -115,7 +115,7 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
             backgroundColor = MaterialTheme.colors.background,
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
             bottomBar = {
-                BottomBar(state.value.mainScreen.tabIndex) {
+                BottomBar(state.value.mainScreen.tabIndex, state.value.canShowMyDeckScreen) {
                     viewModel.onTabSelected(it)
                 }
             }
@@ -148,9 +148,13 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                             viewModel.onCardClicked(it)
                         }
 
-                        3 -> SettingsScreen {
-                            viewModel.onPackSelectionClicked()
-                        }
+                        3 -> SettingsScreen(
+                            onPackSelectionClick = {
+                                viewModel.onPackSelectionClicked()
+                            },
+                            onLogoutClicked = {
+                                viewModel.onLogoutClicked()
+                            })
                     }
                 }
             }
@@ -169,7 +173,7 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
         viewModel.event.collect {
             when (it) {
                 DatabaseSynced -> snackbarHostState.showSnackbar("Database synced!")
-                is CardsDatabaseSyncFailed -> snackbarHostState.showSnackbar("Error syncing database: ${it.exception.message}")
+                is CardsDatabaseSyncFailed -> snackbarHostState.showSnackbar("Error fully syncing database")
                 is DeckCreated -> snackbarHostState.showSnackbar("Deck created! ${it.deckName}")
             }
         }
@@ -217,7 +221,7 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
+fun BottomBar(selectedTabIndex: Int, canShowMyDecks: Boolean = true, onTabSelected: (Int) -> Unit) {
     BottomNavigation(
         modifier = Modifier
             .fillMaxWidth()
@@ -230,12 +234,14 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         backgroundColor = MaterialTheme.colors.surface,
     ) {
         Row(Modifier.fillMaxWidth().padding(bottom = if (isIOs()) 16.dp else 0.dp)) {
-            DefaultBottomNavigationItem(
-                label = stringResource(Res.string.decks),
-                icon = Res.drawable.ic_deck,
-                selected = (selectedTabIndex == 0),
-                onClick = { onTabSelected(0) },
-            )
+            if (canShowMyDecks) {
+                DefaultBottomNavigationItem(
+                    label = stringResource(Res.string.decks),
+                    icon = Res.drawable.ic_deck,
+                    selected = (selectedTabIndex == 0),
+                    onClick = { onTabSelected(0) },
+                )
+            }
             DefaultBottomNavigationItem(
                 label = stringResource(Res.string.spotlight),
                 icon = Res.drawable.ic_spotlight,
@@ -267,7 +273,7 @@ fun CardMenuBottomSheet(mainViewModel: MainViewModel, card: Card) {
 
 private val MainScreen.tabIndex: Int
     get() = when (this) {
-        Decks -> 0
+        MyDecks -> 0
         Spotlight -> 1
         Search -> 2
         Settings -> 3

@@ -1,6 +1,4 @@
 import androidx.compose.runtime.Composable
-import net.schacher.mcc.shared.auth.AuthHandler
-import net.schacher.mcc.shared.auth.PersistingAuthHandler
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
 import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
@@ -10,6 +8,7 @@ import net.schacher.mcc.shared.datasource.http.KtorMarvelCDbDataSource
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.design.theme.MccTheme
 import net.schacher.mcc.shared.platform.platformModule
+import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
@@ -50,7 +49,7 @@ val viewModels = module {
 
 @Composable
 fun App(databaseDao: DatabaseDao, onKoinStart: KoinApplication.() -> Unit = {}) {
-    val authHandler = PersistingAuthHandler(databaseDao as SettingsDao)
+    val authHandler = AuthRepository(databaseDao as SettingsDao)
     KoinApplication(application = {
         onKoinStart()
         modules(platformModule, module {
@@ -59,7 +58,7 @@ fun App(databaseDao: DatabaseDao, onKoinStart: KoinApplication.() -> Unit = {}) 
             single<PackDatabaseDao> { databaseDao }
             single<SettingsDao> { databaseDao }
         }, module {
-            single<AuthHandler> { authHandler }
+            single<AuthRepository> { authHandler }
         }, network, repositories, viewModels
         )
     }) {

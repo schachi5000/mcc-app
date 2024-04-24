@@ -2,44 +2,38 @@ package net.schacher.mcc.shared.screens.main
 
 import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CreateDeck
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Decks
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.MyDecks
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Search
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
+import kotlin.time.Duration.Companion.seconds
 
 class MainViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
-    authHandler: AuthHandler
+    private val authRepository: AuthRepository
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(
-        UiState(
-            mainScreen = if (authHandler.isLoggedIn()) {
-                Decks
-            } else {
-                Spotlight
-            }
-        )
-    )
+    private val _state = MutableStateFlow(UiState())
 
     val state = _state.asStateFlow()
 
@@ -49,7 +43,9 @@ class MainViewModel(
 
     init {
         this.viewModelScope.launch {
+            delay(1.seconds)
             if (!cardRepository.hasCards()) {
+                Logger.d { "No cards found in repo -> refreshing" }
                 try {
                     cardRepository.refreshAllCards()
                     packRepository.refreshAllPacks()
@@ -62,14 +58,16 @@ class MainViewModel(
         }
 
         this.viewModelScope.launch {
-            authHandler.loginState.collect {
+            authRepository.loginState.collect {
                 _state.update {
+                    val loggedIn = !authRepository.isGuest()
                     it.copy(
-                        mainScreen = if (authHandler.isLoggedIn()) {
-                            Decks
+                        mainScreen = if (loggedIn) {
+                            MyDecks
                         } else {
                             Spotlight
-                        }
+                        },
+                        canShowMyDeckScreen = loggedIn
                     )
                 }
             }
@@ -79,7 +77,7 @@ class MainViewModel(
     fun onTabSelected(tabIndex: Int) {
         this.viewModelScope.launch {
             val mainScreen = when (tabIndex) {
-                0 -> Decks
+                0 -> MyDecks
                 1 -> Spotlight
                 2 -> Search
                 3 -> Settings
@@ -160,6 +158,10 @@ class MainViewModel(
         }
     }
 
+    fun onLogoutClicked() {
+        this.authRepository.logout()
+    }
+
     sealed interface Event {
         data object DatabaseSynced : Event
         data class DeckCreated(val deckName: String) : Event
@@ -168,12 +170,13 @@ class MainViewModel(
     }
 
     data class UiState internal constructor(
-        val mainScreen: MainScreen,
+        val mainScreen: MainScreen = Spotlight,
+        val canShowMyDeckScreen: Boolean = false,
         val subScreen: SubScreen? = null,
         val fullScreen: FullScreen? = null
     ) {
         sealed interface MainScreen {
-            data object Decks : MainScreen
+            data object MyDecks : MainScreen
             data object Spotlight : MainScreen
             data object Search : MainScreen
             data object Settings : MainScreen

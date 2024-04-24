@@ -40,10 +40,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import io.kamel.image.KamelImage
-import io.kamel.image.asyncPainterResource
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.Card
+import net.schacher.mcc.shared.design.compose.CardImage
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
@@ -210,14 +209,12 @@ private fun BackgroundImage(
     Box(
         modifier = modifier.height(340.dp)
     ) {
-        KamelImage(
+        CardImage(
             modifier = Modifier.fillMaxSize()
                 .blur(30.dp)
                 .background(MaterialTheme.colors.surface),
-            resource = asyncPainterResource(
-                data = "https://de.marvelcdb.com/bundles/cards/${deck.hero.code}.png",
-                filterQuality = FilterQuality.Low,
-            ),
+            cardCode = deck.hero.code,
+            filterQuality = FilterQuality.Low,
             contentDescription = deck.name,
             contentScale = ContentScale.Crop,
             animationSpec = tween(

@@ -6,9 +6,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.schacher.mcc.shared.auth.AuthHandler
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.platform.PlatformInfo
+import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
@@ -17,7 +17,7 @@ class SettingsViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
-    private val authHandler: AuthHandler,
+    private val authRepository: AuthRepository,
     settingsDao: SettingsDao,
     platformInfo: PlatformInfo
 ) : ViewModel() {
@@ -30,7 +30,7 @@ class SettingsViewModel(
             packsInCollectionCount = packRepository.packsInCollection.value.size,
             settingsValues = settingsDao.getAllEntries(),
             versionName = platformInfo.version,
-            canLogout = authHandler.isLoggedIn()
+            guestLogin = authRepository.isGuest()
         )
     )
 
@@ -44,8 +44,8 @@ class SettingsViewModel(
         }
 
         viewModelScope.launch {
-            authHandler.loginState.collect { loggedIn ->
-                _state.update { it.copy(canLogout = loggedIn) }
+            authRepository.loginState.collect {
+                _state.update { it.copy(guestLogin = authRepository.isGuest()) }
             }
         }
 
@@ -92,6 +92,7 @@ class SettingsViewModel(
             } catch (e: Exception) {
                 Logger.e(e) { "Error refreshing cards" }
             }
+
             try {
                 packRepository.refreshAllPacks()
             } catch (e: Exception) {
@@ -110,10 +111,6 @@ class SettingsViewModel(
         }
     }
 
-    fun onLogoutClicked() {
-        this.authHandler.logout()
-    }
-
     data class UiState(
         val cardCount: Int,
         val deckCount: Int,
@@ -122,7 +119,7 @@ class SettingsViewModel(
         val syncInProgress: Boolean = false,
         val settingsValues: List<Pair<String, Any>> = emptyList(),
         val versionName: String,
-        val canLogout: Boolean
+        val guestLogin: Boolean
     )
 }
 

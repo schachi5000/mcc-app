@@ -44,21 +44,22 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewNavigator
 import com.multiplatform.webview.web.rememberWebViewState
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.login
+import marvelchampionscompanion.shared.generated.resources.login_as_guest
+import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.splash_screen
-import net.schacher.mcc.shared.auth.AuthHandler
-import net.schacher.mcc.shared.auth.PersistingAuthHandler
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.utils.debug
+import net.schacher.mcc.shared.repositories.AuthRepository
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import pro.schacher.mcc.BuildConfig
 
@@ -74,7 +75,7 @@ fun LoginScreen(
             painter = painterResource(Res.drawable.splash_screen),
             contentDescription = "Splash Screen",
             contentScale = ContentScale.Crop,
-            modifier = Modifier.blur(6.dp)
+            modifier = Modifier.blur(12.dp)
         )
 
         Box(
@@ -106,7 +107,7 @@ fun LoginScreen(
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     color = MaterialTheme.colors.onPrimary,
-                    text = "Login with MarvelCDB"
+                    text = stringResource(Res.string.login_with_marvelcdb)
                 )
             }
 
@@ -123,7 +124,7 @@ fun LoginScreen(
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     color = MaterialTheme.colors.primary,
-                    text = "Continue as Guest"
+                    text = stringResource(Res.string.login_as_guest)
                 )
             }
         }
@@ -132,7 +133,6 @@ fun LoginScreen(
     if (loginBottomSheetShowing) {
         ModalBottomLoginSheet(
             onDismiss = {
-                Logger.debug { "Dismiss bottom sheet" }
                 loginBottomSheetShowing = false
             })
     }
@@ -162,7 +162,6 @@ fun ModalBottomLoginSheet(
         sheetContent = {
             LoginWebView(
                 modifier = modifier.heightIn(min = 300.dp, max = 600.dp).imePadding(),
-                onAccessGranted = { },
                 onAccessDenied = {
                     webViewShowing = false
                     onDismiss()
@@ -194,20 +193,20 @@ fun ModalBottomLoginSheet(
     }
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 private fun LoginWebView(
     modifier: Modifier = Modifier,
-    authHandler: AuthHandler = koinInject(),
-    onAccessGranted: () -> Unit,
+    authRepository: AuthRepository = koinInject(), // TODO move to ViewModel
     onAccessDenied: () -> Unit
 ) {
     val webViewState = rememberWebViewState(BuildConfig.OAUTH_URL)
     val navigator = rememberWebViewNavigator()
 
     val lastLoadedUrl = webViewState.lastLoadedUrl
-    if (lastLoadedUrl != null && lastLoadedUrl.startsWith(PersistingAuthHandler.APP_SCHEME)) {
-        if (authHandler.handleCallbackUrl(lastLoadedUrl)) {
-            onAccessGranted()
+    if (lastLoadedUrl != null && lastLoadedUrl.startsWith(AuthRepository.APP_SCHEME)) {
+        if (authRepository.handleCallbackUrl(lastLoadedUrl)) {
+            return
         } else {
             onAccessDenied()
         }
@@ -217,7 +216,7 @@ private fun LoginWebView(
         TopAppBar(
             backgroundColor = MaterialTheme.colors.background,
             contentColor = MaterialTheme.colors.primary,
-            title = { Text(text = "Login") },
+            title = { Text(text = stringResource(Res.string.login)) },
             navigationIcon = {
                 IconButton(onClick = {
                     if (navigator.canGoBack) {

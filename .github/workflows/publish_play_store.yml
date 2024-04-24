@@ -33,8 +33,12 @@ jobs:
         uses: christian-draeger/write-properties@1.1.0
         with:
           path: 'local.properties'
-          property: 'oauth.url'
-          value: ${{ secrets.OAUTH_URL }}
+          property: |
+            'oauth.url'
+            'proxy.url'
+          value: |
+            ${{ secrets.OAUTH_URL }}
+            ${{ secrets.PROXY_URL }}
 
       - name: Generate build number
         id: buildnumber
