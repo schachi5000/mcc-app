@@ -30,15 +30,15 @@ jobs:
           java-version: '17'
 
       - name: Write property file
-        uses: christian-draeger/write-properties@1.1.0
+        uses: GuillaumeFalourd/write-java-properties-file@v1
         with:
-          path: 'local.properties'
+          file_path: 'local.properties'
           property: |
-            'oauth.url'
-            'proxy.url'
+            oauth.url
+            proxy.url
           value: |
-            '${{ secrets.OAUTH_URL }}'
-            '${{ secrets.PROXY_URL }}'
+            ${{ secrets.OAUTH_URL }}
+            ${{ secrets.PROXY_URL }}
 
       - name: Generate build number
         id: buildnumber
