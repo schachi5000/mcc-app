@@ -3,6 +3,7 @@ package net.schacher.mcc.shared.datasource.http
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
@@ -69,10 +70,14 @@ class KtorMarvelCDbDataSource(
             }
             level = LogLevel.INFO
         }
+        install(HttpRequestRetry) {
+            retryOnServerErrors(maxRetries = 2)
+            exponentialDelay()
+        }
     }
 
     override suspend fun getAllPacks() =
-        httpClient.get("$serviceUrl/public/packs").body<List<PackDto>>().map {
+        httpClient.get("$serviceUrl/packs").body<List<PackDto>>().map {
             Pack(
                 code = it.code,
                 name = it.name,
@@ -85,21 +90,29 @@ class KtorMarvelCDbDataSource(
             Logger.i { "Packs loaded: ${it.size}" }
         }
 
-    override suspend fun getCardPack(packCode: String) =
-        httpClient.get("$serviceUrl/public/cards/$packCode").body<List<CardDto>>()
-            .map { it.toCard() }
+    override suspend fun getCardPack(packCode: String): List<Card> =
+        runCatching {
+            httpClient.get("$serviceUrl/pack/$packCode").body<List<CardDto>>()
+                .map {
+                    it.toCard()
+                }
+        }.getOrNull() ?: emptyList()
 
-    override suspend fun getAllCards() = this.getAllPacks().map {
-        CoroutineScope(coroutineContext).async {
-            Logger.i { "Starting download of: ${it.name}" }
-            val result = getCardPack(it.code)
-            Logger.i { "finished download of: ${it.name}" }
-            result
-        }
-    }.awaitAll().flatten()
+    override suspend fun getAllCards(): List<Card> {
+        val allPacks = this.getAllPacks()
+
+        return allPacks.map {
+            CoroutineScope(coroutineContext).async {
+                Logger.i { "Starting download of: ${it.name}" }
+                val result = runCatching { getCardPack(it.code) }.getOrNull() ?: emptyList()
+                Logger.i { "finished download of: ${it.name}" }
+                result
+            }
+        }.awaitAll().flatten()
+    }
 
     override suspend fun getCard(cardCode: String) =
-        httpClient.get("$serviceUrl/public/card/$cardCode").body<CardDto>().toCard()
+        httpClient.get("$serviceUrl/card/$cardCode").body<CardDto>().toCard()
 
     override suspend fun getSpotlightDecksByDate(
         date: LocalDate, cardProvider: suspend (String) -> Card
@@ -124,8 +137,6 @@ class KtorMarvelCDbDataSource(
                         .filterNotNull()
                 )
             }
-    }.onFailure {
-        Logger.e { it.message.toString() }
     }
 
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
@@ -143,7 +154,10 @@ class KtorMarvelCDbDataSource(
                 }.flatten().toMutableList().also { it.add(0, heroCard) })
         }
 
-    override suspend fun getUserDeckById(deckId: Int, cardProvider: suspend (String) -> Card) =
+    override suspend fun getUserDeckById(
+        deckId: Int,
+        cardProvider: suspend (String) -> Card
+    ) =
         httpClient.get("$serviceUrl/oauth2/deck/$deckId") {
             headers { append("Authorization", authHeader) }
         }.body<DeckDto>().let {

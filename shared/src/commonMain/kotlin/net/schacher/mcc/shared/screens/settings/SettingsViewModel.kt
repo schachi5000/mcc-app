@@ -92,6 +92,7 @@ class SettingsViewModel(
             } catch (e: Exception) {
                 Logger.e(e) { "Error refreshing cards" }
             }
+
             try {
                 packRepository.refreshAllPacks()
             } catch (e: Exception) {

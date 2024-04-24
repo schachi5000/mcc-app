@@ -173,7 +173,7 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
         viewModel.event.collect {
             when (it) {
                 DatabaseSynced -> snackbarHostState.showSnackbar("Database synced!")
-                is CardsDatabaseSyncFailed -> snackbarHostState.showSnackbar("Error syncing database: ${it.exception.message}")
+                is CardsDatabaseSyncFailed -> snackbarHostState.showSnackbar("Error fully syncing database")
                 is DeckCreated -> snackbarHostState.showSnackbar("Deck created! ${it.deckName}")
             }
         }

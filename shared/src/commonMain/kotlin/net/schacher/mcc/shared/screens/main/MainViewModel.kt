@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.screens.main
 
 import co.touchlab.kermit.Logger
 import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -23,6 +24,7 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Sea
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
+import kotlin.time.Duration.Companion.seconds
 
 class MainViewModel(
     private val cardRepository: CardRepository,
@@ -41,7 +43,9 @@ class MainViewModel(
 
     init {
         this.viewModelScope.launch {
+            delay(1.seconds)
             if (!cardRepository.hasCards()) {
+                Logger.d { "No cards found in repo -> refreshing" }
                 try {
                     cardRepository.refreshAllCards()
                     packRepository.refreshAllPacks()

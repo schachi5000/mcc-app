@@ -52,6 +52,7 @@ fun SpotlightScreen(
     Box(
         modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
     ) {
+
         AnimatedVisibility(
             visible = !state.loading,
             exit = fadeOut(),
@@ -81,6 +82,14 @@ fun SpotlightScreen(
                     Spacer(Modifier.height(16.dp))
                 }
             }
+        }
+
+        if (!state.loading && state.decks.isEmpty()) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = "No decks for today",
+                style = MaterialTheme.typography.h6
+            )
         }
 
         AnimatedVisibility(
