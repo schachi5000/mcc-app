@@ -140,7 +140,7 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
-        httpClient.get("$serviceUrl/oauth2/decks") {
+        httpClient.get("$serviceUrl/api/oauth2/decks") {
             headers { append("Authorization", authHeader) }
         }.body<List<DeckDto>>().map {
             val heroCard = cardProvider(it.investigator_code!!)
@@ -157,8 +157,7 @@ class KtorMarvelCDbDataSource(
     override suspend fun getUserDeckById(
         deckId: Int,
         cardProvider: suspend (String) -> Card
-    ) =
-        httpClient.get("$serviceUrl/oauth2/deck/$deckId") {
+    ) = httpClient.get("$serviceUrl/api/oauth2/deck/load/$deckId") {
             headers { append("Authorization", authHeader) }
         }.body<DeckDto>().let {
             val heroCard = cardProvider(it.investigator_code!!)

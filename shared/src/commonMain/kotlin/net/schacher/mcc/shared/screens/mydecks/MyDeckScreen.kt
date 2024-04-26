@@ -98,7 +98,7 @@ fun MyDecksScreen(
     val pullRefreshState = rememberPullRefreshState(state.refreshing, { onRefresh() })
 
     Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
-        if (state.decks.isEmpty()) {
+        if (state.decks.isEmpty() && !state.refreshing) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = stringResource(Res.string.no_decks_found),
