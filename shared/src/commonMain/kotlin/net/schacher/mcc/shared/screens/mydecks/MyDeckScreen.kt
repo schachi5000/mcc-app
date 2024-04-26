@@ -117,10 +117,10 @@ fun MyDecksScreen(
             }
         }
 
-        AddDeckButton(
-            modifier = Modifier.align(Alignment.BottomCenter),
-            expanded = expanded
-        ) { onAddDeckClick() }
+//        AddDeckButton(
+//            modifier = Modifier.align(Alignment.BottomCenter),
+//            expanded = expanded
+//        ) { onAddDeckClick() }
 
         PullRefreshIndicator(
             modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),

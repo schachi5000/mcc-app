@@ -11,5 +11,5 @@
     <string name="login_as_guest">Continue as Guest</string>
     <string name="login">Login</string>
     <string name="login_info_title">Information</string>
-    <string name="login_info_message">After successfully entering your MarvelCDB credentials click ACCEPT to finish the login process.</string>
+    <string name="login_info_message">After successfully entering your MarvelCDB credentials click ALLOW to finish the login process.</string>
 </resources>

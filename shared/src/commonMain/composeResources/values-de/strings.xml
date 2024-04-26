@@ -11,5 +11,5 @@
     <string name="login_as_guest">Weiter als Gast</string>
     <string name="login">Anmelden</string>
     <string name="login_info_title">Anmeldehinweis</string>
-    <string name="login_info_message">Nach der erfolgreichen Eingabe deiner Anmeldedaten bitte auf ACCEPT klicken, um die Anmeldung abzuschließen.</string>
+    <string name="login_info_message">Nach der erfolgreichen Eingabe deiner Anmeldedaten bitte auf ALLOW klicken, um die Anmeldung abzuschließen.</string>
 </resources>
