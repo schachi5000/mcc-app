@@ -31,6 +31,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -44,6 +45,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewNavigator
@@ -55,8 +57,11 @@ import marvelchampionscompanion.shared.generated.resources.login_as_guest
 import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.splash_screen
 import net.schacher.mcc.shared.design.compose.BackHandler
+import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.repositories.AuthRepository
+import net.schacher.mcc.shared.screens.login.LoginScreenViewModel.UiState.CONFIRMATION
+import net.schacher.mcc.shared.screens.login.LoginScreenViewModel.UiState.ENTER_CREDENTIALS
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
@@ -66,9 +71,10 @@ import pro.schacher.mcc.BuildConfig
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun LoginScreen(
+    viewModel: LoginScreenViewModel = koinInject(),
     onGuestLogin: () -> Unit,
 ) {
-    var loginBottomSheetShowing by remember { mutableStateOf(false) }
+    val state = viewModel.state.collectAsState().value
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -98,7 +104,9 @@ fun LoginScreen(
         ) {
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { loginBottomSheetShowing = true },
+                onClick = {
+                    viewModel.onLoginClicked()
+                },
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = MaterialTheme.colors.primary
@@ -130,11 +138,26 @@ fun LoginScreen(
         }
     }
 
-    if (loginBottomSheetShowing) {
-        ModalBottomLoginSheet(
-            onDismiss = {
-                loginBottomSheetShowing = false
-            })
+    Logger.d { "LoginScreen: ${state}" }
+    when (state) {
+        CONFIRMATION -> {
+            ConfirmationDialog(
+                title = "Hinweis",
+                message = "Nach der erfolgreichen Eingabe der Anmeldeinformationen bitte auf ACCEPT klicken, um die Anmeldung abzuschließen.",
+                onConfirm = {
+                    viewModel.onDismissInfoClicked()
+                },
+            )
+        }
+
+        ENTER_CREDENTIALS -> {
+            ModalBottomLoginSheet(
+                onDismiss = {
+                    viewModel.onDismissLoginClicked()
+                })
+        }
+
+        else -> {}
     }
 }
 
