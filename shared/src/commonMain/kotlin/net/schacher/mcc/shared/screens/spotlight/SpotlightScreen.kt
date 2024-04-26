@@ -26,12 +26,16 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.compose.LoadingDeck
 import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.spotlight.ListItem.DeckItem
 import net.schacher.mcc.shared.screens.spotlight.ListItem.HeaderItem
+import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -44,6 +48,7 @@ fun SpotlightScreen(
     SpotlightScreen(state, onDeckClick)
 }
 
+@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SpotlightScreen(
     state: SpotlightUiState,
@@ -87,7 +92,7 @@ fun SpotlightScreen(
         if (!state.loading && state.decks.isEmpty()) {
             Text(
                 modifier = Modifier.align(Alignment.Center),
-                text = "No decks for today",
+                text = stringResource(Res.string.no_decks_found),
                 style = MaterialTheme.typography.h6
             )
         }

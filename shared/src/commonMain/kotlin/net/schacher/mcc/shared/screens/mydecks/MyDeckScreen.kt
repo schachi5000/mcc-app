@@ -42,6 +42,7 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.create_new_deck
+import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
@@ -66,7 +67,7 @@ fun MyDecksScreen(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
 @Composable
 fun MyDecksScreen(
     state: MyDecksViewModel.UiState,
@@ -97,6 +98,14 @@ fun MyDecksScreen(
     val pullRefreshState = rememberPullRefreshState(state.refreshing, { onRefresh() })
 
     Box(modifier = Modifier.fillMaxSize().pullRefresh(pullRefreshState)) {
+        if (state.decks.isEmpty()) {
+            Text(
+                modifier = Modifier.align(Alignment.Center),
+                text = stringResource(Res.string.no_decks_found),
+                style = MaterialTheme.typography.h6
+            )
+        }
+
         LazyColumn(
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = 16.dp)

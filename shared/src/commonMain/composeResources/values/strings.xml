@@ -12,4 +12,5 @@
     <string name="login">Login</string>
     <string name="login_info_title">Information</string>
     <string name="login_info_message">After successfully entering your MarvelCDB credentials click ALLOW to finish the login process.</string>
+    <string name="no_decks_found">No decks found</string>
 </resources>

@@ -12,4 +12,5 @@
     <string name="login">Anmelden</string>
     <string name="login_info_title">Anmeldehinweis</string>
     <string name="login_info_message">Nach der erfolgreichen Eingabe deiner Anmeldedaten bitte auf ALLOW klicken, um die Anmeldung abzuschließen.</string>
+    <string name="no_decks_found">Keine Decks gefunden</string>
 </resources>
