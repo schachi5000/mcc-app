@@ -123,7 +123,7 @@ class KtorMarvelCDbDataSource(
                 Deck(
                     id = it.id,
                     name = it.name,
-                    hero = getCard(it.investigator_code!!),
+                    hero = cardProvider(it.investigator_code!!),
                     aspect = it.meta?.parseAspect(),
                     cards = it.slots.entries
                         .map { entry ->

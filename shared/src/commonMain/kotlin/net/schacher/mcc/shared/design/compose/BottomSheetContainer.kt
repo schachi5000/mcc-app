@@ -69,8 +69,7 @@ fun ColumnScope.BottomSheetHandle() {
 @Composable
 fun Modifier.blurByBottomSheet(bottomSheetState: ModalBottomSheetState) = this.blur(
     when (bottomSheetState.targetValue) {
-        ModalBottomSheetValue.Expanded -> 4.dp
-        ModalBottomSheetValue.Hidden -> 4.dp - bottomSheetState.progress * 4.dp
+        ModalBottomSheetValue.Hidden -> 0.dp
         else -> bottomSheetState.progress * 4.dp
     }
 )
