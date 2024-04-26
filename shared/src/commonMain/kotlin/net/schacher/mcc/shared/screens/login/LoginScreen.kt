@@ -45,7 +45,6 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import com.multiplatform.webview.web.LoadingState
 import com.multiplatform.webview.web.WebView
 import com.multiplatform.webview.web.rememberWebViewNavigator
@@ -54,6 +53,8 @@ import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.login
 import marvelchampionscompanion.shared.generated.resources.login_as_guest
+import marvelchampionscompanion.shared.generated.resources.login_info_message
+import marvelchampionscompanion.shared.generated.resources.login_info_title
 import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.splash_screen
 import net.schacher.mcc.shared.design.compose.BackHandler
@@ -138,12 +139,11 @@ fun LoginScreen(
         }
     }
 
-    Logger.d { "LoginScreen: ${state}" }
     when (state) {
         CONFIRMATION -> {
             ConfirmationDialog(
-                title = "Hinweis",
-                message = "Nach der erfolgreichen Eingabe der Anmeldeinformationen bitte auf ACCEPT klicken, um die Anmeldung abzuschließen.",
+                title = stringResource(Res.string.login_info_title),
+                message = stringResource(Res.string.login_info_message),
                 onConfirm = {
                     viewModel.onDismissInfoClicked()
                 },
