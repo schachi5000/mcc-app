@@ -40,10 +40,10 @@ import org.koin.compose.koinInject
 
 @Composable
 fun SpotlightScreen(
-    spotlightViewModel: SpotlightViewModel = koinInject(),
+    viewModel: SpotlightViewModel = koinInject(),
     onDeckClick: (Deck) -> Unit
 ) {
-    val state by spotlightViewModel.state.collectAsState()
+    val state by viewModel.state.collectAsState()
 
     SpotlightScreen(state, onDeckClick)
 }
@@ -51,7 +51,7 @@ fun SpotlightScreen(
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SpotlightScreen(
-    state: SpotlightUiState,
+    state: SpotlightViewModel.UiState,
     onDeckClick: (Deck) -> Unit
 ) {
     Box(

@@ -19,7 +19,7 @@ class SpotlightViewModel(
     private val marvelCDbDataSource: MarvelCDbDataSource
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SpotlightUiState())
+    private val _state = MutableStateFlow(UiState())
 
     val state = _state.asStateFlow()
 
@@ -36,7 +36,11 @@ class SpotlightViewModel(
         this.onRefresh()
     }
 
-    private fun onRefresh() {
+    fun onRefresh() {
+        if (this.state.value.loading) {
+            return
+        }
+
         _state.update { it.copy(loading = true) }
 
         this.viewModelScope.launch {
@@ -61,9 +65,10 @@ class SpotlightViewModel(
             }
         }
     }
+
+    data class UiState(
+        val decks: Map<LocalDate, List<Deck>> = emptyMap(),
+        val loading: Boolean = false
+    )
 }
 
-data class SpotlightUiState(
-    val decks: Map<LocalDate, List<Deck>> = emptyMap(),
-    val loading: Boolean = false
-)
