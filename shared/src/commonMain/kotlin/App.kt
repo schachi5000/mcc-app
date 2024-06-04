@@ -51,7 +51,7 @@ val viewModels = module {
 @Composable
 fun App(
     databaseDao: DatabaseDao,
-    onLoginClicked: ((LoginBridge) -> Unit)? = null,
+    onLoginClicked: (LoginBridge) -> Unit,
     onKoinStart: KoinApplication.() -> Unit = {}
 ) {
     val authHandler = AuthRepository(databaseDao as SettingsDao)
@@ -75,20 +75,15 @@ fun App(
     }) {
         MccTheme {
             AppScreen(
-                onLogInClicked = if (onLoginClicked != null) {
-                    {
-                        onLoginClicked.invoke(
-                            object : LoginBridge {
-                                override val url: String = BuildConfig.OAUTH_URL
-                                override fun handleCallbackUrl(callbackUrl: String) {
-                                    authHandler.handleCallbackUrl(callbackUrl)
-                                }
-                            })
-                    }
-                } else {
-                    null
-                }
-            )
+                onLogInClicked = {
+                    onLoginClicked.invoke(
+                        object : LoginBridge {
+                            override val url: String = BuildConfig.OAUTH_URL
+                            override fun handleCallbackUrl(callbackUrl: String) {
+                                authHandler.handleCallbackUrl(callbackUrl)
+                            }
+                        })
+                })
         }
     }
 }

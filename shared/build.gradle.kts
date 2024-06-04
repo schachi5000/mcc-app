@@ -58,7 +58,6 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material)
                 api(libs.koin.compose)
-                api(libs.compose.webview.multiplatform)
                 implementation(libs.koin.core)
                 implementation(libs.kermit)
                 implementation(libs.kamel)

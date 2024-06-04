@@ -80,5 +80,7 @@ android {
         debugImplementation(libs.androidx.compose.compiler)
         debugImplementation(libs.androidx.compose.tooling)
         implementation(libs.androidx.compose.preview)
+        implementation(libs.androidx.browser)
+        implementation(libs.kermit)
     }
 }
