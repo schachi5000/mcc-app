@@ -1,6 +1,4 @@
 import com.android.build.gradle.internal.tasks.factory.dependsOn
-import org.jetbrains.kotlin.org.jline.utils.InputStreamReader
-import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
@@ -53,9 +51,7 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
-            kotlin.srcDir(
-                // convert the task to a file-provider
-                buildConfigGenerator.map { it.destinationDir })
+            kotlin.srcDir(buildConfigGenerator.map { it.destinationDir })
             dependencies {
                 api(compose.runtime)
                 api(compose.foundation)
@@ -107,20 +103,9 @@ kotlin {
     task("testClasses")
 }
 
-fun getLocalProperty(key: String, file: String = "local.properties"): Any {
-    val properties = Properties()
-    val localProperties = File(file)
-    if (localProperties.isFile) {
-        InputStreamReader(
-            FileInputStream(localProperties),
-            Charsets.UTF_8.toString()
-        ).use { properties.load(it) }
-    } else {
-        return ""
-    }
-
-    return properties.getProperty(key)
-}
+fun getLocalProperty(key: String, file: String = "local.properties") = Properties()
+    .also { it.load(file(rootProject.file(file).path).inputStream()) }
+    .getProperty(key) ?: ""
 
 android {
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
