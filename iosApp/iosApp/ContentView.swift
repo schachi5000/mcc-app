@@ -15,7 +15,7 @@ struct ContentView: View {
             showingSheet.toggle()
         })
                 .onOpenURL(perform: { url in
-                    if(url.absoluteString.contains("mccapp://callback")){
+                    if(loginBridge.isCallbackUrl(url: url.absoluteString)){
                         showingSheet = false
                         loginBridge.onLoginSuccessful(callbackUrl: url.absoluteString)
                     }
@@ -45,7 +45,7 @@ struct SafariWebView: UIViewControllerRepresentable {
     let url: URL
     
     func makeUIViewController(context: Context) -> SFSafariViewController {
-        return SFSafariViewController(url: url).accessibilityZoomIn(at: )
+        return SFSafariViewController(url: url)
     }
     
     func updateUIViewController(_ uiViewController: SFSafariViewController, context: Context) {}

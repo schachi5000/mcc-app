@@ -91,6 +91,8 @@ interface LoginBridge {
     val url: String
 
     fun onLoginSuccessful(callbackUrl: String)
+
+    fun isCallbackUrl(url: String): Boolean = url.startsWith("mccapp://callback")
 }
 
 
