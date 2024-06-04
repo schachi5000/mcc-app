@@ -27,8 +27,6 @@ kotlin {
         }
     }
 
-    val composeVersion = extra["compose.version"] as String
-
     //Generating BuildConfig for multiplatform
     val buildConfigGenerator by tasks.registering(Sync::class) {
         println("Generating BuildConfig for multiplatform")
@@ -63,6 +61,7 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material)
                 api(libs.koin.compose)
+                api(libs.compose.webview.multiplatform)
                 implementation(libs.koin.core)
                 implementation(libs.kermit)
                 implementation(libs.kamel)
@@ -75,9 +74,7 @@ kotlin {
                 implementation(libs.sqldelight)
                 implementation(libs.moko.mvvm.core)
                 implementation(libs.moko.mvvm.compose)
-                @OptIn(org.jetbrains.compose.ExperimentalComposeLibrary::class)
                 implementation(compose.components.resources)
-                api("io.github.kevinnzou:compose-webview-multiplatform:1.9.2")
             }
         }
         val androidMain by getting {
@@ -86,7 +83,6 @@ kotlin {
                 api(libs.androidx.activity)
                 api(libs.androidx.appcompat)
                 api(libs.androidx.core.ktx)
-                api("org.jetbrains.compose.ui:ui-tooling-preview:${composeVersion}")
                 implementation(libs.koin.compose.androidx)
                 implementation(libs.ktor.client.android)
                 implementation(libs.sqldelight.android)
