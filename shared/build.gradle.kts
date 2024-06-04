@@ -12,6 +12,7 @@ plugins {
 }
 
 kotlin {
+
     androidTarget()
 
     listOf(
@@ -105,6 +106,8 @@ kotlin {
             }
         }
     }
+
+    task("testClasses")
 }
 
 fun getLocalProperty(key: String, file: String = "local.properties"): Any {
