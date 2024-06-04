@@ -34,6 +34,9 @@ import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import co.touchlab.kermit.Logger
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.ic_cards
+import marvelchampionscompanion.shared.generated.resources.ic_deck
 import net.schacher.mcc.shared.design.previewablePainterResource
 import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.design.theme.DeckShape
@@ -106,12 +109,9 @@ private fun DeckContent(deck: Deck, onClick: () -> Unit = {}) {
                 verticalArrangement = Arrangement.Center
             ) {
 
-                InfoRow("${deck.cards.size} Karten", DrawableResource("drawable/ic_cards.xml"))
+                InfoRow("${deck.cards.size} Karten", Res.drawable.ic_cards)
                 Spacer(Modifier.height(4.dp))
-                InfoRow(
-                    "${deck.requiredDecks.size} Packs benötigt",
-                    DrawableResource("drawable/ic_deck.xml")
-                )
+                InfoRow("${deck.requiredDecks.size} Packs benötigt", Res.drawable.ic_deck)
             }
         }
     }

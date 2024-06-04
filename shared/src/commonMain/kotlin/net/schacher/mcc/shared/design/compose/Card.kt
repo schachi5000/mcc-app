@@ -25,6 +25,9 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.card_blue_no_image
+import marvelchampionscompanion.shared.generated.resources.card_yellow_no_image
 import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.design.theme.SleeveColors
 import net.schacher.mcc.shared.model.Card
@@ -35,7 +38,6 @@ import net.schacher.mcc.shared.model.CardType.OBLIGATION
 import net.schacher.mcc.shared.model.CardType.SIDE_SCHEME
 import net.schacher.mcc.shared.model.CardType.TREACHERY
 import net.schacher.mcc.shared.model.CardType.VILLAIN
-import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -100,7 +102,7 @@ fun Card(
                     modifier = Modifier.fillMaxSize()
                         .background(card.backSideColor, CardShape)
                         .border(8.dp, card.backSideColor, CardShape),
-                    painter = painterResource(DrawableResource(card.getFailureResource())),
+                    painter = painterResource(card.getFailureResource()),
                     contentDescription = "Placeholder",
                 )
             })
@@ -119,7 +121,7 @@ val Card.backSideColor: Color
         else -> SleeveColors.Blue
     }
 
-private fun Card.getFailureResource(): String = when (this.backSideColor) {
-    SleeveColors.Yellow -> "drawable/card_yellow_no_image.png"
-    else -> "drawable/card_blue_no_image.png"
+private fun Card.getFailureResource() = when (this.backSideColor) {
+    SleeveColors.Yellow -> Res.drawable.card_yellow_no_image
+    else -> Res.drawable.card_blue_no_image
 }
