@@ -17,7 +17,7 @@ struct ContentView: View {
                 .onOpenURL(perform: { url in
                     if(loginBridge.isCallbackUrl(url: url.absoluteString)){
                         showingSheet = false
-                        loginBridge.onLoginSuccessful(callbackUrl: url.absoluteString)
+                        loginBridge.handleCallbackUrl(callbackUrl: url.absoluteString)
                     }
                 })
                 .edgesIgnoringSafeArea(.all)

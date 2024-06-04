@@ -18,7 +18,7 @@ private const val LOG_OUT_MILLIS = 450
 @Composable
 fun AppScreen(
     appViewModel: AppViewModel = koinInject(),
-    onLogInClicked: () -> Unit = {}
+    onLogInClicked: (() -> Unit)? = null
 ) {
     val loggedIn = appViewModel.state.collectAsState()
 
@@ -42,9 +42,9 @@ fun AppScreen(
         if (it) {
             MainScreen()
         } else {
-            LoginScreen(onLogInClicked = onLogInClicked) {
-                appViewModel.onGuestLoginClicked()
-            }
+            LoginScreen(
+                onLogInClicked = onLogInClicked,
+                onGuestLogin = { appViewModel.onGuestLoginClicked() })
         }
     }
 }

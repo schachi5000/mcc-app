@@ -14,7 +14,6 @@ import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.app.AppScreen
 import net.schacher.mcc.shared.screens.app.AppViewModel
-import net.schacher.mcc.shared.screens.login.LoginScreenViewModel
 import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.screens.newdeck.NewDeckViewModel
@@ -40,7 +39,6 @@ val repositories = module {
 
 val viewModels = module {
     singleOf(::AppViewModel)
-    singleOf(::LoginScreenViewModel)
     singleOf(::MainViewModel)
     singleOf(::MyDecksViewModel)
     singleOf(::NewDeckViewModel)
@@ -53,31 +51,44 @@ val viewModels = module {
 @Composable
 fun App(
     databaseDao: DatabaseDao,
-    onLoginClicked: (LoginBridge) -> Unit = {},
+    onLoginClicked: ((LoginBridge) -> Unit)? = null,
     onKoinStart: KoinApplication.() -> Unit = {}
 ) {
     val authHandler = AuthRepository(databaseDao as SettingsDao)
     KoinApplication(application = {
         onKoinStart()
-        modules(platformModule, module {
-            single<CardDatabaseDao> { databaseDao }
-            single<DeckDatabaseDao> { databaseDao }
-            single<PackDatabaseDao> { databaseDao }
-            single<SettingsDao> { databaseDao }
-        }, module {
-            single<AuthRepository> { authHandler }
-        }, network, repositories, viewModels
+        modules(
+            platformModule,
+            module {
+                single<CardDatabaseDao> { databaseDao }
+                single<DeckDatabaseDao> { databaseDao }
+                single<PackDatabaseDao> { databaseDao }
+                single<SettingsDao> { databaseDao }
+            },
+            module {
+                single<AuthRepository> { authHandler }
+            },
+            network,
+            repositories,
+            viewModels
         )
     }) {
         MccTheme {
-            AppScreen(onLogInClicked = {
-                onLoginClicked(object : LoginBridge {
-                    override val url: String = BuildConfig.OAUTH_URL
-                    override fun onLoginSuccessful(callbackUrl: String) {
-                        authHandler.handleCallbackUrl(callbackUrl)
+            AppScreen(
+                onLogInClicked = if (onLoginClicked != null) {
+                    {
+                        onLoginClicked.invoke(
+                            object : LoginBridge {
+                                override val url: String = BuildConfig.OAUTH_URL
+                                override fun handleCallbackUrl(callbackUrl: String) {
+                                    authHandler.handleCallbackUrl(callbackUrl)
+                                }
+                            })
                     }
-                })
-            })
+                } else {
+                    null
+                }
+            )
         }
     }
 }
@@ -90,7 +101,7 @@ interface LoginBridge {
 
     val url: String
 
-    fun onLoginSuccessful(callbackUrl: String)
+    fun handleCallbackUrl(callbackUrl: String)
 
     fun isCallbackUrl(url: String): Boolean = url.startsWith("mccapp://callback")
 }

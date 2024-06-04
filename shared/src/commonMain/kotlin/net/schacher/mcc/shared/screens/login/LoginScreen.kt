@@ -31,7 +31,6 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
@@ -61,22 +60,21 @@ import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.repositories.AuthRepository
-import net.schacher.mcc.shared.screens.login.LoginScreenViewModel.UiState.CONFIRMATION
-import net.schacher.mcc.shared.screens.login.LoginScreenViewModel.UiState.ENTER_CREDENTIALS
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import pro.schacher.mcc.BuildConfig
 
-@OptIn(ExperimentalResourceApi::class)
+internal var confirmationSeen = false
+
 @Composable
 fun LoginScreen(
-    viewModel: LoginScreenViewModel = koinInject(),
-    onLogInClicked: () -> Unit,
+    onLogInClicked: (() -> Unit)? = null,
     onGuestLogin: () -> Unit,
 ) {
-    val state = viewModel.state.collectAsState().value
+    var showingConfirmation by remember { mutableStateOf(false) }
+    var showingLoginView by remember { mutableStateOf(false) }
 
     Box(modifier = Modifier.fillMaxSize()) {
         Image(
@@ -107,8 +105,15 @@ fun LoginScreen(
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    onLogInClicked.invoke()
-//                    viewModel.onLoginClicked()
+                    if (confirmationSeen) {
+                        if (onLogInClicked != null) {
+                            onLogInClicked()
+                        } else {
+                            showingLoginView = true
+                        }
+                    } else {
+                        showingConfirmation = true
+                    }
                 },
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(
@@ -141,25 +146,29 @@ fun LoginScreen(
         }
     }
 
-    when (state) {
-        CONFIRMATION -> {
-            ConfirmationDialog(
-                title = stringResource(Res.string.login_info_title),
-                message = stringResource(Res.string.login_info_message),
-                onConfirm = {
-                    viewModel.onDismissInfoClicked()
-                },
-            )
-        }
+    if (showingConfirmation) {
+        confirmationSeen = true
+        ConfirmationDialog(
+            title = stringResource(Res.string.login_info_title),
+            message = stringResource(Res.string.login_info_message),
+            onConfirm = {
+                showingConfirmation = false
 
-        ENTER_CREDENTIALS -> {
-            ModalBottomLoginSheet(
-                onDismiss = {
-                    viewModel.onDismissLoginClicked()
-                })
-        }
+                if (onLogInClicked != null) {
+                    onLogInClicked.invoke()
+                } else {
+                    showingLoginView = true
+                }
+            },
+        )
+    }
 
-        else -> {}
+    if (showingLoginView) {
+        ModalBottomLoginSheet(
+            onDismiss = {
+                showingLoginView = false
+            }
+        )
     }
 }
 
