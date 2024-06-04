@@ -1,7 +1,7 @@
 [versions]
 # @keep
 androidCompileSdk = "34"
-androidGradlePlugin = "8.2.2"
+androidGradlePlugin = "8.4.0"
 # @keep
 androidMinSdk = "24"
 # @keep
@@ -64,3 +64,4 @@ android-library = { id = "com.android.library", version.ref = "androidGradlePlug
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
 compose = { id = "org.jetbrains.compose", version.ref = "compose" }
+compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }

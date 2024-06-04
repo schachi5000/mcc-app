@@ -4,16 +4,17 @@ import java.io.FileInputStream
 import java.util.Properties
 
 plugins {
-    kotlin("multiplatform")
-    kotlin("plugin.serialization").version(libs.versions.kotlin)
-    id("com.android.library")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.kotlin.serialization)
+    alias(libs.plugins.android.library)
+    alias(libs.plugins.compose)
+//    alias(libs.plugins.compose.compiler)
     alias(libs.plugins.sqldelight)
 }
 
 kotlin {
 
-    androidTarget()
+    android()
 
     listOf(
         iosX64(),
@@ -136,13 +137,12 @@ android {
     defaultConfig {
         minSdk = libs.versions.androidMinSdk.get().toInt()
     }
+
     compileOptions {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-    kotlin {
-        jvmToolchain(17)
-    }
+
 }
 
 sqldelight {
