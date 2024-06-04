@@ -51,6 +51,7 @@ kotlin {
 
     sourceSets {
         val commonMain by getting {
+            resources.srcDirs("src/commonMain/resources")
             kotlin.srcDir(buildConfigGenerator.map { it.destinationDir })
             dependencies {
                 api(compose.runtime)
@@ -123,12 +124,13 @@ android {
         sourceCompatibility = JavaVersion.VERSION_17
         targetCompatibility = JavaVersion.VERSION_17
     }
-
 }
 
 sqldelight {
-    database("AppDatabase") {
-        packageName = "database"
+    databases {
+        create("AppDatabase") {
+            packageName.set("database")
+        }
     }
 }
 

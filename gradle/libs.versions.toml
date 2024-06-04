@@ -8,7 +8,7 @@ androidMinSdk = "24"
 androidTargetSdk = "34"
 appcompat = "1.7.0"
 activity = "1.9.0"
-composeWebview = "1.9.2"
+composeWebview = "1.9.8"
 core-ktx = "1.13.1"
 ktor = "2.3.11"
 kotlinx-datetime = "0.5.0"
@@ -18,12 +18,11 @@ kermit = "2.0.3"
 koin = "3.5.0"
 koin-compose = "1.1.0"
 kotlin = "2.0.0"
-sql-delight = "1.5.5"
+sql-delight = "2.0.2"
 serialization = "1.6.3"
 androidx-compose = "1.6.7"
 androidx-compose-compiler = "1.5.14"
 compose = "1.6.11"
-compose-preview = "1.6.10"
 
 [libraries]
 androidx-compose-compiler = { module = "androidx.compose.compiler:compiler", version.ref = "androidx-compose-compiler" }
@@ -34,7 +33,6 @@ androidx-activity = { module = "androidx.activity:activity-compose", version.ref
 androidx-appcompat = { module = "androidx.appcompat:appcompat", version.ref = "appcompat" }
 androidx-core-ktx = { module = "androidx.core:core-ktx", version.ref = "core-ktx" }
 
-compose-preview = { module = "org.jetbrains.compose.ui:ui-tooling-preview", version.ref = "compose-preview" }
 compose-webview-multiplatform = { module = "io.github.kevinnzou:compose-webview-multiplatform", version.ref = "composeWebview" }
 koin-core = { module = "io.insert-koin:koin-core", version.ref = "koin" }
 koin-compose = { module = "io.insert-koin:koin-compose", version.ref = "koin-compose" }
@@ -56,12 +54,12 @@ kotlinx-serilization-json = { module = "org.jetbrains.kotlinx:kotlinx-serializat
 moko-mvvm-core = { module = "dev.icerock.moko:mvvm-core", version.ref = "moko-mvvm" }
 moko-mvvm-compose = { module = "dev.icerock.moko:mvvm-compose", version.ref = "moko-mvvm" }
 
-sqldelight = { module = "com.squareup.sqldelight:runtime", version.ref = "sql-delight" }
-sqldelight-android = { module = "com.squareup.sqldelight:android-driver", version.ref = "sql-delight" }
-sqldelight-native = { module = "com.squareup.sqldelight:native-driver", version.ref = "sql-delight" }
+sqldelight = { module = "app.cash.sqldelight:runtime", version.ref = "sql-delight" }
+sqldelight-android = { module = "app.cash.sqldelight:android-driver", version.ref = "sql-delight" }
+sqldelight-native = { module = "app.cash.sqldelight:native-driver", version.ref = "sql-delight" }
 
 [plugins]
-sqldelight = { id = "com.squareup.sqldelight", version.ref = "sql-delight" }
+sqldelight = { id = "app.cash.sqldelight", version.ref = "sql-delight" }
 kotlinNativeCocoapods = { id = "org.jetbrains.kotlin.native.cocoapods", version.ref = "kotlin" }
 android-application = { id = "com.android.application", version.ref = "androidGradlePlugin" }
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
