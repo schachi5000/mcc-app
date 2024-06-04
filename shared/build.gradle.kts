@@ -105,8 +105,9 @@ kotlin {
 }
 
 fun getLocalProperty(key: String, file: String = "local.properties") = Properties()
-    .also { it.load(file(rootProject.file(file).path).inputStream()) }
-    .getProperty(key) ?: ""
+    .takeIf { rootProject.file(file).exists() }
+    ?.also { it.load(file(rootProject.file(file).path).inputStream()) }
+    ?.getProperty(key) ?: ""
 
 android {
     compileSdk = libs.versions.androidCompileSdk.get().toInt()
