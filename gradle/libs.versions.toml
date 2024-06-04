@@ -1,4 +1,11 @@
 [versions]
+# @keep
+androidCompileSdk = "34"
+androidGradlePlugin = "8.2.2"
+# @keep
+androidMinSdk = "24"
+# @keep
+androidTargetSdk = "34"
 appcompat = "1.6.1"
 activity = "1.8.2"
 core-ktx = "1.12.0"
