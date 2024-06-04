@@ -16,7 +16,10 @@ private const val LOG_IN_MILLIS = 450
 private const val LOG_OUT_MILLIS = 450
 
 @Composable
-fun AppScreen(appViewModel: AppViewModel = koinInject()) {
+fun AppScreen(
+    appViewModel: AppViewModel = koinInject(),
+    onLogInClicked: () -> Unit = {}
+) {
     val loggedIn = appViewModel.state.collectAsState()
 
     AnimatedContent(targetState = loggedIn.value, transitionSpec = {
@@ -39,7 +42,7 @@ fun AppScreen(appViewModel: AppViewModel = koinInject()) {
         if (it) {
             MainScreen()
         } else {
-            LoginScreen {
+            LoginScreen(onLogInClicked = onLogInClicked) {
                 appViewModel.onGuestLoginClicked()
             }
         }

@@ -73,6 +73,7 @@ import pro.schacher.mcc.BuildConfig
 @Composable
 fun LoginScreen(
     viewModel: LoginScreenViewModel = koinInject(),
+    onLogInClicked: () -> Unit,
     onGuestLogin: () -> Unit,
 ) {
     val state = viewModel.state.collectAsState().value
@@ -106,7 +107,8 @@ fun LoginScreen(
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    viewModel.onLoginClicked()
+                    onLogInClicked.invoke()
+//                    viewModel.onLoginClicked()
                 },
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(

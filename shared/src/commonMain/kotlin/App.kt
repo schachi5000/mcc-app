@@ -26,6 +26,7 @@ import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+import pro.schacher.mcc.BuildConfig
 
 val network = module {
     single<MarvelCDbDataSource> { KtorMarvelCDbDataSource(get()) }
@@ -50,7 +51,11 @@ val viewModels = module {
 }
 
 @Composable
-fun App(databaseDao: DatabaseDao, onKoinStart: KoinApplication.() -> Unit = {}) {
+fun App(
+    databaseDao: DatabaseDao,
+    onLoginClicked: (LoginBridge) -> Unit = {},
+    onKoinStart: KoinApplication.() -> Unit = {}
+) {
     val authHandler = AuthRepository(databaseDao as SettingsDao)
     KoinApplication(application = {
         onKoinStart()
@@ -65,10 +70,30 @@ fun App(databaseDao: DatabaseDao, onKoinStart: KoinApplication.() -> Unit = {}) 
         )
     }) {
         MccTheme {
-            AppScreen()
+            AppScreen(onLogInClicked = {
+                onLoginClicked(object : LoginBridge {
+                    override val url: String = BuildConfig.OAUTH_URL
+                    override fun onLoginSuccessful(callbackUrl: String) {
+                        authHandler.handleCallbackUrl(callbackUrl)
+                    }
+                })
+            })
         }
     }
 }
+
+/**
+ * This interface is used to bridge the login process between the shared code and the iOS platform code.
+ * It's needed to make use of the modal presentation of the Safari web view controller.
+ */
+interface LoginBridge {
+
+    val url: String
+
+    fun onLoginSuccessful(callbackUrl: String)
+}
+
+
 
 
 

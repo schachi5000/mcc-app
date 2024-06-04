@@ -7,7 +7,7 @@ import org.koin.android.ext.koin.androidContext
 @Composable
 fun MainView() {
     val context = LocalContext.current
-    App(DatabaseDao(DatabaseDriverFactory(LocalContext.current))) {
+    App(DatabaseDao(DatabaseDriverFactory(LocalContext.current)), {}) {
         androidContext(context)
     }
 }
