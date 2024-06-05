@@ -14,7 +14,6 @@ import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.app.AppScreen
 import net.schacher.mcc.shared.screens.app.AppViewModel
-import net.schacher.mcc.shared.screens.login.LoginScreenViewModel
 import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.screens.newdeck.NewDeckViewModel
@@ -26,6 +25,7 @@ import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
+import pro.schacher.mcc.BuildConfig
 
 val network = module {
     single<MarvelCDbDataSource> { KtorMarvelCDbDataSource(get()) }
@@ -39,7 +39,6 @@ val repositories = module {
 
 val viewModels = module {
     singleOf(::AppViewModel)
-    singleOf(::LoginScreenViewModel)
     singleOf(::MainViewModel)
     singleOf(::MyDecksViewModel)
     singleOf(::NewDeckViewModel)
@@ -50,25 +49,59 @@ val viewModels = module {
 }
 
 @Composable
-fun App(databaseDao: DatabaseDao, onKoinStart: KoinApplication.() -> Unit = {}) {
+fun App(
+    databaseDao: DatabaseDao,
+    onLoginClicked: (LoginBridge) -> Unit,
+    onKoinStart: KoinApplication.() -> Unit = {}
+) {
     val authHandler = AuthRepository(databaseDao as SettingsDao)
     KoinApplication(application = {
         onKoinStart()
-        modules(platformModule, module {
-            single<CardDatabaseDao> { databaseDao }
-            single<DeckDatabaseDao> { databaseDao }
-            single<PackDatabaseDao> { databaseDao }
-            single<SettingsDao> { databaseDao }
-        }, module {
-            single<AuthRepository> { authHandler }
-        }, network, repositories, viewModels
+        modules(
+            platformModule,
+            module {
+                single<CardDatabaseDao> { databaseDao }
+                single<DeckDatabaseDao> { databaseDao }
+                single<PackDatabaseDao> { databaseDao }
+                single<SettingsDao> { databaseDao }
+            },
+            module {
+                single<AuthRepository> { authHandler }
+            },
+            network,
+            repositories,
+            viewModels
         )
     }) {
         MccTheme {
-            AppScreen()
+            AppScreen(
+                onLogInClicked = {
+                    onLoginClicked.invoke(
+                        object : LoginBridge {
+                            override val url: String = BuildConfig.OAUTH_URL
+                            override fun handleCallbackUrl(callbackUrl: String) {
+                                authHandler.handleCallbackUrl(callbackUrl)
+                            }
+                        })
+                })
         }
     }
 }
+
+/**
+ * This interface is used to bridge the login process between the shared code and the iOS platform code.
+ * It's needed to make use of the modal presentation of the Safari web view controller.
+ */
+interface LoginBridge {
+
+    val url: String
+
+    fun handleCallbackUrl(callbackUrl: String)
+
+    fun isCallbackUrl(url: String): Boolean = url.startsWith("mccapp://callback")
+}
+
+
 
 
 

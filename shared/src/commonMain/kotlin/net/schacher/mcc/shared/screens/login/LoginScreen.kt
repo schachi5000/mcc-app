@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.screens.login
 
-import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -9,75 +10,55 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.heightIn
-import androidx.compose.foundation.layout.imePadding
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ButtonDefaults
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
-import androidx.compose.material.LinearProgressIndicator
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
-import androidx.compose.material.TopAppBar
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.ArrowBack
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.graphics.Brush
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
-import com.multiplatform.webview.web.LoadingState
-import com.multiplatform.webview.web.WebView
-import com.multiplatform.webview.web.rememberWebViewNavigator
-import com.multiplatform.webview.web.rememberWebViewState
-import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
-import marvelchampionscompanion.shared.generated.resources.login
 import marvelchampionscompanion.shared.generated.resources.login_as_guest
 import marvelchampionscompanion.shared.generated.resources.login_info_message
 import marvelchampionscompanion.shared.generated.resources.login_info_title
 import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.splash_screen
-import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.repositories.AuthRepository
-import net.schacher.mcc.shared.screens.login.LoginScreenViewModel.UiState.CONFIRMATION
-import net.schacher.mcc.shared.screens.login.LoginScreenViewModel.UiState.ENTER_CREDENTIALS
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
-import pro.schacher.mcc.BuildConfig
 
-@OptIn(ExperimentalResourceApi::class)
+internal var confirmationSeen = false
+
 @Composable
 fun LoginScreen(
-    viewModel: LoginScreenViewModel = koinInject(),
-    onGuestLogin: () -> Unit,
+    onLogInClicked: () -> Unit,
+    onContinueAsGuestClicked: () -> Unit,
 ) {
-    val state = viewModel.state.collectAsState().value
+    var showingConfirmation by remember { mutableStateOf(false) }
+    var blur by remember { mutableStateOf(0.dp) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    val animatedBlur by animateDpAsState(
+        targetValue = blur,
+        animationSpec = tween()
+    )
+
+    blur = if (showingConfirmation) 5.dp else 0.dp
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .blur(animatedBlur)
+
+    ) {
         Image(
             painter = painterResource(Res.drawable.splash_screen),
             contentDescription = "Splash Screen",
@@ -106,7 +87,11 @@ fun LoginScreen(
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
                 onClick = {
-                    viewModel.onLoginClicked()
+                    if (confirmationSeen) {
+                        onLogInClicked()
+                    } else {
+                        showingConfirmation = true
+                    }
                 },
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(
@@ -124,7 +109,7 @@ fun LoginScreen(
 
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onGuestLogin() },
+                onClick = onContinueAsGuestClicked,
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = MaterialTheme.colors.background
@@ -139,141 +124,16 @@ fun LoginScreen(
         }
     }
 
-    when (state) {
-        CONFIRMATION -> {
-            ConfirmationDialog(
-                title = stringResource(Res.string.login_info_title),
-                message = stringResource(Res.string.login_info_message),
-                onConfirm = {
-                    viewModel.onDismissInfoClicked()
-                },
-            )
-        }
-
-        ENTER_CREDENTIALS -> {
-            ModalBottomLoginSheet(
-                onDismiss = {
-                    viewModel.onDismissLoginClicked()
-                })
-        }
-
-        else -> {}
-    }
-}
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun ModalBottomLoginSheet(
-    modifier: Modifier = Modifier,
-    onDismiss: () -> Unit,
-) {
-    var webViewShowing by remember { mutableStateOf(false) }
-
-    val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true,
-    )
-
-    BackHandler(webViewShowing || sheetState.isVisible) {
-        onDismiss()
-    }
-
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        scrimColor = Color.Black.copy(alpha = 0.35f),
-        sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
-        sheetBackgroundColor = MaterialTheme.colors.surface,
-        sheetContent = {
-            LoginWebView(
-                modifier = modifier.heightIn(min = 300.dp, max = 600.dp).imePadding(),
-                onAccessDenied = {
-                    webViewShowing = false
-                    onDismiss()
-                })
-        }) {
-        Box(modifier = modifier.fillMaxSize().background(Color.Transparent))
-    }
-
-    val scope = rememberCoroutineScope()
-    scope.launch {
-        if (webViewShowing) {
-            sheetState.show()
-        } else {
-            sheetState.hide()
-        }
-    }
-
-    LaunchedEffect(sheetState) {
-        snapshotFlow { sheetState.isVisible }.collect { isVisible ->
-            if (!isVisible && webViewShowing) {
-                onDismiss()
+    if (showingConfirmation) {
+        confirmationSeen = true
+        ConfirmationDialog(
+            title = stringResource(Res.string.login_info_title),
+            message = stringResource(Res.string.login_info_message),
+            onConfirm = {
+                showingConfirmation = false
+                onLogInClicked.invoke()
             }
-            webViewShowing = isVisible
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        webViewShowing = true
-    }
-}
-
-@OptIn(ExperimentalResourceApi::class)
-@Composable
-private fun LoginWebView(
-    modifier: Modifier = Modifier,
-    authRepository: AuthRepository = koinInject(), // TODO move to ViewModel
-    onAccessDenied: () -> Unit
-) {
-    val webViewState = rememberWebViewState(BuildConfig.OAUTH_URL)
-    val navigator = rememberWebViewNavigator()
-
-    val lastLoadedUrl = webViewState.lastLoadedUrl
-    if (lastLoadedUrl != null && lastLoadedUrl.startsWith(AuthRepository.APP_SCHEME)) {
-        if (authRepository.handleCallbackUrl(lastLoadedUrl)) {
-            return
-        } else {
-            onAccessDenied()
-        }
-    }
-
-    Column(modifier.background(Color.White)) {
-        TopAppBar(
-            backgroundColor = MaterialTheme.colors.background,
-            contentColor = MaterialTheme.colors.primary,
-            title = { Text(text = stringResource(Res.string.login)) },
-            navigationIcon = {
-                IconButton(onClick = {
-                    if (navigator.canGoBack) {
-                        navigator.navigateBack()
-                    } else {
-                        onAccessDenied()
-                    }
-                }) {
-                    Icon(
-                        imageVector = if (navigator.canGoBack) {
-                            Icons.AutoMirrored.Filled.ArrowBack
-                        } else {
-                            Icons.Filled.Close
-                        },
-                        contentDescription = "Back",
-                        tint = MaterialTheme.colors.primary
-                    )
-                }
-            })
-
-        val loading = webViewState.loadingState is LoadingState.Loading
-        val progress = (webViewState.loadingState as? LoadingState.Loading)?.progress ?: 0f
-
-        AnimatedVisibility(loading) {
-            LinearProgressIndicator(
-                progress = progress,
-                modifier = Modifier.fillMaxWidth()
-            )
-        }
-
-        WebView(
-            state = webViewState,
-            modifier = Modifier.navigationBarsPadding(),
-            navigator = navigator
         )
     }
 }
+

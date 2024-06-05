@@ -58,7 +58,6 @@ kotlin {
                 api(compose.foundation)
                 api(compose.material)
                 api(libs.koin.compose)
-                api(libs.compose.webview.multiplatform)
                 implementation(libs.koin.core)
                 implementation(libs.kermit)
                 implementation(libs.kamel)
@@ -105,8 +104,9 @@ kotlin {
 }
 
 fun getLocalProperty(key: String, file: String = "local.properties") = Properties()
-    .also { it.load(file(rootProject.file(file).path).inputStream()) }
-    .getProperty(key) ?: ""
+    .takeIf { rootProject.file(file).exists() }
+    ?.also { it.load(file(rootProject.file(file).path).inputStream()) }
+    ?.getProperty(key) ?: ""
 
 android {
     compileSdk = libs.versions.androidCompileSdk.get().toInt()

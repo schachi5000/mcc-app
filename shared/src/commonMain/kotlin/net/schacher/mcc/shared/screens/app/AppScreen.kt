@@ -16,32 +16,39 @@ private const val LOG_IN_MILLIS = 450
 private const val LOG_OUT_MILLIS = 450
 
 @Composable
-fun AppScreen(appViewModel: AppViewModel = koinInject()) {
+fun AppScreen(
+    appViewModel: AppViewModel = koinInject(),
+    onLogInClicked: () -> Unit
+) {
     val loggedIn = appViewModel.state.collectAsState()
 
-    AnimatedContent(targetState = loggedIn.value, transitionSpec = {
-        if (targetState) {
-            slideInVertically(
-                tween(LOG_IN_MILLIS),
-                initialOffsetY = { fillHeight -> fillHeight }) togetherWith
-                    slideOutVertically(tween(
-                        LOG_IN_MILLIS
-                    ), targetOffsetY = { fillHeight -> -fillHeight })
-        } else {
-            slideInVertically(
-                tween(LOG_OUT_MILLIS),
-                initialOffsetY = { fillHeight -> -fillHeight }) togetherWith
-                    slideOutVertically(
-                        tween(LOG_OUT_MILLIS),
-                        targetOffsetY = { fillHeight -> fillHeight })
-        }
-    }) {
+    AnimatedContent(
+        targetState = loggedIn.value,
+        transitionSpec = {
+            if (targetState) {
+                slideInVertically(
+                    tween(LOG_IN_MILLIS),
+                    initialOffsetY = { fillHeight -> fillHeight }) togetherWith
+                        slideOutVertically(tween(
+                            LOG_IN_MILLIS
+                        ), targetOffsetY = { fillHeight -> -fillHeight })
+            } else {
+                slideInVertically(
+                    tween(LOG_OUT_MILLIS),
+                    initialOffsetY = { fillHeight -> -fillHeight }) togetherWith
+                        slideOutVertically(
+                            tween(LOG_OUT_MILLIS),
+                            targetOffsetY = { fillHeight -> fillHeight })
+            }
+        }) {
+
         if (it) {
             MainScreen()
         } else {
-            LoginScreen {
-                appViewModel.onGuestLoginClicked()
-            }
+            LoginScreen(
+                onLogInClicked = onLogInClicked,
+                onContinueAsGuestClicked = { appViewModel.onGuestLoginClicked() }
+            )
         }
     }
 }

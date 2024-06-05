@@ -5,9 +5,9 @@ import net.schacher.mcc.shared.datasource.database.DatabaseDriverFactory
 import org.koin.android.ext.koin.androidContext
 
 @Composable
-fun MainView() {
+fun MainView(onLoginClicked: ((LoginBridge) -> Unit)) {
     val context = LocalContext.current
-    App(DatabaseDao(DatabaseDriverFactory(LocalContext.current))) {
-        androidContext(context)
-    }
+    App(databaseDao = DatabaseDao(DatabaseDriverFactory(LocalContext.current)),
+        onLoginClicked = onLoginClicked,
+        onKoinStart = { androidContext(context) })
 }
