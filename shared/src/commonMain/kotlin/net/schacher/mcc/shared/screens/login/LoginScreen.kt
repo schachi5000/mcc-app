@@ -1,5 +1,7 @@
 package net.schacher.mcc.shared.screens.login
 
+import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -40,11 +42,23 @@ internal var confirmationSeen = false
 @Composable
 fun LoginScreen(
     onLogInClicked: () -> Unit,
-    onGuestLogin: () -> Unit,
+    onContinueAsGuestClicked: () -> Unit,
 ) {
     var showingConfirmation by remember { mutableStateOf(false) }
+    var blur by remember { mutableStateOf(0.dp) }
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    val animatedBlur by animateDpAsState(
+        targetValue = blur,
+        animationSpec = tween()
+    )
+
+    blur = if (showingConfirmation) 5.dp else 0.dp
+
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .blur(animatedBlur)
+
+    ) {
         Image(
             painter = painterResource(Res.drawable.splash_screen),
             contentDescription = "Splash Screen",
@@ -95,7 +109,7 @@ fun LoginScreen(
 
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = { onGuestLogin() },
+                onClick = onContinueAsGuestClicked,
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = MaterialTheme.colors.background

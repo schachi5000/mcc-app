@@ -22,29 +22,33 @@ fun AppScreen(
 ) {
     val loggedIn = appViewModel.state.collectAsState()
 
-    AnimatedContent(targetState = loggedIn.value, transitionSpec = {
-        if (targetState) {
-            slideInVertically(
-                tween(LOG_IN_MILLIS),
-                initialOffsetY = { fillHeight -> fillHeight }) togetherWith
-                    slideOutVertically(tween(
-                        LOG_IN_MILLIS
-                    ), targetOffsetY = { fillHeight -> -fillHeight })
-        } else {
-            slideInVertically(
-                tween(LOG_OUT_MILLIS),
-                initialOffsetY = { fillHeight -> -fillHeight }) togetherWith
-                    slideOutVertically(
-                        tween(LOG_OUT_MILLIS),
-                        targetOffsetY = { fillHeight -> fillHeight })
-        }
-    }) {
+    AnimatedContent(
+        targetState = loggedIn.value,
+        transitionSpec = {
+            if (targetState) {
+                slideInVertically(
+                    tween(LOG_IN_MILLIS),
+                    initialOffsetY = { fillHeight -> fillHeight }) togetherWith
+                        slideOutVertically(tween(
+                            LOG_IN_MILLIS
+                        ), targetOffsetY = { fillHeight -> -fillHeight })
+            } else {
+                slideInVertically(
+                    tween(LOG_OUT_MILLIS),
+                    initialOffsetY = { fillHeight -> -fillHeight }) togetherWith
+                        slideOutVertically(
+                            tween(LOG_OUT_MILLIS),
+                            targetOffsetY = { fillHeight -> fillHeight })
+            }
+        }) {
+
         if (it) {
             MainScreen()
         } else {
             LoginScreen(
                 onLogInClicked = onLogInClicked,
-                onGuestLogin = { appViewModel.onGuestLoginClicked() })
+                onContinueAsGuestClicked = { appViewModel.onGuestLoginClicked() }
+            )
         }
     }
 }
