@@ -1,7 +1,7 @@
 [versions]
 # @keep
 androidCompileSdk = "34"
-androidGradlePlugin = "8.4.1"
+androidGradlePlugin = "8.2.0"
 # @keep
 androidMinSdk = "24"
 # @keep
