@@ -37,21 +37,19 @@ import net.schacher.mcc.shared.design.theme.DefaultShape
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
-internal var confirmationSeen = false
-
 @Composable
 fun LoginScreen(
     onLogInClicked: () -> Unit,
     onContinueAsGuestClicked: () -> Unit,
 ) {
+    var confirmationSeen by remember { mutableStateOf(false) }
     var showingConfirmation by remember { mutableStateOf(false) }
-    var blur by remember { mutableStateOf(0.dp) }
 
+    var blur by remember { mutableStateOf(0.dp) }
     val animatedBlur by animateDpAsState(
         targetValue = blur,
         animationSpec = tween()
     )
-
     blur = if (showingConfirmation) 5.dp else 0.dp
 
     Box(
