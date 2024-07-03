@@ -79,7 +79,6 @@ fun App(
                 onLogInClicked = {
                     onLoginClicked.invoke(
                         object : LoginBridge {
-                            override val url: String = BuildConfig.OAUTH_URL
                             override fun handleCallbackUrl(callbackUrl: String) {
                                 authHandler.handleCallbackUrl(callbackUrl)
                             }
@@ -96,6 +95,7 @@ fun App(
 interface LoginBridge {
 
     val url: String
+        get() = BuildConfig.OAUTH_URL
 
     fun handleCallbackUrl(callbackUrl: String)
 
