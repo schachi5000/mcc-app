@@ -67,6 +67,7 @@ kotlin {
                 implementation(libs.ktor.serialization.json)
                 implementation(libs.kotlinx.serilization.json)
                 implementation(libs.kotlinx.datetime)
+                implementation(libs.kotlinx.viewmodel.compose)
                 implementation(libs.sqldelight)
                 implementation(libs.moko.mvvm.core)
                 implementation(libs.moko.mvvm.compose)

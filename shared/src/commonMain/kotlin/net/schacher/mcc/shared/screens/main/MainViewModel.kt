@@ -1,7 +1,8 @@
 package net.schacher.mcc.shared.screens.main
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -24,6 +25,7 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Sea
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
+import net.schacher.mcc.shared.utils.debug
 import kotlin.time.Duration.Companion.seconds
 
 class MainViewModel(
@@ -42,6 +44,7 @@ class MainViewModel(
     val event = _event.asSharedFlow()
 
     init {
+        Logger.debug { "Init MainViewModel" }
         this.viewModelScope.launch {
             delay(1.seconds)
             if (!cardRepository.hasCards()) {

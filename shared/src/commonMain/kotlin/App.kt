@@ -23,6 +23,7 @@ import net.schacher.mcc.shared.screens.settings.SettingsViewModel
 import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
+import org.koin.core.module.dsl.factoryOf
 import org.koin.core.module.dsl.singleOf
 import org.koin.dsl.module
 import pro.schacher.mcc.BuildConfig
@@ -39,7 +40,7 @@ val repositories = module {
 
 val viewModels = module {
     singleOf(::AppViewModel)
-    singleOf(::MainViewModel)
+    factoryOf(::MainViewModel)
     singleOf(::MyDecksViewModel)
     singleOf(::NewDeckViewModel)
     singleOf(::SettingsViewModel)

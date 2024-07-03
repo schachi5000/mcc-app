@@ -1,7 +1,8 @@
 package net.schacher.mcc.shared.screens.mydecks
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -18,7 +19,7 @@ class MyDecksViewModel(private val deckRepository: DeckRepository) : ViewModel()
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        this.viewModelScope.launch {
             deckRepository.decks.collect {
                 _state.update {
                     it.copy(
