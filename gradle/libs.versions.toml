@@ -1,7 +1,7 @@
 [versions]
 # @keep
 androidCompileSdk = "34"
-androidGradlePlugin = "8.2.0"
+androidGradlePlugin = "8.2.2"
 # @keep
 androidMinSdk = "24"
 # @keep
@@ -11,7 +11,7 @@ activity = "1.9.0"
 browser = "1.8.0"
 core-ktx = "1.13.1"
 ktor = "2.3.11"
-kotlinx-datetime = "0.5.0"
+kotlinx-datetime = "0.6.0"
 moko-mvvm = "0.16.1"
 kamel = "0.9.5"
 kermit = "2.0.3"
@@ -20,7 +20,7 @@ koin-compose = "1.1.0"
 kotlin = "2.0.0"
 sql-delight = "2.0.2"
 serialization = "1.6.3"
-androidx-compose = "1.6.7"
+androidx-compose = "1.6.8"
 androidx-compose-compiler = "1.5.14"
 compose = "1.6.11"
 
@@ -48,6 +48,7 @@ ktor-client-loggin = { module = "io.ktor:ktor-client-logging", version.ref = "kt
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
+kotlinx-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version = "2.8.0" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serilization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 
