@@ -40,8 +40,8 @@ val repositories = module {
 
 val viewModels = module {
     viewModelOf(::AppViewModel)
-    viewModelOf(::MainViewModel) <
-            viewModelOf(::MyDecksViewModel)
+    viewModelOf(::MainViewModel)
+    viewModelOf(::MyDecksViewModel)
     viewModelOf(::NewDeckViewModel)
     viewModelOf(::SettingsViewModel)
     viewModelOf(::SearchViewModel)
