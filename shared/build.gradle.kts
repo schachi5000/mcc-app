@@ -69,8 +69,6 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.viewmodel.compose)
                 implementation(libs.sqldelight)
-                implementation(libs.moko.mvvm.core)
-                implementation(libs.moko.mvvm.compose)
                 implementation(compose.components.resources)
             }
         }
