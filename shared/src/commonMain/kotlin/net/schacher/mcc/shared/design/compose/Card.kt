@@ -29,6 +29,7 @@ import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.card_blue_no_image
 import marvelchampionscompanion.shared.generated.resources.card_yellow_no_image
 import net.schacher.mcc.shared.design.theme.CardShape
+import net.schacher.mcc.shared.design.theme.DefaultCardSize
 import net.schacher.mcc.shared.design.theme.SleeveColors
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardOrientation
@@ -71,7 +72,7 @@ fun LabeledCard(
 @Composable
 fun Card(
     card: Card,
-    modifier: Modifier = Modifier.height(196.dp),
+    modifier: Modifier = Modifier.height(DefaultCardSize),
     shape: Shape = CardShape,
     onClick: () -> Unit = {}
 ) {

@@ -12,6 +12,10 @@ object CornerRadius {
     val Default = 16.dp
 }
 
+val HorizontalScreenPadding = 24.dp
+
+val DefaultCardSize = 216.dp
+
 val CardShape = RoundedCornerShape(Card)
 
 val DeckShape = RoundedCornerShape(Deck)

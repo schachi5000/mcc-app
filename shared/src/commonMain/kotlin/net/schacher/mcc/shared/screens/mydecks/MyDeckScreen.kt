@@ -45,6 +45,7 @@ import marvelchampionscompanion.shared.generated.resources.create_new_deck
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -108,7 +109,7 @@ fun MyDecksScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = HorizontalScreenPadding)
                 .nestedScroll(nestedScrollConnection)
         ) {
             items(entries.size) { index ->

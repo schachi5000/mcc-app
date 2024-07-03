@@ -57,6 +57,7 @@ import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.design.theme.isContrastRatioSufficient
 import net.schacher.mcc.shared.localization.localize
@@ -123,9 +124,9 @@ fun SearchScreen(
 
                 CardRow(
                     modifier = Modifier.padding(
-                        start = 16.dp,
+                        start = HorizontalScreenPadding,
                         top = if (item == 0) 0.dp else 16.dp,
-                        end = 16.dp,
+                        end = HorizontalScreenPadding,
                         bottom = 16.dp
                     ),
                     cardRowEntry = entries[item]

@@ -31,6 +31,7 @@ import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.compose.LoadingDeck
 import net.schacher.mcc.shared.design.compose.ShimmerBox
+import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.spotlight.ListItem.DeckItem
 import net.schacher.mcc.shared.screens.spotlight.ListItem.HeaderItem
@@ -55,7 +56,7 @@ fun SpotlightScreen(
     onDeckClick: (Deck) -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp)
+        modifier = Modifier.fillMaxSize().padding(horizontal = HorizontalScreenPadding)
     ) {
 
         AnimatedVisibility(

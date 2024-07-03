@@ -34,6 +34,7 @@ import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.splash_screen
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -80,7 +81,10 @@ fun LoginScreen(
         Column(
             modifier = Modifier.align(Alignment.BottomCenter)
                 .fillMaxWidth()
-                .padding(horizontal = 32.dp, vertical = 96.dp),
+                .padding(
+                    vertical = 96.dp,
+                    horizontal = HorizontalScreenPadding,
+                ),
         ) {
             TextButton(
                 modifier = Modifier.fillMaxWidth(),
