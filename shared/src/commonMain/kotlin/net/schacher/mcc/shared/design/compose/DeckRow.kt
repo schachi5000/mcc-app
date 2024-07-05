@@ -8,7 +8,6 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -25,7 +24,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.ColorFilter
 import androidx.compose.ui.graphics.ColorMatrix
 import androidx.compose.ui.graphics.FilterQuality
@@ -33,15 +31,12 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.ic_cards
 import marvelchampionscompanion.shared.generated.resources.ic_deck
 import net.schacher.mcc.shared.design.previewablePainterResource
-import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.design.theme.color
-import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -88,8 +83,8 @@ private fun DeckContent(deck: Deck, onClick: () -> Unit = {}) {
             .padding(contentPadding)
     ) {
         Thumbnail(
+            card = deck.hero,
             modifier = Modifier.fillMaxHeight(),
-            card = deck.hero
         )
         Spacer(Modifier.width(contentPadding))
         Column(
@@ -145,33 +140,6 @@ private fun BackgroundImage(modifier: Modifier = Modifier, deck: Deck) {
                 .background(deck.aspect.color.copy(alpha = 0.4f), DeckShape)
         ) {}
     }
-}
-
-@Composable
-private fun Thumbnail(modifier: Modifier = Modifier, card: Card) {
-    CardImage(
-        modifier = modifier.clip(CardShape)
-            .aspectRatio(1f)
-            .scale(1.7f)
-            .graphicsLayer { translationY = 20.dp.toPx() },
-        cardCode = card.code,
-        filterQuality = FilterQuality.Low,
-        contentDescription = card.name,
-        contentScale = ContentScale.Crop,
-        animationSpec = tween(durationMillis = 500),
-        onLoading = {
-            ShimmerBox(
-                Modifier.fillMaxSize(),
-                MaterialTheme.colors.surface.copy(0.8f)
-            )
-        },
-        onFailure = {
-            Logger.e { "Failed to load image for card: ${card.name}(${card.code}) - ${it.message}" }
-            Box(
-                Modifier.fillMaxSize()
-                    .background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)
-            ) { }
-        })
 }
 
 @OptIn(ExperimentalResourceApi::class)

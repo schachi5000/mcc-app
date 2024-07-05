@@ -3,7 +3,6 @@ package net.schacher.mcc.shared.screens.spotlight
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -24,14 +23,18 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
+import kotlinx.datetime.Clock
+import kotlinx.datetime.LocalDate
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
-import net.schacher.mcc.shared.design.compose.DeckRow
+import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.LoadingDeck
 import net.schacher.mcc.shared.design.compose.ShimmerBox
-import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.spotlight.ListItem.DeckItem
 import net.schacher.mcc.shared.screens.spotlight.ListItem.HeaderItem
@@ -41,8 +44,7 @@ import org.koin.compose.koinInject
 
 @Composable
 fun SpotlightScreen(
-    viewModel: SpotlightViewModel = koinInject(),
-    onDeckClick: (Deck) -> Unit
+    viewModel: SpotlightViewModel = koinInject(), onDeckClick: (Deck) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -52,40 +54,37 @@ fun SpotlightScreen(
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SpotlightScreen(
-    state: SpotlightViewModel.UiState,
-    onDeckClick: (Deck) -> Unit
+    state: SpotlightViewModel.UiState, onDeckClick: (Deck) -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxSize().padding(horizontal = HorizontalScreenPadding)
+        modifier = Modifier.fillMaxSize().padding(horizontal = ContentPadding)
     ) {
 
         AnimatedVisibility(
-            visible = !state.loading,
-            exit = fadeOut(),
-            enter = fadeIn()
+            visible = !state.loading, exit = fadeOut(), enter = fadeIn()
         ) {
             val entries = mutableListOf<ListItem>()
             state.decks.forEach { (date, decks) ->
-                entries.add(HeaderItem("${date.dayOfMonth}. ${date.month}"))
+                entries.add(HeaderItem(getLabelByDate(date)))
                 decks.forEach { deck ->
                     entries.add(DeckItem(deck))
                 }
             }
 
-            LazyColumn(horizontalAlignment = Alignment.CenterHorizontally) {
+            LazyColumn {
                 items(entries.size) { index ->
                     if (index == 0) {
-                        Spacer(Modifier.statusBarsPadding().height(16.dp))
+                        Spacer(Modifier.statusBarsPadding().height(ContentPadding))
                     }
 
                     when (val entry = entries[index]) {
                         is HeaderItem -> Header(entry.header)
-                        is DeckItem -> DeckRow(entry.deck) {
+                        is DeckItem -> DeckListItem(deck = entry.deck) {
                             onDeckClick(entry.deck)
                         }
                     }
 
-                    Spacer(Modifier.height(16.dp))
+                    Spacer(Modifier.height(32.dp))
                 }
             }
         }
@@ -99,28 +98,36 @@ fun SpotlightScreen(
         }
 
         AnimatedVisibility(
-            visible = state.loading,
-            exit = fadeOut(),
-            enter = fadeIn()
+            visible = state.loading, exit = fadeOut(), enter = fadeIn()
         ) {
             LoadingContent()
         }
     }
 }
 
+private fun getLabelByDate(date: LocalDate): String {
+    val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear
+
+    return when (date.dayOfYear) {
+        today -> "Today"
+        today - 1 -> "Yesterday"
+        today - 2 -> "Two days ago"
+        else -> "${date.dayOfMonth}. ${date.month}"
+    }
+}
+
 @Composable
 private fun Header(label: String) {
     Row(
-        modifier = Modifier.padding(8.dp),
-        horizontalArrangement = Arrangement.Center
+        modifier = Modifier.padding(top = 16.dp),
+        horizontalArrangement = Arrangement.Start
     ) {
         Text(
-            modifier = Modifier
-                .background(MaterialTheme.colors.primary, RoundedCornerShape(16.dp))
-                .padding(vertical = 4.dp, horizontal = 16.dp),
+            modifier = Modifier.alignByBaseline(),
             text = label,
-            fontSize = 13.sp,
-            color = MaterialTheme.colors.onPrimary
+            style = MaterialTheme.typography.h3,
+            fontWeight = FontWeight.Bold,
+            color = MaterialTheme.colors.onBackground,
         )
     }
 }

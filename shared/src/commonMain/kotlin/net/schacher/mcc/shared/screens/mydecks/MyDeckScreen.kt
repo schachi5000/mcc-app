@@ -43,9 +43,9 @@ import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.create_new_deck
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
-import net.schacher.mcc.shared.design.compose.DeckRow
+import net.schacher.mcc.shared.design.compose.DeckListItem
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -109,21 +109,21 @@ fun MyDecksScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = HorizontalScreenPadding)
+                .padding(horizontal = ContentPadding)
                 .nestedScroll(nestedScrollConnection)
         ) {
             items(entries.size) { index ->
                 if (index == 0) {
-                    Spacer(Modifier.statusBarsPadding().height(16.dp))
+                    Spacer(Modifier.statusBarsPadding().height(ContentPadding))
                 }
 
                 when (val entry = entries[index]) {
-                    is DeckItem -> DeckRow(entry.deck) {
+                    is DeckItem -> DeckListItem(entry.deck) {
                         onDeckClick(entry.deck)
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(32.dp))
             }
         }
 

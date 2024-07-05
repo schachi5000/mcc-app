@@ -49,6 +49,8 @@ import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
 import net.schacher.mcc.shared.design.compose.blurByBottomSheet
+import net.schacher.mcc.shared.design.theme.ButtonSize
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
@@ -138,10 +140,15 @@ private fun Content(
 
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
-                Spacer(Modifier.statusBarsPadding().height(16.dp))
+                Spacer(Modifier.statusBarsPadding().height(ContentPadding))
             }
             item {
-                Row(modifier = Modifier.padding(16.dp)) {
+                Row(
+                    modifier = Modifier.padding(
+                        vertical = 16.dp,
+                        horizontal = ContentPadding
+                    )
+                ) {
                     Card(deck.hero) {
                         onCardClick(deck.hero)
                     }
@@ -155,7 +162,7 @@ private fun Content(
 
             item {
                 CardRow(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(ContentPadding),
                     cardRowEntry = heroCards
                 ) {
                     onCardClick(it)
@@ -168,11 +175,15 @@ private fun Content(
 
             item {
                 CardRow(
-                    modifier = Modifier.padding(16.dp),
+                    modifier = Modifier.padding(ContentPadding),
                     cardRowEntry = otherCards
                 ) {
                     onCardClick(it)
                 }
+            }
+
+            item {
+                Spacer(Modifier.height(64.dp))
             }
         }
 
@@ -187,7 +198,7 @@ private fun Content(
                     end = 16.dp,
                     bottom = if (isAndroid()) 16.dp else 0.dp
                 )
-                .size(48.dp),
+                .size(ButtonSize),
             contentColor = MaterialTheme.colors.onPrimary,
             backgroundColor = MaterialTheme.colors.primary,
             shape = DefaultShape

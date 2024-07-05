@@ -19,7 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
-import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Card
 
 @Composable
@@ -51,7 +51,7 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
         ) {
             items(cardRowEntry.cards.count()) {
                 if (it == 0) {
-                    Spacer(Modifier.size(HorizontalScreenPadding))
+                    Spacer(Modifier.size(ContentPadding))
                 }
                 Column {
                     Card(card = cardRowEntry.cards[it]) {
@@ -71,7 +71,7 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
                 }
 
                 if (it == cardRowEntry.cards.lastIndex) {
-                    Spacer(Modifier.size(HorizontalScreenPadding))
+                    Spacer(Modifier.size(ContentPadding))
                 }
             }
         }

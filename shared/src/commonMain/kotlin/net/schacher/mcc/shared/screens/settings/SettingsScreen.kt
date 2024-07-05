@@ -39,8 +39,8 @@ import marvelchampionscompanion.shared.generated.resources.ic_deck
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -67,7 +67,7 @@ fun SettingsScreen(
     Column(
         modifier = Modifier.fillMaxSize().statusBarsPadding().padding(
             vertical = 16.dp,
-            horizontal = HorizontalScreenPadding
+            horizontal = ContentPadding
         ),
         verticalArrangement = Arrangement.Top,
     ) {

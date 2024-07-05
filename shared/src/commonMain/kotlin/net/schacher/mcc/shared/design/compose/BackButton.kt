@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import net.schacher.mcc.shared.design.theme.ButtonSize
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.platform.isAndroid
 
@@ -25,7 +26,7 @@ fun BoxScope.BackButton(onClick: () -> Unit) {
                 start = 16.dp,
                 bottom = if (isAndroid()) 16.dp else 0.dp
             )
-            .size(48.dp),
+            .size(ButtonSize),
         contentColor = MaterialTheme.colors.onPrimary,
         backgroundColor = MaterialTheme.colors.primary,
         shape = DefaultShape
