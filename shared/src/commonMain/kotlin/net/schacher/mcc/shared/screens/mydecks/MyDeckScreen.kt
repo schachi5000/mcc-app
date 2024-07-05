@@ -68,7 +68,7 @@ fun MyDecksScreen(
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MyDecksScreen(
     state: MyDecksViewModel.UiState,
@@ -133,10 +133,12 @@ fun MyDecksScreen(
 //        ) { onAddDeckClick() }
 
         PullRefreshIndicator(
-            modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),
+            modifier = Modifier.align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = ContentPadding + 72.dp),
             refreshing = state.refreshing,
             state = pullRefreshState,
-            contentColor = MaterialTheme.colors.primary,
+            contentColor = MaterialTheme.colors.onBackground,
             backgroundColor = MaterialTheme.colors.background
         )
     }

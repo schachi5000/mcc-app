@@ -20,9 +20,6 @@ import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CreateDeck
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.MyDecks
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Search
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.utils.debug
@@ -63,32 +60,11 @@ class MainViewModel(
         this.viewModelScope.launch {
             authRepository.loginState.collect {
                 _state.update {
-                    val loggedIn = !authRepository.isGuest()
                     it.copy(
-                        mainScreen = if (loggedIn) {
-                            MyDecks
-                        } else {
-                            Spotlight
-                        },
-                        canShowMyDeckScreen = loggedIn
+                        mainScreen = Spotlight,
+                        canShowMyDeckScreen = authRepository.isSignedIn()
                     )
                 }
-            }
-        }
-    }
-
-    fun onTabSelected(tabIndex: Int) {
-        this.viewModelScope.launch {
-            val mainScreen = when (tabIndex) {
-                0 -> MyDecks
-                1 -> Spotlight
-                2 -> Search
-                3 -> Settings
-                else -> return@launch
-            }
-
-            _state.update {
-                it.copy(mainScreen = mainScreen)
             }
         }
     }
@@ -168,7 +144,6 @@ class MainViewModel(
     sealed interface Event {
         data object DatabaseSynced : Event
         data class DeckCreated(val deckName: String) : Event
-
         data class CardsDatabaseSyncFailed(val exception: Exception) : Event
     }
 
@@ -179,15 +154,13 @@ class MainViewModel(
         val fullScreen: FullScreen? = null
     ) {
         sealed interface MainScreen {
-            data object MyDecks : MainScreen
             data object Spotlight : MainScreen
-            data object Search : MainScreen
+            data object MyDecks : MainScreen
             data object Settings : MainScreen
         }
 
         sealed interface SubScreen {
             data class CardMenu(val card: Card) : SubScreen
-
         }
 
         sealed interface FullScreen {
@@ -196,6 +169,8 @@ class MainViewModel(
             data object PackSelectionScreen : FullScreen
 
             data class CreateDeck(val heroCodes: Set<Card>) : FullScreen
+
+            data object Search : FullScreen
         }
     }
 }

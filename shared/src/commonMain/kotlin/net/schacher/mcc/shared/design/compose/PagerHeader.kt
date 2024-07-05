@@ -1,5 +1,7 @@
 package net.schacher.mcc.shared.design.compose
 
+import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyRow
@@ -8,6 +10,7 @@ import androidx.compose.foundation.pager.PagerState
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -24,20 +27,15 @@ fun PagerHeader(
     pageLabels: List<String>,
     pagerState: PagerState,
     modifier: Modifier = Modifier,
-    fontSize: TextUnit = 24.sp,
+    fontSize: TextUnit = 25.sp,
     onLabelClick: (Int) -> Unit
 ) {
-    val scope = rememberCoroutineScope()
-
     val selectedItem = pagerState.currentPage
     val state = rememberLazyListState()
+    val scope = rememberCoroutineScope()
 
     scope.launch {
-        if (selectedItem > 0) {
-            state.scrollToItem(selectedItem - 1, 0)
-        } else {
-            state.scrollToItem(selectedItem, 0)
-        }
+        state.animateScrollToItem(selectedItem, if (selectedItem > 0) -200 else 0)
     }
 
     LazyRow(
@@ -48,19 +46,23 @@ fun PagerHeader(
         pageLabels.forEachIndexed { index, it ->
             item {
                 val selected = selectedItem == index
+                val alpha: Float by animateFloatAsState(
+                    targetValue = if (selected) 1f else 0.35f,
+                    animationSpec = tween()
+                )
 
                 Text(
                     text = it,
                     fontSize = fontSize,
                     color = MaterialTheme.colors.onBackground,
-                    fontWeight = FontWeight.SemiBold,
+                    fontWeight = FontWeight.Bold,
                     modifier = Modifier
                         .padding(
                             start = if (index == 0) ContentPadding else 0.dp,
-                            end = 12.dp
+                            end = if (index == pageLabels.size - 1) 200.dp else 12.dp
                         )
                         .noRippleClickable { onLabelClick(index) }
-                        .alpha(if (selected) 1f else 0.35f),
+                        .alpha(alpha),
                 )
             }
         }

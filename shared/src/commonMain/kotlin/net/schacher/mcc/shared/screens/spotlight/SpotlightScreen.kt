@@ -126,7 +126,7 @@ private fun Header(label: String) {
             modifier = Modifier.alignByBaseline(),
             text = label,
             style = MaterialTheme.typography.h5,
-            fontWeight = FontWeight.SemiBold,
+            fontWeight = FontWeight.Bold,
             color = MaterialTheme.colors.onBackground,
         )
     }
