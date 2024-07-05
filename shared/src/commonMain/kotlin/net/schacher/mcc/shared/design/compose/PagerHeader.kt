@@ -14,6 +14,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
@@ -33,9 +34,10 @@ fun PagerHeader(
     val selectedItem = pagerState.currentPage
     val state = rememberLazyListState()
     val scope = rememberCoroutineScope()
+    val offset = with(LocalDensity.current) { 2 * ContentPadding.toPx() }.toInt()
 
     scope.launch {
-        state.animateScrollToItem(selectedItem, if (selectedItem > 0) -200 else 0)
+        state.animateScrollToItem(selectedItem, if (selectedItem > 0) -offset else 0)
     }
 
     LazyRow(

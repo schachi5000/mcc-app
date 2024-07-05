@@ -112,7 +112,7 @@ class SettingsViewModel(
         }
     }
 
-    data class UiState(
+    data class UiState internal constructor(
         val cardCount: Int,
         val deckCount: Int,
         val packCount: Int,

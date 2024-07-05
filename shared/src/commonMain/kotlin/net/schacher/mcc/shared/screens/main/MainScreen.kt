@@ -63,6 +63,8 @@ import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.koin.compose.koinInject
 
+internal val topInset = ContentPadding + 72.dp
+
 @OptIn(
     ExperimentalMaterialApi::class, ExperimentalResourceApi::class,
     ExperimentalFoundationApi::class
@@ -112,16 +114,18 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
 
                 HorizontalPager(state = pagerState) { page ->
                     when (page) {
-                        Spotlight.tabIndex -> SpotlightScreen {
+                        Spotlight.tabIndex -> SpotlightScreen(topInset = topInset) {
                             viewModel.onDeckClicked(it)
                         }
 
                         MyDecks.tabIndex -> MyDecksScreen(
+                            topInset = topInset,
                             onDeckClick = { viewModel.onDeckClicked(it) },
                             onAddDeckClick = { viewModel.onNewDeckClicked() }
                         )
 
                         Settings.tabIndex -> SettingsScreen(
+                            topInset = topInset,
                             onPackSelectionClick = {
                                 viewModel.onPackSelectionClicked()
                             },

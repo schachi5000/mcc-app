@@ -24,6 +24,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import kotlinx.datetime.Clock
 import kotlinx.datetime.LocalDate
@@ -44,17 +45,21 @@ import org.koin.compose.koinInject
 
 @Composable
 fun SpotlightScreen(
-    viewModel: SpotlightViewModel = koinInject(), onDeckClick: (Deck) -> Unit
+    viewModel: SpotlightViewModel = koinInject(),
+    topInset: Dp,
+    onDeckClick: (Deck) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
 
-    SpotlightScreen(state, onDeckClick)
+    SpotlightScreen(state, topInset, onDeckClick)
 }
 
 @OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SpotlightScreen(
-    state: SpotlightViewModel.UiState, onDeckClick: (Deck) -> Unit
+    state: SpotlightViewModel.UiState,
+    topInset: Dp = 0.dp,
+    onDeckClick: (Deck) -> Unit
 ) {
     Box(
         modifier = Modifier.fillMaxSize().padding(horizontal = ContentPadding)
@@ -74,7 +79,7 @@ fun SpotlightScreen(
             LazyColumn {
                 items(entries.size) { index ->
                     if (index == 0) {
-                        Spacer(Modifier.statusBarsPadding().height(ContentPadding + 64.dp))
+                        Spacer(Modifier.statusBarsPadding().height(topInset))
                     }
 
                     when (val entry = entries[index]) {

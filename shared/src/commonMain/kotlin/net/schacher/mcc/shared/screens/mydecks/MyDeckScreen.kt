@@ -39,6 +39,7 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.create_new_deck
@@ -55,6 +56,7 @@ import org.koin.compose.koinInject
 @Composable
 fun MyDecksScreen(
     viewModel: MyDecksViewModel = koinInject(),
+    topInset: Dp,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit
 ) {
@@ -62,6 +64,7 @@ fun MyDecksScreen(
 
     MyDecksScreen(
         state = state,
+        topInset = topInset,
         onDeckClick = onDeckClick,
         onAddDeckClick = onAddDeckClick,
         onRefresh = { viewModel.onRefreshClicked() }
@@ -72,6 +75,7 @@ fun MyDecksScreen(
 @Composable
 fun MyDecksScreen(
     state: MyDecksViewModel.UiState,
+    topInset: Dp = 0.dp,
     onRefresh: () -> Unit,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit
@@ -114,7 +118,7 @@ fun MyDecksScreen(
         ) {
             items(entries.size) { index ->
                 if (index == 0) {
-                    Spacer(Modifier.statusBarsPadding().height(ContentPadding + 72.dp))
+                    Spacer(Modifier.statusBarsPadding().height(topInset))
                 }
 
                 when (val entry = entries[index]) {

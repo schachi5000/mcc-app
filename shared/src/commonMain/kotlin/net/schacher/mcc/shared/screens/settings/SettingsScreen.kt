@@ -31,6 +31,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.database
@@ -41,6 +42,7 @@ import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.screens.settings.SettingsViewModel.UiState
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -49,10 +51,32 @@ import org.koin.compose.koinInject
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel = koinInject(),
+    topInset: Dp,
     onPackSelectionClick: () -> Unit,
     onLogoutClicked: () -> Unit
 ) {
     val state by settingsViewModel.state.collectAsState()
+
+    SettingsScreen(
+        state = state,
+        topInset = topInset,
+        onPackSelectionClick = onPackSelectionClick,
+        onLogoutClick = onLogoutClicked,
+        onSyncClick = { settingsViewModel.onSyncClick() },
+        onWipeDatabaseClick = { settingsViewModel.onWipeDatabaseClick() },
+    )
+}
+
+@ExperimentalResourceApi
+@Composable
+fun SettingsScreen(
+    state: UiState,
+    topInset: Dp,
+    onPackSelectionClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onSyncClick: () -> Unit,
+    onWipeDatabaseClick: () -> Unit
+) {
     var deleteDatabaseDialog by remember { mutableStateOf(false) }
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -66,7 +90,7 @@ fun SettingsScreen(
 
     Column(
         modifier = Modifier.fillMaxSize().statusBarsPadding().padding(
-            top = ContentPadding + 64.dp,
+            top = topInset,
             start = ContentPadding,
             end = ContentPadding,
             bottom = ContentPadding
@@ -77,9 +101,8 @@ fun SettingsScreen(
             OptionsEntry(
                 label = "Sync with MarvelCDB",
                 imageVector = Icons.Rounded.Refresh,
-                onClick = {
-                    settingsViewModel.onSyncClick()
-                })
+                onClick = onSyncClick
+            )
 
             OptionsEntry(
                 label = "Alle Einträge löschen",
@@ -115,7 +138,7 @@ fun SettingsScreen(
 
         TextButton(
             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-            onClick = { onLogoutClicked() },
+            onClick = { onLogoutClick() },
             shape = DefaultShape,
             colors = ButtonDefaults.textButtonColors(
                 backgroundColor = MaterialTheme.colors.surface
@@ -143,7 +166,7 @@ fun SettingsScreen(
             message = "Möchtest du wirklich alle Einträge löschen?",
             onDismiss = { deleteDatabaseDialog = false },
             onConfirm = {
-                settingsViewModel.onWipeDatabaseClick()
+                onWipeDatabaseClick()
                 deleteDatabaseDialog = false
             })
     }
