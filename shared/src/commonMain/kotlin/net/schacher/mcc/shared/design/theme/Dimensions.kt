@@ -14,6 +14,8 @@ object CornerRadius {
 
 val ContentPadding = 32.dp
 
+val FABPadding = ContentPadding / 2
+
 val DefaultCardSize = 216.dp
 
 val ButtonSize = 56.dp

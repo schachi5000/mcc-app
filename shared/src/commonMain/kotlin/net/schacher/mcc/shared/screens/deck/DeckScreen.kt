@@ -52,6 +52,7 @@ import net.schacher.mcc.shared.design.compose.blurByBottomSheet
 import net.schacher.mcc.shared.design.theme.ButtonSize
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.FABPadding
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
@@ -191,10 +192,11 @@ private fun Content(
 
         FloatingActionButton(
             onClick = { onDeleteDeckClick(deck.id) },
-            modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding()
+            modifier = Modifier.align(Alignment.BottomEnd)
+                .navigationBarsPadding()
                 .padding(
-                    end = ContentPadding,
-                    bottom = if (isAndroid()) ContentPadding else 0.dp
+                    end = FABPadding,
+                    bottom = if (isAndroid()) FABPadding else 0.dp
                 )
                 .size(ButtonSize),
             contentColor = MaterialTheme.colors.onPrimary,

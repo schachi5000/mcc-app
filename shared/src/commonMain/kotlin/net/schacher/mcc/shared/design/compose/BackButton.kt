@@ -14,8 +14,8 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.theme.ButtonSize
-import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.FABPadding
 import net.schacher.mcc.shared.platform.isAndroid
 
 @Composable
@@ -24,8 +24,8 @@ fun BoxScope.BackButton(onClick: () -> Unit) {
         onClick = onClick,
         modifier = Modifier.align(Alignment.BottomStart).navigationBarsPadding()
             .padding(
-                start = ContentPadding,
-                bottom = if (isAndroid()) 16.dp else 0.dp
+                start = FABPadding,
+                bottom = if (isAndroid()) FABPadding else 0.dp
             )
             .size(ButtonSize),
         contentColor = MaterialTheme.colors.onPrimary,
