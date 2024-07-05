@@ -41,12 +41,12 @@ val repositories = module {
 val viewModels = module {
     viewModelOf(::AppViewModel)
     viewModelOf(::MainViewModel)
-    viewModelOf(::MyDecksViewModel)
     viewModelOf(::NewDeckViewModel)
-    viewModelOf(::SettingsViewModel)
     viewModelOf(::SearchViewModel)
-    viewModelOf(::SpotlightViewModel)
     viewModelOf(::PackSelectionViewModel)
+    singleOf(::MyDecksViewModel)
+    singleOf(::SettingsViewModel)
+    singleOf(::SpotlightViewModel)
 }
 
 @Composable

@@ -66,8 +66,10 @@ fun SettingsScreen(
 
     Column(
         modifier = Modifier.fillMaxSize().statusBarsPadding().padding(
-            vertical = 16.dp,
-            horizontal = ContentPadding
+            top = ContentPadding + 64.dp,
+            start = ContentPadding,
+            end = ContentPadding,
+            bottom = ContentPadding
         ),
         verticalArrangement = Arrangement.Top,
     ) {

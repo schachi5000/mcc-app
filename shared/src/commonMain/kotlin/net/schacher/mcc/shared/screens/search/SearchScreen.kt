@@ -113,8 +113,7 @@ fun SearchScreen(
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-                .nestedScroll(nestedScrollConnection)
+            modifier = Modifier.fillMaxWidth().nestedScroll(nestedScrollConnection)
         ) {
             val entries = createEntries(state.result)
             items(entries.count()) { item ->

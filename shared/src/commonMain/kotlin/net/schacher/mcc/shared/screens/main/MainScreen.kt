@@ -1,24 +1,28 @@
 package net.schacher.mcc.shared.screens.main
 
 import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.slideOutVertically
 import androidx.compose.animation.togetherWith
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
+import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.BottomNavigation
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
@@ -26,34 +30,34 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Settings
+import androidx.compose.material.icons.rounded.Search
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
-import marvelchampionscompanion.shared.generated.resources.Res
-import marvelchampionscompanion.shared.generated.resources.decks
-import marvelchampionscompanion.shared.generated.resources.ic_deck
-import marvelchampionscompanion.shared.generated.resources.ic_search
-import marvelchampionscompanion.shared.generated.resources.ic_spotlight
-import marvelchampionscompanion.shared.generated.resources.more
-import marvelchampionscompanion.shared.generated.resources.search
-import marvelchampionscompanion.shared.generated.resources.spotlight
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
+import net.schacher.mcc.shared.design.compose.PagerHeader
 import net.schacher.mcc.shared.design.compose.blurByBottomSheet
+import net.schacher.mcc.shared.design.theme.ButtonSize
+import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.platform.isIOs
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DatabaseSynced
@@ -68,16 +72,18 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Set
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
+import net.schacher.mcc.shared.screens.mydecks.animateHorizontalAlignmentAsState
 import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
 import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
-import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
+@OptIn(
+    ExperimentalMaterialApi::class, ExperimentalResourceApi::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
 fun MainScreen(viewModel: MainViewModel = koinInject()) {
     val state = viewModel.state.collectAsState()
@@ -114,27 +120,15 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
             modifier = Modifier.fillMaxSize().blurByBottomSheet(sheetState),
             backgroundColor = MaterialTheme.colors.background,
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            bottomBar = {
-                BottomBar(state.value.mainScreen.tabIndex, state.value.canShowMyDeckScreen) {
-                    viewModel.onTabSelected(it)
-                }
-            }
         ) {
             Box(
                 modifier = Modifier.padding(it)
             ) {
-                AnimatedContent(
-                    targetState = state.value.mainScreen.tabIndex,
-                    transitionSpec = {
-                        if (targetState > initialState) {
-                            (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
-                                slideOutHorizontally { width -> -width } + fadeOut())
-                        } else {
-                            (slideInHorizontally { width -> -width } + fadeIn()).togetherWith(
-                                slideOutHorizontally { width -> width } + fadeOut())
-                        }
-                    }) { state ->
-                    when (state) {
+                val pageLabels = listOf("Decks", "Spotlight", "Settings")
+                val pagerState = rememberPagerState(pageCount = { pageLabels.size })
+
+                HorizontalPager(state = pagerState) { page ->
+                    when (page) {
                         0 -> MyDecksScreen(
                             onDeckClick = { viewModel.onDeckClicked(it) },
                             onAddDeckClick = { viewModel.onNewDeckClicked() }
@@ -144,11 +138,7 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                             viewModel.onDeckClicked(it)
                         }
 
-                        2 -> SearchScreen {
-                            viewModel.onCardClicked(it)
-                        }
-
-                        3 -> SettingsScreen(
+                        2 -> SettingsScreen(
                             onPackSelectionClick = {
                                 viewModel.onPackSelectionClicked()
                             },
@@ -156,6 +146,34 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                                 viewModel.onLogoutClicked()
                             })
                     }
+                }
+
+                PagerHeader(
+                    modifier = Modifier.fillMaxWidth()
+                        .background(shade)
+                        .statusBarsPadding()
+                        .padding(
+                            top = ContentPadding,
+                            bottom = ContentPadding + 16.dp
+                        ),
+                    pageLabels = pageLabels,
+                    pagerState = pagerState,
+                ) {
+                    scope.launch {
+                        pagerState.animateScrollToPage(it)
+                    }
+                }
+
+                if (pagerState.currentPage < 2) {
+                    ScrollDependingTextButton(
+                        text = "Suche",
+                        icon = { Icon(Icons.Rounded.Search, contentDescription = "Search cards") },
+                        expanded = true,
+                        modifier = Modifier.align(Alignment.BottomCenter),
+                        onClick = {
+
+                        }
+                    )
                 }
             }
         }
@@ -219,47 +237,57 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
     }
 }
 
+private val shade: Brush
+    @Composable
+    get() = Brush.verticalGradient(
+        colorStops = arrayOf(
+            0f to MaterialTheme.colors.background.copy(alpha = 1f),
+            0.75f to MaterialTheme.colors.background.copy(alpha = 1f),
+            1f to MaterialTheme.colors.background.copy(alpha = 0.0f)
+        )
+    )
+
 @OptIn(ExperimentalResourceApi::class)
 @Composable
-fun BottomBar(selectedTabIndex: Int, canShowMyDecks: Boolean = true, onTabSelected: (Int) -> Unit) {
-    BottomNavigation(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(72.dp)
-            .graphicsLayer {
-                clip = true
-                shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
-            },
-        elevation = 0.dp,
-        backgroundColor = MaterialTheme.colors.surface,
+fun ScrollDependingTextButton(
+    text: String,
+    icon: @Composable () -> Unit,
+    expanded: Boolean,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    var horizontalBias by remember { mutableStateOf(1f) }
+    val alignment by animateHorizontalAlignmentAsState(horizontalBias)
+
+    horizontalBias = if (expanded) 0f else 1f
+
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        horizontalAlignment = alignment
     ) {
-        Row(Modifier.fillMaxWidth().padding(bottom = if (isIOs()) 16.dp else 0.dp)) {
-            if (canShowMyDecks) {
-                DefaultBottomNavigationItem(
-                    label = stringResource(Res.string.decks),
-                    icon = Res.drawable.ic_deck,
-                    selected = (selectedTabIndex == 0),
-                    onClick = { onTabSelected(0) },
-                )
+        FloatingActionButton(
+            onClick = onClick,
+            modifier = Modifier
+                .padding(vertical = 16.dp, horizontal = ContentPadding)
+                .sizeIn(maxHeight = ButtonSize, minWidth = ButtonSize)
+                .padding(horizontal = 8.dp),
+            contentColor = MaterialTheme.colors.onPrimary,
+            backgroundColor = MaterialTheme.colors.primary,
+            shape = DefaultShape
+        ) {
+            Row(
+                modifier = Modifier.fillMaxHeight().padding(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                icon()
+
+                AnimatedVisibility(visible = expanded) {
+                    Text(
+                        modifier = Modifier.padding(start = 8.dp),
+                        text = text
+                    )
+                }
             }
-            DefaultBottomNavigationItem(
-                label = stringResource(Res.string.spotlight),
-                icon = Res.drawable.ic_spotlight,
-                selected = (selectedTabIndex == 1),
-                onClick = { onTabSelected(1) },
-            )
-            DefaultBottomNavigationItem(
-                label = stringResource(Res.string.search),
-                icon = Res.drawable.ic_search,
-                selected = (selectedTabIndex == 2),
-                onClick = { onTabSelected(2) },
-            )
-            DefaultBottomNavigationItem(
-                label = stringResource(Res.string.more),
-                icon = { Icon(Icons.Rounded.Settings, "Settings") },
-                selected = (selectedTabIndex == 3),
-                onClick = { onTabSelected(3) },
-            )
         }
     }
 }

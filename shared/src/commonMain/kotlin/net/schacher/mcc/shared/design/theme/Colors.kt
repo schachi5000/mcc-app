@@ -17,9 +17,9 @@ private val primary = Color(0xFF0074df)
 val LightColorScheme = lightColors(
     primary = primary,
     onPrimary = Color(0xFFFFFFFF),
-    background = Color(0xffededed),
+    background = Color(0xFFFFFFFF),
     onBackground = Color(0xFF000000),
-    surface = Color(0xFFFFFFFF),
+    surface = Color(0xfff0f0f0),
     onSurface = Color(0xFF000000),
 )
 

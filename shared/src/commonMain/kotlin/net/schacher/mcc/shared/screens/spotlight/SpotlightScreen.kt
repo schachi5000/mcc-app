@@ -74,7 +74,7 @@ fun SpotlightScreen(
             LazyColumn {
                 items(entries.size) { index ->
                     if (index == 0) {
-                        Spacer(Modifier.statusBarsPadding().height(ContentPadding))
+                        Spacer(Modifier.statusBarsPadding().height(ContentPadding + 64.dp))
                     }
 
                     when (val entry = entries[index]) {
@@ -125,8 +125,8 @@ private fun Header(label: String) {
         Text(
             modifier = Modifier.alignByBaseline(),
             text = label,
-            style = MaterialTheme.typography.h3,
-            fontWeight = FontWeight.Bold,
+            style = MaterialTheme.typography.h5,
+            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colors.onBackground,
         )
     }

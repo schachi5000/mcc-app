@@ -114,7 +114,7 @@ fun MyDecksScreen(
         ) {
             items(entries.size) { index ->
                 if (index == 0) {
-                    Spacer(Modifier.statusBarsPadding().height(ContentPadding))
+                    Spacer(Modifier.statusBarsPadding().height(ContentPadding + 72.dp))
                 }
 
                 when (val entry = entries[index]) {
@@ -185,7 +185,7 @@ fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun animateHorizontalAlignmentAsState(targetBiasValue: Float): State<BiasAlignment.Horizontal> {
+fun animateHorizontalAlignmentAsState(targetBiasValue: Float): State<BiasAlignment.Horizontal> {
     val bias by animateFloatAsState(targetBiasValue)
     return derivedStateOf { BiasAlignment.Horizontal(bias) }
 }
