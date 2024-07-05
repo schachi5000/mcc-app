@@ -190,13 +190,11 @@ private fun Content(
         BackButton(onCloseClick)
 
         FloatingActionButton(
-            onClick = {
-                onDeleteDeckClick(deck.id)
-            },
+            onClick = { onDeleteDeckClick(deck.id) },
             modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding()
                 .padding(
-                    end = 16.dp,
-                    bottom = if (isAndroid()) 16.dp else 0.dp
+                    end = ContentPadding,
+                    bottom = if (isAndroid()) ContentPadding else 0.dp
                 )
                 .size(ButtonSize),
             contentColor = MaterialTheme.colors.onPrimary,
