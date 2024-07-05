@@ -139,37 +139,42 @@ class KtorMarvelCDbDataSource(
             }
     }
 
-    override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
-        httpClient.get("$serviceUrl/api/oauth2/decks") {
+    override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) = httpClient
+        .get("$serviceUrl/api/oauth2/decks") {
             headers { append("Authorization", authHeader) }
-        }.body<List<DeckDto>>().map {
+        }
+        .body<List<DeckDto>>()
+        .map {
             val heroCard = cardProvider(it.investigator_code!!)
-
             Deck(id = it.id,
                 name = it.name,
                 hero = heroCard,
                 aspect = it.meta?.parseAspect(),
                 cards = it.slots.entries.map { entry ->
                     List(entry.value) { cardProvider(entry.key) }
-                }.flatten().toMutableList().also { it.add(0, heroCard) })
+                }
+                    .flatten()
+                    .toMutableList()
+                    .also { it.add(0, heroCard) })
         }
+        .sortedBy { it.name }
 
     override suspend fun getUserDeckById(
         deckId: Int,
         cardProvider: suspend (String) -> Card
     ) = httpClient.get("$serviceUrl/api/oauth2/deck/load/$deckId") {
-            headers { append("Authorization", authHeader) }
-        }.body<DeckDto>().let {
-            val heroCard = cardProvider(it.investigator_code!!)
+        headers { append("Authorization", authHeader) }
+    }.body<DeckDto>().let {
+        val heroCard = cardProvider(it.investigator_code!!)
 
-            Deck(id = it.id,
-                name = it.name,
-                hero = heroCard,
-                aspect = it.meta?.parseAspect(),
-                cards = it.slots.entries.map { entry ->
-                    List(entry.value) { cardProvider(entry.key) }
-                }.flatten().toMutableList().also { it.add(0, heroCard) })
-        }
+        Deck(id = it.id,
+            name = it.name,
+            hero = heroCard,
+            aspect = it.meta?.parseAspect(),
+            cards = it.slots.entries.map { entry ->
+                List(entry.value) { cardProvider(entry.key) }
+            }.flatten().toMutableList().also { it.add(0, heroCard) })
+    }
 }
 
 private fun LocalDate.toDateString(): String {
