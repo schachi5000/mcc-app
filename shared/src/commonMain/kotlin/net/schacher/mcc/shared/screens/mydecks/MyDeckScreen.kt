@@ -108,7 +108,7 @@ fun MyDecksScreen(
                 modifier = Modifier.align(Alignment.Center),
                 text = stringResource(Res.string.no_decks_found),
                 style = MaterialTheme.typography.h6,
-                color = MaterialTheme.typography.h6.color.copy(alpha = 0.5f)
+                color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f)
             )
         }
 
@@ -131,11 +131,6 @@ fun MyDecksScreen(
                 Spacer(Modifier.height(32.dp))
             }
         }
-
-//        AddDeckButton(
-//            modifier = Modifier.align(Alignment.BottomCenter),
-//            expanded = expanded
-//        ) { onAddDeckClick() }
 
         PullRefreshIndicator(
             modifier = Modifier.align(Alignment.TopCenter)
