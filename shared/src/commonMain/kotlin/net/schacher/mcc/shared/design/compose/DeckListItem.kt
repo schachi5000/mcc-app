@@ -60,7 +60,7 @@ fun DeckListItem(
                 ).joinToString(" · "),
                 style = MaterialTheme.typography.body2,
                 color = Color.Gray,
-                maxLines = 1
+                maxLines = 2
             )
         }
     }
