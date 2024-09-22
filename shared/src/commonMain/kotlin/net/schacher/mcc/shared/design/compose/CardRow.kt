@@ -33,9 +33,9 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
             Text(
                 modifier = Modifier.alignByBaseline(),
                 text = cardRowEntry.title.uppercase(),
+                style = MaterialTheme.typography.h5,
                 fontWeight = FontWeight.Bold,
                 color = MaterialTheme.colors.onBackground,
-                fontSize = 28.sp
             )
 
             Text(
