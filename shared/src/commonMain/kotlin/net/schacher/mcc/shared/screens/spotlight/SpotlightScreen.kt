@@ -14,8 +14,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.pullRefresh
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -54,19 +58,24 @@ fun SpotlightScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    SpotlightScreen(state, topInset, onDeckClick)
+    SpotlightScreen(state, topInset, onDeckClick, viewModel::onRefresh)
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SpotlightScreen(
     state: SpotlightViewModel.UiState,
     topInset: Dp = 0.dp,
-    onDeckClick: (Deck) -> Unit
+    onDeckClick: (Deck) -> Unit,
+    onRefresh: () -> Unit
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize().padding(horizontal = ContentPadding)
-    ) {
+    val pullRefreshState = rememberPullRefreshState(state.loading, { onRefresh() })
 
+    Box(
+        modifier = Modifier.fillMaxSize()
+            .padding(horizontal = ContentPadding)
+            .pullRefresh(pullRefreshState)
+    ) {
         AnimatedVisibility(
             visible = !state.loading,
             exit = fadeOut(),
@@ -114,6 +123,16 @@ fun SpotlightScreen(
         ) {
             LoadingContent()
         }
+
+        PullRefreshIndicator(
+            modifier = Modifier.align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = ContentPadding + 72.dp),
+            refreshing = state.loading,
+            state = pullRefreshState,
+            contentColor = MaterialTheme.colors.onBackground,
+            backgroundColor = MaterialTheme.colors.background
+        )
     }
 }
 
