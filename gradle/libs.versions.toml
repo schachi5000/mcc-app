@@ -19,9 +19,9 @@ koin-compose = "1.2.0-Beta4"
 kotlin = "2.0.0"
 sql-delight = "2.0.2"
 serialization = "1.6.3"
-androidx-compose = "1.6.8"
-androidx-compose-compiler = "1.5.14"
-compose = "1.6.11"
+androidx-compose = "1.7.2"
+androidx-compose-compiler = "1.5.15"
+jetbrains-compose = "1.6.11"
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }
@@ -63,5 +63,5 @@ android-application = { id = "com.android.application", version.ref = "androidGr
 android-library = { id = "com.android.library", version.ref = "androidGradlePlugin" }
 kotlin-multiplatform = { id = "org.jetbrains.kotlin.multiplatform", version.ref = "kotlin" }
 kotlin-serialization = { id = "org.jetbrains.kotlin.plugin.serialization", version.ref = "kotlin" }
-compose = { id = "org.jetbrains.compose", version.ref = "compose" }
-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+kotlin-compose-compiler = { id = "org.jetbrains.kotlin.plugin.compose", version.ref = "kotlin" }
+jetbrains-compose = { id = "org.jetbrains.compose", version.ref = "jetbrains-compose" }

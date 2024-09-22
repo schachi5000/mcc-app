@@ -224,7 +224,6 @@ private fun String.toAnnotatedString(): AnnotatedString {
         }
         .toList()
 
-
     return buildAnnotatedString {
         value.split(boldRegex).forEachIndexed { index, s ->
             append(s)
@@ -237,4 +236,3 @@ private fun String.toAnnotatedString(): AnnotatedString {
         }
     }
 }
-
