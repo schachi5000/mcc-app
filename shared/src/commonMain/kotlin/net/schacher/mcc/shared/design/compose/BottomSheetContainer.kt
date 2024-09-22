@@ -1,7 +1,6 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -22,22 +21,6 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.times
 
-
-// TODO Needs better name
-@Composable
-fun FreeBottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
-    Box(modifier = modifier) {
-        content()
-
-        Column(
-            modifier = Modifier.fillMaxWidth()
-        ) {
-            Spacer(Modifier.height(8.dp))
-            BottomSheetHandle()
-        }
-    }
-}
-
 @Composable
 fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
     Column(
@@ -54,7 +37,7 @@ fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () 
 }
 
 @Composable
-fun ColumnScope.BottomSheetHandle() {
+private fun ColumnScope.BottomSheetHandle() {
     Row(
         modifier = Modifier.size(40.dp, 4.dp)
             .background(

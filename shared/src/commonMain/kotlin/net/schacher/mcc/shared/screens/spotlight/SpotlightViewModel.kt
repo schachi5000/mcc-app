@@ -42,21 +42,28 @@ class SpotlightViewModel(
             return
         }
 
-        _state.update { it.copy(loading = true) }
+        _state.update {
+            it.copy(
+                decks = emptyMap(),
+                loading = true
+            )
+        }
 
         this.viewModelScope.launch {
+            val updatedDecks = mutableMapOf<LocalDate, List<Deck>>()
             dates.forEach { date ->
                 val result = marvelCDbDataSource.getSpotlightDecksByDate(date) {
                     cardRepository.getCard(it)
                 }
 
-                val decks = result.getOrNull() ?: emptyList()
+                result.getOrNull()?.let {
+                    updatedDecks[date] = it
+                }
+
                 _state.update {
                     it.copy(
-                        decks = it.decks.toMutableMap()
-                            .also { map -> map[date] = decks }
-                            .filter { (_, entries) -> entries.isNotEmpty() },
-                        loading = it.decks.entries.all { it.value.isEmpty() }
+                        decks = updatedDecks,
+                        loading = updatedDecks.isNotEmpty()
                     )
                 }
             }

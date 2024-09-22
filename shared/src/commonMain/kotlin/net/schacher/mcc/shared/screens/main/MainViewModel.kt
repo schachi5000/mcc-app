@@ -18,13 +18,10 @@ import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CardScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CreateDeck
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.MyDecks
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Search
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.utils.debug
 import kotlin.time.Duration.Companion.seconds
 
@@ -63,39 +60,18 @@ class MainViewModel(
         this.viewModelScope.launch {
             authRepository.loginState.collect {
                 _state.update {
-                    val loggedIn = !authRepository.isGuest()
                     it.copy(
-                        mainScreen = if (loggedIn) {
-                            MyDecks
-                        } else {
-                            Spotlight
-                        },
-                        canShowMyDeckScreen = loggedIn
+                        mainScreen = Spotlight,
+                        canShowMyDeckScreen = authRepository.isSignedIn()
                     )
                 }
             }
         }
     }
 
-    fun onTabSelected(tabIndex: Int) {
-        this.viewModelScope.launch {
-            val mainScreen = when (tabIndex) {
-                0 -> MyDecks
-                1 -> Spotlight
-                2 -> Search
-                3 -> Settings
-                else -> return@launch
-            }
-
-            _state.update {
-                it.copy(mainScreen = mainScreen)
-            }
-        }
-    }
-
     fun onCardClicked(card: Card) {
         this.viewModelScope.launch {
-            _state.update { it.copy(subScreen = CardMenu(card)) }
+            _state.update { it.copy(fullScreen = CardScreen(card)) }
         }
     }
 
@@ -103,12 +79,6 @@ class MainViewModel(
     fun onDeckClicked(deck: Deck) {
         this.viewModelScope.launch {
             _state.update { it.copy(fullScreen = DeckScreen(deck)) }
-        }
-    }
-
-    fun onContextMenuClosed() {
-        this.viewModelScope.launch {
-            _state.update { it.copy(subScreen = null) }
         }
     }
 
@@ -148,7 +118,6 @@ class MainViewModel(
         this.viewModelScope.launch {
             _state.update {
                 it.copy(
-                    subScreen = null,
                     fullScreen = null
                 )
             }
@@ -168,34 +137,31 @@ class MainViewModel(
     sealed interface Event {
         data object DatabaseSynced : Event
         data class DeckCreated(val deckName: String) : Event
-
         data class CardsDatabaseSyncFailed(val exception: Exception) : Event
     }
 
     data class UiState internal constructor(
         val mainScreen: MainScreen = Spotlight,
         val canShowMyDeckScreen: Boolean = false,
-        val subScreen: SubScreen? = null,
         val fullScreen: FullScreen? = null
     ) {
         sealed interface MainScreen {
-            data object MyDecks : MainScreen
             data object Spotlight : MainScreen
-            data object Search : MainScreen
+            data object MyDecks : MainScreen
+            data object Cards : MainScreen
             data object Settings : MainScreen
-        }
-
-        sealed interface SubScreen {
-            data class CardMenu(val card: Card) : SubScreen
-
         }
 
         sealed interface FullScreen {
             data class DeckScreen(val deck: Deck) : FullScreen
 
+            data class CardScreen(val card: Card) : FullScreen
+
             data object PackSelectionScreen : FullScreen
 
             data class CreateDeck(val heroCodes: Set<Card>) : FullScreen
+
+            data object Search : FullScreen
         }
     }
 }

@@ -112,6 +112,8 @@ class AuthRepository(private val settingsDao: SettingsDao) {
         (accessToken?.expiresAt ?: 0) > Time.currentTimeMillis
 
     fun isGuest(): Boolean = this.userType is UserType.Guest
+
+    fun isSignedIn(): Boolean = this.userType is UserType.AuthorizedUser
 }
 
 

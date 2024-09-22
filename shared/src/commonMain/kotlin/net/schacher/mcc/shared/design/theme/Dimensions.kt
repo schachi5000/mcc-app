@@ -12,9 +12,13 @@ object CornerRadius {
     val Default = 16.dp
 }
 
-val HorizontalScreenPadding = 24.dp
+val ContentPadding = 32.dp
+
+val FABPadding = ContentPadding / 2
 
 val DefaultCardSize = 216.dp
+
+val ButtonSize = 56.dp
 
 val CardShape = RoundedCornerShape(Card)
 

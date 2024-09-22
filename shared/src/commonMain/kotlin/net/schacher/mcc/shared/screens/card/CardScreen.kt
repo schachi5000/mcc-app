@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.design.compose
+package net.schacher.mcc.shared.screens.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -31,19 +32,25 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
+import net.schacher.mcc.shared.design.compose.BackButton
+import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.localize
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 
 @Composable
-fun CardInfo(modifier: Modifier = Modifier, card: Card) {
+fun CardScreen(modifier: Modifier = Modifier, card: Card, onCloseClick: () -> Unit) {
     Logger.i { card.toString() }
 
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier
+            .statusBarsPadding()
+            .background(MaterialTheme.colors.background)
+    ) {
         Card(
             modifier = Modifier.fillMaxWidth()
-                .blur(0.5.dp)
+                .blur(20.dp)
                 .graphicsLayer { translationY = getTranslationY(card).toPx() },
             card = card
         )
@@ -155,6 +162,8 @@ fun CardInfo(modifier: Modifier = Modifier, card: Card) {
                 }
             }
         }
+
+        BackButton(onCloseClick)
     }
 }
 
@@ -220,7 +229,6 @@ private fun String.toAnnotatedString(): AnnotatedString {
         }
         .toList()
 
-
     return buildAnnotatedString {
         value.split(boldRegex).forEachIndexed { index, s ->
             append(s)
@@ -233,4 +241,3 @@ private fun String.toAnnotatedString(): AnnotatedString {
         }
     }
 }
-

@@ -56,8 +56,8 @@ import marvelchampionscompanion.shared.generated.resources.ic_arrow_back
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.design.theme.isContrastRatioSufficient
 import net.schacher.mcc.shared.localization.localize
@@ -113,8 +113,7 @@ fun SearchScreen(
         }
 
         LazyColumn(
-            modifier = Modifier.fillMaxWidth()
-                .nestedScroll(nestedScrollConnection)
+            modifier = Modifier.fillMaxWidth().nestedScroll(nestedScrollConnection)
         ) {
             val entries = createEntries(state.result)
             items(entries.count()) { item ->
@@ -124,9 +123,9 @@ fun SearchScreen(
 
                 CardRow(
                     modifier = Modifier.padding(
-                        start = HorizontalScreenPadding,
+                        start = ContentPadding,
                         top = if (item == 0) 0.dp else 16.dp,
-                        end = HorizontalScreenPadding,
+                        end = ContentPadding,
                         bottom = 16.dp
                     ),
                     cardRowEntry = entries[item]

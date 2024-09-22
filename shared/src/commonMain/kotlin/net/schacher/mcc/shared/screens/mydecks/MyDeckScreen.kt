@@ -39,13 +39,14 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.create_new_deck
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
-import net.schacher.mcc.shared.design.compose.DeckRow
+import net.schacher.mcc.shared.design.compose.DeckListItem
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -55,6 +56,7 @@ import org.koin.compose.koinInject
 @Composable
 fun MyDecksScreen(
     viewModel: MyDecksViewModel = koinInject(),
+    topInset: Dp,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit
 ) {
@@ -62,16 +64,18 @@ fun MyDecksScreen(
 
     MyDecksScreen(
         state = state,
+        topInset = topInset,
         onDeckClick = onDeckClick,
         onAddDeckClick = onAddDeckClick,
         onRefresh = { viewModel.onRefreshClicked() }
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MyDecksScreen(
     state: MyDecksViewModel.UiState,
+    topInset: Dp = 0.dp,
     onRefresh: () -> Unit,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit
@@ -103,40 +107,38 @@ fun MyDecksScreen(
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = stringResource(Res.string.no_decks_found),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f)
             )
         }
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = HorizontalScreenPadding)
+                .padding(horizontal = ContentPadding)
                 .nestedScroll(nestedScrollConnection)
         ) {
             items(entries.size) { index ->
                 if (index == 0) {
-                    Spacer(Modifier.statusBarsPadding().height(16.dp))
+                    Spacer(Modifier.statusBarsPadding().height(topInset))
                 }
 
                 when (val entry = entries[index]) {
-                    is DeckItem -> DeckRow(entry.deck) {
+                    is DeckItem -> DeckListItem(entry.deck) {
                         onDeckClick(entry.deck)
                     }
                 }
 
-                Spacer(Modifier.height(16.dp))
+                Spacer(Modifier.height(32.dp))
             }
         }
 
-//        AddDeckButton(
-//            modifier = Modifier.align(Alignment.BottomCenter),
-//            expanded = expanded
-//        ) { onAddDeckClick() }
-
         PullRefreshIndicator(
-            modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),
+            modifier = Modifier.align(Alignment.TopCenter)
+                .statusBarsPadding()
+                .padding(top = ContentPadding + 72.dp),
             refreshing = state.refreshing,
             state = pullRefreshState,
-            contentColor = MaterialTheme.colors.primary,
+            contentColor = MaterialTheme.colors.onBackground,
             backgroundColor = MaterialTheme.colors.background
         )
     }
@@ -185,7 +187,7 @@ fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
 }
 
 @Composable
-private fun animateHorizontalAlignmentAsState(targetBiasValue: Float): State<BiasAlignment.Horizontal> {
+fun animateHorizontalAlignmentAsState(targetBiasValue: Float): State<BiasAlignment.Horizontal> {
     val bias by animateFloatAsState(targetBiasValue)
     return derivedStateOf { BiasAlignment.Horizontal(bias) }
 }

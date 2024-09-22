@@ -1,7 +1,7 @@
 package net.schacher.mcc.shared.repositories
 
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -12,7 +12,8 @@ import net.schacher.mcc.shared.model.Card
 
 class CardRepository(
     private val cardDatabaseDao: CardDatabaseDao,
-    private val marvelCDbDataSource: MarvelCDbDataSource
+    private val marvelCDbDataSource: MarvelCDbDataSource,
+    private val scope: CoroutineScope
 ) {
 
     private val _cards = MutableStateFlow<Map<String, Card>>(emptyMap())
@@ -20,7 +21,7 @@ class CardRepository(
     val cards = _cards.asStateFlow()
 
     init {
-        MainScope().launch {
+        this.scope.launch {
             _cards.emit(cardDatabaseDao.getAllCards().toMap())
         }
     }

@@ -33,8 +33,8 @@ import marvelchampionscompanion.shared.generated.resources.login_info_title
 import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.splash_screen
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.design.theme.HorizontalScreenPadding
 import org.jetbrains.compose.resources.painterResource
 import org.jetbrains.compose.resources.stringResource
 
@@ -83,7 +83,7 @@ fun LoginScreen(
                 .fillMaxWidth()
                 .padding(
                     vertical = 96.dp,
-                    horizontal = HorizontalScreenPadding,
+                    horizontal = ContentPadding,
                 ),
         ) {
             TextButton(
