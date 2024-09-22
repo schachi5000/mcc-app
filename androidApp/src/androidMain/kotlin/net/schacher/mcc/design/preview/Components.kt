@@ -13,7 +13,6 @@ import net.schacher.mcc.design.ThemedPreviews
 import net.schacher.mcc.shared.design.LocalPreview
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.Card
-import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.Deck
 import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.DeckRow
@@ -27,6 +26,7 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
+import net.schacher.mcc.shared.screens.card.CardScreen
 
 
 @ThemedPreviews
@@ -105,9 +105,11 @@ fun ShimmerBoxPreview() {
 @Composable
 fun CardInfoPreview() {
     MccTheme {
-        CardInfo(
+        CardScreen(
             card = previewCard
-        )
+        ) {
+
+        }
     }
 }
 

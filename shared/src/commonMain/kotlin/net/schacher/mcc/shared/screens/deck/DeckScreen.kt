@@ -1,11 +1,11 @@
 package net.schacher.mcc.shared.screens.deck
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
@@ -14,24 +14,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
-import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
@@ -40,15 +33,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import net.schacher.mcc.shared.design.compose.Animation
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardImage
-import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
-import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
-
 import net.schacher.mcc.shared.design.theme.ButtonSize
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
@@ -57,8 +48,8 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.platform.isAndroid
+import net.schacher.mcc.shared.screens.card.CardScreen
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DeckScreen(
     deck: Deck,
@@ -68,44 +59,11 @@ fun DeckScreen(
     var selectedCard by remember { mutableStateOf<Card?>(null) }
     var deleteDeckShowing by remember { mutableStateOf(false) }
 
-    val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true,
-    )
-
-    if (selectedCard != null) {
-        LaunchedEffect(selectedCard) {
-            sheetState.show()
-        }
-    }
-
-    LaunchedEffect(Unit) {
-        snapshotFlow { sheetState.currentValue }.collect {
-            if (it == ModalBottomSheetValue.Hidden) {
-                selectedCard = null
-            }
-        }
-    }
-
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        scrimColor = Color.Black.copy(alpha = 0.35f),
-        sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
-        sheetBackgroundColor = MaterialTheme.colors.surface,
-        sheetContent = {
-            selectedCard?.let {
-                FreeBottomSheetContainer(modifier = Modifier.fillMaxHeight(0.75f)) {
-                    CardInfo(card = it)
-                }
-            }
-        }) {
-
-        Content(
-            sheetState = sheetState,
-            deck = deck,
-            onCloseClick = onCloseClick,
-            onDeleteDeckClick = { deleteDeckShowing = true },
-            onCardClick = { selectedCard = it })
-    }
+    Content(
+        deck = deck,
+        onCloseClick = onCloseClick,
+        onDeleteDeckClick = { deleteDeckShowing = true },
+        onCardClick = { selectedCard = it })
 
     if (deleteDeckShowing) {
         ConfirmationDialog(
@@ -118,12 +76,23 @@ fun DeckScreen(
             onDismiss = { deleteDeckShowing = false }
         )
     }
+
+    AnimatedVisibility(
+        selectedCard != null,
+        enter = Animation.fullscreenEnter,
+        exit = Animation.fullscreenExit
+    ) {
+        selectedCard?.let {
+            CardScreen(card = it) {
+                selectedCard = null
+            }
+        }
+    }
 }
 
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 private fun Content(
-    sheetState: ModalBottomSheetState,
     deck: Deck,
     onCloseClick: () -> Unit,
     onDeleteDeckClick: (Int) -> Unit,

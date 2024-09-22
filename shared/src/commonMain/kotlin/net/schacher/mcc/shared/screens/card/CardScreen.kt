@@ -1,4 +1,4 @@
-package net.schacher.mcc.shared.design.compose
+package net.schacher.mcc.shared.screens.card
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -31,13 +31,15 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
+import net.schacher.mcc.shared.design.compose.BackButton
+import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.localize
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 
 @Composable
-fun CardInfo(modifier: Modifier = Modifier, card: Card) {
+fun CardScreen(modifier: Modifier = Modifier, card: Card, onCloseClick: () -> Unit) {
     Logger.i { card.toString() }
 
     Box(modifier = modifier) {
@@ -155,6 +157,8 @@ fun CardInfo(modifier: Modifier = Modifier, card: Card) {
                 }
             }
         }
+
+        BackButton(onCloseClick)
     }
 }
 

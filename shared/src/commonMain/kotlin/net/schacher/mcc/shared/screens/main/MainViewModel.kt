@@ -18,10 +18,10 @@ import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CardScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CreateDeck
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.utils.debug
 import kotlin.time.Duration.Companion.seconds
 
@@ -71,7 +71,7 @@ class MainViewModel(
 
     fun onCardClicked(card: Card) {
         this.viewModelScope.launch {
-            _state.update { it.copy(subScreen = CardMenu(card)) }
+            _state.update { it.copy(fullScreen = CardScreen(card)) }
         }
     }
 
@@ -79,12 +79,6 @@ class MainViewModel(
     fun onDeckClicked(deck: Deck) {
         this.viewModelScope.launch {
             _state.update { it.copy(fullScreen = DeckScreen(deck)) }
-        }
-    }
-
-    fun onContextMenuClosed() {
-        this.viewModelScope.launch {
-            _state.update { it.copy(subScreen = null) }
         }
     }
 
@@ -124,7 +118,6 @@ class MainViewModel(
         this.viewModelScope.launch {
             _state.update {
                 it.copy(
-                    subScreen = null,
                     fullScreen = null
                 )
             }
@@ -150,7 +143,6 @@ class MainViewModel(
     data class UiState internal constructor(
         val mainScreen: MainScreen = Spotlight,
         val canShowMyDeckScreen: Boolean = false,
-        val subScreen: SubScreen? = null,
         val fullScreen: FullScreen? = null
     ) {
         sealed interface MainScreen {
@@ -160,12 +152,10 @@ class MainViewModel(
             data object Settings : MainScreen
         }
 
-        sealed interface SubScreen {
-            data class CardMenu(val card: Card) : SubScreen
-        }
-
         sealed interface FullScreen {
             data class DeckScreen(val deck: Deck) : FullScreen
+
+            data class CardScreen(val card: Card) : FullScreen
 
             data object PackSelectionScreen : FullScreen
 
