@@ -7,7 +7,9 @@ import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.material.MaterialTheme
@@ -20,10 +22,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
 
 @Composable
@@ -35,16 +39,17 @@ fun DeckListItem(
         verticalAlignment = Alignment.CenterVertically
     ) {
         Thumbnail(
-            modifier = Modifier.size(80.dp), card = deck.hero
+            modifier = Modifier.size(80.dp),
+            card = deck.hero
         )
 
         Column(
-            modifier = Modifier.fillMaxWidth().padding(horizontal = 16.dp)
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 16.dp)
         ) {
             Text(
                 text = deck.name, style = MaterialTheme.typography.h6, maxLines = 2
             )
-
 
             Text(
                 modifier = Modifier.padding(top = 4.dp),
@@ -64,6 +69,35 @@ fun DeckListItem(
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
     this.clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) {
         onClick()
+    }
+}
+
+@Composable
+fun LoadingDeckListItem() {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        ShimmerBox(
+            modifier = Modifier.size(80.dp)
+                .clip(DefaultShape)
+        )
+
+        Column(
+            modifier = Modifier.fillMaxWidth()
+                .padding(horizontal = 16.dp)
+        ) {
+            ShimmerBox(
+                modifier = Modifier.fillMaxWidth(0.6f)
+                    .height(22.dp)
+                    .clip(DefaultShape)
+            )
+
+            Spacer(Modifier.height(6.dp))
+
+            ShimmerBox(
+                modifier = Modifier.fillMaxWidth(0.9f)
+                    .height(22.dp)
+                    .clip(DefaultShape)
+            )
+        }
     }
 }
 

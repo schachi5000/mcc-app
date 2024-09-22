@@ -11,10 +11,9 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -32,11 +31,16 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
+import marvelchampionscompanion.shared.generated.resources.today
+import marvelchampionscompanion.shared.generated.resources.two_days_ago
+import marvelchampionscompanion.shared.generated.resources.yesterday
 import net.schacher.mcc.shared.design.compose.DeckListItem
-import net.schacher.mcc.shared.design.compose.LoadingDeck
+import net.schacher.mcc.shared.design.compose.LoadingDeckListItem
 import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.screens.main.topInset
 import net.schacher.mcc.shared.screens.spotlight.ListItem.DeckItem
 import net.schacher.mcc.shared.screens.spotlight.ListItem.HeaderItem
 import org.jetbrains.compose.resources.stringResource
@@ -64,7 +68,9 @@ fun SpotlightScreen(
     ) {
 
         AnimatedVisibility(
-            visible = !state.loading, exit = fadeOut(), enter = fadeIn()
+            visible = !state.loading,
+            exit = fadeOut(),
+            enter = fadeIn()
         ) {
             val entries = mutableListOf<ListItem>()
             state.decks.forEach { (date, decks) ->
@@ -102,20 +108,23 @@ fun SpotlightScreen(
         }
 
         AnimatedVisibility(
-            visible = state.loading, exit = fadeOut(), enter = fadeIn()
+            visible = state.loading,
+            exit = fadeOut(),
+            enter = fadeIn()
         ) {
             LoadingContent()
         }
     }
 }
 
+@Composable
 private fun getLabelByDate(date: LocalDate): String {
     val today = Clock.System.now().toLocalDateTime(TimeZone.currentSystemDefault()).dayOfYear
 
     return when (date.dayOfYear) {
-        today -> "Today"
-        today - 1 -> "Yesterday"
-        today - 2 -> "Two days ago"
+        today -> stringResource(Res.string.today)
+        today - 1 -> stringResource(Res.string.yesterday)
+        today - 2 -> stringResource(Res.string.two_days_ago)
         else -> "${date.dayOfMonth}. ${date.month}"
     }
 }
@@ -139,20 +148,22 @@ private fun Header(label: String) {
 @Composable
 private fun LoadingContent() {
     Column(
-        modifier = Modifier.fillMaxSize().statusBarsPadding(),
-        horizontalAlignment = Alignment.CenterHorizontally
+        modifier = Modifier.fillMaxSize(),
     ) {
-        Row(
-            modifier = Modifier.padding(vertical = 24.dp),
-            horizontalArrangement = Arrangement.Center
-        ) {
-            ShimmerBox(Modifier.size(112.dp, height = 24.dp).clip(RoundedCornerShape(16.dp)))
-        }
+        Spacer(Modifier.statusBarsPadding().height(topInset + 14.dp))
 
+        ShimmerBox(
+            modifier = Modifier
+                .width(80.dp)
+                .height(32.dp)
+                .clip(DefaultShape)
+        )
 
-        for (i in 0..2) {
-            LoadingDeck()
-            Spacer(Modifier.height(16.dp))
+        Spacer(Modifier.height(28.dp))
+
+        for (i in 0..6) {
+            LoadingDeckListItem()
+            Spacer(Modifier.height(32.dp))
         }
     }
 }

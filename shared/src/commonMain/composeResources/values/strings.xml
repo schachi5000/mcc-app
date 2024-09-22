@@ -15,4 +15,7 @@
     <string name="login_info_title">Information</string>
     <string name="login_info_message">After successfully entering your MarvelCDB credentials click ALLOW to finish the login process.</string>
     <string name="no_decks_found">No decks found</string>
+    <string name="today">Today</string>
+    <string name="yesterday">Yesterday</string>
+    <string name="two_days_ago">Two days ago</string>
 </resources>
