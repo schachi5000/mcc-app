@@ -1,4 +1,6 @@
 import androidx.compose.runtime.Composable
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.MainScope
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
 import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
@@ -60,6 +62,9 @@ fun App(
         onKoinStart()
         modules(
             platformModule,
+            module {
+                single<CoroutineScope> { MainScope() }
+            },
             module {
                 single<CardDatabaseDao> { databaseDao }
                 single<DeckDatabaseDao> { databaseDao }
