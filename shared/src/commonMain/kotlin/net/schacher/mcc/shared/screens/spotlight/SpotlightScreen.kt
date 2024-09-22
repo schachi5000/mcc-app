@@ -39,7 +39,6 @@ import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.spotlight.ListItem.DeckItem
 import net.schacher.mcc.shared.screens.spotlight.ListItem.HeaderItem
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
@@ -54,7 +53,6 @@ fun SpotlightScreen(
     SpotlightScreen(state, topInset, onDeckClick)
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SpotlightScreen(
     state: SpotlightViewModel.UiState,
@@ -98,7 +96,8 @@ fun SpotlightScreen(
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = stringResource(Res.string.no_decks_found),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.typography.h6.color.copy(alpha = 0.5f)
             )
         }
 

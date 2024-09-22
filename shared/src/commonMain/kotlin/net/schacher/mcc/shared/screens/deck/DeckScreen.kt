@@ -48,7 +48,7 @@ import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
-import net.schacher.mcc.shared.design.compose.blurByBottomSheet
+
 import net.schacher.mcc.shared.design.theme.ButtonSize
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
@@ -130,8 +130,8 @@ private fun Content(
     onCardClick: (Card) -> Unit
 ) {
     Box(
-        modifier = Modifier.fillMaxSize()
-            .blurByBottomSheet(sheetState)
+        modifier = Modifier
+            .fillMaxSize()
             .background(MaterialTheme.colors.background)
     ) {
         BackgroundImage(

@@ -40,7 +40,6 @@ import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
 import net.schacher.mcc.shared.design.compose.PagerHeader
-import net.schacher.mcc.shared.design.compose.blurByBottomSheet
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.deck.DeckScreen
@@ -51,6 +50,7 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.Cre
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.PackSelectionScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Cards
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.MyDecks
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
@@ -58,6 +58,7 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.Card
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
 import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
 import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
+import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -66,8 +67,7 @@ import org.koin.compose.koinInject
 internal val topInset = ContentPadding + 72.dp
 
 @OptIn(
-    ExperimentalMaterialApi::class, ExperimentalResourceApi::class,
-    ExperimentalFoundationApi::class
+    ExperimentalMaterialApi::class, ExperimentalResourceApi::class, ExperimentalFoundationApi::class
 )
 @Composable
 fun MainScreen(viewModel: MainViewModel = koinInject()) {
@@ -75,14 +75,12 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
     val scope = rememberCoroutineScope()
 
     val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true
+        initialValue = ModalBottomSheetValue.Hidden, skipHalfExpanded = true
     )
     val snackbarHostState = remember { SnackbarHostState() }
 
     BackHandler(
-        enabled = (state.value.subScreen != null ||
-                state.value.fullScreen != null)
+        enabled = (state.value.subScreen != null || state.value.fullScreen != null)
     ) {
         viewModel.onBackPressed()
     }
@@ -102,14 +100,14 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
         }) {
 
         Scaffold(
-            modifier = Modifier.fillMaxSize().blurByBottomSheet(sheetState),
+            modifier = Modifier.fillMaxSize(),
             backgroundColor = MaterialTheme.colors.background,
             snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
         ) {
             Box(
                 modifier = Modifier.padding(it)
             ) {
-                val pageLabels = listOf(Spotlight, MyDecks, Settings)
+                val pageLabels = listOf(Spotlight, MyDecks, Cards, Settings)
                 val pagerState = rememberPagerState(pageCount = { pageLabels.size })
 
                 HorizontalPager(state = pagerState) { page ->
@@ -118,11 +116,13 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                             viewModel.onDeckClicked(it)
                         }
 
-                        MyDecks.tabIndex -> MyDecksScreen(
-                            topInset = topInset,
+                        MyDecks.tabIndex -> MyDecksScreen(topInset = topInset,
                             onDeckClick = { viewModel.onDeckClicked(it) },
-                            onAddDeckClick = { viewModel.onNewDeckClicked() }
-                        )
+                            onAddDeckClick = { viewModel.onNewDeckClicked() })
+
+                        Cards.tabIndex -> SearchScreen {
+                            viewModel.onCardClicked(it)
+                        }
 
                         Settings.tabIndex -> SettingsScreen(
                             topInset = topInset,
@@ -136,12 +136,9 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                 }
 
                 PagerHeader(
-                    modifier = Modifier.fillMaxWidth()
-                        .background(shade)
-                        .statusBarsPadding()
+                    modifier = Modifier.fillMaxWidth().background(shade).statusBarsPadding()
                         .padding(
-                            top = ContentPadding,
-                            bottom = ContentPadding + 16.dp
+                            top = ContentPadding, bottom = ContentPadding + 16.dp
                         ),
                     pageLabels = pageLabels.map { it.localizedLabel },
                     pagerState = pagerState,
@@ -180,30 +177,22 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
         }
     }
 
-    AnimatedContent(
-        targetState = state.value.fullScreen,
-        transitionSpec = {
-            (slideInVertically { height -> height } + fadeIn()).togetherWith(
-                slideOutVertically { height -> height } + fadeOut())
-        }
-    ) {
+    AnimatedContent(targetState = state.value.fullScreen, transitionSpec = {
+        (slideInVertically { height -> height } + fadeIn()).togetherWith(slideOutVertically { height -> height } + fadeOut())
+    }) {
         when (it) {
-            is DeckScreen -> DeckScreen(
-                it.deck,
+            is DeckScreen -> DeckScreen(it.deck,
                 onCloseClick = { viewModel.onBackPressed() },
-                onDeleteDeckClick = { viewModel.onRemoveDeckClick(it) }
-            )
+                onDeleteDeckClick = { viewModel.onRemoveDeckClick(it) })
 
             is PackSelectionScreen -> PackSelectionScreen {
                 viewModel.onBackPressed()
             }
 
-            is CreateDeck -> NewDeckScreen(
-                onBackPress = { viewModel.onBackPressed() },
+            is CreateDeck -> NewDeckScreen(onBackPress = { viewModel.onBackPressed() },
                 onNewDeckSelected = { card, aspect ->
                     viewModel.onNewDeckHeroSelected(card, aspect)
-                }
-            )
+                })
 
             else -> {
                 Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
@@ -213,8 +202,7 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
 }
 
 private val shade: Brush
-    @Composable
-    get() = Brush.verticalGradient(
+    @Composable get() = Brush.verticalGradient(
         colorStops = arrayOf(
             0f to MaterialTheme.colors.background.copy(alpha = 1f),
             0.75f to MaterialTheme.colors.background.copy(alpha = 1f),
@@ -233,12 +221,14 @@ private val MainScreen.tabIndex: Int
     get() = when (this) {
         Spotlight -> 0
         MyDecks -> 1
-        Settings -> 2
+        Cards -> 2
+        Settings -> 3
     }
 
 private val MainScreen.localizedLabel: String
     get() = when (this) {
         MyDecks -> "Meine Decks"
         Spotlight -> "Spotlight"
+        Cards -> "Cards"
         Settings -> "Einstellungen"
     }

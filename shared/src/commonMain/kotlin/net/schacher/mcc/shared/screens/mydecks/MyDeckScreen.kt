@@ -107,7 +107,8 @@ fun MyDecksScreen(
             Text(
                 modifier = Modifier.align(Alignment.Center),
                 text = stringResource(Res.string.no_decks_found),
-                style = MaterialTheme.typography.h6
+                style = MaterialTheme.typography.h6,
+                color = MaterialTheme.typography.h6.color.copy(alpha = 0.5f)
             )
         }
 

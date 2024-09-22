@@ -33,7 +33,7 @@
       selectedDebuggerIdentifier = "Xcode.DebuggerFoundation.Debugger.LLDB"
       selectedLauncherIdentifier = "Xcode.DebuggerFoundation.Launcher.LLDB"
       launchStyle = "0"
-      useCustomWorkingDirectory = "YES"
+      useCustomWorkingDirectory = "NO"
       customWorkingDirectory = "/Users/alexander/Developer/git/marvel-champions-companion"
       ignoresPersistentStateOnLaunch = "NO"
       debugDocumentVersioning = "YES"

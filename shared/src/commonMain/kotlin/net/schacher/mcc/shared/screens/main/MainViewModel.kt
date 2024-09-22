@@ -156,6 +156,7 @@ class MainViewModel(
         sealed interface MainScreen {
             data object Spotlight : MainScreen
             data object MyDecks : MainScreen
+            data object Cards : MainScreen
             data object Settings : MainScreen
         }
 
