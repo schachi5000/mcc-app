@@ -7,6 +7,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -42,10 +43,14 @@ import net.schacher.mcc.shared.model.CardType
 fun CardScreen(modifier: Modifier = Modifier, card: Card, onCloseClick: () -> Unit) {
     Logger.i { card.toString() }
 
-    Box(modifier = modifier) {
+    Box(
+        modifier = modifier
+            .statusBarsPadding()
+            .background(MaterialTheme.colors.background)
+    ) {
         Card(
             modifier = Modifier.fillMaxWidth()
-                .blur(0.5.dp)
+                .blur(20.dp)
                 .graphicsLayer { translationY = getTranslationY(card).toPx() },
             card = card
         )

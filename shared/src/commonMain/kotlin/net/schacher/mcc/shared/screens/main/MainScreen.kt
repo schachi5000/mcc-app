@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
@@ -25,6 +24,11 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.cards
+import marvelchampionscompanion.shared.generated.resources.my_decks
+import marvelchampionscompanion.shared.generated.resources.settings
+import marvelchampionscompanion.shared.generated.resources.spotlight
 import net.schacher.mcc.shared.design.compose.Animation
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.PagerHeader
@@ -50,12 +54,14 @@ import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 internal val topInset = ContentPadding + 72.dp
 
 @OptIn(
-    ExperimentalMaterialApi::class, ExperimentalResourceApi::class, ExperimentalFoundationApi::class
+    ExperimentalResourceApi::class,
+    ExperimentalFoundationApi::class
 )
 @Composable
 fun MainScreen(viewModel: MainViewModel = koinInject()) {
@@ -111,7 +117,7 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                     .padding(
                         top = ContentPadding, bottom = ContentPadding + 16.dp
                     ),
-                pageLabels = pageLabels.map { it.localizedLabel },
+                pageLabels = pageLabels.map { it.label },
                 pagerState = pagerState,
             ) {
                 scope.launch {
@@ -178,10 +184,11 @@ private val MainScreen.tabIndex: Int
         Settings -> 3
     }
 
-private val MainScreen.localizedLabel: String
+private val MainScreen.label: String
+    @Composable
     get() = when (this) {
-        MyDecks -> "Meine Decks"
-        Spotlight -> "Spotlight"
-        Cards -> "Cards"
-        Settings -> "Einstellungen"
+        Spotlight -> stringResource(Res.string.spotlight)
+        MyDecks -> stringResource(Res.string.my_decks)
+        Cards -> stringResource(Res.string.cards)
+        Settings -> stringResource(Res.string.settings)
     }
