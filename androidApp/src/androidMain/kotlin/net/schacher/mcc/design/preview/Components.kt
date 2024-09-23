@@ -5,17 +5,14 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.design.ThemedPreviews
-import net.schacher.mcc.shared.design.LocalPreview
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.Deck
 import net.schacher.mcc.shared.design.compose.DeckListItem
-import net.schacher.mcc.shared.design.compose.DeckRow
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
 import net.schacher.mcc.shared.design.compose.ShimmerBox
@@ -56,16 +53,6 @@ fun DeckListItemPreview() {
             DeckListItem(deck = previewDeck) {
 
             }
-        }
-    }
-}
-
-@ThemedPreviews
-@Composable
-fun DeckRowPreview() {
-    CompositionLocalProvider(LocalPreview provides true) {
-        MccTheme {
-            DeckRow(deck = previewDeck)
         }
     }
 }

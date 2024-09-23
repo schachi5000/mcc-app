@@ -26,9 +26,9 @@ val LightColorScheme = lightColors(
 val DarkColorScheme = darkColors(
     primary = primary,
     onPrimary = Color(0xFFFFFFFF),
-    background = Color(0xFF15161d),
+    background = Color(0xff14171f),
     onBackground = Color(0xFFf4f4f4),
-    surface = Color(0xff1b1c25),
+    surface = Color(0xff21232b),
     onSurface = Color(0xFFf0f0f0),
 )
 

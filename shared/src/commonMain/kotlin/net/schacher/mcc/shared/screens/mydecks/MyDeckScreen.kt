@@ -135,11 +135,11 @@ fun MyDecksScreen(
         PullRefreshIndicator(
             modifier = Modifier.align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .padding(top = ContentPadding + 72.dp),
+                .padding(top = topInset),
             refreshing = state.refreshing,
             state = pullRefreshState,
-            contentColor = MaterialTheme.colors.onBackground,
-            backgroundColor = MaterialTheme.colors.background
+            contentColor = MaterialTheme.colors.onPrimary,
+            backgroundColor = MaterialTheme.colors.primary
         )
     }
 }

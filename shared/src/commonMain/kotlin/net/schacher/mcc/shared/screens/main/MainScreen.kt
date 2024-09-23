@@ -20,7 +20,6 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import kotlinx.coroutines.launch
@@ -97,7 +96,7 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                         onDeckClick = { viewModel.onDeckClicked(it) },
                         onAddDeckClick = { viewModel.onNewDeckClicked() })
 
-                    Cards.tabIndex -> SearchScreen {
+                    Cards.tabIndex -> SearchScreen(topInset = topInset) {
                         viewModel.onCardClicked(it)
                     }
 
@@ -113,9 +112,12 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
             }
 
             PagerHeader(
-                modifier = Modifier.fillMaxWidth().background(shade).statusBarsPadding()
+                modifier = Modifier.fillMaxWidth()
+                    .background(MaterialTheme.colors.background)
+                    .statusBarsPadding()
                     .padding(
-                        top = ContentPadding, bottom = ContentPadding + 16.dp
+                        top = ContentPadding,
+                        bottom = ContentPadding
                     ),
                 pageLabels = pageLabels.map { it.label },
                 pagerState = pagerState,
@@ -166,15 +168,6 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
         }
     }
 }
-
-private val shade: Brush
-    @Composable get() = Brush.verticalGradient(
-        colorStops = arrayOf(
-            0f to MaterialTheme.colors.background.copy(alpha = 1f),
-            0.75f to MaterialTheme.colors.background.copy(alpha = 1f),
-            1f to MaterialTheme.colors.background.copy(alpha = 0.0f)
-        )
-    )
 
 private val MainScreen.tabIndex: Int
     get() = when (this) {

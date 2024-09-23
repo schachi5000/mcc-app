@@ -30,19 +30,9 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                modifier = Modifier.alignByBaseline(),
-                text = cardRowEntry.title.uppercase(),
-                style = MaterialTheme.typography.h5,
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.onBackground,
-            )
-
-            Text(
-                modifier = Modifier.alignByBaseline(),
-                text = "${cardRowEntry.cards.size}",
-                color = MaterialTheme.colors.onBackground.copy(alpha = 0.75f),
-                fontSize = 17.sp
+            Header(
+                title = cardRowEntry.title,
+                subTitle = cardRowEntry.cards.size.toString()
             )
         }
 
