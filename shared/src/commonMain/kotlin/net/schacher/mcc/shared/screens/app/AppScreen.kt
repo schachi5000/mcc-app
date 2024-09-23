@@ -1,54 +1,96 @@
 package net.schacher.mcc.shared.screens.app
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Modifier
+import androidx.navigation.NavController
+import androidx.navigation.NavHostController
+import androidx.navigation.NavType
+import androidx.navigation.compose.NavHost
+import androidx.navigation.compose.composable
+import androidx.navigation.navArgument
+import net.schacher.mcc.shared.design.compose.Animation
+import net.schacher.mcc.shared.screens.AppScreen
+import net.schacher.mcc.shared.screens.card.CardScreen
+import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.login.LoginScreen
 import net.schacher.mcc.shared.screens.main.MainScreen
+import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
+import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
 import org.koin.compose.koinInject
-
-private const val LOG_IN_MILLIS = 450
-
-private const val LOG_OUT_MILLIS = 450
 
 @Composable
 fun AppScreen(
     appViewModel: AppViewModel = koinInject(),
+    navController: NavController = koinInject(),
     onLogInClicked: () -> Unit
 ) {
-    val loggedIn = appViewModel.state.collectAsState()
-
-    AnimatedContent(
-        targetState = loggedIn.value,
-        transitionSpec = {
-            if (targetState) {
-                slideInVertically(
-                    tween(LOG_IN_MILLIS),
-                    initialOffsetY = { fillHeight -> fillHeight }) togetherWith
-                        slideOutVertically(tween(
-                            LOG_IN_MILLIS
-                        ), targetOffsetY = { fillHeight -> -fillHeight })
-            } else {
-                slideInVertically(
-                    tween(LOG_OUT_MILLIS),
-                    initialOffsetY = { fillHeight -> -fillHeight }) togetherWith
-                        slideOutVertically(
-                            tween(LOG_OUT_MILLIS),
-                            targetOffsetY = { fillHeight -> fillHeight })
-            }
-        }) {
-
-        if (it) {
-            MainScreen()
-        } else {
+    NavHost(
+        navController = navController as NavHostController,
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background),
+        startDestination = AppScreen.Login.route,
+        popEnterTransition = { fadeIn() + slideInHorizontally { _ -> -100 } },
+        popExitTransition = { Animation.fullscreenExit },
+        enterTransition = { Animation.fullscreenEnter },
+        exitTransition = { fadeOut() + slideOutHorizontally { _ -> -100 } },
+    ) {
+        composable(AppScreen.Login.route) {
             LoginScreen(
                 onLogInClicked = onLogInClicked,
-                onContinueAsGuestClicked = { appViewModel.onGuestLoginClicked() }
+                onContinueAsGuestClicked = { appViewModel.onGuestLoginClicked() })
+        }
+
+        composable(AppScreen.Main.route) {
+            MainScreen()
+        }
+
+        composable(AppScreen.AddDeck.route) {
+            NewDeckScreen(
+                onBackPress = { navController.popBackStack() },
+                onNewDeckSelected = { _, _ -> },
             )
         }
+
+        composable(AppScreen.Packs.route) {
+            PackSelectionScreen()
+        }
+
+        composable(
+            route = AppScreen.Deck.route,
+            arguments = listOf(navArgument("deckId") {
+                type = NavType.IntType
+            })
+        ) {
+            it.arguments?.getInt("deckId")?.let { deckId ->
+                DeckScreen(
+                    deckId = deckId,
+                    onDeleteDeckClick = {}
+                )
+            }
+        }
+        composable(
+            route = AppScreen.Card.route,
+            arguments = listOf(navArgument("cardCode") {
+                type = NavType.StringType
+            })
+        ) {
+            it.arguments?.getString("cardCode")?.let { cardCode ->
+                CardScreen(cardCode = cardCode)
+            }
+        }
+    }
+
+    val loggedIn = appViewModel.state.collectAsState()
+    if (loggedIn.value) {
+        navController.navigate(AppScreen.Main.route)
+    } else {
+        navController.popBackStack(AppScreen.Login.route, false)
     }
 }

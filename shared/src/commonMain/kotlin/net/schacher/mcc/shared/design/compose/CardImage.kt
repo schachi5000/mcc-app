@@ -17,7 +17,7 @@ import pro.schacher.mcc.BuildConfig
 fun CardImage(
     cardCode: String,
     filterQuality: FilterQuality = FilterQuality.High,
-    contentDescription: String?,
+    contentDescription: String? = null,
     modifier: Modifier = Modifier,
     alignment: Alignment = Alignment.Center,
     contentScale: ContentScale = ContentScale.Fit,
