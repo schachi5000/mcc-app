@@ -36,6 +36,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.Card
@@ -51,7 +52,7 @@ fun CardScreen(
     cardCode: String,
     modifier: Modifier = Modifier,
     cardRepository: CardRepository = koinInject(),
-    onCloseClick: () -> Unit
+    navController: NavController = koinInject()
 ) {
     var card by remember { mutableStateOf<Card?>(null) }
     LaunchedEffect(cardCode) {
@@ -60,14 +61,18 @@ fun CardScreen(
 
     card?.let {
         CardScreen(
-            card = it, modifier = modifier, onCloseClick = onCloseClick
+            card = it,
+            modifier = modifier,
+            onCloseClick = { navController.popBackStack() }
         )
     }
 }
 
 @Composable
 fun CardScreen(
-    card: Card, modifier: Modifier = Modifier, onCloseClick: () -> Unit
+    card: Card,
+    modifier: Modifier = Modifier,
+    onCloseClick: () -> Unit
 ) {
     Logger.i { card.toString() }
 
@@ -85,15 +90,15 @@ fun CardScreen(
 
         Column(
             modifier = Modifier.fillMaxSize().background(
-                    Brush.verticalGradient(
-                        colorStops = arrayOf(
-                            0f to MaterialTheme.colors.background.copy(alpha = 0f),
-                            0.15f to MaterialTheme.colors.background.copy(alpha = 0.2f),
-                            0.3f to MaterialTheme.colors.background.copy(alpha = 0.8f),
-                            0.4f to MaterialTheme.colors.background.copy(alpha = 1f),
-                            1f to MaterialTheme.colors.background.copy(alpha = 1f)
-                        )
+                Brush.verticalGradient(
+                    colorStops = arrayOf(
+                        0f to MaterialTheme.colors.background.copy(alpha = 0f),
+                        0.15f to MaterialTheme.colors.background.copy(alpha = 0.2f),
+                        0.3f to MaterialTheme.colors.background.copy(alpha = 0.8f),
+                        0.4f to MaterialTheme.colors.background.copy(alpha = 1f),
+                        1f to MaterialTheme.colors.background.copy(alpha = 1f)
                     )
+                )
             ).padding(top = 200.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.Start
         ) {

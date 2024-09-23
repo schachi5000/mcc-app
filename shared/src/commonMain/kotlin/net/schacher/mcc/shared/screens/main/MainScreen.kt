@@ -20,16 +20,16 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NavHostController
+import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.cards
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
-import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.PagerHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.screens.AppScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DatabaseSynced
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DeckCreated
@@ -55,18 +55,12 @@ internal val topInset = ContentPadding + 72.dp
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = koinInject(),
-    navController: NavHostController
+    navController: NavController = koinInject(),
 ) {
     val state = viewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
 
     val snackbarHostState = remember { SnackbarHostState() }
-
-    BackHandler(
-        enabled = (state.value.fullScreen != null)
-    ) {
-        viewModel.onBackPressed()
-    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -89,7 +83,9 @@ fun MainScreen(
                         onDeckClick = {
                             navController.navigate("deck/${it.id}")
                         },
-                        onAddDeckClick = { viewModel.onNewDeckClicked() })
+                        onAddDeckClick = {
+                            navController.navigate(AppScreen.AddDeck.route)
+                        })
 
                     Cards.tabIndex -> SearchScreen(topInset = topInset) {
                         navController.navigate("card/${it.code}")
@@ -98,7 +94,7 @@ fun MainScreen(
                     Settings.tabIndex -> SettingsScreen(
                         topInset = topInset,
                         onPackSelectionClick = {
-                            viewModel.onPackSelectionClicked()
+                            navController.navigate(AppScreen.Packs.route)
                         },
                         onLogoutClicked = {
                             viewModel.onLogoutClicked()

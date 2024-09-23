@@ -5,5 +5,6 @@ enum class AppScreen(val route: String) {
     Main(route = "main"),
     Deck(route = "deck/{deckId}"),
     Card(route = "card/{cardCode}"),
-    AddDeck(route = "add_deck")
+    AddDeck(route = "add_deck"),
+    Packs(route = "packs")
 }

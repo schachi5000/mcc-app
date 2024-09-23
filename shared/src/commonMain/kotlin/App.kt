@@ -1,4 +1,6 @@
 import androidx.compose.runtime.Composable
+import androidx.navigation.NavController
+import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
@@ -60,6 +62,8 @@ fun App(
     onKoinStart: KoinApplication.() -> Unit = {}
 ) {
     val authHandler = AuthRepository(databaseDao as SettingsDao)
+    val navController = rememberNavController()
+
     KoinApplication(application = {
         onKoinStart()
         modules(
@@ -75,6 +79,9 @@ fun App(
             },
             module {
                 single<AuthRepository> { authHandler }
+            },
+            module {
+                single<NavController> { navController }
             },
             network,
             repositories,

@@ -10,17 +10,10 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-import net.schacher.mcc.shared.model.Aspect
-import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.model.CardType
-import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CardScreen
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CreateDeck
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.utils.debug
 import kotlin.time.Duration.Companion.seconds
@@ -69,67 +62,6 @@ class MainViewModel(
         }
     }
 
-    fun onCardClicked(card: Card) {
-        this.viewModelScope.launch {
-            _state.update { it.copy(fullScreen = CardScreen(card)) }
-        }
-    }
-
-
-    fun onDeckClicked(deck: Deck) {
-        this.viewModelScope.launch {
-            _state.update { it.copy(fullScreen = DeckScreen(deck)) }
-        }
-    }
-
-    fun onRemoveDeckClick(deckId: Int) {
-        this.viewModelScope.launch {
-            deckRepository.removeDeck(deckId)
-            _state.update { it.copy(fullScreen = null) }
-        }
-    }
-
-    fun onNewDeckClicked() {
-        this.viewModelScope.launch {
-            _state.update {
-                val values = cardRepository.cards.value.values
-                    .filter { it.type == CardType.HERO }.toSet()
-
-                it.copy(fullScreen = CreateDeck(values))
-            }
-        }
-    }
-
-    fun onNewDeckHeroSelected(hero: Card, aspect: Aspect? = null) {
-        this.viewModelScope.launch {
-            try {
-                deckRepository.createDeck(heroCard = hero, aspect = aspect)
-                _state.update {
-                    it.copy(fullScreen = null)
-                }
-                _event.emit(Event.DeckCreated(hero.name))
-            } catch (e: Exception) {
-                Logger.e(e) { "Error creating deck for card $hero" }
-            }
-        }
-    }
-
-    fun onBackPressed() {
-        this.viewModelScope.launch {
-            _state.update {
-                it.copy(
-                    fullScreen = null
-                )
-            }
-        }
-    }
-
-    fun onPackSelectionClicked() {
-        this._state.update {
-            it.copy(fullScreen = UiState.FullScreen.PackSelectionScreen)
-        }
-    }
-
     fun onLogoutClicked() {
         this.authRepository.logout()
     }
@@ -143,25 +75,12 @@ class MainViewModel(
     data class UiState internal constructor(
         val mainScreen: MainScreen = Spotlight,
         val canShowMyDeckScreen: Boolean = false,
-        val fullScreen: FullScreen? = null
     ) {
         sealed interface MainScreen {
             data object Spotlight : MainScreen
             data object MyDecks : MainScreen
             data object Cards : MainScreen
             data object Settings : MainScreen
-        }
-
-        sealed interface FullScreen {
-            data class DeckScreen(val deck: Deck) : FullScreen
-
-            data class CardScreen(val card: Card) : FullScreen
-
-            data object PackSelectionScreen : FullScreen
-
-            data class CreateDeck(val heroCodes: Set<Card>) : FullScreen
-
-            data object Search : FullScreen
         }
     }
 }
