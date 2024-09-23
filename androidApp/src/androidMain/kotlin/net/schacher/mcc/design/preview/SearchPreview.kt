@@ -1,6 +1,7 @@
 package net.schacher.mcc.design.preview
 
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.unit.dp
 import net.schacher.mcc.design.ThemedPreviews
 import net.schacher.mcc.shared.design.theme.MccTheme
 import net.schacher.mcc.shared.screens.search.SearchBar
@@ -17,6 +18,7 @@ fun SearchScreenPreview() {
                 loading = true,
                 result = emptyList()
             ),
+            topInset = 0.dp,
             onCardClicked = {},
             onSearch = {}
         )

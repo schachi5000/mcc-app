@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -37,6 +38,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
@@ -49,10 +51,8 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.platform.LocalFocusManager
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
-import androidx.compose.ui.text.style.BaselineShift
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import marvelchampionscompanion.shared.generated.resources.Res
-import marvelchampionscompanion.shared.generated.resources.ic_arrow_back
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
@@ -71,14 +71,13 @@ import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
 import net.schacher.mcc.shared.utils.defaultSort
-import org.jetbrains.compose.resources.ExperimentalResourceApi
-import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 
 
 @Composable
 fun SearchScreen(
     searchViewModel: SearchViewModel = koinInject(),
+    topInset: Dp,
     onCardClicked: (Card) -> Unit
 ) {
     val state by searchViewModel.state.collectAsState()
@@ -86,6 +85,7 @@ fun SearchScreen(
     SearchScreen(
         state = state,
         onCardClicked = onCardClicked,
+        topInset = topInset,
         onSearch = searchViewModel::onSearch,
         onFilterClicked = searchViewModel::onFilterClicked
     )
@@ -95,17 +95,21 @@ fun SearchScreen(
 @Composable
 fun SearchScreen(
     state: UiState,
+    topInset: Dp,
     onCardClicked: (Card) -> Unit,
     onSearch: (String?) -> Unit,
     onFilterClicked: (Filter) -> Unit = {}
 ) {
     val focusManager = LocalFocusManager.current
 
-    Box(modifier = Modifier.fillMaxSize()) {
+    Box(modifier = Modifier.fillMaxSize().imePadding()) {
         val nestedScrollConnection = remember {
             object : NestedScrollConnection {
 
-                override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
+                override fun onPreScroll(
+                    available: Offset,
+                    source: NestedScrollSource
+                ): Offset {
                     focusManager.clearFocus()
                     return Offset.Zero
                 }
@@ -118,7 +122,7 @@ fun SearchScreen(
             val entries = createEntries(state.result)
             items(entries.count()) { item ->
                 if (item == 0) {
-                    Spacer(Modifier.statusBarsPadding().padding(bottom = 148.dp))
+                    Spacer(Modifier.statusBarsPadding().height(topInset))
                 }
 
                 CardRow(
@@ -137,19 +141,23 @@ fun SearchScreen(
         }
 
         Column(
-            modifier = Modifier.background(shade)
+            modifier = Modifier
                 .statusBarsPadding()
+                .align(Alignment.BottomCenter)
                 .padding(vertical = 16.dp)
         ) {
-            SearchBar(onDoneClick = { focusManager.clearFocus() }) { query ->
-                onSearch(query)
-            }
-
             FilterRow(
-                modifier = Modifier.padding(vertical = 8.dp),
-                filters = state.filters
+                modifier = Modifier.padding(bottom = 8.dp),
+                filters = state.filters,
+                horizontalPadding = ContentPadding
             ) {
                 onFilterClicked(it)
+            }
+
+            SearchBar(
+                horizontalPadding = ContentPadding,
+                onDoneClick = { focusManager.clearFocus() }) { query ->
+                onSearch(query)
             }
         }
     }
@@ -172,9 +180,9 @@ private fun createEntries(cards: List<Card>): List<CardRowEntry> =
         }
     }.sortedBy { it.title }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun SearchBar(
+    horizontalPadding: Dp = 16.dp,
     onDoneClick: () -> Unit,
     onQueryChange: (String) -> Unit
 ) {
@@ -182,30 +190,13 @@ fun SearchBar(
     val focusRequester = remember { FocusRequester() }
 
     Row(modifier = Modifier.fillMaxWidth().height(48.dp)) {
-        AnimatedVisibility(visible = isKeyboardVisible()) {
-            IconButton(
-                modifier = Modifier
-                    .size(56.dp)
-                    .background(Color.Transparent, DefaultShape),
-                onClick = {
-                    focusRequester.freeFocus()
-                    onDoneClick()
-                }
-            ) {
-                Icon(
-                    painterResource(Res.drawable.ic_arrow_back), "Clear",
-                    tint = MaterialTheme.colors.onBackground
-                )
-            }
-        }
-
         Surface(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxSize()
                 .padding(
-                    start = if (isKeyboardVisible()) 0.dp else 16.dp,
-                    end = if (input.isNotEmpty()) 0.dp else 16.dp
+                    start = horizontalPadding,
+                    end = if (input.isNotEmpty()) 0.dp else horizontalPadding
                 ),
             shape = DefaultShape,
             color = MaterialTheme.colors.surface,
@@ -217,12 +208,9 @@ fun SearchBar(
             TextField(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .padding(vertical = 0.dp)
                     .focusRequester(focusRequester),
                 value = input,
-                textStyle = MaterialTheme.typography.body1.copy(
-                    baselineShift = BaselineShift.Subscript
-                ),
+                textStyle = MaterialTheme.typography.body1,
                 colors = TextFieldDefaults.textFieldColors(
                     backgroundColor = Color.Transparent,
                     cursorColor = MaterialTheme.colors.onSurface,
@@ -245,7 +233,7 @@ fun SearchBar(
         AnimatedVisibility(visible = input.isNotEmpty()) {
             IconButton(
                 modifier = Modifier
-                    .padding(start = 8.dp, end = 16.dp)
+                    .padding(start = 8.dp, end = horizontalPadding)
                     .size(48.dp)
                     .background(MaterialTheme.colors.surface, DefaultShape)
                     .border(
@@ -269,6 +257,7 @@ fun SearchBar(
 fun FilterRow(
     modifier: Modifier = Modifier,
     filters: Set<Filter>,
+    horizontalPadding: Dp,
     onFilterClicked: (Filter) -> Unit = {}
 ) {
     LazyRow(
@@ -279,8 +268,8 @@ fun FilterRow(
             item {
                 SearchFilterChip(
                     modifier = Modifier.padding(
-                        start = if (index == 0) 16.dp else 0.dp,
-                        end = if (index == filters.count() - 1) 16.dp else 0.dp
+                        start = if (index == 0) horizontalPadding else 0.dp,
+                        end = if (index == filters.count() - 1) horizontalPadding else 0.dp
                     ),
                     color = when (filter.type) {
                         AGGRESSION -> Aspect.AGGRESSION.color

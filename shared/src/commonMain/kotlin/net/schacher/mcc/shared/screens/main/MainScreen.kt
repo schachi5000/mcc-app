@@ -97,7 +97,7 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                         onDeckClick = { viewModel.onDeckClicked(it) },
                         onAddDeckClick = { viewModel.onNewDeckClicked() })
 
-                    Cards.tabIndex -> SearchScreen {
+                    Cards.tabIndex -> SearchScreen(topInset = topInset) {
                         viewModel.onCardClicked(it)
                     }
 
