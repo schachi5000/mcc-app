@@ -3,7 +3,6 @@ package net.schacher.mcc.shared.repositories
 import co.touchlab.kermit.Logger
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.time.Time
@@ -19,7 +18,7 @@ class AuthRepository(private val settingsDao: SettingsDao) {
 
     private val _loginState = MutableStateFlow(this.loggedIn)
 
-    val loginState: StateFlow<Boolean> = _loginState.asStateFlow()
+    val loginState = _loginState.asStateFlow()
 
     init {
         this.restoreAccessToken()
@@ -101,7 +100,6 @@ class AuthRepository(private val settingsDao: SettingsDao) {
         this.settingsDao.remove(ACCESS_TOKEN)
         this.settingsDao.remove(EXPIRES_AT)
     }
-
 
     private fun storeAccessToken(accessToken: AccessToken) {
         this.settingsDao.putString(ACCESS_TOKEN, accessToken.token)

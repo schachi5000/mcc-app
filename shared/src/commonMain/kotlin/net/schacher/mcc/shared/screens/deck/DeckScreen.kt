@@ -33,6 +33,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import net.schacher.mcc.shared.design.compose.Animation
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.Card
@@ -48,22 +49,44 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.platform.isAndroid
+import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.screens.card.CardScreen
+import org.koin.compose.koinInject
+
+
+@Composable
+fun DeckScreen(
+    deckId: Int,
+    navController: NavController,
+    deckRepository: DeckRepository = koinInject(),
+    onDeleteDeckClick: (Int) -> Unit,
+) {
+    val deck = deckRepository.getDeckById(deckId) ?: return
+
+    DeckScreen(
+        deck = deck,
+        navController = navController,
+        onDeleteDeckClick = onDeleteDeckClick,
+    )
+}
 
 @Composable
 fun DeckScreen(
     deck: Deck,
-    onDeleteDeckClick: (Int) -> Unit,
-    onCloseClick: () -> Unit
+    navController: NavController,
+    onDeleteDeckClick: (Int) -> Unit
 ) {
     var selectedCard by remember { mutableStateOf<Card?>(null) }
     var deleteDeckShowing by remember { mutableStateOf(false) }
 
     Content(
         deck = deck,
-        onCloseClick = onCloseClick,
+        onCloseClick = { navController.popBackStack() },
         onDeleteDeckClick = { deleteDeckShowing = true },
-        onCardClick = { selectedCard = it })
+        onCardClick = {
+            navController.navigate("cards/${it.code}")
+        }
+    )
 
     if (deleteDeckShowing) {
         ConfirmationDialog(
@@ -76,6 +99,7 @@ fun DeckScreen(
             onDismiss = { deleteDeckShowing = false }
         )
     }
+
 
     AnimatedVisibility(
         selectedCard != null,

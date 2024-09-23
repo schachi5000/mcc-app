@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.screens.main
 
-import androidx.compose.animation.AnimatedContent
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
@@ -20,35 +19,26 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.cards
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
-import net.schacher.mcc.shared.design.compose.Animation
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.PagerHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
-import net.schacher.mcc.shared.screens.card.CardScreen
-import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DatabaseSynced
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DeckCreated
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CardScreen
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CreateDeck
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.PackSelectionScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Cards
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.MyDecks
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
-import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
-import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
 import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
@@ -63,7 +53,10 @@ internal val topInset = ContentPadding + 72.dp
     ExperimentalFoundationApi::class
 )
 @Composable
-fun MainScreen(viewModel: MainViewModel = koinInject()) {
+fun MainScreen(
+    viewModel: MainViewModel = koinInject(),
+    navController: NavHostController
+) {
     val state = viewModel.state.collectAsState()
     val scope = rememberCoroutineScope()
 
@@ -89,15 +82,17 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
             HorizontalPager(state = pagerState) { page ->
                 when (page) {
                     Spotlight.tabIndex -> SpotlightScreen(topInset = topInset) {
-                        viewModel.onDeckClicked(it)
+                        navController.navigate("deck/${it.id}")
                     }
 
                     MyDecks.tabIndex -> MyDecksScreen(topInset = topInset,
-                        onDeckClick = { viewModel.onDeckClicked(it) },
+                        onDeckClick = {
+                            navController.navigate("deck/${it.id}")
+                        },
                         onAddDeckClick = { viewModel.onNewDeckClicked() })
 
                     Cards.tabIndex -> SearchScreen(topInset = topInset) {
-                        viewModel.onCardClicked(it)
+                        navController.navigate("card/${it.code}")
                     }
 
                     Settings.tabIndex -> SettingsScreen(
@@ -136,34 +131,6 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
                 DatabaseSynced -> snackbarHostState.showSnackbar("Database synced!")
                 is CardsDatabaseSyncFailed -> snackbarHostState.showSnackbar("Error fully syncing database")
                 is DeckCreated -> snackbarHostState.showSnackbar("Deck created! ${it.deckName}")
-            }
-        }
-    }
-
-    AnimatedContent(
-        targetState = state.value.fullScreen,
-        transitionSpec = { Animation.fullscreenTransition })
-    {
-        when (it) {
-            is DeckScreen -> DeckScreen(it.deck,
-                onCloseClick = { viewModel.onBackPressed() },
-                onDeleteDeckClick = { viewModel.onRemoveDeckClick(it) })
-
-            is PackSelectionScreen -> PackSelectionScreen {
-                viewModel.onBackPressed()
-            }
-
-            is CardScreen -> CardScreen(card = it.card) {
-                viewModel.onBackPressed()
-            }
-
-            is CreateDeck -> NewDeckScreen(onBackPress = { viewModel.onBackPressed() },
-                onNewDeckSelected = { card, aspect ->
-                    viewModel.onNewDeckHeroSelected(card, aspect)
-                })
-
-            else -> {
-                Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
             }
         }
     }

@@ -2,7 +2,6 @@ package net.schacher.mcc.shared.screens.spotlight
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -12,13 +11,11 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
-import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.repositories.CardRepository
+import net.schacher.mcc.shared.repositories.SpotlightRepository
 
 class SpotlightViewModel(
-    private val cardRepository: CardRepository,
-    private val marvelCDbDataSource: MarvelCDbDataSource
+    private val spotlightRepository: SpotlightRepository,
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -53,17 +50,10 @@ class SpotlightViewModel(
         this.viewModelScope.launch {
             val updatedDecks = mutableMapOf<LocalDate, List<Deck>>()
             dates.forEach { date ->
-                val result = marvelCDbDataSource.getSpotlightDecksByDate(date) {
-                    cardRepository.getCard(it)
-                }
+                val spotlightDecks = spotlightRepository.getSpotlightDecks(date)
 
-                result.exceptionOrNull()?.let {
-                    Logger.e(it) { "Error loading decks for $date" }
-                }
-
-                result.getOrNull()?.let {
-                    updatedDecks[date] = it
-                    Logger.d { "${it.size} decks loaded to $date" }
+                if (spotlightDecks.isNotEmpty()) {
+                    updatedDecks[date] = spotlightDecks
                 }
 
                 _state.update {

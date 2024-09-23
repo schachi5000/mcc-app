@@ -14,6 +14,7 @@ import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
+import net.schacher.mcc.shared.repositories.SpotlightRepository
 import net.schacher.mcc.shared.screens.app.AppScreen
 import net.schacher.mcc.shared.screens.app.AppViewModel
 import net.schacher.mcc.shared.screens.main.MainViewModel
@@ -38,6 +39,7 @@ val repositories = module {
     singleOf(::CardRepository)
     singleOf(::DeckRepository)
     singleOf(::PackRepository)
+    singleOf(::SpotlightRepository)
 }
 
 val viewModels = module {

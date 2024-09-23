@@ -14,6 +14,11 @@ import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -38,34 +43,48 @@ import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
+import net.schacher.mcc.shared.repositories.CardRepository
+import org.koin.compose.koinInject
 
 @Composable
-fun CardScreen(modifier: Modifier = Modifier, card: Card, onCloseClick: () -> Unit) {
+fun CardScreen(
+    cardCode: String,
+    modifier: Modifier = Modifier,
+    cardRepository: CardRepository = koinInject(),
+    onCloseClick: () -> Unit
+) {
+    var card by remember { mutableStateOf<Card?>(null) }
+    LaunchedEffect(cardCode) {
+        card = cardRepository.getCard(cardCode)
+    }
+
+    card?.let {
+        CardScreen(
+            card = it, modifier = modifier, onCloseClick = onCloseClick
+        )
+    }
+}
+
+@Composable
+fun CardScreen(
+    card: Card, modifier: Modifier = Modifier, onCloseClick: () -> Unit
+) {
     Logger.i { card.toString() }
 
     Box(
-        modifier = modifier
-            .statusBarsPadding()
-            .background(MaterialTheme.colors.background)
+        modifier = modifier.statusBarsPadding().background(MaterialTheme.colors.background)
     ) {
         Card(
-            modifier = Modifier.fillMaxWidth()
-                .blur(20.dp)
-                .graphicsLayer { translationY = getTranslationY(card).toPx() },
-            card = card
+            modifier = Modifier.fillMaxWidth().blur(20.dp)
+                .graphicsLayer { translationY = getTranslationY(card).toPx() }, card = card
         )
 
         Tag(
-            modifier = Modifier.align(Alignment.TopEnd)
-                .padding(16.dp)
-                .alpha(0.8f),
-            text = card.code
+            modifier = Modifier.align(Alignment.TopEnd).padding(16.dp).alpha(0.8f), text = card.code
         )
 
         Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .background(
+            modifier = Modifier.fillMaxSize().background(
                     Brush.verticalGradient(
                         colorStops = arrayOf(
                             0f to MaterialTheme.colors.background.copy(alpha = 0f),
@@ -75,8 +94,7 @@ fun CardScreen(modifier: Modifier = Modifier, card: Card, onCloseClick: () -> Un
                             1f to MaterialTheme.colors.background.copy(alpha = 1f)
                         )
                     )
-                )
-                .padding(top = 200.dp, start = 16.dp, end = 16.dp),
+            ).padding(top = 200.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.Start
         ) {
             Text(
@@ -139,15 +157,12 @@ fun CardScreen(modifier: Modifier = Modifier, card: Card, onCloseClick: () -> Un
 
                 card.boostText?.let {
                     Text(
-                        modifier = Modifier.padding(top = 16.dp),
-                        text = buildAnnotatedString {
+                        modifier = Modifier.padding(top = 16.dp), text = buildAnnotatedString {
                             pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
                             append("Boost: ")
                             pop()
                             append(it.toAnnotatedString())
-                        },
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colors.onSurface
+                        }, fontSize = 18.sp, color = MaterialTheme.colors.onSurface
                     )
                 }
 
@@ -168,16 +183,7 @@ fun CardScreen(modifier: Modifier = Modifier, card: Card, onCloseClick: () -> Un
 }
 
 private fun getTranslationY(card: Card): Dp = when (card.type) {
-    CardType.EVENT,
-    CardType.MINION,
-    CardType.VILLAIN,
-    CardType.ENVIRONMENT,
-    CardType.SUPPORT,
-    CardType.UPGRADE,
-    CardType.ALLY,
-    CardType.OBLIGATION,
-    CardType.TREACHERY,
-    CardType.HERO -> (-65).dp
+    CardType.EVENT, CardType.MINION, CardType.VILLAIN, CardType.ENVIRONMENT, CardType.SUPPORT, CardType.UPGRADE, CardType.ALLY, CardType.OBLIGATION, CardType.TREACHERY, CardType.HERO -> (-65).dp
 
     else -> 0.dp
 }
@@ -194,8 +200,7 @@ private fun Tag(
     }
 ) {
     Text(
-        modifier = modifier
-            .widthIn(max = 140.dp)
+        modifier = modifier.widthIn(max = 140.dp)
             .background(color = color, shape = RoundedCornerShape(6.dp))
             .padding(horizontal = 6.dp, vertical = 2.dp),
         text = text,
@@ -217,17 +222,10 @@ private fun String.toAnnotatedString(): AnnotatedString {
     val value = this
 
     // Could be handled more elegantly, but this works for now
-    val boldStrings = boldRegex.findAll(value)
-        .map {
-            it.value
-                .replace("<b>", "")
-                .replace("</b>", "")
-                .replace("[", "")
-                .replace("]", "")
-                .replace("per_hero", EMOJI_HERO)
-                .replace("per_player", EMOJI_HERO)
-        }
-        .toList()
+    val boldStrings = boldRegex.findAll(value).map {
+        it.value.replace("<b>", "").replace("</b>", "").replace("[", "").replace("]", "")
+            .replace("per_hero", EMOJI_HERO).replace("per_player", EMOJI_HERO)
+    }.toList()
 
     return buildAnnotatedString {
         value.split(boldRegex).forEachIndexed { index, s ->

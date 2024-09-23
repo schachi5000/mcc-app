@@ -18,6 +18,7 @@ import kotlin.random.Random
 
 class DeckRepository(
     private val cardRepository: CardRepository,
+    private val spotlightRepository: SpotlightRepository,
     private val deckDatabaseDao: DeckDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource,
     private val authRepository: AuthRepository
@@ -40,6 +41,9 @@ class DeckRepository(
 
     private val randomDeckNumber: Int
         get() = Random.nextInt(Int.MAX_VALUE) * -1
+
+    fun getDeckById(deckId: Int): Deck? =
+        this.decks.value.find { it.id == deckId } ?: this.spotlightRepository.getDeckById(deckId)
 
     suspend fun createDeck(heroCard: Card, label: String? = null, aspect: Aspect? = null) {
         if (heroCard.type != HERO) {
