@@ -32,7 +32,8 @@ import net.schacher.mcc.shared.model.Deck
 
 @Composable
 fun DeckListItem(
-    deck: Deck, onClick: () -> Unit
+    deck: Deck,
+    onClick: () -> Unit
 ) {
     Row(
         modifier = Modifier.bounceClick().noRippleClickable { onClick() },

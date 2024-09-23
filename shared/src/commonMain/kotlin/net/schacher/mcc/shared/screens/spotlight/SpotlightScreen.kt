@@ -127,11 +127,11 @@ fun SpotlightScreen(
         PullRefreshIndicator(
             modifier = Modifier.align(Alignment.TopCenter)
                 .statusBarsPadding()
-                .padding(top = ContentPadding + 72.dp),
+                .padding(top = topInset),
             refreshing = state.loading,
             state = pullRefreshState,
-            contentColor = MaterialTheme.colors.onBackground,
-            backgroundColor = MaterialTheme.colors.background
+            contentColor = MaterialTheme.colors.primary,
+            backgroundColor = MaterialTheme.colors.surface
         )
     }
 }

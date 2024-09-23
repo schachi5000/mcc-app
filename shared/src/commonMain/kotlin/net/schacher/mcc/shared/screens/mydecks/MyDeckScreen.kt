@@ -138,8 +138,8 @@ fun MyDecksScreen(
                 .padding(top = ContentPadding + 72.dp),
             refreshing = state.refreshing,
             state = pullRefreshState,
-            contentColor = MaterialTheme.colors.onBackground,
-            backgroundColor = MaterialTheme.colors.background
+            contentColor = MaterialTheme.colors.primary,
+            backgroundColor = MaterialTheme.colors.surface
         )
     }
 }

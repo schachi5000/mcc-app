@@ -69,10 +69,10 @@ fun LoginScreen(
             modifier = Modifier.fillMaxSize().background(
                 Brush.verticalGradient(
                     colorStops = arrayOf(
-                        0f to MaterialTheme.colors.surface.copy(alpha = 0.1f),
-                        0.4f to MaterialTheme.colors.surface.copy(alpha = 0.8f),
-                        0.6f to MaterialTheme.colors.surface.copy(alpha = 1f),
-                        1f to MaterialTheme.colors.surface.copy(alpha = 1f)
+                        0f to MaterialTheme.colors.background.copy(alpha = 0.1f),
+                        0.4f to MaterialTheme.colors.background.copy(alpha = 0.8f),
+                        0.6f to MaterialTheme.colors.background.copy(alpha = 1f),
+                        1f to MaterialTheme.colors.background.copy(alpha = 1f)
                     )
                 )
             )
@@ -114,7 +114,7 @@ fun LoginScreen(
                 onClick = onContinueAsGuestClicked,
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = MaterialTheme.colors.background
+                    backgroundColor = MaterialTheme.colors.surface
                 )
             ) {
                 Text(
