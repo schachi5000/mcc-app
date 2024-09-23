@@ -130,8 +130,8 @@ fun SpotlightScreen(
                 .padding(top = topInset),
             refreshing = state.loading,
             state = pullRefreshState,
-            contentColor = MaterialTheme.colors.primary,
-            backgroundColor = MaterialTheme.colors.surface
+            contentColor = MaterialTheme.colors.onPrimary,
+            backgroundColor = MaterialTheme.colors.primary
         )
     }
 }

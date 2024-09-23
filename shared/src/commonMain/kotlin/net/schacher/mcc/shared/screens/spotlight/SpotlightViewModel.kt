@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.screens.spotlight
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -56,8 +57,13 @@ class SpotlightViewModel(
                     cardRepository.getCard(it)
                 }
 
+                result.exceptionOrNull()?.let {
+                    Logger.e(it) { "Error loading decks for $date" }
+                }
+
                 result.getOrNull()?.let {
                     updatedDecks[date] = it
+                    Logger.d { "${it.size} decks loaded to $date" }
                 }
 
                 _state.update {

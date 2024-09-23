@@ -70,10 +70,9 @@ class DatabaseDao(
         )
     }
 
-    override suspend fun getCardByCode(cardCode: String): Card =
+    override suspend fun getCardByCode(cardCode: String): Card? =
         measuringWithContext(Dispatchers.IO, "getCardByCode") {
             dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
-                ?: throw Exception("Card with code $cardCode not found")
         }
 
     override suspend fun getAllCards(): List<Card> =
@@ -108,18 +107,23 @@ class DatabaseDao(
 
     override suspend fun getDecks(): List<Deck> =
         measuringWithContext(Dispatchers.IO, "getDecks") {
-            dbQuery.selectAllDecks().executeAsList().map {
-                val cards = it.cardCodes.toCardCodeList().map {
+            dbQuery.selectAllDecks().executeAsList().mapNotNull {
+                val cards = it.cardCodes.toCardCodeList().mapNotNull {
                     getCardByCode(it)
                 }
 
-                Deck(
-                    id = it.id.toInt(),
-                    name = it.name,
-                    hero = getCardByCode(it.heroCardCode),
-                    aspect = it.aspect?.let { Aspect.valueOf(it) },
-                    cards = cards
-                )
+                val heroCard = getCardByCode(it.heroCardCode)
+                if (heroCard != null) {
+                    Deck(
+                        id = it.id.toInt(),
+                        name = it.name,
+                        hero = heroCard,
+                        aspect = it.aspect?.let { Aspect.valueOf(it) },
+                        cards = cards
+                    )
+                } else {
+                    null
+                }
             }
         }
 
