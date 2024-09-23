@@ -132,7 +132,10 @@ private fun Content(
 
             item {
                 CardRow(
-                    modifier = Modifier.padding(ContentPadding),
+                    modifier = Modifier.padding(
+                        horizontal = ContentPadding,
+                        vertical = 16.dp,
+                    ),
                     cardRowEntry = heroCards
                 ) {
                     onCardClick(it)
@@ -145,7 +148,10 @@ private fun Content(
 
             item {
                 CardRow(
-                    modifier = Modifier.padding(ContentPadding),
+                    modifier = Modifier.padding(
+                        horizontal = ContentPadding,
+                        vertical = 16.dp,
+                    ),
                     cardRowEntry = otherCards
                 ) {
                     onCardClick(it)
