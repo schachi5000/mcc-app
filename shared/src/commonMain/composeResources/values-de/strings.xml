@@ -1,11 +1,13 @@
 <resources>
     <string name="app_name">MCC</string>
-    <string name="database">Datenbank</string>
+    <string name="database">Database</string>
     <string name="delete">Löschen</string>
-    <string name="decks">Decks</string>
+    <string name="my_decks">Meine Decks</string>
+    <string name="cards">Karten</string>
     <string name="spotlight">Spotlight</string>
     <string name="search">Suche</string>
     <string name="more">Mehr</string>
+    <string name="settings">Einstellungen</string>
     <string name="create_new_deck">Neues Deck erstellen</string>
     <string name="login_with_marvelcdb">Anmelden mit MarvelCDB</string>
     <string name="login_as_guest">Weiter als Gast</string>
@@ -13,4 +15,7 @@
     <string name="login_info_title">Anmeldehinweis</string>
     <string name="login_info_message">Nach der erfolgreichen Eingabe deiner Anmeldedaten bitte auf ALLOW klicken, um die Anmeldung abzuschließen.</string>
     <string name="no_decks_found">Keine Decks gefunden</string>
+    <string name="today">Heute</string>
+    <string name="yesterday">Gestern</string>
+    <string name="two_days_ago">Vorgestern</string>
 </resources>
