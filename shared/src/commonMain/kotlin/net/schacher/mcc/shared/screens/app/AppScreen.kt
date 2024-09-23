@@ -4,7 +4,9 @@ import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
@@ -32,7 +34,7 @@ fun AppScreen(
 ) {
     NavHost(
         navController = navController as NavHostController,
-        modifier = Modifier.fillMaxSize(),
+        modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background),
         startDestination = AppScreen.Login.route,
         popEnterTransition = { fadeIn() + slideInHorizontally { _ -> -100 } },
         popExitTransition = { Animation.fullscreenExit },

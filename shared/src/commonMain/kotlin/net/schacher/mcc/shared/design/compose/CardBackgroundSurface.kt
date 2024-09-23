@@ -24,7 +24,7 @@ fun CardBackgroundBox(
     content: @Composable BoxScope.() -> Unit
 ) {
     Box(
-        modifier = modifier
+        modifier = modifier.background(MaterialTheme.colors.background)
     ) {
         CardBackgroundImage(
             modifier = Modifier.fillMaxWidth(),
