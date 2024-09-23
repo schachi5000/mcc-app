@@ -3,7 +3,6 @@ package net.schacher.mcc.shared.screens.search
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.background
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -194,8 +193,9 @@ fun SearchBar(
     Row(modifier = Modifier.fillMaxWidth().height(48.dp)) {
         Surface(
             modifier = Modifier
+                .fillMaxWidth()
+                .height(48.dp)
                 .weight(1f)
-                .fillMaxSize()
                 .padding(
                     start = horizontalPadding,
                     end = if (input.isNotEmpty()) 0.dp else horizontalPadding
@@ -237,18 +237,14 @@ fun SearchBar(
                 modifier = Modifier
                     .padding(start = 8.dp, end = horizontalPadding)
                     .size(48.dp)
-                    .background(MaterialTheme.colors.surface, DefaultShape)
-                    .border(
-                        BorderStroke(1.dp, MaterialTheme.colors.background),
-                        DefaultShape
-                    ),
+                    .background(MaterialTheme.colors.primary, DefaultShape),
                 onClick = {
                     input = ""
                     onQueryChange("")
                 }) {
                 Icon(
                     Icons.Rounded.Clear, "Clear",
-                    tint = MaterialTheme.colors.onSurface
+                    tint = MaterialTheme.colors.onPrimary
                 )
             }
         }
