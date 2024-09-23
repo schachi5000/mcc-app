@@ -12,11 +12,13 @@ browser = "1.8.0"
 core-ktx = "1.13.1"
 ktor = "2.3.11"
 kotlinx-datetime = "0.6.0"
+kotlinx-navigation-compose = "2.7.0-alpha07"
+kotlinx-viewmodel-compose = "2.8.0"
 kamel = "0.9.5"
 kermit = "2.0.3"
-koin = "3.5.6"
-koin-compose = "1.2.0-Beta4"
-kotlin = "2.0.0"
+koin = "4.0.0"
+koin-compose = "4.0.0"
+kotlin = "2.0.20"
 sql-delight = "2.0.2"
 serialization = "1.6.3"
 androidx-compose = "1.6.8"
@@ -48,7 +50,8 @@ ktor-client-loggin = { module = "io.ktor:ktor-client-logging", version.ref = "kt
 ktor-client-content-negotiation = { module = "io.ktor:ktor-client-content-negotiation", version.ref = "ktor" }
 ktor-serialization-json = { module = "io.ktor:ktor-serialization-kotlinx-json", version.ref = "ktor" }
 
-kotlinx-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version = "2.8.0" }
+kotlinx-viewmodel-compose = { module = "org.jetbrains.androidx.lifecycle:lifecycle-viewmodel-compose", version = "kotlinx-viewmodel-compose" }
+kotlinx-navigation-compose = { module = "org.jetbrains.androidx.navigation:navigation-compose", version.ref = "kotlinx-navigation-compose" }
 kotlinx-datetime = { module = "org.jetbrains.kotlinx:kotlinx-datetime", version.ref = "kotlinx-datetime" }
 kotlinx-serilization-json = { module = "org.jetbrains.kotlinx:kotlinx-serialization-json", version.ref = "serialization" }
 

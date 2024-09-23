@@ -60,6 +60,7 @@ kotlin {
                 api(libs.koin.compose)
                 implementation(libs.koin.core)
                 implementation(libs.koin.compose.viewmodel)
+                implementation(libs.kotlinx.navigation.compose)
                 implementation(libs.kermit)
                 implementation(libs.kamel)
                 implementation(libs.ktor.client.core)
