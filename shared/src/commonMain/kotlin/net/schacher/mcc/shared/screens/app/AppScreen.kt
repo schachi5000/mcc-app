@@ -21,6 +21,7 @@ import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.login.LoginScreen
 import net.schacher.mcc.shared.screens.main.MainScreen
 import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
+import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
 import org.koin.compose.koinInject
 
 @Composable
@@ -29,8 +30,6 @@ fun AppScreen(
     navController: NavController = koinInject(),
     onLogInClicked: () -> Unit
 ) {
-
-
     NavHost(
         navController = navController as NavHostController,
         modifier = Modifier.fillMaxSize(),
@@ -55,6 +54,10 @@ fun AppScreen(
                 onBackPress = { navController.popBackStack() },
                 onNewDeckSelected = { _, _ -> },
             )
+        }
+
+        composable(AppScreen.Packs.route) {
+            PackSelectionScreen()
         }
 
         composable(

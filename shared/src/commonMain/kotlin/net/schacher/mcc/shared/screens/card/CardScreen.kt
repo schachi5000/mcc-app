@@ -22,10 +22,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.draw.blur
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -33,17 +30,14 @@ import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
-import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.design.compose.BackButton
-import net.schacher.mcc.shared.design.compose.Card
+import net.schacher.mcc.shared.design.compose.CardBackgroundBox
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.repositories.CardRepository
 import org.koin.compose.koinInject
 
@@ -74,32 +68,29 @@ fun CardScreen(
     modifier: Modifier = Modifier,
     onCloseClick: () -> Unit
 ) {
-    Logger.i { card.toString() }
-
-    Box(
-        modifier = modifier.statusBarsPadding().background(MaterialTheme.colors.background)
+    CardBackgroundBox(
+        cardCode = card.code,
+        modifier = modifier
     ) {
-        Card(
-            modifier = Modifier.fillMaxWidth().blur(20.dp)
-                .graphicsLayer { translationY = getTranslationY(card).toPx() }, card = card
+        Content(
+            card = card,
+            onCloseClick = onCloseClick
         )
+    }
+}
 
+@Composable
+private fun Content(card: Card, onCloseClick: () -> Unit) {
+    Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         Tag(
-            modifier = Modifier.align(Alignment.TopEnd).padding(16.dp).alpha(0.8f), text = card.code
+            modifier = Modifier.align(Alignment.TopEnd)
+                .padding(16.dp)
+                .alpha(0.8f),
+            text = card.code
         )
 
         Column(
-            modifier = Modifier.fillMaxSize().background(
-                Brush.verticalGradient(
-                    colorStops = arrayOf(
-                        0f to MaterialTheme.colors.background.copy(alpha = 0f),
-                        0.15f to MaterialTheme.colors.background.copy(alpha = 0.2f),
-                        0.3f to MaterialTheme.colors.background.copy(alpha = 0.8f),
-                        0.4f to MaterialTheme.colors.background.copy(alpha = 1f),
-                        1f to MaterialTheme.colors.background.copy(alpha = 1f)
-                    )
-                )
-            ).padding(top = 200.dp, start = 16.dp, end = 16.dp),
+            modifier = Modifier.fillMaxSize().padding(top = 200.dp, start = 16.dp, end = 16.dp),
             horizontalAlignment = Alignment.Start
         ) {
             Text(
@@ -187,12 +178,6 @@ fun CardScreen(
     }
 }
 
-private fun getTranslationY(card: Card): Dp = when (card.type) {
-    CardType.EVENT, CardType.MINION, CardType.VILLAIN, CardType.ENVIRONMENT, CardType.SUPPORT, CardType.UPGRADE, CardType.ALLY, CardType.OBLIGATION, CardType.TREACHERY, CardType.HERO -> (-65).dp
-
-    else -> 0.dp
-}
-
 @Composable
 private fun Tag(
     modifier: Modifier = Modifier,
@@ -228,8 +213,12 @@ private fun String.toAnnotatedString(): AnnotatedString {
 
     // Could be handled more elegantly, but this works for now
     val boldStrings = boldRegex.findAll(value).map {
-        it.value.replace("<b>", "").replace("</b>", "").replace("[", "").replace("]", "")
-            .replace("per_hero", EMOJI_HERO).replace("per_player", EMOJI_HERO)
+        it.value.replace("<b>", "")
+            .replace("</b>", "")
+            .replace("[", "")
+            .replace("]", "")
+            .replace("per_hero", EMOJI_HERO)
+            .replace("per_player", EMOJI_HERO)
     }.toList()
 
     return buildAnnotatedString {
