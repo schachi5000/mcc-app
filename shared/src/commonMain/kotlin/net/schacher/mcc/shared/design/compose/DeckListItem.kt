@@ -27,8 +27,13 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.cards
+import marvelchampionscompanion.shared.generated.resources.decks
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Deck
+import org.jetbrains.compose.resources.pluralStringResource
 
 @Composable
 fun DeckListItem(
@@ -49,15 +54,25 @@ fun DeckListItem(
                 .padding(horizontal = 16.dp)
         ) {
             Text(
-                text = deck.name, style = MaterialTheme.typography.h6, maxLines = 2
+                text = deck.name,
+                style = MaterialTheme.typography.h6,
+                maxLines = 2
             )
 
             Text(
                 modifier = Modifier.padding(top = 4.dp),
-                text = listOf(
-                    deck.aspect?.name ?: "Unknown",
-                    "${deck.cards.size} Cards",
-                    "${deck.requiredDecks.size} Packs"
+                text = listOfNotNull(
+                    deck.aspect?.label,
+                    pluralStringResource(
+                        Res.plurals.cards,
+                        deck.cards.size,
+                        deck.cards.size
+                    ),
+                    pluralStringResource(
+                        Res.plurals.decks,
+                        deck.requiredDecks.size,
+                        deck.requiredDecks.size
+                    )
                 ).joinToString(" · "),
                 style = MaterialTheme.typography.body2,
                 color = Color.Gray,

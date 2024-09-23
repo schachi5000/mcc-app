@@ -43,7 +43,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
@@ -60,7 +59,7 @@ import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.design.theme.isContrastRatioSufficient
-import net.schacher.mcc.shared.localization.localize
+import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.search.Filter.Type
@@ -116,10 +115,20 @@ fun SearchScreen(
             }
         }
 
+        val entries = state.result
+            .groupBy { it.type }
+            .mapNotNull { (type, cards) ->
+                type?.let {
+                    CardRowEntry(it.label, cards.defaultSort())
+                }
+            }
+            .sortedBy { it.title }
+
         LazyColumn(
-            modifier = Modifier.fillMaxWidth().nestedScroll(nestedScrollConnection)
+            modifier = Modifier
+                .fillMaxWidth()
+                .nestedScroll(nestedScrollConnection)
         ) {
-            val entries = createEntries(state.result)
             items(entries.count()) { item ->
                 if (item == 0) {
                     Spacer(Modifier.statusBarsPadding().height(topInset))
@@ -163,23 +172,6 @@ fun SearchScreen(
         }
     }
 }
-
-private val shade: Brush
-    @Composable
-    get() = Brush.verticalGradient(
-        colorStops = arrayOf(
-            0f to MaterialTheme.colors.background.copy(alpha = 0.8f),
-            0.8f to MaterialTheme.colors.background.copy(alpha = 0.7f),
-            1f to MaterialTheme.colors.background.copy(alpha = 0.0f)
-        )
-    )
-
-private fun createEntries(cards: List<Card>): List<CardRowEntry> =
-    cards.groupBy { it.type }.mapNotNull { (type, cards) ->
-        type?.let {
-            CardRowEntry(it.localize(), cards.defaultSort())
-        }
-    }.sortedBy { it.title }
 
 @Composable
 fun SearchBar(
@@ -325,11 +317,12 @@ fun SearchFilterChip(
 
 
 private val Type.label: String
+    @Composable
     get() = when (this) {
         OWNED -> "In Besitz"
         BASIC -> "Basis"
-        AGGRESSION -> Aspect.AGGRESSION.localize()
-        PROTECTION -> Aspect.PROTECTION.localize()
-        JUSTICE -> Aspect.JUSTICE.localize()
-        LEADERSHIP -> Aspect.LEADERSHIP.localize()
+        AGGRESSION -> Aspect.AGGRESSION.label
+        PROTECTION -> Aspect.PROTECTION.label
+        JUSTICE -> Aspect.JUSTICE.label
+        LEADERSHIP -> Aspect.LEADERSHIP.label
     }

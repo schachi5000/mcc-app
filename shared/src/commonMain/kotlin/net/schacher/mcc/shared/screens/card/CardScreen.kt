@@ -35,7 +35,7 @@ import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.theme.color
-import net.schacher.mcc.shared.localization.localize
+import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 
@@ -100,8 +100,8 @@ fun CardScreen(modifier: Modifier = Modifier, card: Card, onCloseClick: () -> Un
                 modifier = Modifier.padding(top = 8.dp),
                 horizontalArrangement = Arrangement.spacedBy(4.dp)
             ) {
-                item { card.type?.let { Tag(text = it.localize()) } }
-                item { card.aspect?.let { Tag(text = it.localize(), color = it.color) } }
+                item { card.type?.let { Tag(text = it.label) } }
+                item { card.aspect?.let { Tag(text = it.label, color = it.color) } }
             }
 
             Column(

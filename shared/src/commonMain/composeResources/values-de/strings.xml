@@ -18,4 +18,35 @@
     <string name="today">Heute</string>
     <string name="yesterday">Gestern</string>
     <string name="two_days_ago">Vorgestern</string>
+
+    <string name="aggression">Aggression</string>
+    <string name="protection">Schutz</string>
+    <string name="justice">Gerechtigkeit</string>
+    <string name="leadership">Führung</string>
+
+    <string name="hero">Held</string>
+    <string name="ally">Verbündeter</string>
+    <string name="event">Ereignis</string>
+    <string name="support">Unterstützung</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="resource">Ressource</string>
+    <string name="villain">Schurke</string>
+    <string name="main_scheme">Hauptplan</string>
+    <string name="side_scheme">Nebenplan</string>
+    <string name="player_side_scheme">Spielernebenplan</string>
+    <string name="attachment">Anhang</string>
+    <string name="minion">Scherge</string>
+    <string name="treachery">Verrat</string>
+    <string name="environment">Umgebung</string>
+    <string name="obligation">Verpflichtung</string>
+
+    <plurals name="cards">
+        <item quantity="one">1 Karte</item>
+        <item quantity="other">%1$d Karten</item>
+    </plurals>
+
+    <plurals name="decks">
+        <item quantity="one">1 Deck</item>
+        <item quantity="other">%1$d Decks</item>
+    </plurals>
 </resources>

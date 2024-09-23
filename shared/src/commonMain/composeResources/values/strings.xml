@@ -18,4 +18,38 @@
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="two_days_ago">Two days ago</string>
+
+    <string name="aggression">Aggression</string>
+    <string name="protection">Protection</string>
+    <string name="justice">Justice</string>
+    <string name="leadership">Leadership</string>
+
+    <string name="hero">Hero</string>
+    <string name="ally">Ally</string>
+    <string name="event">Event</string>
+    <string name="support">Support</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="resource">Resource</string>
+    <string name="villain">Villain</string>
+    <string name="main_scheme">Main Scheme</string>
+    <string name="side_scheme">Side Scheme</string>
+    <string name="player_side_scheme">Player Side Scheme</string>
+    <string name="attachment">Attachment</string>
+    <string name="minion">Minion</string>
+    <string name="treachery">Treachery</string>
+    <string name="environment">Environment</string>
+    <string name="obligation">Obligation</string>
+
+    <plurals name="cards">
+        <item quantity="one">1 card</item>
+        <item quantity="other">%1$d cards</item>
+    </plurals>
+
+    <plurals name="decks">
+        <item quantity="one">1 deck</item>
+        <item quantity="other">%1$d decks</item>
+    </plurals>
 </resources>
+
+
+
