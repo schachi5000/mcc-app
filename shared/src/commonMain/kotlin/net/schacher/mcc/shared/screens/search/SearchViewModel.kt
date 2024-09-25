@@ -118,6 +118,7 @@ data class UiState(
 
 data class Filter(val type: Type, val active: Boolean) {
     enum class Type {
+        HERO,
         OWNED,
         AGGRESSION,
         PROTECTION,

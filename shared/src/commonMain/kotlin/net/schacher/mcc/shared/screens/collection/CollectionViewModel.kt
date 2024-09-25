@@ -10,17 +10,21 @@ import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.search.Filter
 import net.schacher.mcc.shared.screens.search.Filter.Type.AGGRESSION
 import net.schacher.mcc.shared.screens.search.Filter.Type.BASIC
+import net.schacher.mcc.shared.screens.search.Filter.Type.HERO
 import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
 import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
+import net.schacher.mcc.shared.utils.defaultSort
 import net.schacher.mcc.shared.utils.distinctByName
+import net.schacher.mcc.shared.utils.findAndRemove
 import net.schacher.mcc.shared.utils.launchAndCollect
 
 class CollectionViewModel(
@@ -44,7 +48,10 @@ class CollectionViewModel(
 
     private fun refresh() {
         this.viewModelScope.launch {
-            val cards = getFilteredCards(_state.value.filters).toList()
+            val cards = getFilteredCards(_state.value.filters
+                .filter { it.active }
+                .toMutableList()
+            )
             _state.update {
                 it.copy(cardsInCollection = cards)
             }
@@ -59,25 +66,28 @@ class CollectionViewModel(
         this.refresh()
     }
 
-    private suspend fun getFilteredCards(filters: Set<Filter> = emptySet()) =
+    private suspend fun getFilteredCards(filters: List<Filter>) =
         withContext(Dispatchers.Default) {
-            val showOnlyOwned = filters.any { it.type == OWNED && it.active }
+            val updatedFilter = filters.toMutableList()
+            val showOnlyOwned = updatedFilter.findAndRemove { it.type == OWNED }?.active ?: false
+
             cardRepository.cards.value.values
+                .filter { !showOnlyOwned || packRepository.hasPackInCollection(it.packCode) }
                 .filter { card ->
-                    filters.none { it.active } ||
-                            filters.any { filter ->
-                                when {
-                                    filter.type == BASIC -> card.faction == Faction.BASIC
-                                    filter.type == AGGRESSION -> card.aspect == Aspect.AGGRESSION
-                                    filter.type == PROTECTION -> card.aspect == Aspect.PROTECTION
-                                    filter.type == JUSTICE -> card.aspect == Aspect.JUSTICE
-                                    filter.type == LEADERSHIP -> card.aspect == Aspect.LEADERSHIP
-                                    showOnlyOwned -> packRepository.hasPackInCollection(card.packCode)
-                                    else -> false
-                                } && filter.active
-                            }
+                    updatedFilter.isEmpty() || updatedFilter.any {
+                        when (it.type) {
+                            BASIC -> card.faction == Faction.BASIC
+                            AGGRESSION -> card.aspect == Aspect.AGGRESSION
+                            PROTECTION -> card.aspect == Aspect.PROTECTION
+                            JUSTICE -> card.aspect == Aspect.JUSTICE
+                            LEADERSHIP -> card.aspect == Aspect.LEADERSHIP
+                            HERO -> card.type == CardType.HERO
+                            else -> false
+                        }
+                    }
                 }
                 .distinctByName()
+                .defaultSort()
         }
 }
 
@@ -88,6 +98,7 @@ data class UiState internal constructor(
         Filter(PROTECTION, false),
         Filter(JUSTICE, false),
         Filter(LEADERSHIP, false),
+        Filter(HERO, false),
         Filter(BASIC, false),
         Filter(OWNED, false),
     )

@@ -63,9 +63,11 @@ import net.schacher.mcc.shared.design.theme.isContrastRatioSufficient
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.screens.search.Filter.Type
 import net.schacher.mcc.shared.screens.search.Filter.Type.AGGRESSION
 import net.schacher.mcc.shared.screens.search.Filter.Type.BASIC
+import net.schacher.mcc.shared.screens.search.Filter.Type.HERO
 import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
 import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
@@ -172,12 +174,8 @@ fun SearchBar(
     Row(modifier = Modifier.fillMaxWidth().height(48.dp)) {
         Surface(
             modifier = Modifier.fillMaxWidth().height(48.dp).weight(1f).padding(
-                start = horizontalPadding,
-                end = if (input.isNotEmpty()) 0.dp else horizontalPadding
-            ),
-            shape = DefaultShape,
-            color = MaterialTheme.colors.surface,
-            border = BorderStroke(
+                start = horizontalPadding, end = if (input.isNotEmpty()) 0.dp else horizontalPadding
+            ), shape = DefaultShape, color = MaterialTheme.colors.surface, border = BorderStroke(
                 if (isKeyboardVisible()) 2.dp else 1.dp,
                 if (isKeyboardVisible()) MaterialTheme.colors.primary else MaterialTheme.colors.background
             )
@@ -233,13 +231,16 @@ fun FilterRow(
                     modifier = Modifier.padding(
                         start = if (index == 0) horizontalPadding else 0.dp,
                         end = if (index == filters.count() - 1) horizontalPadding else 0.dp
-                    ), color = when (filter.type) {
+                    ),
+                    color = when (filter.type) {
                         AGGRESSION -> Aspect.AGGRESSION.color
                         PROTECTION -> Aspect.PROTECTION.color
                         JUSTICE -> Aspect.JUSTICE.color
                         LEADERSHIP -> Aspect.LEADERSHIP.color
-                        BASIC, OWNED -> MaterialTheme.colors.primary
-                    }, label = filter.type.label, selected = filter.active
+                        else -> MaterialTheme.colors.primary
+                    },
+                    label = filter.type.label,
+                    selected = filter.active
                 ) {
                     onFilterClicked(filter)
                 }
@@ -289,8 +290,7 @@ fun SearchFilterChip(
         },
     ) {
         Text(
-            text = label,
-            fontWeight = FontWeight.SemiBold
+            text = label, fontWeight = FontWeight.SemiBold
         )
     }
 }
@@ -299,6 +299,7 @@ val Type.label: String
     @Composable get() = when (this) {
         OWNED -> "In Besitz"
         BASIC -> "Basis"
+        HERO -> CardType.HERO.label
         AGGRESSION -> Aspect.AGGRESSION.label
         PROTECTION -> Aspect.PROTECTION.label
         JUSTICE -> Aspect.JUSTICE.label

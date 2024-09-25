@@ -11,10 +11,8 @@ import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.screens.search.Filter
 import net.schacher.mcc.shared.screens.search.Filter.Type.AGGRESSION
-import net.schacher.mcc.shared.screens.search.Filter.Type.BASIC
 import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
 import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
-import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
 import net.schacher.mcc.shared.screens.search.SearchFilterChip
 import net.schacher.mcc.shared.screens.search.label
@@ -37,8 +35,7 @@ fun FilterFlowRow(
                     PROTECTION -> Aspect.PROTECTION.color
                     JUSTICE -> Aspect.JUSTICE.color
                     LEADERSHIP -> Aspect.LEADERSHIP.color
-                    BASIC,
-                    OWNED -> MaterialTheme.colors.primary
+                    else -> MaterialTheme.colors.primary
                 },
                 label = filter.type.label,
                 selected = filter.active
