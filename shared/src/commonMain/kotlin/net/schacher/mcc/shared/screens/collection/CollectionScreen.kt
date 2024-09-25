@@ -107,9 +107,9 @@ fun CollectionScreen(
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        scrimColor = Color.Black.copy(alpha = 0.35f),
+        scrimColor = Color.Black.copy(alpha = 0.75f),
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
-        sheetBackgroundColor = MaterialTheme.colors.surface,
+        sheetBackgroundColor = MaterialTheme.colors.background,
         sheetContent = {
             BottomSheetContainer {
                 FilterContent(
@@ -150,7 +150,7 @@ fun CollectionScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize()
-                    .padding(horizontal = 16.dp)
+                    .padding(horizontal = 12.dp)
                     .nestedScroll(nestedScrollConnection),
             ) {
                 items(count = 3) {
@@ -179,11 +179,15 @@ fun CollectionScreen(
                                 textAlign = TextAlign.Center,
                                 color = MaterialTheme.colors.onBackground,
                                 maxLines = 2,
-                                fontSize = 15.sp,
+                                fontSize = 14.sp,
                                 fontWeight = FontWeight.SemiBold
                             )
                         }
                     }
+                }
+
+                items(count = 3) {
+                    Spacer(modifier = Modifier.height(topInset))
                 }
             }
 
@@ -192,11 +196,11 @@ fun CollectionScreen(
                     .align(Alignment.BottomEnd)
                     .navigationBarsPadding()
                     .padding(16.dp),
-                label = "Filter collection",
+                label = "Filter Collection",
                 icon = {
                     Icon(
                         Icons.AutoMirrored.Rounded.List,
-                        contentDescription = "Filter collection"
+                        contentDescription = "Filter Collection"
                     )
                 },
                 expanded = expanded,

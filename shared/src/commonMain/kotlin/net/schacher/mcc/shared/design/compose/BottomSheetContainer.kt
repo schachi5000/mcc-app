@@ -10,16 +10,11 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetState
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment.Companion.CenterHorizontally
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 
 @Composable
 fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () -> Unit) {
@@ -32,7 +27,7 @@ fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () 
         BottomSheetHandle()
         Spacer(Modifier.height(8.dp))
         content()
-        Spacer(Modifier.navigationBarsPadding().height(8.dp))
+        Spacer(Modifier.navigationBarsPadding())
     }
 }
 
@@ -47,12 +42,3 @@ private fun ColumnScope.BottomSheetHandle() {
             .align(CenterHorizontally)
     ) {}
 }
-
-@OptIn(ExperimentalMaterialApi::class)
-@Composable
-fun Modifier.blurByBottomSheet(bottomSheetState: ModalBottomSheetState) = this.blur(
-    when (bottomSheetState.targetValue) {
-        ModalBottomSheetValue.Hidden -> 0.dp
-        else -> bottomSheetState.progress * 4.dp
-    }
-)
