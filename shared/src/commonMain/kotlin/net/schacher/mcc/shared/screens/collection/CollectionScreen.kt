@@ -25,6 +25,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
+import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
@@ -62,6 +63,7 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppScreen
 import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.search.Filter
+import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.utils.replace
 import org.koin.compose.koinInject
 
@@ -219,6 +221,11 @@ fun FilterContent(
     onSelectPacksClicked: () -> Unit = {},
 ) {
     var selectedFilters by remember { mutableStateOf(state.filters.toList()) }
+    var showOnlyOwned by remember {
+        mutableStateOf(
+            state.filters.find { it.type == OWNED }?.active ?: false
+        )
+    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -233,8 +240,14 @@ fun FilterContent(
         )
 
         FilterFlowRow(
-            modifier = Modifier.padding(vertical = 16.dp),
-            filters = selectedFilters.toSet(),
+            modifier = Modifier.padding(
+                start = 16.dp,
+                top = 16.dp,
+                end = 16.dp
+            ),
+            filters = selectedFilters.toMutableSet().also {
+                it.removeAll { it.type == OWNED }
+            },
             onFilterClicked = { filter ->
                 selectedFilters = selectedFilters.replace(
                     filter, filter.copy(active = !filter.active)
@@ -244,10 +257,24 @@ fun FilterContent(
 
         Row(
             modifier = Modifier.fillMaxWidth()
-                .height(124.dp)
-                .padding(16.dp)
-                .clickable { onSelectPacksClicked() },
-            horizontalArrangement = Arrangement.SpaceBetween
+                .clickable { showOnlyOwned = !showOnlyOwned }
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text("Show only owned")
+            Switch(
+                checked = showOnlyOwned,
+                onCheckedChange = { showOnlyOwned = it }
+            )
+        }
+
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .clickable { onSelectPacksClicked() }
+                .padding(16.dp),
+            horizontalArrangement = Arrangement.SpaceBetween,
+            verticalAlignment = Alignment.CenterVertically
         ) {
             Text("My packs")
             Icon(
@@ -276,11 +303,17 @@ fun FilterContent(
 
             TextButton(
                 modifier = Modifier.weight(1f),
-                onClick = { onApplyFilerClick(selectedFilters.toSet()) },
                 shape = DefaultShape,
                 colors = ButtonDefaults.textButtonColors(
                     backgroundColor = MaterialTheme.colors.primary
-                )
+                ),
+                onClick = {
+                    val ownedFilter = selectedFilters.find { it.type == OWNED }
+                    val finalFilters =
+                        selectedFilters.replace(ownedFilter, Filter(OWNED, showOnlyOwned))
+
+                    onApplyFilerClick(finalFilters.toSet())
+                },
             ) {
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
