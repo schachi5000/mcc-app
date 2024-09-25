@@ -19,6 +19,7 @@ import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.repositories.SpotlightRepository
 import net.schacher.mcc.shared.screens.app.AppScreen
 import net.schacher.mcc.shared.screens.app.AppViewModel
+import net.schacher.mcc.shared.screens.collection.CollectionViewModel
 import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.screens.newdeck.NewDeckViewModel
@@ -52,6 +53,7 @@ val viewModels = module {
     singleOf(::MyDecksViewModel)
     singleOf(::SettingsViewModel)
     singleOf(::SpotlightViewModel)
+    singleOf(::CollectionViewModel)
 }
 
 @Composable

@@ -22,7 +22,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
-import marvelchampionscompanion.shared.generated.resources.cards
+import marvelchampionscompanion.shared.generated.resources.collection
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
@@ -30,16 +30,16 @@ import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.PagerHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.screens.AppScreen
+import net.schacher.mcc.shared.screens.collection.CollectionScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DatabaseSynced
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DeckCreated
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Cards
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Collection
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.MyDecks
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
-import net.schacher.mcc.shared.screens.search.SearchScreen
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -73,7 +73,10 @@ fun MainScreen(
         Box(
             modifier = Modifier.padding(it)
         ) {
-            val pageLabels = listOf(Spotlight, MyDecks, Cards, Settings)
+            val pageLabels = listOf(
+                Spotlight, MyDecks,
+                Collection, Settings
+            )
             val pagerState = rememberPagerState(pageCount = { pageLabels.size })
 
             HorizontalPager(state = pagerState) { page ->
@@ -90,7 +93,7 @@ fun MainScreen(
                             navController.navigate(AppScreen.AddDeck.route)
                         })
 
-                    Cards.tabIndex -> SearchScreen(topInset = topInset) {
+                    Collection.tabIndex -> CollectionScreen(topInset = topInset) {
                         navController.navigate("card/${it.code}")
                     }
 
@@ -139,7 +142,7 @@ private val MainScreen.tabIndex: Int
     get() = when (this) {
         Spotlight -> 0
         MyDecks -> 1
-        Cards -> 2
+        Collection -> 2
         Settings -> 3
     }
 
@@ -148,6 +151,6 @@ private val MainScreen.label: String
     get() = when (this) {
         Spotlight -> stringResource(Res.string.spotlight)
         MyDecks -> stringResource(Res.string.my_decks)
-        Cards -> stringResource(Res.string.cards)
+        Collection -> stringResource(Res.string.collection)
         Settings -> stringResource(Res.string.settings)
     }
