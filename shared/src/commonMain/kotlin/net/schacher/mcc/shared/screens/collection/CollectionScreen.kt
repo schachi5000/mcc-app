@@ -187,7 +187,7 @@ fun CollectionScreen(
                 }
 
                 items(count = 3) {
-                    Spacer(modifier = Modifier.height(topInset))
+                    Spacer(modifier = Modifier.height(88.dp))
                 }
             }
 

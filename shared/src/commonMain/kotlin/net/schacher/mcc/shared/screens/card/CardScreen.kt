@@ -14,6 +14,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -87,7 +88,9 @@ fun CardScreen(
 @Composable
 private fun Content(card: Card, onCloseClick: () -> Unit) {
     Box(modifier = Modifier.fillMaxSize()) {
-        LazyColumn {
+        val state = rememberLazyListState()
+
+        LazyColumn(state = state) {
             item {
                 Column(
                     modifier = Modifier.fillMaxSize()
@@ -101,12 +104,12 @@ private fun Content(card: Card, onCloseClick: () -> Unit) {
                     ) {
                         Card(
                             card = card,
-                            modifier = Modifier.sizeIn(maxWidth = 240.dp)
+                            modifier = Modifier.sizeIn(maxWidth = 260.dp)
                         )
                     }
 
                     Text(
-                        modifier = Modifier.padding(top = 16.dp),
+                        modifier = Modifier.padding(top = ContentPadding),
                         text = card.name,
                         maxLines = 2,
                         fontWeight = FontWeight.SemiBold,
@@ -190,7 +193,7 @@ private fun Content(card: Card, onCloseClick: () -> Unit) {
                         }
                     }
 
-                    Spacer(Modifier.height(120.dp))
+                    Spacer(Modifier.height(88.dp))
                 }
 
             }

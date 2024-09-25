@@ -152,7 +152,7 @@ private fun Content(
             }
 
             item {
-                Spacer(Modifier.height(64.dp))
+                Spacer(Modifier.height(88.dp))
             }
         }
 
