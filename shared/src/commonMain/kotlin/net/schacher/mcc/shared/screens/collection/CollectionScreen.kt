@@ -58,6 +58,7 @@ import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppScreen
@@ -232,7 +233,7 @@ fun FilterContent(
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
-            modifier = Modifier.padding(top = 16.dp),
+            modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
             text = "Filter",
             color = MaterialTheme.colors.onBackground,
             fontSize = 20.sp,
@@ -240,11 +241,11 @@ fun FilterContent(
         )
 
         FilterFlowRow(
-            modifier = Modifier.padding(
-                start = 16.dp,
-                top = 16.dp,
-                end = 16.dp
-            ),
+            modifier = Modifier.fillMaxWidth()
+                .padding(
+                    start = ContentPadding,
+                    end = ContentPadding
+                ),
             filters = selectedFilters.toMutableSet().also {
                 it.removeAll { it.type == OWNED }
             },
@@ -255,10 +256,13 @@ fun FilterContent(
             }
         )
 
+        Spacer(Modifier.height(8.dp))
+
         Row(
             modifier = Modifier.fillMaxWidth()
+                .height(64.dp)
                 .clickable { showOnlyOwned = !showOnlyOwned }
-                .padding(16.dp),
+                .padding(horizontal = ContentPadding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -271,8 +275,9 @@ fun FilterContent(
 
         Row(
             modifier = Modifier.fillMaxWidth()
+                .height(64.dp)
                 .clickable { onSelectPacksClicked() }
-                .padding(16.dp),
+                .padding(horizontal = ContentPadding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
@@ -283,7 +288,12 @@ fun FilterContent(
             )
         }
 
-        Row(modifier = Modifier.fillMaxWidth().padding(16.dp)) {
+        Row(
+            modifier = Modifier.fillMaxWidth().padding(
+                vertical = 16.dp,
+                horizontal = ContentPadding,
+            )
+        ) {
             TextButton(
                 modifier = Modifier.weight(1f),
                 onClick = onBackClick,
