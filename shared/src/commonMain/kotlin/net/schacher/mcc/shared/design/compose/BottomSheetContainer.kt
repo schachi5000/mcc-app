@@ -26,7 +26,7 @@ fun BottomSheetContainer(modifier: Modifier = Modifier, content: @Composable () 
     Column(
         modifier = modifier
             .fillMaxWidth()
-            .background(MaterialTheme.colors.surface)
+            .background(MaterialTheme.colors.background)
     ) {
         Spacer(Modifier.height(8.dp))
         BottomSheetHandle()

@@ -16,3 +16,14 @@ fun Collection<Card>.defaultSort(): List<Card> {
 fun Collection<Card>.distinctByName(): List<Card> {
     return this.distinctBy { "${it.name} ${it.aspect}" }
 }
+
+fun <T> Collection<T>.replace(old: T, new: T): List<T> {
+    val index = this.indexOf(old)
+    if (index == -1) {
+        return this.toMutableList()
+    }
+    val newList = this.toMutableList()
+    newList[index] = new
+
+    return newList
+}

@@ -280,6 +280,7 @@ fun FilterRow(
 }
 
 
+
 @OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun SearchFilterChip(
@@ -315,8 +316,7 @@ fun SearchFilterChip(
     }
 }
 
-
-private val Type.label: String
+val Type.label: String
     @Composable
     get() = when (this) {
         OWNED -> "In Besitz"
