@@ -4,11 +4,15 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
@@ -21,7 +25,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
@@ -34,7 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import net.schacher.mcc.shared.design.compose.BackButton
+import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardBackgroundBox
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
@@ -81,99 +86,115 @@ fun CardScreen(
 
 @Composable
 private fun Content(card: Card, onCloseClick: () -> Unit) {
-    Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
-        Tag(
-            modifier = Modifier.align(Alignment.TopEnd)
-                .padding(16.dp)
-                .alpha(0.8f),
-            text = card.code
-        )
-
-        Column(
-            modifier = Modifier.fillMaxSize().padding(top = 200.dp, start = 16.dp, end = 16.dp),
-            horizontalAlignment = Alignment.Start
-        ) {
-            Text(
-                text = card.name,
-                maxLines = 2,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 28.sp,
-                color = MaterialTheme.colors.onSurface
-            )
-
-            Text(
-                text = card.packName,
-                maxLines = 1,
-                fontWeight = FontWeight.SemiBold,
-                fontSize = 18.sp,
-                color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
-            )
-
-
-            LazyRow(
-                modifier = Modifier.padding(top = 8.dp),
-                horizontalArrangement = Arrangement.spacedBy(4.dp)
-            ) {
-                item { card.type?.let { Tag(text = it.label) } }
-                item { card.aspect?.let { Tag(text = it.label, color = it.color) } }
-            }
-
-            Column(
-                modifier = Modifier.fillMaxWidth().padding(top = 24.dp),
-                horizontalAlignment = Alignment.Start
-            ) {
-                card.traits?.let {
-                    Text(
+    Box(modifier = Modifier.fillMaxSize()) {
+        LazyColumn {
+            item {
+                Column(
+                    modifier = Modifier.fillMaxSize()
+                        .statusBarsPadding()
+                        .padding(ContentPadding),
+                    horizontalAlignment = Alignment.Start
+                ) {
+                    Column(
                         modifier = Modifier.fillMaxWidth(),
-                        text = it.toAnnotatedString(),
-                        fontSize = 18.sp,
-                        textAlign = TextAlign.Center,
+                        horizontalAlignment = Alignment.CenterHorizontally
+                    ) {
+                        Card(
+                            card = card,
+                            modifier = Modifier.sizeIn(maxWidth = 240.dp)
+                        )
+                    }
+
+                    Text(
+                        modifier = Modifier.padding(top = 16.dp),
+                        text = card.name,
+                        maxLines = 2,
                         fontWeight = FontWeight.SemiBold,
+                        fontSize = 28.sp,
                         color = MaterialTheme.colors.onSurface
                     )
-                }
 
-                card.text?.let {
                     Text(
-                        modifier = Modifier.padding(top = 16.dp),
-                        text = it.toAnnotatedString(),
+                        text = card.packName,
+                        maxLines = 1,
+                        fontWeight = FontWeight.SemiBold,
                         fontSize = 18.sp,
-                        color = MaterialTheme.colors.onSurface
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
                     )
+
+
+                    LazyRow(
+                        modifier = Modifier.padding(top = 8.dp),
+                        horizontalArrangement = Arrangement.spacedBy(4.dp)
+                    ) {
+                        item { Tag(text = card.code) }
+                        item { card.type?.let { Tag(text = it.label) } }
+                        item { card.aspect?.let { Tag(text = it.label, color = it.color) } }
+                    }
+
+                    Column(
+                        modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
+                        horizontalAlignment = Alignment.Start
+                    ) {
+                        card.traits?.let {
+                            Text(
+                                modifier = Modifier.fillMaxWidth(),
+                                text = it.toAnnotatedString(),
+                                fontSize = 18.sp,
+                                textAlign = TextAlign.Center,
+                                fontWeight = FontWeight.SemiBold,
+                                color = MaterialTheme.colors.onSurface
+                            )
+                        }
+
+                        card.text?.let {
+                            Text(
+                                modifier = Modifier.padding(top = 16.dp),
+                                text = it.toAnnotatedString(),
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colors.onSurface
+                            )
+                        }
+
+                        card.attackText?.let {
+                            Text(
+                                modifier = Modifier.padding(top = 16.dp),
+                                text = it.toAnnotatedString(),
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colors.onSurface
+                            )
+                        }
+
+                        card.boostText?.let {
+                            Text(
+                                modifier = Modifier.padding(top = 16.dp),
+                                text = buildAnnotatedString {
+                                    pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
+                                    append("Boost: ")
+                                    pop()
+                                    append(it.toAnnotatedString())
+                                },
+                                fontSize = 18.sp,
+                                color = MaterialTheme.colors.onSurface
+                            )
+                        }
+
+                        card.quote?.let {
+                            Text(
+                                modifier = Modifier.padding(top = 32.dp),
+                                text = it,
+                                fontSize = 18.sp,
+                                fontStyle = FontStyle.Italic,
+                                color = MaterialTheme.colors.onSurface
+                            )
+                        }
+                    }
+
+                    Spacer(Modifier.height(120.dp))
                 }
 
-                card.attackText?.let {
-                    Text(
-                        modifier = Modifier.padding(top = 16.dp),
-                        text = it.toAnnotatedString(),
-                        fontSize = 18.sp,
-                        color = MaterialTheme.colors.onSurface
-                    )
-                }
-
-                card.boostText?.let {
-                    Text(
-                        modifier = Modifier.padding(top = 16.dp), text = buildAnnotatedString {
-                            pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                            append("Boost: ")
-                            pop()
-                            append(it.toAnnotatedString())
-                        }, fontSize = 18.sp, color = MaterialTheme.colors.onSurface
-                    )
-                }
-
-                card.quote?.let {
-                    Text(
-                        modifier = Modifier.padding(top = 32.dp),
-                        text = it,
-                        fontSize = 18.sp,
-                        fontStyle = FontStyle.Italic,
-                        color = MaterialTheme.colors.onSurface
-                    )
-                }
             }
         }
-
         BackButton(onCloseClick)
     }
 }
