@@ -55,6 +55,7 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
+import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
@@ -187,7 +188,7 @@ fun CollectionScreen(
                 }
 
                 items(count = 3) {
-                    Spacer(modifier = Modifier.height(88.dp))
+                    BottomSpacer()
                 }
             }
 
