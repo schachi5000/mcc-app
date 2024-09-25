@@ -4,19 +4,16 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
@@ -34,15 +31,16 @@ import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import net.schacher.mcc.shared.design.compose.Card
-import net.schacher.mcc.shared.design.theme.ButtonSize
-import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppScreen
-import net.schacher.mcc.shared.screens.mydecks.animateHorizontalAlignmentAsState
 import net.schacher.mcc.shared.screens.navigate
 import org.koin.compose.koinInject
 
@@ -70,19 +68,17 @@ fun CollectionScreen(
     topInset: Dp,
     onCardClicked: (Card) -> Unit,
 ) {
-    Box(
-        modifier = Modifier.fillMaxSize()
-            .statusBarsPadding()
-            .padding(horizontal = 16.dp)
-    ) {
+    var labeled by remember { mutableStateOf(false) }
+
+    Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
         var expanded by remember { mutableStateOf(false) }
         val nestedScrollConnection = remember {
             object : NestedScrollConnection {
                 override fun onPreScroll(available: Offset, source: NestedScrollSource): Offset {
                     expanded = if (expanded) {
-                        available.y > -10
+                        available.y > -65
                     } else {
-                        available.y > 1
+                        available.y > 30
                     }
 
                     return Offset.Zero
@@ -94,7 +90,9 @@ fun CollectionScreen(
             columns = GridCells.Fixed(3),
             verticalArrangement = Arrangement.spacedBy(12.dp),
             horizontalArrangement = Arrangement.spacedBy(12.dp),
-            modifier = Modifier.fillMaxSize().nestedScroll(nestedScrollConnection),
+            modifier = Modifier.fillMaxSize()
+                .padding(horizontal = 16.dp)
+                .nestedScroll(nestedScrollConnection),
         ) {
             items(count = 3) {
                 Spacer(modifier = Modifier.height(topInset))
@@ -102,15 +100,39 @@ fun CollectionScreen(
 
             items(count = state.cardsInCollection.size) { index ->
                 val card = state.cardsInCollection[index]
-                Card(
-                    modifier = Modifier.wrapContentHeight(),
-                    card = card,
-                    onClick = { onCardClicked(card) })
+
+                Column {
+                    Card(
+                        card = card,
+                        modifier = Modifier.wrapContentHeight()
+                    ) {
+                        onCardClicked(card)
+                    }
+
+                    AnimatedVisibility(
+                        visible = expanded,
+                        modifier = Modifier.padding(vertical = 8.dp)
+                            .sizeIn(maxWidth = 128.dp)
+                            .align(Alignment.CenterHorizontally)
+                    ) {
+                        Text(
+                            text = card.name,
+                            textAlign = TextAlign.Center,
+                            color = MaterialTheme.colors.onBackground,
+                            maxLines = 2,
+                            fontSize = 15.sp,
+                            fontWeight = FontWeight.SemiBold
+                        )
+                    }
+                }
             }
         }
 
-        FilterButton(
-            modifier = Modifier.align(Alignment.BottomEnd),
+        ExpandingButton(
+            modifier = Modifier
+                .align(Alignment.BottomEnd)
+                .navigationBarsPadding()
+                .padding(16.dp),
             label = "Filter collection",
             icon = {
                 Icon(
@@ -119,51 +141,10 @@ fun CollectionScreen(
                 )
             },
             expanded = expanded,
-            onClick = { navController.navigate(AppScreen.Packs) }
-        )
-    }
-}
-
-@Composable
-fun FilterButton(
-    modifier: Modifier,
-    label: String,
-    expanded: Boolean,
-    icon: @Composable() () -> Unit,
-    onClick: () -> Unit
-) {
-    var horizontalBias by remember { mutableStateOf(1f) }
-    val alignment by animateHorizontalAlignmentAsState(horizontalBias)
-
-    horizontalBias = if (expanded) 0f else 1f
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = alignment
-    ) {
-        FloatingActionButton(
-            onClick = onClick,
-            modifier = Modifier
-                .padding(vertical = 16.dp, horizontal = 16.dp)
-                .sizeIn(maxHeight = ButtonSize, minWidth = ButtonSize),
-            contentColor = MaterialTheme.colors.onPrimary,
-            backgroundColor = MaterialTheme.colors.primary,
-            shape = DefaultShape
-        ) {
-            Row(
-                modifier = Modifier.fillMaxHeight()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                icon()
-
-                AnimatedVisibility(visible = expanded) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        text = label
-                    )
-                }
+            onClick = {
+                labeled = !labeled
+                navController.navigate(AppScreen.Packs)
             }
-        }
+        )
     }
 }
