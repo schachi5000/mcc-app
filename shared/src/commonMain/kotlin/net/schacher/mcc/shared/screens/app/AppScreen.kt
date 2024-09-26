@@ -8,6 +8,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
@@ -89,9 +90,11 @@ fun AppScreen(
     }
 
     val loggedIn = appViewModel.state.collectAsState()
-    if (loggedIn.value) {
-        navController.navigate(AppScreen.Main.route)
-    } else {
-        navController.popBackStack(AppScreen.Login.route, false)
+    LaunchedEffect(loggedIn.value) {
+        if (loggedIn.value) {
+            navController.navigate(AppScreen.Main.route)
+        } else {
+            navController.popBackStack(AppScreen.Login.route, false)
+        }
     }
 }

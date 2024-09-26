@@ -41,6 +41,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -111,7 +112,7 @@ fun CollectionScreen(
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        scrimColor = MaterialTheme.colors.background.copy(alpha = 0.75f),
+        scrimColor = Color.Black.copy(alpha = 0.75f),
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetBackgroundColor = MaterialTheme.colors.background,
         sheetContent = {
