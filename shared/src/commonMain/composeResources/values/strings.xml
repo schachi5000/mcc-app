@@ -4,6 +4,7 @@
     <string name="delete">Delete</string>
     <string name="my_decks">My Decks</string>
     <string name="cards">Cards</string>
+    <string name="collection">Collection</string>
     <string name="spotlight">Spotlight</string>
     <string name="search">Search</string>
     <string name="more">More</string>
@@ -39,6 +40,10 @@
     <string name="treachery">Treachery</string>
     <string name="environment">Environment</string>
     <string name="obligation">Obligation</string>
+
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
 
     <plurals name="cards">
         <item quantity="one">1 card</item>

@@ -62,9 +62,11 @@ import net.schacher.mcc.shared.design.theme.isContrastRatioSufficient
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.screens.search.Filter.Type
 import net.schacher.mcc.shared.screens.search.Filter.Type.AGGRESSION
 import net.schacher.mcc.shared.screens.search.Filter.Type.BASIC
+import net.schacher.mcc.shared.screens.search.Filter.Type.HERO
 import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
 import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
@@ -75,9 +77,7 @@ import org.koin.compose.koinInject
 
 @Composable
 fun SearchScreen(
-    searchViewModel: SearchViewModel = koinInject(),
-    topInset: Dp,
-    onCardClicked: (Card) -> Unit
+    searchViewModel: SearchViewModel = koinInject(), topInset: Dp, onCardClicked: (Card) -> Unit
 ) {
     val state by searchViewModel.state.collectAsState()
 
@@ -106,8 +106,7 @@ fun SearchScreen(
             object : NestedScrollConnection {
 
                 override fun onPreScroll(
-                    available: Offset,
-                    source: NestedScrollSource
+                    available: Offset, source: NestedScrollSource
                 ): Offset {
                     focusManager.clearFocus()
                     return Offset.Zero
@@ -115,19 +114,14 @@ fun SearchScreen(
             }
         }
 
-        val entries = state.result
-            .groupBy { it.type }
-            .mapNotNull { (type, cards) ->
-                type?.let {
-                    CardRowEntry(it.label, cards.defaultSort())
-                }
+        val entries = state.result.groupBy { it.type }.mapNotNull { (type, cards) ->
+            type?.let {
+                CardRowEntry(it.label, cards.defaultSort())
             }
-            .sortedBy { it.title }
+        }.sortedBy { it.title }
 
         LazyColumn(
-            modifier = Modifier
-                .fillMaxWidth()
-                .nestedScroll(nestedScrollConnection)
+            modifier = Modifier.fillMaxWidth().nestedScroll(nestedScrollConnection)
         ) {
             items(entries.count()) { item ->
                 if (item == 0) {
@@ -140,8 +134,7 @@ fun SearchScreen(
                         top = if (item == 0) 0.dp else 16.dp,
                         end = ContentPadding,
                         bottom = 16.dp
-                    ),
-                    cardRowEntry = entries[item]
+                    ), cardRowEntry = entries[item]
                 ) {
                     focusManager.clearFocus()
                     onCardClicked(it)
@@ -150,11 +143,8 @@ fun SearchScreen(
         }
 
         Column(
-            modifier = Modifier
-                .statusBarsPadding()
-                .align(Alignment.BottomCenter)
-                .navigationBarsPadding()
-                .padding(bottom = 16.dp)
+            modifier = Modifier.statusBarsPadding().align(Alignment.BottomCenter)
+                .navigationBarsPadding().padding(bottom = 16.dp)
         ) {
             FilterRow(
                 modifier = Modifier.padding(bottom = 4.dp),
@@ -175,34 +165,22 @@ fun SearchScreen(
 
 @Composable
 fun SearchBar(
-    horizontalPadding: Dp = 16.dp,
-    onDoneClick: () -> Unit,
-    onQueryChange: (String) -> Unit
+    horizontalPadding: Dp = 16.dp, onDoneClick: () -> Unit, onQueryChange: (String) -> Unit
 ) {
     var input by remember { mutableStateOf("") }
     val focusRequester = remember { FocusRequester() }
 
     Row(modifier = Modifier.fillMaxWidth().height(48.dp)) {
         Surface(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(48.dp)
-                .weight(1f)
-                .padding(
-                    start = horizontalPadding,
-                    end = if (input.isNotEmpty()) 0.dp else horizontalPadding
-                ),
-            shape = DefaultShape,
-            color = MaterialTheme.colors.surface,
-            border = BorderStroke(
+            modifier = Modifier.fillMaxWidth().height(48.dp).weight(1f).padding(
+                start = horizontalPadding, end = if (input.isNotEmpty()) 0.dp else horizontalPadding
+            ), shape = DefaultShape, color = MaterialTheme.colors.surface, border = BorderStroke(
                 if (isKeyboardVisible()) 2.dp else 1.dp,
                 if (isKeyboardVisible()) MaterialTheme.colors.primary else MaterialTheme.colors.background
             )
         ) {
             TextField(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .focusRequester(focusRequester),
+                modifier = Modifier.fillMaxWidth().focusRequester(focusRequester),
                 value = input,
                 textStyle = MaterialTheme.typography.body1,
                 colors = TextFieldDefaults.textFieldColors(
@@ -212,9 +190,7 @@ fun SearchBar(
                     unfocusedIndicatorColor = Color.Transparent
                 ),
                 keyboardOptions = KeyboardOptions(imeAction = ImeAction.Done),
-                keyboardActions = KeyboardActions(
-                    onDone = { onDoneClick() }
-                ),
+                keyboardActions = KeyboardActions(onDone = { onDoneClick() }),
                 singleLine = true,
                 onValueChange = {
                     input = it
@@ -225,18 +201,13 @@ fun SearchBar(
         }
 
         AnimatedVisibility(visible = input.isNotEmpty()) {
-            IconButton(
-                modifier = Modifier
-                    .padding(start = 8.dp, end = horizontalPadding)
-                    .size(48.dp)
-                    .background(MaterialTheme.colors.primary, DefaultShape),
-                onClick = {
-                    input = ""
-                    onQueryChange("")
-                }) {
+            IconButton(modifier = Modifier.padding(start = 8.dp, end = horizontalPadding)
+                .size(48.dp).background(MaterialTheme.colors.primary, DefaultShape), onClick = {
+                input = ""
+                onQueryChange("")
+            }) {
                 Icon(
-                    Icons.Rounded.Clear, "Clear",
-                    tint = MaterialTheme.colors.onPrimary
+                    Icons.Rounded.Clear, "Clear", tint = MaterialTheme.colors.onPrimary
                 )
             }
         }
@@ -251,8 +222,7 @@ fun FilterRow(
     onFilterClicked: (Filter) -> Unit = {}
 ) {
     LazyRow(
-        modifier = modifier,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
+        modifier = modifier, horizontalArrangement = Arrangement.spacedBy(8.dp)
     ) {
         filters.forEachIndexed { index, filter ->
             item {
@@ -266,8 +236,7 @@ fun FilterRow(
                         PROTECTION -> Aspect.PROTECTION.color
                         JUSTICE -> Aspect.JUSTICE.color
                         LEADERSHIP -> Aspect.LEADERSHIP.color
-                        BASIC,
-                        OWNED -> MaterialTheme.colors.primary
+                        else -> MaterialTheme.colors.primary
                     },
                     label = filter.type.label,
                     selected = filter.active
@@ -289,6 +258,12 @@ fun SearchFilterChip(
     selected: Boolean = false,
     onClick: () -> Unit = {}
 ) {
+    val contentColor = if (color.isContrastRatioSufficient(Color.White)) {
+        Color.White
+    } else {
+        Color.Black
+    }
+
     FilterChip(
         modifier = modifier,
         onClick = onClick,
@@ -300,27 +275,21 @@ fun SearchFilterChip(
         ),
         colors = ChipDefaults.filterChipColors(
             backgroundColor = MaterialTheme.colors.surface,
-            selectedContentColor = if (color.isContrastRatioSufficient(Color.White)) {
-                Color.White
-            } else {
-                Color.Black
-            },
-            selectedBackgroundColor = color
-        )
+            selectedContentColor = contentColor,
+            selectedBackgroundColor = color,
+        ),
     ) {
         Text(
-            text = label,
-            fontWeight = FontWeight.SemiBold
+            text = label, fontWeight = FontWeight.SemiBold
         )
     }
 }
 
-
-private val Type.label: String
-    @Composable
-    get() = when (this) {
+val Type.label: String
+    @Composable get() = when (this) {
         OWNED -> "In Besitz"
         BASIC -> "Basis"
+        HERO -> CardType.HERO.label
         AGGRESSION -> Aspect.AGGRESSION.label
         PROTECTION -> Aspect.PROTECTION.label
         JUSTICE -> Aspect.JUSTICE.label

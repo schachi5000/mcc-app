@@ -54,7 +54,7 @@ import org.koin.compose.koinInject
 fun SpotlightScreen(
     viewModel: SpotlightViewModel = koinInject(),
     topInset: Dp,
-    onDeckClick: (Deck) -> Unit
+    onDeckClick: (Deck) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -96,13 +96,19 @@ fun SpotlightScreen(
                     }
 
                     when (val entry = entries[index]) {
-                        is HeaderItem -> Header(entry.header)
-                        is DeckItem -> DeckListItem(deck = entry.deck) {
-                            onDeckClick(entry.deck)
+                        is HeaderItem -> {
+                            Header(entry.header)
+                            Spacer(Modifier.height(24.dp))
+                        }
+
+                        is DeckItem -> {
+                            DeckListItem(deck = entry.deck) {
+                                onDeckClick(entry.deck)
+                            }
+                            Spacer(Modifier.height(32.dp))
                         }
                     }
 
-                    Spacer(Modifier.height(32.dp))
                 }
             }
         }
@@ -151,7 +157,7 @@ private fun getLabelByDate(date: LocalDate): String {
 @Composable
 private fun Header(label: String) {
     Row(
-        modifier = Modifier.padding(top = 16.dp),
+        modifier = Modifier.padding(top = 8.dp),
         horizontalArrangement = Arrangement.Start
     ) {
         Text(
@@ -166,10 +172,8 @@ private fun Header(label: String) {
 
 @Composable
 private fun LoadingContent() {
-    Column(
-        modifier = Modifier.fillMaxSize(),
-    ) {
-        Spacer(Modifier.statusBarsPadding().height(topInset + 14.dp))
+    Column(modifier = Modifier.fillMaxSize()) {
+        Spacer(Modifier.statusBarsPadding().height(topInset + 8.dp))
 
         ShimmerBox(
             modifier = Modifier
@@ -178,7 +182,7 @@ private fun LoadingContent() {
                 .clip(DefaultShape)
         )
 
-        Spacer(Modifier.height(28.dp))
+        Spacer(Modifier.height(20.dp))
 
         for (i in 0..6) {
             LoadingDeckListItem()

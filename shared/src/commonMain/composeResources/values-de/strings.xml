@@ -4,6 +4,7 @@
     <string name="delete">Löschen</string>
     <string name="my_decks">Meine Decks</string>
     <string name="cards">Karten</string>
+    <string name="collection">Sammlung</string>
     <string name="spotlight">Spotlight</string>
     <string name="search">Suche</string>
     <string name="more">Mehr</string>
@@ -39,6 +40,10 @@
     <string name="treachery">Verrat</string>
     <string name="environment">Umgebung</string>
     <string name="obligation">Verpflichtung</string>
+
+    <string name="apply">Anwenden</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="ok">Ok</string>
 
     <plurals name="cards">
         <item quantity="one">1 Karte</item>

@@ -101,7 +101,7 @@ fun LoadingDeckListItem() {
                 .padding(horizontal = 16.dp)
         ) {
             ShimmerBox(
-                modifier = Modifier.fillMaxWidth(0.6f)
+                modifier = Modifier.fillMaxWidth(0.7f)
                     .height(22.dp)
                     .clip(DefaultShape)
             )
@@ -109,7 +109,7 @@ fun LoadingDeckListItem() {
             Spacer(Modifier.height(6.dp))
 
             ShimmerBox(
-                modifier = Modifier.fillMaxWidth(0.9f)
+                modifier = Modifier.fillMaxWidth(1f)
                     .height(22.dp)
                     .clip(DefaultShape)
             )

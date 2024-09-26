@@ -25,6 +25,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import net.schacher.mcc.shared.design.compose.BackButton
+import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardBackgroundBox
 import net.schacher.mcc.shared.design.compose.CardRow
@@ -152,7 +153,7 @@ private fun Content(
             }
 
             item {
-                Spacer(Modifier.height(64.dp))
+                BottomSpacer()
             }
         }
 
