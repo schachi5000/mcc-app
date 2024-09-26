@@ -25,10 +25,11 @@ import net.schacher.mcc.shared.screens.main.MainScreen
 import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
 import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun AppScreen(
-    appViewModel: AppViewModel = koinInject(),
+    appViewModel: AppViewModel = koinViewModel(),
     navController: NavController = koinInject(),
     onLogInClicked: () -> Unit
 ) {

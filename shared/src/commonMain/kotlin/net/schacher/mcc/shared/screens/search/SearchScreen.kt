@@ -72,12 +72,12 @@ import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
 import net.schacher.mcc.shared.utils.defaultSort
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 
 @Composable
 fun SearchScreen(
-    searchViewModel: SearchViewModel = koinInject(), topInset: Dp, onCardClicked: (Card) -> Unit
+    searchViewModel: SearchViewModel = koinViewModel(), topInset: Dp, onCardClicked: (Card) -> Unit
 ) {
     val state by searchViewModel.state.collectAsState()
 

@@ -48,11 +48,11 @@ import net.schacher.mcc.shared.screens.main.topInset
 import net.schacher.mcc.shared.screens.spotlight.ListItem.DeckItem
 import net.schacher.mcc.shared.screens.spotlight.ListItem.HeaderItem
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun SpotlightScreen(
-    viewModel: SpotlightViewModel = koinInject(),
+    viewModel: SpotlightViewModel = koinViewModel(),
     topInset: Dp,
     onDeckClick: (Deck) -> Unit,
 ) {

@@ -45,12 +45,12 @@ import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.screens.settings.SettingsViewModel.UiState
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @ExperimentalResourceApi
 @Composable
 fun SettingsScreen(
-    settingsViewModel: SettingsViewModel = koinInject(),
+    settingsViewModel: SettingsViewModel = koinViewModel(),
     topInset: Dp,
     onPackSelectionClick: () -> Unit,
     onLogoutClicked: () -> Unit

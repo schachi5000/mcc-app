@@ -30,6 +30,7 @@ import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import pro.schacher.mcc.BuildConfig
 
@@ -45,15 +46,15 @@ val repositories = module {
 }
 
 val viewModels = module {
-    singleOf(::AppViewModel)
-    singleOf(::MainViewModel)
-    singleOf(::NewDeckViewModel)
-    singleOf(::SearchViewModel)
-    singleOf(::PackSelectionViewModel)
-    singleOf(::MyDecksViewModel)
-    singleOf(::SettingsViewModel)
-    singleOf(::SpotlightViewModel)
-    singleOf(::CollectionViewModel)
+    viewModelOf(::AppViewModel)
+    viewModelOf(::MainViewModel)
+    viewModelOf(::NewDeckViewModel)
+    viewModelOf(::SearchViewModel)
+    viewModelOf(::PackSelectionViewModel)
+    viewModelOf(::MyDecksViewModel)
+    viewModelOf(::SettingsViewModel)
+    viewModelOf(::SpotlightViewModel)
+    viewModelOf(::CollectionViewModel)
 }
 
 @Composable

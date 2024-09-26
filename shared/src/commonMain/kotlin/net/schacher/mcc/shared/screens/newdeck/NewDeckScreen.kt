@@ -22,11 +22,11 @@ import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun NewDeckScreen(
-    viewModel: NewDeckViewModel = koinInject(),
+    viewModel: NewDeckViewModel = koinViewModel(),
     onNewDeckSelected: (Card, Aspect?) -> Unit,
     onBackPress: () -> Unit
 ) {

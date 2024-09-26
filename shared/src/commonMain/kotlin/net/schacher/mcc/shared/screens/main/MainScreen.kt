@@ -46,6 +46,7 @@ import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 internal val topInset = 2 * ContentPadding + 64.dp
 
@@ -55,7 +56,7 @@ internal val topInset = 2 * ContentPadding + 64.dp
 )
 @Composable
 fun MainScreen(
-    viewModel: MainViewModel = koinInject(),
+    viewModel: MainViewModel = koinViewModel(),
     navController: NavController = koinInject(),
 ) {
     val scope = rememberCoroutineScope()

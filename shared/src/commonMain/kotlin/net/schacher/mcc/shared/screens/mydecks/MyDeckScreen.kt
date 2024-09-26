@@ -51,11 +51,11 @@ import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun MyDecksScreen(
-    viewModel: MyDecksViewModel = koinInject(),
+    viewModel: MyDecksViewModel = koinViewModel(),
     topInset: Dp,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit

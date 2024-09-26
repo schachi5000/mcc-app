@@ -70,11 +70,12 @@ import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.utils.replace
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun CollectionScreen(
+    viewModel: CollectionViewModel = koinViewModel(),
     navController: NavController = koinInject(),
-    viewModel: CollectionViewModel = koinInject(),
     topInset: Dp,
     onCardClicked: (Card) -> Unit
 ) {
