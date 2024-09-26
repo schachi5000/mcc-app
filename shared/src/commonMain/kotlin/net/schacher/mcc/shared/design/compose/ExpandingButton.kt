@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.animateDpAsState
 import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -38,14 +39,18 @@ fun BoxScope.ExpandingButton(
     var horizontalBias by remember { mutableStateOf(1f) }
     val alignment by animateHorizontalAlignmentAsState(horizontalBias)
 
+    var endPadding by remember { mutableStateOf(FABPadding) }
+    val animateEndPadding by animateDpAsState(endPadding)
+
     horizontalBias = if (expanded) 0f else 1f
+    endPadding = if (expanded) 0.dp else FABPadding
 
     Column(
         modifier = modifier.fillMaxWidth()
             .align(Alignment.BottomEnd)
             .navigationBarsPadding()
             .padding(
-                end = FABPadding.takeIf { !expanded } ?: 0.dp,
+                end = animateEndPadding,
                 bottom = if (isAndroid()) ContentPadding else 0.dp
             ),
         horizontalAlignment = alignment
