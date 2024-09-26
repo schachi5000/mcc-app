@@ -30,14 +30,14 @@ import net.schacher.mcc.shared.screens.mydecks.animateHorizontalAlignmentAsState
 
 @Composable
 fun BoxScope.ExpandingButton(
-    modifier: Modifier = Modifier,
     label: String,
     expanded: Boolean,
+    alignment: Alignment = Alignment.BottomEnd,
     icon: @Composable() () -> Unit,
     onClick: () -> Unit
 ) {
     var horizontalBias by remember { mutableStateOf(1f) }
-    val alignment by animateHorizontalAlignmentAsState(horizontalBias)
+    val horizontalAlignment by animateHorizontalAlignmentAsState(horizontalBias)
 
     var endPadding by remember { mutableStateOf(FABPadding) }
     val animateEndPadding by animateDpAsState(endPadding)
@@ -46,18 +46,21 @@ fun BoxScope.ExpandingButton(
     endPadding = if (expanded) 0.dp else FABPadding
 
     Column(
-        modifier = modifier.fillMaxWidth()
-            .align(Alignment.BottomEnd)
+        modifier = Modifier.fillMaxWidth()
+            .align(alignment)
             .navigationBarsPadding()
             .padding(
                 end = animateEndPadding,
                 bottom = if (isAndroid()) ContentPadding else 0.dp
             ),
-        horizontalAlignment = alignment
+        horizontalAlignment = horizontalAlignment
     ) {
         FloatingActionButton(
             onClick = onClick,
-            modifier = Modifier.sizeIn(maxHeight = ButtonSize, minWidth = ButtonSize),
+            modifier = Modifier.sizeIn(
+                minWidth = ButtonSize,
+                maxHeight = ButtonSize,
+            ),
             contentColor = MaterialTheme.colors.onPrimary,
             backgroundColor = MaterialTheme.colors.primary,
             shape = DefaultShape
