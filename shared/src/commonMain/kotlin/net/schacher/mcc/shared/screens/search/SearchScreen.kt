@@ -31,7 +31,6 @@ import androidx.compose.material.Text
 import androidx.compose.material.TextField
 import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Check
 import androidx.compose.material.icons.rounded.Clear
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
@@ -271,23 +270,14 @@ fun SearchFilterChip(
         selected = selected,
         shape = DefaultShape,
         border = BorderStroke(
-            width = 1.dp, color = MaterialTheme.colors.background
+            width = 1.dp,
+            color = MaterialTheme.colors.background
         ),
         colors = ChipDefaults.filterChipColors(
             backgroundColor = MaterialTheme.colors.surface,
             selectedContentColor = contentColor,
             selectedBackgroundColor = color,
-            leadingIconColor = contentColor
         ),
-        leadingIcon = {
-            if (selected) {
-                Icon(
-                    modifier = Modifier.padding(start = 4.dp),
-                    imageVector = Icons.Rounded.Check,
-                    contentDescription = label,
-                )
-            }
-        },
     ) {
         Text(
             text = label, fontWeight = FontWeight.SemiBold
