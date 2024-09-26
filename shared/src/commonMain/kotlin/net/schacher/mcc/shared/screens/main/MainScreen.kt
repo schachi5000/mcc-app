@@ -41,6 +41,7 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.MyD
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
+import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
@@ -92,7 +93,7 @@ fun MainScreen(
                             navController.navigate("deck/${it.id}")
                         },
                         onAddDeckClick = {
-                            navController.navigate(AppScreen.AddDeck.route)
+                            navController.navigate(AppScreen.AddDeck)
                         })
 
                     Collection.tabIndex -> CollectionScreen(topInset = topInset) {
@@ -102,7 +103,7 @@ fun MainScreen(
                     Settings.tabIndex -> SettingsScreen(
                         topInset = topInset,
                         onPackSelectionClick = {
-                            navController.navigate(AppScreen.Packs.route)
+                            navController.navigate(AppScreen.Packs)
                         },
                         onLogoutClicked = {
                             viewModel.onLogoutClicked()

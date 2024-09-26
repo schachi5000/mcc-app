@@ -13,10 +13,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
-import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import androidx.navigation.navArgument
 import net.schacher.mcc.shared.design.compose.Animation
 import net.schacher.mcc.shared.screens.AppScreen
 import net.schacher.mcc.shared.screens.card.CardScreen
@@ -66,9 +64,7 @@ fun AppScreen(
 
         composable(
             route = AppScreen.Deck.route,
-            arguments = listOf(navArgument("deckId") {
-                type = NavType.IntType
-            })
+            arguments = AppScreen.Deck.navArguments
         ) {
             it.arguments?.getInt("deckId")?.let { deckId ->
                 DeckScreen(
@@ -79,9 +75,7 @@ fun AppScreen(
         }
         composable(
             route = AppScreen.Card.route,
-            arguments = listOf(navArgument("cardCode") {
-                type = NavType.StringType
-            })
+            arguments = AppScreen.Card.navArguments
         ) {
             it.arguments?.getString("cardCode")?.let { cardCode ->
                 CardScreen(cardCode = cardCode)
