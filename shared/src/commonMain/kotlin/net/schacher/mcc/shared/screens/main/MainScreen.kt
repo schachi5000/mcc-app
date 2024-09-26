@@ -30,7 +30,7 @@ import marvelchampionscompanion.shared.generated.resources.spotlight
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.PagerHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
-import net.schacher.mcc.shared.screens.AppScreen
+import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.collection.CollectionScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DatabaseSynced
@@ -93,7 +93,7 @@ fun MainScreen(
                             navController.navigate("deck/${it.id}")
                         },
                         onAddDeckClick = {
-                            navController.navigate(AppScreen.AddDeck)
+                            navController.navigate(AppRoute.AddDeck)
                         })
 
                     Collection.tabIndex -> CollectionScreen(topInset = topInset) {
@@ -103,7 +103,7 @@ fun MainScreen(
                     Settings.tabIndex -> SettingsScreen(
                         topInset = topInset,
                         onPackSelectionClick = {
-                            navController.navigate(AppScreen.Packs)
+                            navController.navigate(AppRoute.Packs)
                         },
                         onLogoutClicked = {
                             viewModel.onLogoutClicked()

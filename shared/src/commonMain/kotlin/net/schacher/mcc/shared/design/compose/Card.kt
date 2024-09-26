@@ -39,6 +39,7 @@ import net.schacher.mcc.shared.model.CardType.OBLIGATION
 import net.schacher.mcc.shared.model.CardType.SIDE_SCHEME
 import net.schacher.mcc.shared.model.CardType.TREACHERY
 import net.schacher.mcc.shared.model.CardType.VILLAIN
+import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
@@ -99,15 +100,25 @@ fun Card(
             },
             onFailure = {
                 Logger.e { "Failed to load image for card: ${card.name}(${card.code}) - ${it.message}" }
-                Image(
-                    modifier = Modifier.fillMaxSize()
-                        .background(card.backSideColor, CardShape)
-                        .border(8.dp, card.backSideColor, CardShape),
-                    painter = painterResource(card.getFailureResource()),
-                    contentDescription = "Placeholder",
-                )
+                FailureImage(card)
             })
     }
+}
+
+@Composable
+fun FailureImage(card: Card) {
+    FailureImage(card.backSideColor, card.getFailureResource())
+}
+
+@Composable
+fun FailureImage(backgroundColor: Color, resource: DrawableResource) {
+    Image(
+        modifier = Modifier.fillMaxSize()
+            .background(backgroundColor, CardShape)
+            .border(8.dp, backgroundColor, CardShape),
+        painter = painterResource(resource),
+        contentDescription = "Placeholder",
+    )
 }
 
 val Card.backSideColor: Color

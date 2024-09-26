@@ -16,7 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import net.schacher.mcc.shared.design.compose.Animation
-import net.schacher.mcc.shared.screens.AppScreen
+import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.card.CardScreen
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.login.LoginScreen
@@ -35,36 +35,36 @@ fun AppScreen(
     NavHost(
         navController = navController as NavHostController,
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background),
-        startDestination = AppScreen.Login.route,
+        startDestination = AppRoute.Login.route,
         popEnterTransition = { fadeIn() + slideInHorizontally { _ -> -100 } },
         popExitTransition = { Animation.fullscreenExit },
         enterTransition = { Animation.fullscreenEnter },
         exitTransition = { fadeOut() + slideOutHorizontally { _ -> -100 } },
     ) {
-        composable(AppScreen.Login.route) {
+        composable(AppRoute.Login.route) {
             LoginScreen(
                 onLogInClicked = onLogInClicked,
                 onContinueAsGuestClicked = { appViewModel.onGuestLoginClicked() })
         }
 
-        composable(AppScreen.Main.route) {
+        composable(AppRoute.Main.route) {
             MainScreen()
         }
 
-        composable(AppScreen.AddDeck.route) {
+        composable(AppRoute.AddDeck.route) {
             NewDeckScreen(
                 onBackPress = { navController.popBackStack() },
                 onNewDeckSelected = { _, _ -> },
             )
         }
 
-        composable(AppScreen.Packs.route) {
+        composable(AppRoute.Packs.route) {
             PackSelectionScreen()
         }
 
         composable(
-            route = AppScreen.Deck.route,
-            arguments = AppScreen.Deck.navArguments
+            route = AppRoute.Deck.route,
+            arguments = AppRoute.Deck.navArguments
         ) {
             it.arguments?.getInt("deckId")?.let { deckId ->
                 DeckScreen(
@@ -74,8 +74,8 @@ fun AppScreen(
             }
         }
         composable(
-            route = AppScreen.Card.route,
-            arguments = AppScreen.Card.navArguments
+            route = AppRoute.Card.route,
+            arguments = AppRoute.Card.navArguments
         ) {
             it.arguments?.getString("cardCode")?.let { cardCode ->
                 CardScreen(cardCode = cardCode)
@@ -86,9 +86,9 @@ fun AppScreen(
     val loggedIn = appViewModel.state.collectAsState()
     LaunchedEffect(loggedIn.value) {
         if (loggedIn.value) {
-            navController.navigate(AppScreen.Main.route)
+            navController.navigate(AppRoute.Main.route)
         } else {
-            navController.popBackStack(AppScreen.Login.route, false)
+            navController.popBackStack(AppRoute.Login.route, false)
         }
     }
 }

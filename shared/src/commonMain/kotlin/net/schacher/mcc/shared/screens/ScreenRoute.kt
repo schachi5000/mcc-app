@@ -5,13 +5,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavType
 import androidx.navigation.navArgument
 
-interface ScreenRoute {
-    val route: String
-
-    val navArguments: List<NamedNavArgument>
-}
-
-enum class AppScreen(
+enum class AppRoute(
     val route: String,
     var navArguments: List<NamedNavArgument> = emptyList()
 ) {
@@ -33,6 +27,6 @@ enum class AppScreen(
     Packs(route = "packs")
 }
 
-fun NavController.navigate(appScreen: AppScreen) {
-    this.navigate(appScreen.route)
+fun NavController.navigate(appRoute: AppRoute) {
+    this.navigate(appRoute.route)
 }

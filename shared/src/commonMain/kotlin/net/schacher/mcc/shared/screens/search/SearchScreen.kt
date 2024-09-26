@@ -52,7 +52,6 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import androidx.navigation.NamedNavArgument
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.isKeyboardVisible
@@ -64,7 +63,6 @@ import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
-import net.schacher.mcc.shared.screens.ScreenRoute
 import net.schacher.mcc.shared.screens.search.Filter.Type
 import net.schacher.mcc.shared.screens.search.Filter.Type.AGGRESSION
 import net.schacher.mcc.shared.screens.search.Filter.Type.BASIC
@@ -75,11 +73,6 @@ import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
 import net.schacher.mcc.shared.utils.defaultSort
 import org.koin.compose.viewmodel.koinViewModel
-
-class SearchRoute : ScreenRoute {
-    override val route: String = "search"
-    override val navArguments: List<NamedNavArgument> = emptyList()
-}
 
 @Composable
 fun SearchScreen(
@@ -97,7 +90,6 @@ fun SearchScreen(
         onFilterClicked = searchViewModel::onFilterClicked
     )
 }
-
 
 @Composable
 fun SearchScreen(

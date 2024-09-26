@@ -16,6 +16,9 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.unit.dp
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.card_blue_no_image
+import net.schacher.mcc.shared.design.theme.SleeveColors
 
 @Composable
 fun CardBackgroundBox(
@@ -54,7 +57,12 @@ fun CardBackgroundImage(
                 durationMillis = 500
             ),
             onLoading = {},
-            onFailure = {})
+            onFailure = {
+                FailureImage(
+                    backgroundColor = SleeveColors.Blue,
+                    resource = Res.drawable.card_blue_no_image
+                )
+            })
 
         Box(
             modifier = Modifier.fillMaxSize().background(

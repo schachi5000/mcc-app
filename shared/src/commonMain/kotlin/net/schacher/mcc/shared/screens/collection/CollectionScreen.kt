@@ -64,7 +64,7 @@ import net.schacher.mcc.shared.design.compose.FilterFlowRow
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.screens.AppScreen
+import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.search.Filter
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
@@ -120,7 +120,7 @@ fun CollectionScreen(
                 FilterContent(
                     state = state,
                     onBackClick = { scope.launch { sheetState.hide() } },
-                    onSelectPacksClicked = { navController.navigate(AppScreen.Packs) },
+                    onSelectPacksClicked = { navController.navigate(AppRoute.Packs) },
                     onApplyFilerClick = { filters ->
                         onApplyFilerClick(filters)
                         scope.launch { sheetState.hide() }
