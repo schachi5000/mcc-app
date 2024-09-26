@@ -12,9 +12,9 @@ object CornerRadius {
     val Default = 16.dp
 }
 
-val ContentPadding = 32.dp
+val ContentPadding = 16.dp
 
-val FABPadding = ContentPadding / 2
+val FABPadding = ContentPadding * 2
 
 val DefaultCardSize = 216.dp
 

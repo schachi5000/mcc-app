@@ -61,6 +61,7 @@ import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.FABPadding
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppScreen
 import net.schacher.mcc.shared.screens.navigate
@@ -127,7 +128,7 @@ fun CollectionScreen(
     ) {
         var labeled by remember { mutableStateOf(false) }
 
-        Box(modifier = Modifier.fillMaxSize().statusBarsPadding()) {
+        Box(modifier = Modifier.fillMaxSize()) {
             var expanded by remember { mutableStateOf(false) }
             val nestedScrollConnection = remember {
                 object : NestedScrollConnection {
@@ -151,11 +152,11 @@ fun CollectionScreen(
                 verticalArrangement = Arrangement.spacedBy(12.dp),
                 horizontalArrangement = Arrangement.spacedBy(12.dp),
                 modifier = Modifier.fillMaxSize()
-                    .padding(horizontal = 12.dp)
+                    .padding(horizontal = ContentPadding)
                     .nestedScroll(nestedScrollConnection),
             ) {
                 items(count = 3) {
-                    Spacer(modifier = Modifier.height(topInset))
+                    Spacer(modifier = Modifier.statusBarsPadding().height(topInset))
                 }
 
                 items(count = state.cardsInCollection.size) { index ->
@@ -196,7 +197,10 @@ fun CollectionScreen(
                 modifier = Modifier
                     .align(Alignment.BottomEnd)
                     .navigationBarsPadding()
-                    .padding(16.dp),
+                    .padding(
+                        horizontal = FABPadding,
+                        vertical = 16.dp
+                    ),
                 label = "Filter Collection",
                 icon = {
                     Icon(

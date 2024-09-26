@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.screens.card
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -9,11 +8,9 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -24,14 +21,12 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
@@ -39,6 +34,7 @@ import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardBackgroundBox
+import net.schacher.mcc.shared.design.compose.Tag
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
@@ -104,6 +100,7 @@ private fun Content(card: Card, onCloseClick: () -> Unit) {
                         Card(
                             card = card,
                             modifier = Modifier.sizeIn(maxWidth = 260.dp)
+                                .padding(vertical = ContentPadding)
                         )
                     }
 
@@ -201,29 +198,6 @@ private fun Content(card: Card, onCloseClick: () -> Unit) {
     }
 }
 
-@Composable
-private fun Tag(
-    modifier: Modifier = Modifier,
-    text: String,
-    textColor: Color = Color.White,
-    color: Color = if (MaterialTheme.colors.isLight) {
-        Color.Gray
-    } else {
-        Color.DarkGray
-    }
-) {
-    Text(
-        modifier = modifier.widthIn(max = 140.dp)
-            .background(color = color, shape = RoundedCornerShape(6.dp))
-            .padding(horizontal = 6.dp, vertical = 2.dp),
-        text = text,
-        overflow = TextOverflow.Ellipsis,
-        maxLines = 1,
-        fontWeight = FontWeight.SemiBold,
-        fontSize = 14.sp,
-        color = textColor
-    )
-}
 
 private val boldRegex = Regex("<b>(.*?)</b>|\\[\\[(.*?)]]|\\[(.*?)]")
 

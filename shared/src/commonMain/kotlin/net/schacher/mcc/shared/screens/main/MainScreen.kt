@@ -19,6 +19,7 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.times
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
@@ -46,7 +47,7 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
-internal val topInset = ContentPadding + 72.dp
+internal val topInset = 2 * ContentPadding + 64.dp
 
 @OptIn(
     ExperimentalResourceApi::class,
@@ -110,12 +111,9 @@ fun MainScreen(
 
             PagerHeader(
                 modifier = Modifier.fillMaxWidth()
-                    .background(MaterialTheme.colors.background)
+                    .background(MaterialTheme.colors.background.copy(alpha = .9f))
                     .statusBarsPadding()
-                    .padding(
-                        top = ContentPadding,
-                        bottom = ContentPadding
-                    ),
+                    .padding(vertical = ContentPadding * 2),
                 pageLabels = pageLabels.map { it.label },
                 pagerState = pagerState,
             ) {
