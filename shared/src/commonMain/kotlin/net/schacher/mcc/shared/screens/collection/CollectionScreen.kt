@@ -41,7 +41,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -52,6 +51,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.apply
+import marvelchampionscompanion.shared.generated.resources.cancel
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.BottomSpacer
@@ -66,6 +68,7 @@ import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.search.Filter
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.utils.replace
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 
 @Composable
@@ -107,7 +110,7 @@ fun CollectionScreen(
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        scrimColor = Color.Black.copy(alpha = 0.75f),
+        scrimColor = MaterialTheme.colors.background.copy(alpha = 0.75f),
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
         sheetBackgroundColor = MaterialTheme.colors.background,
         sheetContent = {
@@ -124,8 +127,6 @@ fun CollectionScreen(
             }
         }
     ) {
-        var labeled by remember { mutableStateOf(false) }
-
         Box(modifier = Modifier.fillMaxSize()) {
             var expanded by remember { mutableStateOf(false) }
             val nestedScrollConnection = remember {
@@ -305,7 +306,7 @@ fun FilterContent(
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     color = MaterialTheme.colors.primary,
-                    text = "Cancel"
+                    text = stringResource(Res.string.cancel),
                 )
             }
 
@@ -328,7 +329,7 @@ fun FilterContent(
                 Text(
                     modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                     color = MaterialTheme.colors.onPrimary,
-                    text = "Apply"
+                    text = stringResource(Res.string.apply),
                 )
             }
         }

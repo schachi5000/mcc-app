@@ -18,7 +18,11 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.cancel
+import marvelchampionscompanion.shared.generated.resources.ok
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ConfirmationDialog(
@@ -58,7 +62,7 @@ fun ConfirmationDialog(
                             shape = DefaultShape
                         ) {
                             Text(
-                                text = "Cancel",
+                                text = stringResource(Res.string.cancel),
                                 modifier = Modifier
                                     .fillMaxWidth()
                                     .wrapContentSize(Alignment.Center),
@@ -76,7 +80,7 @@ fun ConfirmationDialog(
                         shape = DefaultShape
                     ) {
                         Text(
-                            text = "Ok",
+                            text = stringResource(Res.string.ok),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentSize(Alignment.Center),

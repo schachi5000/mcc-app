@@ -41,6 +41,10 @@
     <string name="environment">Environment</string>
     <string name="obligation">Obligation</string>
 
+    <string name="apply">Apply</string>
+    <string name="cancel">Cancel</string>
+    <string name="ok">Ok</string>
+
     <plurals name="cards">
         <item quantity="one">1 card</item>
         <item quantity="other">%1$d cards</item>
