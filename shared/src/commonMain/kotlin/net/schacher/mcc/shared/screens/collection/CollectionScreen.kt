@@ -10,7 +10,6 @@ import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
-import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
@@ -61,7 +60,6 @@ import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.design.theme.FABPadding
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppScreen
 import net.schacher.mcc.shared.screens.navigate
@@ -194,13 +192,6 @@ fun CollectionScreen(
             }
 
             ExpandingButton(
-                modifier = Modifier
-                    .align(Alignment.BottomEnd)
-                    .navigationBarsPadding()
-                    .padding(
-                        horizontal = FABPadding,
-                        vertical = 16.dp
-                    ),
                 label = "Filter Collection",
                 icon = {
                     Icon(

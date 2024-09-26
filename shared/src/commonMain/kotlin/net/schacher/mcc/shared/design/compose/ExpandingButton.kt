@@ -1,10 +1,12 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.layout.BoxScope
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.FloatingActionButton
@@ -19,12 +21,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.theme.ButtonSize
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.FABPadding
+import net.schacher.mcc.shared.platform.isAndroid
 import net.schacher.mcc.shared.screens.mydecks.animateHorizontalAlignmentAsState
 
 @Composable
-fun ExpandingButton(
-    modifier: Modifier,
+fun BoxScope.ExpandingButton(
+    modifier: Modifier = Modifier,
     label: String,
     expanded: Boolean,
     icon: @Composable() () -> Unit,
@@ -36,7 +41,13 @@ fun ExpandingButton(
     horizontalBias = if (expanded) 0f else 1f
 
     Column(
-        modifier = modifier.fillMaxWidth(),
+        modifier = modifier.fillMaxWidth()
+            .align(Alignment.BottomEnd)
+            .navigationBarsPadding()
+            .padding(
+                end = FABPadding.takeIf { !expanded } ?: 0.dp,
+                bottom = if (isAndroid()) ContentPadding else 0.dp
+            ),
         horizontalAlignment = alignment
     ) {
         FloatingActionButton(
