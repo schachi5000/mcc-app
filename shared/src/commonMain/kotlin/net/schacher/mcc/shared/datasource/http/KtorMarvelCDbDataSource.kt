@@ -53,6 +53,10 @@ class KtorMarvelCDbDataSource(
     private val authRepository: AuthRepository
 ) : MarvelCDbDataSource {
 
+    private companion object {
+        const val TAG = "KtorMarvelCDbDataSource"
+    }
+
     private val serviceUrl: String = BuildConfig.PROXY_URL
 
     private val authHeader: String
@@ -69,7 +73,7 @@ class KtorMarvelCDbDataSource(
         install(Logging) {
             logger = object : io.ktor.client.plugins.logging.Logger {
                 override fun log(message: String) {
-                    Logger.i { message }
+                    Logger.d(TAG) { message }
                 }
             }
             level = LogLevel.INFO
