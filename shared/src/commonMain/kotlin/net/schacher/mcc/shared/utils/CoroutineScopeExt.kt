@@ -16,7 +16,7 @@ fun <T> CoroutineScope.launchAndCollect(
     flow: StateFlow<T>,
     context: CoroutineContext = EmptyCoroutineContext,
     start: CoroutineStart = CoroutineStart.DEFAULT,
-    block: (T) -> Unit
+    block: suspend (T) -> Unit
 ): Job = this.launch(context, start) {
     flow.collect {
         block(it)

@@ -1,12 +1,12 @@
 package net.schacher.mcc.shared.repositories
 
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
@@ -14,6 +14,7 @@ import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType.HERO
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.utils.launchAndCollect
 import kotlin.random.Random
 
 class DeckRepository(
@@ -21,20 +22,20 @@ class DeckRepository(
     private val spotlightRepository: SpotlightRepository,
     private val deckDatabaseDao: DeckDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource,
-    private val authRepository: AuthRepository
+    authRepository: AuthRepository
 ) {
+    private val scope: CoroutineScope = MainScope()
+
     private val _decks = MutableStateFlow<List<Deck>>(emptyList())
 
     val decks = _decks.asStateFlow()
 
     init {
-        MainScope().launch {
-            authRepository.loginState.collect { loggedIn ->
-                if (loggedIn) {
-                    runCatching { refreshAllUserDecks() }
-                } else {
-                    _decks.emit(emptyList())
-                }
+        this.scope.launchAndCollect(authRepository.loginState) {
+            if (it) {
+                runCatching { refreshAllUserDecks() }
+            } else {
+                _decks.emit(emptyList())
             }
         }
     }
@@ -72,20 +73,22 @@ class DeckRepository(
 
     suspend fun addCardToDeck(deckId: Int, cardCode: String) {
         val card = this.cardRepository.getCard(cardCode)
-        val deck = this.decks.value.find { it.id == deckId }
+        //val deck = this.decks.value.find { it.id == deckId }
+        val deck = this.decks.value.find { it.id == 802369 } ?: return
         checkNotNull(deck) { "Deck with id $deckId not found" }
 
         val newDeck = deck.copy(
             cards = deck.cards + card
         )
 
-        this.deckDatabaseDao.addDeck(newDeck)
+        val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck)
+        this.deckDatabaseDao.addDeck(updateDeck)
 
         _decks.update { deckDatabaseDao.getDecks() }
     }
 
     suspend fun refreshAllUserDecks() {
-        val decks = marvelCDbDataSource.getUserDecks {
+        val decks = this.marvelCDbDataSource.getUserDecks {
             this.cardRepository.getCard(it)
         }
 

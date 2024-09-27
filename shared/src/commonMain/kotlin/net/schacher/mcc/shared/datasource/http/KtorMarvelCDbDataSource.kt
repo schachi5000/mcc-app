@@ -9,6 +9,8 @@ import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
+import io.ktor.client.request.parameter
+import io.ktor.client.request.put
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
 import kotlinx.coroutines.CoroutineScope
@@ -16,9 +18,11 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.schacher.mcc.shared.datasource.http.dto.CardDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
+import net.schacher.mcc.shared.datasource.http.dto.DeckUpdateResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.PackDto
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
@@ -77,25 +81,26 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getAllPacks() =
-        httpClient.get("$serviceUrl/packs").body<List<PackDto>>().map {
-            Pack(
-                code = it.code,
-                name = it.name,
-                cardCodes = this.getCardPack(it.code).map { it.code },
-                url = it.url,
-                id = it.id,
-                position = it.position
-            )
-        }.also {
-            Logger.i { "Packs loaded: ${it.size}" }
-        }
+        httpClient.get("$serviceUrl/packs")
+            .body<List<PackDto>>()
+            .map {
+                Pack(
+                    code = it.code,
+                    name = it.name,
+                    cardCodes = this.getCardPack(it.code).map { it.code },
+                    url = it.url,
+                    id = it.id,
+                    position = it.position
+                )
+            }.also {
+                Logger.i { "Packs loaded: ${it.size}" }
+            }
 
     override suspend fun getCardPack(packCode: String): List<Card> =
         runCatching {
-            httpClient.get("$serviceUrl/pack/$packCode").body<List<CardDto>>()
-                .map {
-                    it.toCard()
-                }
+            httpClient.get("$serviceUrl/pack/$packCode")
+                .body<List<CardDto>>()
+                .map { it.toCard() }
         }.getOrNull() ?: emptyList()
 
     override suspend fun getAllCards(): List<Card> {
@@ -144,36 +149,34 @@ class KtorMarvelCDbDataSource(
             headers { append("Authorization", authHeader) }
         }
         .body<List<DeckDto>>()
-        .map {
-            val heroCard = cardProvider(it.investigator_code!!)
-            Deck(id = it.id,
-                name = it.name,
-                hero = heroCard,
-                aspect = it.meta?.parseAspect(),
-                cards = it.slots.entries.map { entry ->
-                    List(entry.value) { cardProvider(entry.key) }
-                }
-                    .flatten()
-                    .toMutableList()
-                    .also { it.add(0, heroCard) })
-        }
+        .map { it.toDeck(cardProvider) }
         .sortedBy { it.name }
 
     override suspend fun getUserDeckById(
         deckId: Int,
         cardProvider: suspend (String) -> Card
-    ) = httpClient.get("$serviceUrl/api/oauth2/deck/load/$deckId") {
-        headers { append("Authorization", authHeader) }
-    }.body<DeckDto>().let {
-        val heroCard = cardProvider(it.investigator_code!!)
+    ): Deck = this.getUserDeckDtoById(deckId).toDeck(cardProvider)
 
-        Deck(id = it.id,
-            name = it.name,
-            hero = heroCard,
-            aspect = it.meta?.parseAspect(),
-            cards = it.slots.entries.map { entry ->
-                List(entry.value) { cardProvider(entry.key) }
-            }.flatten().toMutableList().also { it.add(0, heroCard) })
+    private suspend fun getUserDeckDtoById(deckId: Int) =
+        this.httpClient.get("$serviceUrl/api/oauth2/deck/load/$deckId") {
+            headers { append("Authorization", authHeader) }
+        }.body<DeckDto>()
+
+    override suspend fun updateDeck(deck: Deck): Deck {
+        val slots = deck.cards.groupingBy { it.code }.eachCount().let {
+            Json.encodeToString(it)
+        }
+
+        val response = this.httpClient.put("$serviceUrl/api/oauth2/deck/save/${deck.id}") {
+            headers { append("Authorization", authHeader) }
+            parameter("slots", slots)
+        }.body<DeckUpdateResponseDto>()
+
+        if (response.success) {
+            return getUserDeckById(deck.id) { this.getCard(it) }
+        } else {
+            throw Exception("Failed to update deck: ${response.msg?.toString()}")
+        }
     }
 }
 
@@ -239,4 +242,18 @@ private fun String?.toCardType(): CardType? = when (this) {
     "environment" -> ENVIRONMENT
     "obligation" -> OBLIGATION
     else -> null
+}
+
+private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck {
+    val heroCard = cardProvider(this.investigator_code!!)
+
+    return Deck(id = this.id,
+        name = this.name,
+        hero = heroCard,
+        aspect = this.meta?.parseAspect(),
+        cards = this.slots.entries
+            .map { entry -> List(entry.value) { cardProvider(entry.key) } }
+            .flatten()
+            .toMutableList()
+            .also { it.add(0, heroCard) })
 }

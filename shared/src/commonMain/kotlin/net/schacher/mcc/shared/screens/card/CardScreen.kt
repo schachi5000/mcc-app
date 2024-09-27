@@ -18,6 +18,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,6 +31,7 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
@@ -40,6 +42,7 @@ import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.repositories.CardRepository
+import net.schacher.mcc.shared.repositories.DeckRepository
 import org.koin.compose.koinInject
 
 @Composable
@@ -81,7 +84,11 @@ fun CardScreen(
 }
 
 @Composable
-private fun Content(card: Card, onCloseClick: () -> Unit) {
+private fun Content(
+    card: Card,
+    deckRepository: DeckRepository = koinInject(),
+    onCloseClick: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxSize()) {
         val state = rememberLazyListState()
 
@@ -194,7 +201,18 @@ private fun Content(card: Card, onCloseClick: () -> Unit) {
 
             }
         }
-        BackButton(onCloseClick)
+
+        val scope = rememberCoroutineScope()
+        //BackButton(onCloseClick)
+        BackButton {
+            scope.launch {
+                try {
+                    deckRepository.addCardToDeck(0, card.code)
+                } catch (e: Exception) {
+                    e.printStackTrace()
+                }
+            }
+        }
     }
 }
 
