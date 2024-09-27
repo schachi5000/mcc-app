@@ -5,12 +5,12 @@ import database.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
-import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.utils.measuringWithContext
@@ -20,9 +20,8 @@ private const val LIST_DELIMITER = ";"
 class DatabaseDao(
     databaseDriverFactory: DatabaseDriverFactory,
     wipeDatabase: Boolean = false,
-    scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
+    scope: CoroutineScope = MainScope()
 ) :
-    DeckDatabaseDao,
     CardDatabaseDao,
     PackDatabaseDao,
     SettingsDao {
@@ -35,7 +34,6 @@ class DatabaseDao(
         if (wipeDatabase) {
             scope.launch {
                 wipeCardTable()
-                wipeDeckTable()
                 wipePackTable()
             }
         }
@@ -93,50 +91,6 @@ class DatabaseDao(
                 }
 
         }
-
-
-    override suspend fun addDeck(deck: Deck) = measuringWithContext(Dispatchers.IO, "addDeck") {
-        dbQuery.addDeck(
-            deck.id.toLong(),
-            deck.name,
-            deck.aspect?.name,
-            deck.hero.code,
-            deck.cards.map { it.code }.toCardCodeString()
-        )
-    }
-
-    override suspend fun getDecks(): List<Deck> =
-        measuringWithContext(Dispatchers.IO, "getDecks") {
-            dbQuery.selectAllDecks().executeAsList().mapNotNull {
-                val cards = it.cardCodes.toCardCodeList().mapNotNull {
-                    getCardByCode(it)
-                }
-
-                val heroCard = getCardByCode(it.heroCardCode)
-                if (heroCard != null) {
-                    Deck(
-                        id = it.id.toInt(),
-                        name = it.name,
-                        hero = heroCard,
-                        aspect = it.aspect?.let { Aspect.valueOf(it) },
-                        cards = cards
-                    )
-                } else {
-                    null
-                }
-            }
-        }
-
-    override suspend fun removeDeck(deckId: Int) =
-        measuringWithContext(Dispatchers.IO, "removeDeck") {
-            Logger.i { "Deleting deck $deckId from database" }
-            dbQuery.removeDeckById(deckId.toLong())
-        }
-
-    override suspend fun wipeDeckTable() = withContext(Dispatchers.IO) {
-        Logger.i { "Deleting all decks from database" }
-        dbQuery.removeAllDecks()
-    }
 
     override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
         Logger.i { "Deleting all decks from database" }

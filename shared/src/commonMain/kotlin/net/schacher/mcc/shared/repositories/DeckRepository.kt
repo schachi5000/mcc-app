@@ -1,26 +1,22 @@
 package net.schacher.mcc.shared.repositories
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
-import kotlinx.coroutines.withContext
-import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType.HERO
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.utils.launchAndCollect
+import net.schacher.mcc.shared.utils.replace
 import kotlin.random.Random
 
 class DeckRepository(
     private val cardRepository: CardRepository,
     private val spotlightRepository: SpotlightRepository,
-    private val deckDatabaseDao: DeckDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource,
     authRepository: AuthRepository
 ) {
@@ -46,7 +42,7 @@ class DeckRepository(
     fun getDeckById(deckId: Int): Deck? =
         this.decks.value.find { it.id == deckId } ?: this.spotlightRepository.getDeckById(deckId)
 
-    suspend fun createDeck(heroCard: Card, label: String? = null, aspect: Aspect? = null) {
+    fun createDeck(heroCard: Card, label: String? = null, aspect: Aspect? = null) {
         if (heroCard.type != HERO) {
             throw Exception("Hero card must be of type HERO - $heroCard")
         }
@@ -57,13 +53,14 @@ class DeckRepository(
 
         val deck = Deck(randomDeckNumber, deckLabel, heroCard, aspect, defaultCards)
 
-        this.deckDatabaseDao.addDeck(deck)
-        _decks.update { deckDatabaseDao.getDecks() }
+        _decks.update {
+            it.toMutableList().also {
+                it.add(deck)
+            }
+        }
     }
 
-    suspend fun removeDeck(deckId: Int) {
-        this.deckDatabaseDao.removeDeck(deckId)
-
+    fun removeDeck(deckId: Int) {
         _decks.update {
             it.toMutableList().also {
                 it.removeAll { it.id == deckId }
@@ -81,10 +78,9 @@ class DeckRepository(
             cards = deck.cards + card
         )
 
-        val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck)
-        this.deckDatabaseDao.addDeck(updateDeck)
+        val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck) { cardRepository.getCard(it) }
 
-        _decks.update { deckDatabaseDao.getDecks() }
+        _decks.update { it.toMutableList().replace(deck, updateDeck) }
     }
 
     suspend fun refreshAllUserDecks() {
@@ -92,24 +88,11 @@ class DeckRepository(
             this.cardRepository.getCard(it)
         }
 
-//        decks.forEach {
-//            this.deckDatabaseDao.addDeck(it)
-//        }
-
         _decks.emit(decks)
     }
 
-    suspend fun addDeckById(deckId: Int) {
-        val deck = marvelCDbDataSource.getUserDeckById(deckId) {
-            this.cardRepository.getCard(it)
-        }
 
-        this.deckDatabaseDao.addDeck(deck)
-        _decks.emit(deckDatabaseDao.getDecks())
-    }
-
-    suspend fun deleteAllDeckData() = withContext(Dispatchers.IO) {
-        deckDatabaseDao.wipeDeckTable()
-        _decks.emit(deckDatabaseDao.getDecks())
+    suspend fun deleteAllDeckData() {
+//        _decks.emit(deckDatabaseDao.getDecks())
     }
 }

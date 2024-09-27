@@ -16,13 +16,16 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import net.schacher.mcc.shared.design.compose.Animation
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.card.CardScreen
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.login.LoginScreen
 import net.schacher.mcc.shared.screens.main.MainScreen
+import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
 import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
 import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
+import net.schacher.mcc.shared.screens.setResultAndPopBackstack
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -80,6 +83,15 @@ fun AppScreen(
             it.arguments?.getString("cardCode")?.let { cardCode ->
                 CardScreen(cardCode = cardCode)
             }
+        }
+
+        composable(AppRoute.SelectDeck.route) {
+            MyDecksScreen(
+                topInset = ContentPadding,
+                onDeckClick = {
+                    navController.setResultAndPopBackstack(it.id)
+                }
+            )
         }
     }
 

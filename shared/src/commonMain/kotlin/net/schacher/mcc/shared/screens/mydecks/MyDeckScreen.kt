@@ -58,7 +58,7 @@ fun MyDecksScreen(
     viewModel: MyDecksViewModel = koinViewModel(),
     topInset: Dp,
     onDeckClick: (Deck) -> Unit,
-    onAddDeckClick: () -> Unit
+    onAddDeckClick: () -> Unit = {}
 ) {
     val state by viewModel.state.collectAsState()
 

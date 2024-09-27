@@ -92,9 +92,7 @@ fun ShimmerBoxPreview() {
 @Composable
 fun CardInfoPreview() {
     MccTheme {
-        CardScreen(card = previewCard) {
-
-        }
+        CardScreen(card = previewCard, onCloseClick = {}, onAddToDeckClick = {})
     }
 }
 

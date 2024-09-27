@@ -162,7 +162,7 @@ class KtorMarvelCDbDataSource(
             headers { append("Authorization", authHeader) }
         }.body<DeckDto>()
 
-    override suspend fun updateDeck(deck: Deck): Deck {
+    override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card): Deck {
         val slots = deck.cards.groupingBy { it.code }.eachCount().let {
             Json.encodeToString(it)
         }
@@ -173,7 +173,7 @@ class KtorMarvelCDbDataSource(
         }.body<DeckUpdateResponseDto>()
 
         if (response.success) {
-            return getUserDeckById(deck.id) { this.getCard(it) }
+            return getUserDeckById(deck.id) { cardProvider(it) }
         } else {
             throw Exception("Failed to update deck: ${response.msg?.toString()}")
         }
