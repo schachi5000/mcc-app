@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.design.compose
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
@@ -49,23 +51,28 @@ const val LANDSCAPE_RATIO = 1.396f
 @Composable
 fun LabeledCard(
     card: Card,
+    showLabel: Boolean = true,
     modifier: Modifier = Modifier.height(196.dp),
     shape: Shape = CardShape,
     onClick: () -> Unit = {}
 ) {
     Column {
         Card(card, modifier, shape, onClick)
-        Text(
-            modifier = Modifier
+        AnimatedVisibility(
+            visible = showLabel,
+            modifier = Modifier.padding(vertical = 8.dp)
                 .sizeIn(maxWidth = 128.dp)
-                .align(Alignment.CenterHorizontally),
-            text = card.name,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onBackground,
-            maxLines = 2,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.SemiBold
-        )
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = card.name,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.onBackground,
+                maxLines = 2,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }
 

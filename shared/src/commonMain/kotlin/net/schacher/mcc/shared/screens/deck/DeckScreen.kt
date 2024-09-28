@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.screens.deck
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.ExperimentalLayoutApi
@@ -10,11 +11,12 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
-import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
@@ -29,6 +31,8 @@ import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardBackgroundBox
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
+import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
@@ -112,47 +116,70 @@ private fun Content(
                     onCardClick(it)
                 }
             }
+
+
             val otherCards = CardRowEntry("Other cards", deck.cards
                 .filter { it.setCode != deck.hero.setCode }
                 .distinctBy { it.name }
                 .sortedBy { it.cost ?: 0 })
 
-            var columnCount = 3
+            item {
+                Row(
+                    modifier = Modifier.fillMaxWidth().padding(ContentPadding),
+                    verticalAlignment = Alignment.Bottom,
+                    horizontalArrangement = Arrangement.SpaceBetween
+                ) {
+                    Header(
+                        title = "Other Cards",
+                        subTitle = otherCards.cards.size.toString()
+                    )
+                }
+            }
+
+            val columnCount = 3
             val rows = otherCards.cards.chunked(columnCount)
             items(rows.size) { index ->
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(
-                            horizontal = ContentPadding,
-                            vertical = 8.dp
+                            start = ContentPadding,
+                            end = ContentPadding,
+                            top = 8.dp
                         ),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
                     rows[index].forEach { card ->
                         Box(Modifier.weight(1f)) {
-                            Card(
+                            LabeledCard(
                                 modifier = Modifier.wrapContentHeight(),
                                 card = card
                             ) {
                                 onCardClick(card)
                             }
 
-                            IconButton(
-                                modifier = Modifier.padding(8.dp)
-                                    .align(Alignment.TopEnd),
-                                onClick = {},
-                            ) {
-                                Icon(
-                                    imageVector = Icons.Default.MoreVert,
-                                    contentDescription = "Card Options"
-                                )
-                            }
+                            Icon(
+                                modifier = Modifier
+                                    .padding(2.dp)
+                                    .size(32.dp)
+                                    .background(
+                                        MaterialTheme.colors.surface.copy(alpha = 0.8f),
+                                        CircleShape
+                                    )
+                                    .padding(4.dp)
+                                    .align(Alignment.TopEnd)
+                                    .clickable {
+
+                                    },
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = "Card Options",
+                                tint = MaterialTheme.colors.onSurface
+                            )
                         }
                     }
 
-                    if (rows.size < columnCount) {
-                        repeat(columnCount - rows.size) {
+                    if (rows[index].size < columnCount) {
+                        repeat(columnCount - rows[index].size) {
                             Spacer(modifier = Modifier.weight(1f))
                         }
                     }
