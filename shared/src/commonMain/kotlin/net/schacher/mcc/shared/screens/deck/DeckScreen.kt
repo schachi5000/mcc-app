@@ -1,15 +1,25 @@
 package net.schacher.mcc.shared.screens.deck
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.material.Icon
+import androidx.compose.material.IconButton
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.MoreVert
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -56,6 +66,7 @@ fun DeckScreen(
     )
 }
 
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 private fun Content(
     deck: Deck,
@@ -106,18 +117,47 @@ private fun Content(
                 .distinctBy { it.name }
                 .sortedBy { it.cost ?: 0 })
 
-            item {
-                CardRow(
-                    modifier = Modifier.padding(
-                        horizontal = ContentPadding,
-                        vertical = 16.dp,
-                    ),
-                    cardRowEntry = otherCards
+            var columnCount = 3
+            val rows = otherCards.cards.chunked(columnCount)
+            items(rows.size) { index ->
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            horizontal = ContentPadding,
+                            vertical = 8.dp
+                        ),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
-                    onCardClick(it)
+                    rows[index].forEach { card ->
+                        Box(Modifier.weight(1f)) {
+                            Card(
+                                modifier = Modifier.wrapContentHeight(),
+                                card = card
+                            ) {
+                                onCardClick(card)
+                            }
+
+                            IconButton(
+                                modifier = Modifier.padding(8.dp)
+                                    .align(Alignment.TopEnd),
+                                onClick = {},
+                            ) {
+                                Icon(
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Card Options"
+                                )
+                            }
+                        }
+                    }
+
+                    if (rows.size < columnCount) {
+                        repeat(columnCount - rows.size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
                 }
             }
-
             item {
                 BottomSpacer()
             }
