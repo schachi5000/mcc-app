@@ -120,32 +120,7 @@ fun DeckScreen(
             topStart = CornerRadius.Default,
             topEnd = CornerRadius.Default
         ),
-        sheetContent = {
-            BottomSheetContainer {
-                Column {
-                    state.options.forEach {
-                        Row(modifier = Modifier.fillMaxWidth()
-                            .height(64.dp)
-                            .clickable { onOptionClick(it) }
-                            .padding(ContentPadding),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Icon(
-                                imageVector = Icons.Rounded.Delete,
-                                contentDescription = "Delete",
-                                tint = MaterialTheme.colors.onSurface,
-                                modifier = Modifier.size(24.dp)
-                            )
-                            Text(
-                                text = it.label,
-                                style = MaterialTheme.typography.body1,
-                                modifier = Modifier.padding(start = ContentPadding)
-                            )
-                        }
-                    }
-                }
-            }
-        }
+        sheetContent = { OptionBottomSheet(state.options, onOptionClick) }
     ) {
         Content(
             deck = state.deck,
@@ -205,10 +180,10 @@ private fun Content(
                 }
             }
 
-            val otherCards = CardRowEntry("Other cards", deck.cards
+            val otherCards = deck.cards
                 .filter { it.setCode != deck.hero.setCode }
                 .distinctBy { it.name }
-                .sortedBy { it.cost ?: 0 })
+                .sortedBy { it.cost ?: 0 }
 
             item {
                 Row(
@@ -218,13 +193,13 @@ private fun Content(
                 ) {
                     Header(
                         title = "Other Cards",
-                        subTitle = otherCards.cards.size.toString()
+                        subTitle = otherCards.size.toString()
                     )
                 }
             }
 
             val columnCount = 3
-            val rows = otherCards.cards.chunked(columnCount)
+            val rows = otherCards.chunked(columnCount)
             items(rows.size) { index ->
                 Row(
                     modifier = Modifier
@@ -238,8 +213,12 @@ private fun Content(
                 ) {
                     rows[index].forEach { card ->
                         Box(Modifier.weight(1f)) {
+                            val cardCount = deck.cards.count { it.code == card.code }
                             LabeledCard(
                                 modifier = Modifier.wrapContentHeight(),
+                                label = listOfNotNull(card.name,
+                                    cardCount.takeIf { it > 1 }?.let { "($it)" })
+                                    .joinToString(" "),
                                 card = card
                             ) {
                                 onCardClick(card)
@@ -280,6 +259,37 @@ private fun Content(
         }
 
         BackButton(onCloseClick)
+    }
+}
+
+@Composable
+private fun OptionBottomSheet(
+    options: Set<UiState.Option>,
+    onOptionClick: (UiState.Option) -> Unit
+) {
+    BottomSheetContainer {
+        Column {
+            options.forEach {
+                Row(modifier = Modifier.fillMaxWidth()
+                    .height(64.dp)
+                    .clickable { onOptionClick(it) }
+                    .padding(ContentPadding),
+                    verticalAlignment = Alignment.CenterVertically
+                ) {
+                    Icon(
+                        imageVector = Icons.Rounded.Delete,
+                        contentDescription = "Delete",
+                        tint = MaterialTheme.colors.onSurface,
+                        modifier = Modifier.size(24.dp)
+                    )
+                    Text(
+                        text = it.label,
+                        style = MaterialTheme.typography.body1,
+                        modifier = Modifier.padding(start = ContentPadding)
+                    )
+                }
+            }
+        }
     }
 }
 

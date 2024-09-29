@@ -42,7 +42,6 @@ import net.schacher.mcc.shared.model.CardType.SIDE_SCHEME
 import net.schacher.mcc.shared.model.CardType.TREACHERY
 import net.schacher.mcc.shared.model.CardType.VILLAIN
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 const val PORTRAIT_RATIO = 0.715f
@@ -51,6 +50,7 @@ const val LANDSCAPE_RATIO = 1.396f
 @Composable
 fun LabeledCard(
     card: Card,
+    label: String = card.name,
     showLabel: Boolean = true,
     modifier: Modifier = Modifier.height(196.dp),
     shape: Shape = CardShape,
@@ -60,12 +60,12 @@ fun LabeledCard(
         Card(card, modifier, shape, onClick)
         AnimatedVisibility(
             visible = showLabel,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(vertical = 4.dp)
                 .sizeIn(maxWidth = 128.dp)
                 .align(Alignment.CenterHorizontally)
         ) {
             Text(
-                text = card.name,
+                text = label,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.onBackground,
                 maxLines = 2,
@@ -76,7 +76,7 @@ fun LabeledCard(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Card(
     card: Card,
