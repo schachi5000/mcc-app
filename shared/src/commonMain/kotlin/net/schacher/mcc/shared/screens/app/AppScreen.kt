@@ -16,6 +16,7 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import net.schacher.mcc.shared.design.compose.Animation
+import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.card.CardScreen
@@ -33,7 +34,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AppScreen(
     appViewModel: AppViewModel = koinViewModel(),
     navController: NavController = koinInject(),
-    onLogInClicked: () -> Unit
+    onLogInClicked: () -> Unit,
+    onQuitApp: () -> Unit
 ) {
     NavHost(
         navController = navController as NavHostController,
@@ -92,6 +94,10 @@ fun AppScreen(
                 onBackPress = { navController.popBackStack() }
             )
         }
+    }
+
+    BackHandler {
+        onQuitApp()
     }
 
     val loggedIn = appViewModel.state.collectAsState()

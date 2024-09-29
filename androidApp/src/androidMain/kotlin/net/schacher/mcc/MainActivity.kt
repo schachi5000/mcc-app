@@ -22,10 +22,12 @@ class MainActivity : AppCompatActivity() {
 
         Logger.d("MainActivity") { "onCreate $this" }
         setContent {
-            MainView {
-                loginBridge = it
-                openWebView(it.url)
-            }
+            MainView(
+                onQuitApp = { finish() },
+                onLoginClicked = {
+                    loginBridge = it
+                    openWebView(it.url)
+                })
         }
     }
 

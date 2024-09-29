@@ -57,6 +57,7 @@ import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Option.REMOVE
+import net.schacher.mcc.shared.utils.defaultSort
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -200,7 +201,7 @@ private fun Content(
             val otherCards = deck.cards
                 .filter { it.setCode != deck.hero.setCode }
                 .distinctBy { it.name }
-                .sortedBy { it.cost ?: 0 }
+                .defaultSort()
 
             if (otherCards.isNotEmpty()) {
                 item {

@@ -4,5 +4,8 @@ import net.schacher.mcc.shared.datasource.database.DatabaseDriverFactory
 
 fun MainViewController(onLogInClicked: (delegate: LoginBridge) -> Unit) =
     ComposeUIViewController {
-        App(DatabaseDao(DatabaseDriverFactory()), onLogInClicked)
+        App(
+            databaseDao = DatabaseDao(DatabaseDriverFactory()),
+            onLoginClicked = onLogInClicked
+        )
     }

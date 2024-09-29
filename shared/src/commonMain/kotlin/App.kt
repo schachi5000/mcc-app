@@ -1,4 +1,6 @@
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
@@ -64,11 +66,13 @@ val viewModels = module {
 @Composable
 fun App(
     databaseDao: DatabaseDao,
+    onKoinStart: KoinApplication.() -> Unit = {},
+    onQuitApp: () -> Unit = {},
     onLoginClicked: (LoginBridge) -> Unit,
-    onKoinStart: KoinApplication.() -> Unit = {}
 ) {
     val authHandler = AuthRepository(databaseDao as SettingsDao)
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     KoinApplication(application = {
         onKoinStart()
@@ -88,6 +92,9 @@ fun App(
             module {
                 single<NavController> { navController }
             },
+            module {
+                single<SnackbarHostState> { snackbarHostState }
+            },
             network,
             repositories,
             viewModels
@@ -102,7 +109,9 @@ fun App(
                                 authHandler.handleCallbackUrl(callbackUrl)
                             }
                         })
-                })
+                },
+                onQuitApp = onQuitApp
+            )
         }
     }
 }
@@ -120,8 +129,3 @@ interface LoginBridge {
 
     fun isCallbackUrl(url: String): Boolean = url.startsWith("mccapp://callback")
 }
-
-
-
-
-

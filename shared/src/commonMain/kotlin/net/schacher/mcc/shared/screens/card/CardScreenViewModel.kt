@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
@@ -15,13 +16,8 @@ class CardScreenViewModel(
     private val deckRepository: DeckRepository
 ) : ViewModel() {
 
-    private lateinit var _state: MutableStateFlow<UiState>
-
-    init {
-        this.viewModelScope.launch {
-            val card = cardRepository.getCard(cardCode)
-            _state = MutableStateFlow(UiState(card))
-        }
+    private val _state: MutableStateFlow<UiState> = runBlocking {
+        MutableStateFlow(UiState(cardRepository.getCard(cardCode)))
     }
 
     val state = _state.asStateFlow()
