@@ -21,10 +21,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
@@ -49,43 +46,36 @@ import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.platform.isAndroid
-import net.schacher.mcc.shared.repositories.CardRepository
-import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.resultState
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun CardScreen(
     cardCode: String,
     modifier: Modifier = Modifier,
-    cardRepository: CardRepository = koinInject(),
-    deckRepository: DeckRepository = koinInject(),
+    viewModel: CardScreenViewModel = koinInject { parametersOf(cardCode) },
     navController: NavController = koinInject()
 ) {
-    var card by remember { mutableStateOf<Card?>(null) }
-    LaunchedEffect(cardCode) {
-        card = cardRepository.getCard(cardCode)
-    }
 
     val selectedDeckId = navController.resultState<Int?>()?.value
     selectedDeckId?.let {
         LaunchedEffect(it) {
-            deckRepository.addCardToDeck(it, cardCode)
+            viewModel.onAddCardToDeck(it, cardCode)
         }
     }
 
-    card?.let {
-        CardScreen(
-            card = it,
-            modifier = modifier,
-            onCloseClick = { navController.popBackStack() },
-            onAddToDeckClick = {
-                navController.navigate(AppRoute.SelectDeck)
-            }
-        )
-    }
+    val state = viewModel.state.collectAsState()
+    CardScreen(
+        card = state.value.card,
+        modifier = modifier,
+        onCloseClick = { navController.popBackStack() },
+        onAddToDeckClick = {
+            navController.navigate(AppRoute.SelectDeck)
+        }
+    )
 }
 
 @Composable
