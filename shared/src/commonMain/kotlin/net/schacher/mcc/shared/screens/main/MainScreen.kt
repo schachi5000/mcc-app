@@ -87,8 +87,7 @@ fun MainScreen(
                         },
                         onAddDeckClick = {
                             navController.navigate(AppRoute.AddDeck)
-                        },
-                        onBackPress = { navController.popBackStack() })
+                        })
 
                     Collection.tabIndex -> CollectionScreen(topInset = topInset) {
                         navController.navigate("card/${it.code}")
