@@ -128,24 +128,7 @@ class KtorMarvelCDbDataSource(
     ) = runCatching {
         this.httpClient.get("$serviceUrl/spotlight/${date.toDateString()}")
             .body<List<DeckDto>>()
-            .map {
-                Deck(
-                    id = it.id,
-                    name = it.name,
-                    hero = cardProvider(it.investigator_code!!),
-                    aspect = it.meta?.parseAspect(),
-                    cards = it.slots.entries
-                        .map { entry ->
-                            List(entry.value) {
-                                runCatching {
-                                    cardProvider(entry.key)
-                                }.getOrNull()
-                            }
-                        }
-                        .flatten()
-                        .filterNotNull()
-                )
-            }
+            .map { it.toDeck(cardProvider) }
     }
 
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) = httpClient
@@ -167,9 +150,13 @@ class KtorMarvelCDbDataSource(
         }.body<DeckDto>()
 
     override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card): Deck {
-        val slots = deck.cards.groupingBy { it.code }.eachCount().let {
-            Json.encodeToString(it)
-        }
+        val slots = deck.cards.toMutableList()
+            .also { it.removeAll { it.code == deck.hero.code } }
+            .groupingBy { it.code }
+            .eachCount()
+            .let {
+                Json.encodeToString(it)
+            }
 
         val response = this.httpClient.put("$serviceUrl/api/oauth2/deck/save/${deck.id}") {
             headers { append("Authorization", authHeader) }
@@ -259,5 +246,8 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
             .map { entry -> List(entry.value) { cardProvider(entry.key) } }
             .flatten()
             .toMutableList()
-            .also { it.add(0, heroCard) })
+            .also { it.add(0, heroCard) },
+        problem = this.problem,
+        version = this.version
+    )
 }

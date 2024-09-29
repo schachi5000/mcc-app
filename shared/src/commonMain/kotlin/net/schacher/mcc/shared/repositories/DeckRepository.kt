@@ -51,11 +51,11 @@ class DeckRepository(
         val defaultCards =
             heroCard.setCode?.let { cardRepository.getCardsBySetCode(it) } ?: emptyList()
 
-        val deck = Deck(randomDeckNumber, deckLabel, heroCard, aspect, defaultCards)
+        //val deck = Deck(randomDeckNumber, deckLabel, heroCard, aspect, defaultCards, Info())
 
         _decks.update {
             it.toMutableList().also {
-                it.add(deck)
+                //      it.add(deck)
             }
         }
     }
