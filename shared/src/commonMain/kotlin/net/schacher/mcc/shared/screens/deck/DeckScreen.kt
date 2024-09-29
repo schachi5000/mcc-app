@@ -4,6 +4,7 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -15,7 +16,7 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.Button
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -24,6 +25,7 @@ import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.MoreVert
+import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -34,8 +36,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.remove_card_from_deck
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
@@ -47,11 +50,12 @@ import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.Header
 import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.theme.ContentPadding
-import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.CornerRadius
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
@@ -68,9 +72,9 @@ fun DeckScreen(
     DeckScreen(
         state = state.value,
         navController = navController,
-        onRemoveCardFromDeckClick = { viewModel.onRemoveCardFromDeck(it.code) },
-        onCardOptionsClick = { viewModel.onCardOptionClicked(it) },
-        onCardOptionsDismiss = { viewModel.onCardOptionDismissed() }
+        onShowCardOptions = { viewModel.onShowCardOptionClicked(it) },
+        onCardOptionsDismiss = { viewModel.onCardOptionDismissed() },
+        onOptionClick = { viewModel.onOptionClicked(it) }
     )
 }
 
@@ -79,11 +83,11 @@ fun DeckScreen(
 fun DeckScreen(
     state: UiState,
     navController: NavController,
-    onRemoveCardFromDeckClick: (Card) -> Unit,
-    onCardOptionsClick: (Card) -> Unit,
+    onShowCardOptions: (Card) -> Unit,
     onCardOptionsDismiss: () -> Unit,
+    onOptionClick: (UiState.Option) -> Unit,
 ) {
-    Logger.d("DeckScreen") { state.selectedCard?.name ?: "no name" }
+
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
@@ -112,16 +116,32 @@ fun DeckScreen(
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        scrimColor = MaterialTheme.colors.surface.copy(alpha = 0.5f),
-        sheetShape = DefaultShape,
+        sheetShape = RoundedCornerShape(
+            topStart = CornerRadius.Default,
+            topEnd = CornerRadius.Default
+        ),
         sheetContent = {
-            val card = state.selectedCard ?: return@ModalBottomSheetLayout
             BottomSheetContainer {
-                Box(Modifier.wrapContentHeight()) {
-                    Button(onClick = {
-                        onRemoveCardFromDeckClick(card)
-                    }) {
-                        Text("Remove")
+                Column {
+                    state.options.forEach {
+                        Row(modifier = Modifier.fillMaxWidth()
+                            .height(64.dp)
+                            .clickable { onOptionClick(it) }
+                            .padding(ContentPadding),
+                            verticalAlignment = Alignment.CenterVertically
+                        ) {
+                            Icon(
+                                imageVector = Icons.Rounded.Delete,
+                                contentDescription = "Delete",
+                                tint = MaterialTheme.colors.onSurface,
+                                modifier = Modifier.size(24.dp)
+                            )
+                            Text(
+                                text = it.label,
+                                style = MaterialTheme.typography.body1,
+                                modifier = Modifier.padding(start = ContentPadding)
+                            )
+                        }
                     }
                 }
             }
@@ -129,10 +149,10 @@ fun DeckScreen(
     ) {
         Content(
             deck = state.deck,
+            showOptions = state.options.isNotEmpty(),
             onCloseClick = { navController.popBackStack() },
             onCardClick = { navController.navigate("card/${it.code}") },
-            onCardOptionsClick = onCardOptionsClick,
-            onRemoveCardFromDeckClick = { onRemoveCardFromDeckClick(it) }
+            onCardOptionsClick = onShowCardOptions,
         )
     }
 }
@@ -140,10 +160,10 @@ fun DeckScreen(
 @Composable
 private fun Content(
     deck: Deck,
+    showOptions: Boolean,
     onCloseClick: () -> Unit,
     onCardClick: (Card) -> Unit,
     onCardOptionsClick: (Card) -> Unit,
-    onRemoveCardFromDeckClick: (Card) -> Unit,
 ) {
     CardBackgroundBox(
         modifier = Modifier
@@ -163,7 +183,7 @@ private fun Content(
                     )
                 ) {
                     Card(deck.hero) {
-                        onRemoveCardFromDeckClick(deck.hero)
+                        onCardClick(deck.hero)
                     }
                 }
             }
@@ -184,7 +204,6 @@ private fun Content(
                     onCardClick(it)
                 }
             }
-
 
             val otherCards = CardRowEntry("Other cards", deck.cards
                 .filter { it.setCode != deck.hero.setCode }
@@ -226,23 +245,25 @@ private fun Content(
                                 onCardClick(card)
                             }
 
-                            Icon(
-                                modifier = Modifier
-                                    .padding(2.dp)
-                                    .size(32.dp)
-                                    .background(
-                                        MaterialTheme.colors.surface.copy(alpha = 0.8f),
-                                        CircleShape
-                                    )
-                                    .padding(4.dp)
-                                    .align(Alignment.TopEnd)
-                                    .clickable {
-                                        onCardOptionsClick(card)
-                                    },
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = "Card Options",
-                                tint = MaterialTheme.colors.onSurface
-                            )
+                            if (showOptions) {
+                                Icon(
+                                    modifier = Modifier
+                                        .padding(2.dp)
+                                        .size(32.dp)
+                                        .background(
+                                            MaterialTheme.colors.surface.copy(alpha = 0.8f),
+                                            CircleShape
+                                        )
+                                        .padding(4.dp)
+                                        .align(Alignment.TopEnd)
+                                        .clickable {
+                                            onCardOptionsClick(card)
+                                        },
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = "Card Options",
+                                    tint = MaterialTheme.colors.onSurface
+                                )
+                            }
                         }
                     }
 
@@ -261,3 +282,9 @@ private fun Content(
         BackButton(onCloseClick)
     }
 }
+
+private val UiState.Option.label
+    @Composable
+    get() = when (this) {
+        UiState.Option.REMOVE -> stringResource(Res.string.remove_card_from_deck)
+    }

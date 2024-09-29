@@ -45,6 +45,8 @@
     <string name="cancel">Cancel</string>
     <string name="ok">Ok</string>
 
+    <string name="remove_card_from_deck">Remove card from deck</string>
+
     <plurals name="cards">
         <item quantity="one">1 card</item>
         <item quantity="other">%1$d cards</item>

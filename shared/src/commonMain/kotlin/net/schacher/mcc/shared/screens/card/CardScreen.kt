@@ -69,9 +69,8 @@ fun CardScreen(
         card = cardRepository.getCard(cardCode)
     }
 
-    val selectedDeckId = navController.resultState<Int?>()
-
-    selectedDeckId?.value?.let {
+    val selectedDeckId = navController.resultState<Int?>()?.value
+    selectedDeckId?.let {
         LaunchedEffect(it) {
             deckRepository.addCardToDeck(it, cardCode)
         }

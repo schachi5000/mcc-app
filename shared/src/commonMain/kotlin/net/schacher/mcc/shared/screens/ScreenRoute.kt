@@ -46,4 +46,4 @@ fun NavController.setResultAndPopBackstack(result: Number) {
 }
 
 fun <T> NavController.resultState(): StateFlow<T?>? =
-    this.previousBackStackEntry?.savedStateHandle?.getStateFlow<T?>(RESULT_KEY, null)
+    this.currentBackStackEntry?.savedStateHandle?.getStateFlow<T?>(RESULT_KEY, null)

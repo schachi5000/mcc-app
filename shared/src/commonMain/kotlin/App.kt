@@ -56,7 +56,7 @@ val viewModels = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::SpotlightViewModel)
     viewModelOf(::CollectionViewModel)
-    viewModel { (deckId: Int) -> DeckScreenViewModel(deckId, get()) }
+    viewModel { (deckId: Int) -> DeckScreenViewModel(deckId, get(), get()) }
 }
 
 @Composable

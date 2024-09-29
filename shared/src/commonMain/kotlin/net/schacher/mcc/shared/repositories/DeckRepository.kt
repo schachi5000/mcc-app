@@ -16,7 +16,6 @@ import kotlin.random.Random
 
 class DeckRepository(
     private val cardRepository: CardRepository,
-    private val spotlightRepository: SpotlightRepository,
     private val marvelCDbDataSource: MarvelCDbDataSource,
     authRepository: AuthRepository
 ) {
@@ -39,8 +38,9 @@ class DeckRepository(
     private val randomDeckNumber: Int
         get() = Random.nextInt(Int.MAX_VALUE) * -1
 
-    fun getDeckById(deckId: Int): Deck? =
-        this.decks.value.find { it.id == deckId } ?: this.spotlightRepository.getDeckById(deckId)
+    fun hasDeck(deckId: Int): Boolean = this.getDeckById(deckId) != null
+
+    fun getDeckById(deckId: Int): Deck? = this.decks.value.find { it.id == deckId }
 
     fun createDeck(heroCard: Card, label: String? = null, aspect: Aspect? = null) {
         if (heroCard.type != HERO) {
@@ -113,4 +113,6 @@ class DeckRepository(
     suspend fun deleteAllDeckData() {
 //        _decks.emit(deckDatabaseDao.getDecks())
     }
+
+
 }
