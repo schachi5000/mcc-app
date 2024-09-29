@@ -56,6 +56,7 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
+import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Option.REMOVE
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -315,5 +316,5 @@ private fun OptionBottomSheet(
 private val UiState.Option.label
     @Composable
     get() = when (this) {
-        UiState.Option.REMOVE -> stringResource(Res.string.remove_card_from_deck)
+        REMOVE -> stringResource(Res.string.remove_card_from_deck)
     }
