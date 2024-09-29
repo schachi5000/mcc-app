@@ -9,6 +9,7 @@ import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.utils.launchAndCollect
 
 class MyDecksViewModel(private val deckRepository: DeckRepository) : ViewModel() {
 
@@ -19,19 +20,13 @@ class MyDecksViewModel(private val deckRepository: DeckRepository) : ViewModel()
     val state = _state.asStateFlow()
 
     init {
-        this.viewModelScope.launch {
-            deckRepository.decks.collect {
-                _state.update {
-                    it.copy(
-                        decks = it.decks,
-                        refreshing = false
-                    )
-                }
+        this.viewModelScope.launchAndCollect(this.deckRepository.decks) {
+            _state.update {
+                it.copy(
+                    decks = it.decks,
+                    refreshing = false
+                )
             }
-        }
-
-        viewModelScope.launch {
-            refreshDecks()
         }
     }
 
