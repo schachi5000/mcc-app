@@ -70,9 +70,8 @@ class DeckRepository(
 
     suspend fun addCardToDeck(deckId: Int, cardCode: String) {
         val card = this.cardRepository.getCard(cardCode)
-        //val deck = this.decks.value.find { it.id == deckId }
-        val deck = this.decks.value.find { it.id == 802369 } ?: return
-        checkNotNull(deck) { "Deck with id $deckId not found" }
+        val deck = this.decks.value.find { it.id == deckId }
+            ?: throw IllegalArgumentException("Deck with id $deckId not found")
 
         val newDeck = deck.copy(
             cards = deck.cards + card
@@ -81,6 +80,25 @@ class DeckRepository(
         val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck) { cardRepository.getCard(it) }
 
         _decks.update { it.toMutableList().replace(deck, updateDeck) }
+    }
+
+    suspend fun removeCardFromDeck(deckId: Int, cardCode: String): Deck {
+        val card = this.cardRepository.getCard(cardCode)
+        val deck = this.decks.value.find { it.id == deckId }
+            ?: throw IllegalArgumentException("Deck with id $deckId not found")
+
+        if (!deck.cards.contains(card)) {
+            throw IllegalArgumentException("Card with code $cardCode not found in deck with id $deckId")
+        }
+
+        val newDeck = deck.copy(
+            cards = deck.cards - card
+        )
+
+        val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck) { cardRepository.getCard(it) }
+
+        _decks.update { it.toMutableList().replace(deck, updateDeck) }
+        return updateDeck
     }
 
     suspend fun refreshAllUserDecks() {

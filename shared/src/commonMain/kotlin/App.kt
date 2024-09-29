@@ -19,6 +19,7 @@ import net.schacher.mcc.shared.repositories.SpotlightRepository
 import net.schacher.mcc.shared.screens.app.AppScreen
 import net.schacher.mcc.shared.screens.app.AppViewModel
 import net.schacher.mcc.shared.screens.collection.CollectionViewModel
+import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel
 import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.screens.newdeck.NewDeckViewModel
@@ -29,6 +30,7 @@ import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import pro.schacher.mcc.BuildConfig
@@ -54,6 +56,7 @@ val viewModels = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::SpotlightViewModel)
     viewModelOf(::CollectionViewModel)
+    viewModel { (deckId: Int) -> DeckScreenViewModel(deckId, get()) }
 }
 
 @Composable

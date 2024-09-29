@@ -41,7 +41,7 @@ private fun ColumnScope.BottomSheetHandle() {
     Row(
         modifier = Modifier.size(40.dp, 4.dp)
             .background(
-                MaterialTheme.colors.onSurface.copy(alpha = 0.5f),
+                MaterialTheme.colors.onSurface.copy(alpha = 0.4f),
                 RoundedCornerShape(4.dp)
             )
             .align(CenterHorizontally)
