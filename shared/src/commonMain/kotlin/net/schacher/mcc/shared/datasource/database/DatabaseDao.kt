@@ -109,8 +109,9 @@ class DatabaseDao(
         this.dbQuery.addSetting(key, value)
     }.isSuccess
 
-    override fun getBoolean(key: String): Boolean? =
+    override fun getBoolean(key: String, default: Boolean): Boolean =
         this.dbQuery.getSetting(key).executeAsOneOrNull()?.value_?.toBooleanStrictOrNull()
+            ?: default
 
     override fun putBoolean(key: String, value: Boolean): Boolean = runCatching {
         this.dbQuery.addSetting(key, value.toString())
