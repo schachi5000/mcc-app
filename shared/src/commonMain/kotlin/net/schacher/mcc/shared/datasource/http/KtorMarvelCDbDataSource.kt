@@ -19,6 +19,7 @@ import kotlinx.coroutines.IO
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
@@ -87,21 +88,26 @@ class KtorMarvelCDbDataSource(
         }
     }
 
-    override suspend fun getAllPacks() =
-        httpClient.get("$serviceUrl/packs")
+    override suspend fun getAllPacks() = withContext(Dispatchers.IO) {
+        val packs = httpClient.get("$serviceUrl/packs")
             .body<List<PackDto>>()
-            .map {
+
+        packs.map {
+            async(Dispatchers.Default) {
+                Logger.d { "Processing Pack: ${it.name}" }
                 Pack(
                     code = it.code,
                     name = it.name,
-                    cardCodes = this.getCardPack(it.code).map { it.code },
+                    cardCodes = getCardPack(it.code).map { it.code },
                     url = it.url,
                     id = it.id,
                     position = it.position
-                )
-            }.also {
-                Logger.i { "Packs loaded: ${it.size}" }
+                ).also {
+                    Logger.d { "Processing done: ${it.name}" }
+                }
             }
+        }.awaitAll()
+    }
 
     override suspend fun getCardPack(packCode: String): List<Card> =
         runCatching {

@@ -3,8 +3,6 @@ package net.schacher.mcc.shared.screens.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +16,7 @@ import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.utils.debug
+import net.schacher.mcc.shared.utils.launchAndCollect
 import kotlin.time.Duration.Companion.seconds
 
 class MainViewModel(
@@ -37,7 +36,7 @@ class MainViewModel(
 
     init {
         Logger.debug { "Init MainViewModel" }
-        this.viewModelScope.launch(Dispatchers.IO) {
+        this.viewModelScope.launch {
             delay(1.seconds)
             if (!cardRepository.hasCards()) {
                 Logger.d { "No cards found in repo -> refreshing" }
@@ -52,14 +51,12 @@ class MainViewModel(
             }
         }
 
-        this.viewModelScope.launch {
-            authRepository.loginState.collect {
-                _state.update {
-                    it.copy(
-                        mainScreen = Spotlight,
-                        canShowMyDeckScreen = authRepository.isSignedIn()
-                    )
-                }
+        this.viewModelScope.launchAndCollect(authRepository.loginState) {
+            _state.update {
+                it.copy(
+                    mainScreen = Spotlight,
+                    canShowMyDeckScreen = authRepository.isSignedIn()
+                )
             }
         }
     }
