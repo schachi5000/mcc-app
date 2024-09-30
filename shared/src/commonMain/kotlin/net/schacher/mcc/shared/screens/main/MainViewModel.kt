@@ -3,7 +3,6 @@ package net.schacher.mcc.shared.screens.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
@@ -17,7 +16,6 @@ import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.utils.debug
 import net.schacher.mcc.shared.utils.launchAndCollect
-import kotlin.time.Duration.Companion.seconds
 
 class MainViewModel(
     private val cardRepository: CardRepository,
@@ -37,7 +35,6 @@ class MainViewModel(
     init {
         Logger.debug { "Init MainViewModel" }
         this.viewModelScope.launch {
-            delay(1.seconds)
             if (!settingsDao.getBoolean("cards-synced", false)) {
                 Logger.d { "No cards found in repo -> refreshing" }
                 try {
