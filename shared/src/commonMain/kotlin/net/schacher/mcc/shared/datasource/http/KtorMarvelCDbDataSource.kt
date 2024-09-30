@@ -14,6 +14,9 @@ import io.ktor.client.request.put
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
+import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.datetime.LocalDate
@@ -47,10 +50,10 @@ import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.AuthRepository
 import pro.schacher.mcc.BuildConfig
-import kotlin.coroutines.coroutineContext
 
 class KtorMarvelCDbDataSource(
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val scope: CoroutineScope = MainScope()
 ) : MarvelCDbDataSource {
 
     private companion object {
@@ -104,16 +107,25 @@ class KtorMarvelCDbDataSource(
         runCatching {
             httpClient.get("$serviceUrl/pack/$packCode")
                 .body<List<CardDto>>()
-                .map { it.toCard() }
+                .map {
+                    val card = it.toCard()
+                    val linkedCard = it.linked_card?.toCard()?.copy(
+                        linkedCard = card
+                    )
+
+                    card.copy(
+                        linkedCard = linkedCard
+                    )
+                }
         }.getOrNull() ?: emptyList()
 
     override suspend fun getAllCards(): List<Card> {
         val allPacks = this.getAllPacks()
 
         return allPacks.map {
-            CoroutineScope(coroutineContext).async {
+            this.scope.async(Dispatchers.IO) {
                 Logger.i { "Starting download of: ${it.name}" }
-                val result = runCatching { getCardPack(it.code) }.getOrNull() ?: emptyList()
+                val result = getCardPack(it.code)
                 Logger.i { "finished download of: ${it.name}" }
                 result
             }

@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.repositories
 
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,7 +12,8 @@ import net.schacher.mcc.shared.model.Pack
 
 class PackRepository(
     private val packDatabaseDao: PackDatabaseDao,
-    private val marvelCDbDataSource: MarvelCDbDataSource
+    private val marvelCDbDataSource: MarvelCDbDataSource,
+    private val scope: CoroutineScope = MainScope()
 ) {
     private val _packs = MutableStateFlow<List<Pack>>(emptyList())
 
@@ -22,7 +24,7 @@ class PackRepository(
     val packsInCollection = _packsInCollection.asStateFlow()
 
     init {
-        MainScope().launch {
+        this.scope.launch {
             _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
             _packs.emit(packDatabaseDao.getAllPacks())
         }

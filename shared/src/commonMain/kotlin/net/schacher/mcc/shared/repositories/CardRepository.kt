@@ -27,7 +27,7 @@ class CardRepository(
     }
 
     suspend fun hasCards(): Boolean = try {
-        cardDatabaseDao.getAllCards().isNotEmpty()
+        cards.value.isNotEmpty()
     } catch (e: Exception) {
         Logger.e(e) { "Error checking for cards" }
         false
@@ -56,9 +56,11 @@ class CardRepository(
             return card
         }
 
-        return this.marvelCDbDataSource.getCard(cardCode).also {
-            this.cardDatabaseDao.addCard(it)
-            _cards.emit(this.cardDatabaseDao.getAllCards().toMap())
+        return this.marvelCDbDataSource.getCard(cardCode).also { newCard ->
+            this.cardDatabaseDao.addCard(newCard)
+            this._cards.update {
+                it.toMutableMap().apply { put(cardCode, newCard) }
+            }
         }
     }
 

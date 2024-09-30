@@ -3,6 +3,8 @@ package net.schacher.mcc.shared.screens.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.IO
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -35,7 +37,7 @@ class MainViewModel(
 
     init {
         Logger.debug { "Init MainViewModel" }
-        this.viewModelScope.launch {
+        this.viewModelScope.launch(Dispatchers.IO) {
             delay(1.seconds)
             if (!cardRepository.hasCards()) {
                 Logger.d { "No cards found in repo -> refreshing" }
