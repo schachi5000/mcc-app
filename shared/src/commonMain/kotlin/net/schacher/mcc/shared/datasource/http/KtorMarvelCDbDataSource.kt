@@ -16,7 +16,6 @@ import io.ktor.util.toUpperCasePreservingASCIIRules
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
@@ -53,10 +52,7 @@ import net.schacher.mcc.shared.repositories.AuthRepository
 import pro.schacher.mcc.BuildConfig
 import kotlin.coroutines.CoroutineContext
 
-class KtorMarvelCDbDataSource(
-    private val authRepository: AuthRepository,
-    private val scope: CoroutineScope = MainScope()
-) : MarvelCDbDataSource {
+class KtorMarvelCDbDataSource(private val authRepository: AuthRepository) : MarvelCDbDataSource {
 
     private companion object {
         const val TAG = "KtorMarvelCDbDataSource"
@@ -90,24 +86,24 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getAllPacks() = withContext(Dispatchers.IO) {
-        val packs = httpClient.get("$serviceUrl/packs")
+        httpClient.get("$serviceUrl/packs")
             .body<List<PackDto>>()
-
-        packs.map {
-            async(Dispatchers.Default) {
-                Logger.d { "Processing Pack: ${it.name}" }
-                Pack(
-                    code = it.code,
-                    name = it.name,
-                    cards = getCardsInPack(it.code),
-                    url = it.url,
-                    id = it.id,
-                    position = it.position
-                ).also {
-                    Logger.d { "Processing done: ${it.name}" }
+            .map {
+                async(Dispatchers.Default) {
+                    Logger.d { "Processing Pack: ${it.name}" }
+                    Pack(
+                        code = it.code,
+                        name = it.name,
+                        cards = getCardsInPack(it.code),
+                        url = it.url,
+                        id = it.id,
+                        position = it.position
+                    ).also {
+                        Logger.d { "Processing done: ${it.name}" }
+                    }
                 }
             }
-        }.awaitAll()
+            .awaitAll()
     }
 
     override suspend fun getCardsInPack(packCode: String): List<Card> =
@@ -125,19 +121,6 @@ class KtorMarvelCDbDataSource(
                     )
                 }
         }.getOrNull() ?: emptyList()
-
-    override suspend fun getAllCards(): List<Card> {
-        val allPacks = this.getAllPacks()
-
-        return allPacks.map {
-            this.scope.async(Dispatchers.IO) {
-                Logger.i { "Starting download of: ${it.name}" }
-                val result = getCardsInPack(it.code)
-                Logger.i { "finished download of: ${it.name}" }
-                result
-            }
-        }.awaitAll().flatten()
-    }
 
     override suspend fun getCard(cardCode: String) = withContext(Dispatchers.IO) {
         httpClient.get("$serviceUrl/card/$cardCode").body<CardDto>().toCard()
@@ -167,19 +150,18 @@ class KtorMarvelCDbDataSource(
         cardProvider: suspend (String) -> Card
     ): Deck = this.getUserDeckDtoById(deckId).toDeck(cardProvider)
 
-    private suspend fun getUserDeckDtoById(deckId: Int) =
-        this.httpClient.get("$serviceUrl/api/oauth2/deck/load/$deckId") {
+    private suspend fun getUserDeckDtoById(deckId: Int) = withContext(Dispatchers.IO) {
+        httpClient.get("$serviceUrl/api/oauth2/deck/load/$deckId") {
             headers { append("Authorization", authHeader) }
         }.body<DeckDto>()
+    }
 
     override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card): Deck {
         val slots = deck.cards.toMutableList()
             .also { it.removeAll { it.code == deck.hero.code } }
             .groupingBy { it.code }
             .eachCount()
-            .let {
-                Json.encodeToString(it)
-            }
+            .let { Json.encodeToString(it) }
 
         val response = this.httpClient.put("$serviceUrl/api/oauth2/deck/save/${deck.id}") {
             headers { append("Authorization", authHeader) }
