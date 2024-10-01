@@ -20,7 +20,7 @@ class SettingsViewModel(
     private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
     private val authRepository: AuthRepository,
-    settingsDao: SettingsDao,
+    private val settingsDao: SettingsDao,
     platformInfo: PlatformInfo
 ) : ViewModel() {
 
@@ -74,6 +74,7 @@ class SettingsViewModel(
             Logger.i { "Wiping database..." }
             cardRepository.deleteAllCardData()
             packRepository.deleteAllPackData()
+            settingsDao.remove("cards-synced")
             Logger.i { "Wiping complete" }
         }
     }

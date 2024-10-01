@@ -58,7 +58,7 @@ class PackRepository(
     }
 
     suspend fun removePackFromCollection(packCode: String) {
-        this.packDatabaseDao.removePackToCollection(packCode)
+        this.packDatabaseDao.removePackFromCollection(packCode)
         _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
     }
 }

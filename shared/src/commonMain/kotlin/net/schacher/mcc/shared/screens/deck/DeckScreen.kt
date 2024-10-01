@@ -163,6 +163,12 @@ private fun Content(
                     Card(deck.hero) {
                         onCardClick(deck.hero)
                     }
+
+                    deck.hero.linkedCard?.let {
+                        Card(it) {
+                            onCardClick(it)
+                        }
+                    }
                 }
             }
 

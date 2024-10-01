@@ -74,6 +74,16 @@ SELECT *
 FROM Pack
 WHERE inPosession = 1;
 
+addPackToPossession:
+UPDATE Pack
+SET inPosession = 1
+WHERE code = ?;
+
+removePackFromPossession:
+UPDATE Pack
+SET inPosession = 0
+WHERE code = ?;
+
 removeAllPacks:
 DELETE FROM Pack;
 

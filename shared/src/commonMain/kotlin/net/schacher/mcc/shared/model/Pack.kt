@@ -7,7 +7,4 @@ data class Pack(
     val position: Int,
     val cards: List<Card>,
     val url: String,
-) {
-    val cardCodes: List<String>
-        get() = cards.map { it.code }
-}
+)

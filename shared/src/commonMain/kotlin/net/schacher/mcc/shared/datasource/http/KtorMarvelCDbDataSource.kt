@@ -91,10 +91,12 @@ class KtorMarvelCDbDataSource(private val authRepository: AuthRepository) : Marv
             .map {
                 async(Dispatchers.Default) {
                     Logger.d { "Processing Pack: ${it.name}" }
+                    val cards = getCardsInPack(it.code)
+
                     Pack(
                         code = it.code,
                         name = it.name,
-                        cards = getCardsInPack(it.code),
+                        cards = cards,
                         url = it.url,
                         id = it.id,
                         position = it.position
@@ -123,7 +125,18 @@ class KtorMarvelCDbDataSource(private val authRepository: AuthRepository) : Marv
         }.getOrNull() ?: emptyList()
 
     override suspend fun getCard(cardCode: String) = withContext(Dispatchers.IO) {
-        httpClient.get("$serviceUrl/card/$cardCode").body<CardDto>().toCard()
+        httpClient.get("$serviceUrl/card/$cardCode")
+            .body<CardDto>()
+            .let {
+                val card = it.toCard()
+                val linkedCard = it.linked_card?.toCard()?.copy(
+                    linkedCard = card
+                )
+
+                card.copy(
+                    linkedCard = linkedCard
+                )
+            }
     }
 
     override suspend fun getSpotlightDecksByDate(
@@ -248,7 +261,11 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
         hero = heroCard,
         aspect = this.meta?.parseAspect(),
         cards = this.slots.entries
-            .map { entry -> List(entry.value) { cardProvider(entry.key) } }
+            .map { entry ->
+                List(entry.value) {
+                    cardProvider(entry.key)
+                }
+            }
             .flatten()
             .toMutableList()
             .also { it.add(0, heroCard) },
