@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.SharedFlow
 import net.schacher.mcc.shared.model.Card
 
 interface CardDatabaseDao {
-    val onCardsUpdated: SharedFlow<List<Card>>
+    val onCardAdded: SharedFlow<Card>
 
     suspend fun addCards(cards: List<Card>)
 

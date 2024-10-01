@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.repositories
 
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -8,6 +9,7 @@ import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.utils.launchAndCollect
 
 class CardRepository(
     private val cardDatabaseDao: CardDatabaseDao,
@@ -21,6 +23,13 @@ class CardRepository(
     init {
         this.scope.launch {
             _cards.emit(cardDatabaseDao.getAllCards().toMap())
+        }
+
+        this.scope.launchAndCollect(
+            this.cardDatabaseDao.onCardAdded,
+            Dispatchers.Default
+        ) { card ->
+            _cards.update { it.toMutableMap().apply { put(card.code, card) } }
         }
     }
 

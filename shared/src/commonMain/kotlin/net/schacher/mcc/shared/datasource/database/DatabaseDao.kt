@@ -9,7 +9,7 @@ import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.SharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
@@ -32,7 +32,9 @@ class DatabaseDao(
 
     private val dbQuery = database.appDatabaseQueries
 
-    override val onCardsUpdated: SharedFlow<List<Card>> = MutableSharedFlow()
+    private val _onCardAdded = MutableSharedFlow<Card>()
+
+    override val onCardAdded = this._onCardAdded.asSharedFlow()
 
     init {
         if (wipeDatabase) {
@@ -49,28 +51,31 @@ class DatabaseDao(
             cards.forEach { addCard(it) }
         }
 
-    override suspend fun addCard(card: Card) = measuringWithContext(Dispatchers.IO, "addCard") {
-        dbQuery.addCard(
-            code = card.code,
-            position = card.position.toLong(),
-            type = card.type?.name,
-            cardSetCode = card.setCode,
-            cardSetName = card.setName,
-            packCode = card.packCode,
-            packName = card.packName,
-            name = card.name,
-            cost = card.cost?.toLong(),
-            aspect = card.aspect?.name,
-            text = card.text,
-            boostText = card.boostText,
-            attackText = card.attackText,
-            quote = card.quote,
-            traits = card.traits,
-            imagePath = card.imagePath,
-            faction = card.faction.name,
-            linkedCardCode = card.linkedCard?.code
-        )
-    }
+    override suspend fun addCard(card: Card) =
+        measuringWithContext(Dispatchers.IO, "addCard") {
+            dbQuery.addCard(
+                code = card.code,
+                position = card.position.toLong(),
+                type = card.type?.name,
+                cardSetCode = card.setCode,
+                cardSetName = card.setName,
+                packCode = card.packCode,
+                packName = card.packName,
+                name = card.name,
+                cost = card.cost?.toLong(),
+                aspect = card.aspect?.name,
+                text = card.text,
+                boostText = card.boostText,
+                attackText = card.attackText,
+                quote = card.quote,
+                traits = card.traits,
+                imagePath = card.imagePath,
+                faction = card.faction.name,
+                linkedCardCode = card.linkedCard?.code
+            )
+        }.also {
+            _onCardAdded.emit(card)
+        }
 
     override suspend fun getCardByCode(cardCode: String): Card? =
         measuringWithContext(Dispatchers.IO, "getCardByCode") {
