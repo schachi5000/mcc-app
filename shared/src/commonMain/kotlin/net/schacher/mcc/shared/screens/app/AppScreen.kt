@@ -10,6 +10,7 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -96,7 +97,8 @@ fun AppScreen(
         }
     }
 
-    BackHandler {
+    val currentBackStack by navController.currentBackStack.collectAsState()
+    BackHandler(currentBackStack.last().destination.route == AppRoute.Main.route) {
         onQuitApp()
     }
 

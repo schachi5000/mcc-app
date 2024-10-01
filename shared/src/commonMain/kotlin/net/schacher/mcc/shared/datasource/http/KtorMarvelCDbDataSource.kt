@@ -13,7 +13,6 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.put
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
-import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -52,6 +51,7 @@ import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.AuthRepository
 import pro.schacher.mcc.BuildConfig
+import kotlin.coroutines.CoroutineContext
 
 class KtorMarvelCDbDataSource(
     private val authRepository: AuthRepository,
@@ -111,7 +111,7 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getCardsInPack(packCode: String): List<Card> =
-        runCatchingOnDispatcher {
+        withContextSafe(Dispatchers.IO) {
             httpClient.get("$serviceUrl/pack/$packCode")
                 .body<List<CardDto>>()
                 .map {
@@ -145,14 +145,14 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getSpotlightDecksByDate(
         date: LocalDate, cardProvider: suspend (String) -> Card
-    ) = runCatchingOnDispatcher {
+    ) = withContextSafe(Dispatchers.IO) {
         httpClient.get("$serviceUrl/spotlight/${date.toDateString()}")
             .body<List<DeckDto>>()
             .map { it.toDeck(cardProvider) }
     }
 
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
-        runCatchingOnDispatcher {
+        withContextSafe(Dispatchers.IO) {
             httpClient
                 .get("$serviceUrl/api/oauth2/decks") {
                     headers { append("Authorization", authHeader) }
@@ -275,16 +275,11 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
     )
 }
 
-@SinceKotlin("1.3")
-private suspend fun <T, R> T.runCatchingOnDispatcher(
-    dispatcher: CoroutineDispatcher = Dispatchers.IO,
-    block: suspend T.() -> R
-): Result<R> {
-    return try {
-        withContext(dispatcher) {
-            Result.success(block())
-        }
-    } catch (e: Throwable) {
-        Result.failure(e)
+private suspend fun <T> withContextSafe(
+    context: CoroutineContext,
+    block: suspend CoroutineScope.() -> T
+): Result<T> = withContext(context) {
+    runCatching<T> {
+        block()
     }
 }
