@@ -46,8 +46,8 @@ class PackRepository(
 
     suspend fun deleteAllPackData() {
         this.packDatabaseDao.wipePackTable()
-        _packsInCollection.emit(emptyList())
-        _packs.emit(emptyList())
+        this._packsInCollection.emit(emptyList())
+        this._packs.emit(emptyList())
     }
 
     fun hasPackInCollection(packCode: String) = this.packsInCollection.value.contains(packCode)

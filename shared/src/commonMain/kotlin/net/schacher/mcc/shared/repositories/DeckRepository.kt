@@ -8,7 +8,6 @@ import kotlinx.coroutines.flow.update
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.model.CardType.HERO
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.utils.launchAndCollect
 import net.schacher.mcc.shared.utils.replace
@@ -39,21 +38,7 @@ class DeckRepository(
     fun getDeckById(deckId: Int): Deck? = this.decks.value.find { it.id == deckId }
 
     fun createDeck(heroCard: Card, label: String? = null, aspect: Aspect? = null) {
-        if (heroCard.type != HERO) {
-            throw Exception("Hero card must be of type HERO - $heroCard")
-        }
-
-        val deckLabel = label ?: "${heroCard.name} ${aspect?.name ?: ""}"
-        val defaultCards =
-            heroCard.setCode?.let { cardRepository.getCardsBySetCode(it) } ?: emptyList()
-
-        //val deck = Deck(randomDeckNumber, deckLabel, heroCard, aspect, defaultCards, Info())
-
-        _decks.update {
-            it.toMutableList().also {
-                //      it.add(deck)
-            }
-        }
+        // TODO:
     }
 
     fun removeDeck(deckId: Int) {
@@ -104,11 +89,4 @@ class DeckRepository(
 
         _decks.emit(decks)
     }
-
-
-    suspend fun deleteAllDeckData() {
-//        _decks.emit(deckDatabaseDao.getDecks())
-    }
-
-
 }

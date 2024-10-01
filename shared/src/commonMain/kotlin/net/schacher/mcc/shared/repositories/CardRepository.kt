@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.repositories
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -26,11 +25,9 @@ class CardRepository(
     }
 
     suspend fun refreshAllCards() {
-        val result = this.marvelCDbDataSource.getAllCards()
-        Logger.i { "${result.size} cards loaded" }
-        this.cardDatabaseDao.addCards(result)
-
-        _cards.emit(cardDatabaseDao.getAllCards().toMap())
+        this._cards.update {
+            cardDatabaseDao.getAllCards().toMap()
+        }
     }
 
     suspend fun deleteAllCardData() {
