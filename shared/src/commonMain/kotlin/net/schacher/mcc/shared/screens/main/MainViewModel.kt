@@ -38,7 +38,7 @@ class MainViewModel(
             if (!settingsDao.getBoolean("cards-synced", false)) {
                 Logger.d { "No cards found in repo -> refreshing" }
                 try {
-                    cardRepository.refreshAllCards()
+//                    cardRepository.refreshAllCards()
                     packRepository.refreshAllPacks()
                     settingsDao.putBoolean("cards-synced", true)
                     _event.emit(Event.DatabaseSynced)

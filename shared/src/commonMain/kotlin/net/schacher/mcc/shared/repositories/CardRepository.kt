@@ -15,7 +15,6 @@ class CardRepository(
     private val marvelCDbDataSource: MarvelCDbDataSource,
     private val scope: CoroutineScope
 ) {
-
     private val _cards = MutableStateFlow<Map<String, Card>>(emptyMap())
 
     val cards = _cards.asStateFlow()
@@ -24,13 +23,6 @@ class CardRepository(
         this.scope.launch {
             _cards.emit(cardDatabaseDao.getAllCards().toMap())
         }
-    }
-
-    suspend fun hasCards(): Boolean = try {
-        cards.value.isNotEmpty()
-    } catch (e: Exception) {
-        Logger.e(e) { "Error checking for cards" }
-        false
     }
 
     suspend fun refreshAllCards() {

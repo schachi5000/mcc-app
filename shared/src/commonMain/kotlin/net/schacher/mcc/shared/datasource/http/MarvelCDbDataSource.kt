@@ -9,7 +9,7 @@ interface MarvelCDbDataSource {
 
     suspend fun getAllPacks(): List<Pack>
 
-    suspend fun getCardPack(packCode: String): List<Card>
+    suspend fun getCardsInPack(packCode: String): List<Card>
 
     suspend fun getAllCards(): List<Card>
 
@@ -20,7 +20,7 @@ interface MarvelCDbDataSource {
         cardProvider: suspend (String) -> Card
     ): Result<List<Deck>>
 
-    suspend fun getUserDecks(cardProvider: suspend (String) -> Card): List<Deck>
+    suspend fun getUserDecks(cardProvider: suspend (String) -> Card): Result<List<Deck>>
 
     suspend fun getUserDeckById(
         deckId: Int,

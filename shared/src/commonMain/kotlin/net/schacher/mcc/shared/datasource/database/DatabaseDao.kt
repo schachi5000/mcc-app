@@ -6,7 +6,12 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.async
+import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.SharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
@@ -21,14 +26,13 @@ class DatabaseDao(
     databaseDriverFactory: DatabaseDriverFactory,
     wipeDatabase: Boolean = false,
     scope: CoroutineScope = MainScope()
-) :
-    CardDatabaseDao,
-    PackDatabaseDao,
-    SettingsDao {
+) : CardDatabaseDao, PackDatabaseDao, SettingsDao {
 
     private val database = AppDatabase(databaseDriverFactory.createDriver())
 
     private val dbQuery = database.appDatabaseQueries
+
+    override val onCardsUpdated: SharedFlow<List<Card>> = MutableSharedFlow()
 
     init {
         if (wipeDatabase) {
@@ -75,20 +79,18 @@ class DatabaseDao(
 
     override suspend fun getAllCards(): List<Card> =
         measuringWithContext(Dispatchers.IO, "getAllCards") {
-            dbQuery.selectAllCards()
-                .executeAsList()
-                .map {
-                    val card = it.toCard()
-                    val linkedCard = it.linkedCardCode?.let {
-                        dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
-                    }
-
-                    card.copy(
-                        linkedCard = linkedCard?.copy(
-                            linkedCard = card
-                        )
-                    )
+            dbQuery.selectAllCards().executeAsList().map {
+                val card = it.toCard()
+                val linkedCard = it.linkedCardCode?.let {
+                    dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
                 }
+
+                card.copy(
+                    linkedCard = linkedCard?.copy(
+                        linkedCard = card
+                    )
+                )
+            }
 
         }
 
@@ -127,33 +129,49 @@ class DatabaseDao(
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
         Logger.i { "Adding pack ${pack.name} to database ${hasPackInCollection(pack.code)}" }
 
-        dbQuery.addPack(
-            pack.code,
-            pack.id.toLong(),
-            pack.name,
-            pack.position.toLong(),
-            pack.cardCodes.toCardCodeString(),
-            pack.url,
-            hasPackInCollection(pack.code).toLong()
-        )
+        listOf(
+            async {
+                dbQuery.addPack(
+                    pack.code,
+                    pack.id.toLong(),
+                    pack.name,
+                    pack.position.toLong(),
+                    pack.cardCodes.toCardCodeString(),
+                    pack.url,
+                    hasPackInCollection(pack.code).toLong()
+                )
+            }, async {
+                addCards(pack.cards)
+            })
+            .awaitAll()
     }
 
     override suspend fun addPacks(packs: List<Pack>) {
         Logger.i { "Adding ${packs.size} packs to database" }
-        packs.forEach { this.addPack(it) }
+        packs.forEach {
+            this.addPack(it)
+        }
     }
 
     private suspend fun getPack(packCode: String): Pack =
         measuringWithContext(Dispatchers.IO, "getPack") {
-            dbQuery.getPack(packCode)
-                .executeAsOne()
-                .toPack()
+            dbQuery.getPack(packCode).executeAsOne().toPack {
+                runBlocking {
+                    getCardByCode(it) ?: throw IllegalStateException("Card $it not found")
+                }
+            }
         }
 
 
     override suspend fun getAllPacks(): List<Pack> =
         measuringWithContext(Dispatchers.IO, "getAllPacks") {
-            dbQuery.getAllPacks().executeAsList().map { it.toPack() }
+            dbQuery.getAllPacks().executeAsList().map {
+                it.toPack {
+                    runBlocking {
+                        getCardByCode(it) ?: throw IllegalStateException("Card $it not found")
+                    }
+                }
+            }
         }
 
     override suspend fun addPackToCollection(packCode: String) =
@@ -188,12 +206,9 @@ class DatabaseDao(
 
     override suspend fun getPacksInCollection(): List<String> =
         measuringWithContext(Dispatchers.IO, "getPacksInCollection") {
-            dbQuery.getAllPacks()
-                .executeAsList()
-                .filter { it.inPosession.toBoolean() }
-                .map {
-                    it.code
-                }
+            dbQuery.getAllPacks().executeAsList().filter { it.inPosession.toBoolean() }.map {
+                it.code
+            }
         }
 
     override suspend fun hasPackInCollection(packCode: String): Boolean =
@@ -210,13 +225,10 @@ private fun Boolean.toLong() = if (this) 1L else 0L
 
 private fun Long?.toBoolean() = if (this == null) false else this != 0L
 
-private fun database.Pack.toPack() = Pack(
-    name = this.name,
-    code = this.code,
-    cardCodes = this.cardCodes.toCardCodeList(),
-    url = this.url,
-    id = this.id.toInt(),
-    position = this.position.toInt()
+private fun database.Pack.toPack(cardProvider: (cardCode: String) -> Card) = Pack(
+    name = this.name, code = this.code, cards = this.cardCodes.toCardCodeList().map {
+        cardProvider(it)
+    }, url = this.url, id = this.id.toInt(), position = this.position.toInt()
 )
 
 private fun database.Card.toCard() = Card(

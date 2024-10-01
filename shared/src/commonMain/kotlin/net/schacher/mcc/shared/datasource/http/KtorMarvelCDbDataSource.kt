@@ -13,6 +13,7 @@ import io.ktor.client.request.parameter
 import io.ktor.client.request.put
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -98,7 +99,7 @@ class KtorMarvelCDbDataSource(
                 Pack(
                     code = it.code,
                     name = it.name,
-                    cardCodes = getCardPack(it.code).map { it.code },
+                    cards = getCardsInPack(it.code),
                     url = it.url,
                     id = it.id,
                     position = it.position
@@ -109,8 +110,8 @@ class KtorMarvelCDbDataSource(
         }.awaitAll()
     }
 
-    override suspend fun getCardPack(packCode: String): List<Card> =
-        runCatching {
+    override suspend fun getCardsInPack(packCode: String): List<Card> =
+        runCatchingOnDispatcher {
             httpClient.get("$serviceUrl/pack/$packCode")
                 .body<List<CardDto>>()
                 .map {
@@ -131,31 +132,35 @@ class KtorMarvelCDbDataSource(
         return allPacks.map {
             this.scope.async(Dispatchers.IO) {
                 Logger.i { "Starting download of: ${it.name}" }
-                val result = getCardPack(it.code)
+                val result = getCardsInPack(it.code)
                 Logger.i { "finished download of: ${it.name}" }
                 result
             }
         }.awaitAll().flatten()
     }
 
-    override suspend fun getCard(cardCode: String) =
+    override suspend fun getCard(cardCode: String) = withContext(Dispatchers.IO) {
         httpClient.get("$serviceUrl/card/$cardCode").body<CardDto>().toCard()
+    }
 
     override suspend fun getSpotlightDecksByDate(
         date: LocalDate, cardProvider: suspend (String) -> Card
-    ) = runCatching {
-        this.httpClient.get("$serviceUrl/spotlight/${date.toDateString()}")
+    ) = runCatchingOnDispatcher {
+        httpClient.get("$serviceUrl/spotlight/${date.toDateString()}")
             .body<List<DeckDto>>()
             .map { it.toDeck(cardProvider) }
     }
 
-    override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) = httpClient
-        .get("$serviceUrl/api/oauth2/decks") {
-            headers { append("Authorization", authHeader) }
+    override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
+        runCatchingOnDispatcher {
+            httpClient
+                .get("$serviceUrl/api/oauth2/decks") {
+                    headers { append("Authorization", authHeader) }
+                }
+                .body<List<DeckDto>>()
+                .map { it.toDeck(cardProvider) }
+                .sortedBy { it.name }
         }
-        .body<List<DeckDto>>()
-        .map { it.toDeck(cardProvider) }
-        .sortedBy { it.name }
 
     override suspend fun getUserDeckById(
         deckId: Int,
@@ -268,4 +273,18 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
         problem = this.problem,
         version = this.version
     )
+}
+
+@SinceKotlin("1.3")
+private suspend fun <T, R> T.runCatchingOnDispatcher(
+    dispatcher: CoroutineDispatcher = Dispatchers.IO,
+    block: suspend T.() -> R
+): Result<R> {
+    return try {
+        withContext(dispatcher) {
+            Result.success(block())
+        }
+    } catch (e: Throwable) {
+        Result.failure(e)
+    }
 }

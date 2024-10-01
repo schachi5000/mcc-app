@@ -12,7 +12,6 @@ import net.schacher.mcc.shared.model.CardType.HERO
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.utils.launchAndCollect
 import net.schacher.mcc.shared.utils.replace
-import kotlin.random.Random
 
 class DeckRepository(
     private val cardRepository: CardRepository,
@@ -28,15 +27,12 @@ class DeckRepository(
     init {
         this.scope.launchAndCollect(authRepository.loginState) {
             if (it) {
-                runCatching { refreshAllUserDecks() }
+                refreshAllUserDecks()
             } else {
                 _decks.emit(emptyList())
             }
         }
     }
-
-    private val randomDeckNumber: Int
-        get() = Random.nextInt(Int.MAX_VALUE) * -1
 
     fun hasDeck(deckId: Int): Boolean = this.getDeckById(deckId) != null
 
@@ -104,7 +100,7 @@ class DeckRepository(
     suspend fun refreshAllUserDecks() {
         val decks = this.marvelCDbDataSource.getUserDecks {
             this.cardRepository.getCard(it)
-        }
+        }.getOrNull() ?: return
 
         _decks.emit(decks)
     }
