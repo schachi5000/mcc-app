@@ -17,11 +17,11 @@ class PackRepository(
 ) {
     private val _packs = MutableStateFlow<List<Pack>>(emptyList())
 
-    val packs = _packs.asStateFlow()
+    val packs = this._packs.asStateFlow()
 
     private val _packsInCollection = MutableStateFlow<List<String>>(emptyList())
 
-    val packsInCollection = _packsInCollection.asStateFlow()
+    val packsInCollection = this._packsInCollection.asStateFlow()
 
     init {
         this.scope.launch {
