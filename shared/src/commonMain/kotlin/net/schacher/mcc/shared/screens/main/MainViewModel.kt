@@ -53,7 +53,7 @@ class MainViewModel(
             _state.update {
                 it.copy(
                     mainScreen = Spotlight,
-                    canShowMyDeckScreen = authRepository.isSignedIn()
+                    canShowMyDeckScreen = authRepository.isSignedInAsUser()
                 )
             }
         }

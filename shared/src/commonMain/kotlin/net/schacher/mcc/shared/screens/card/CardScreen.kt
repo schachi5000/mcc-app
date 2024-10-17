@@ -74,7 +74,7 @@ fun CardScreen(
         onCloseClick = { navController.popBackStack() },
         onAddToDeckClick = {
             navController.navigate(AppRoute.SelectDeck)
-        }
+        }.takeIf { state.value.canAddToDeck }
     )
 }
 
@@ -82,7 +82,7 @@ fun CardScreen(
 fun CardScreen(
     card: Card,
     modifier: Modifier = Modifier,
-    onAddToDeckClick: () -> Unit,
+    onAddToDeckClick: (() -> Unit)?,
     onCloseClick: () -> Unit,
 ) {
     CardBackgroundBox(
@@ -100,7 +100,7 @@ fun CardScreen(
 @Composable
 private fun Content(
     card: Card,
-    onAddToDeckClick: () -> Unit,
+    onAddToDeckClick: (() -> Unit)?,
     onCloseClick: () -> Unit
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -219,22 +219,24 @@ private fun Content(
         BackButton(onCloseClick)
 
 
-        FloatingActionButton(
-            onClick = onAddToDeckClick,
-            modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding()
-                .padding(
-                    end = FABPadding,
-                    bottom = if (isAndroid()) ContentPadding else 0.dp
+        onAddToDeckClick?.let {
+            FloatingActionButton(
+                onClick = it,
+                modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding()
+                    .padding(
+                        end = FABPadding,
+                        bottom = if (isAndroid()) ContentPadding else 0.dp
+                    )
+                    .size(ButtonSize),
+                contentColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = MaterialTheme.colors.primary,
+                shape = DefaultShape
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = "Add to deck"
                 )
-                .size(ButtonSize),
-            contentColor = MaterialTheme.colors.onPrimary,
-            backgroundColor = MaterialTheme.colors.primary,
-            shape = DefaultShape
-        ) {
-            Icon(
-                imageVector = Icons.Rounded.Add,
-                contentDescription = "Add to deck"
-            )
+            }
         }
     }
 }

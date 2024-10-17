@@ -111,7 +111,7 @@ class AuthRepository(private val settingsDao: SettingsDao) {
 
     fun isGuest(): Boolean = this.userType is UserType.Guest
 
-    fun isSignedIn(): Boolean = this.userType is UserType.AuthorizedUser
+    fun isSignedInAsUser(): Boolean = this.userType is UserType.AuthorizedUser
 }
 
 
