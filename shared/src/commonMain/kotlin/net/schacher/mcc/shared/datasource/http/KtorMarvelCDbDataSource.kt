@@ -49,7 +49,6 @@ import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.AuthRepository
-import pro.schacher.mcc.BuildConfig
 import kotlin.coroutines.CoroutineContext
 
 class KtorMarvelCDbDataSource(
@@ -87,19 +86,18 @@ class KtorMarvelCDbDataSource(
         }
     }
 
-    override suspend fun getAllPacks() = withContext(Dispatchers.IO) {
+    override suspend fun getAllPacks() = withContextSafe(Dispatchers.IO) {
         httpClient.get("$serviceUrl/packs")
             .body<List<PackDto>>()
             .map {
                 async(Dispatchers.Default) {
                     Logger.d { "Processing Pack: ${it.name}" }
-                    val cards = getCardsInPack(it.code)
+                    val cards = getCardsInPack(it.code).getOrThrow()
 
                     Pack(
                         code = it.code,
                         name = it.name,
                         cards = cards,
-                        url = it.url,
                         id = it.id,
                         position = it.position
                     ).also {
@@ -110,7 +108,7 @@ class KtorMarvelCDbDataSource(
             .awaitAll()
     }
 
-    override suspend fun getCardsInPack(packCode: String): List<Card> =
+    override suspend fun getCardsInPack(packCode: String) =
         withContextSafe(Dispatchers.IO) {
             httpClient.get("$serviceUrl/packs/$packCode")
                 .body<List<CardDto>>()
@@ -124,9 +122,9 @@ class KtorMarvelCDbDataSource(
                         linkedCard = linkedCard
                     )
                 }
-        }.getOrNull() ?: emptyList()
+        }
 
-    override suspend fun getCard(cardCode: String) = withContext(Dispatchers.IO) {
+    override suspend fun getCard(cardCode: String) = withContextSafe(Dispatchers.IO) {
         httpClient.get("$serviceUrl/cards/$cardCode")
             .body<CardDto>()
             .let {
@@ -165,9 +163,11 @@ class KtorMarvelCDbDataSource(
     override suspend fun getUserDeckById(
         deckId: Int,
         cardProvider: suspend (String) -> Card
-    ): Deck = this.getUserDeckDtoById(deckId).toDeck(cardProvider)
+    ) = runCatching {
+        this.getUserDeckDtoById(deckId).getOrThrow().toDeck(cardProvider)
+    }
 
-    private suspend fun getUserDeckDtoById(deckId: Int) = withContext(Dispatchers.IO) {
+    private suspend fun getUserDeckDtoById(deckId: Int) = withContextSafe(Dispatchers.IO) {
         httpClient.get("$serviceUrl/decks/$deckId") {
             headers { append(AUTHORIZATION, authHeader) }
         }.body<DeckDto>()
@@ -187,7 +187,7 @@ class KtorMarvelCDbDataSource(
             }.body<DeckUpdateResponseDto>()
 
             if (response.success) {
-                getUserDeckById(deck.id) { cardProvider(it) }
+                getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
             } else {
                 throw Exception("Failed to update deck: ${response.msg?.toString()}")
             }

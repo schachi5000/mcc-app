@@ -7,11 +7,11 @@ import net.schacher.mcc.shared.model.Pack
 
 interface MarvelCDbDataSource {
 
-    suspend fun getAllPacks(): List<Pack>
+    suspend fun getAllPacks(): Result<List<Pack>>
 
-    suspend fun getCardsInPack(packCode: String): List<Card>
+    suspend fun getCardsInPack(packCode: String): Result<List<Card>>
 
-    suspend fun getCard(cardCode: String): Card
+    suspend fun getCard(cardCode: String): Result<Card>
 
     suspend fun getSpotlightDecksByDate(
         date: LocalDate,
@@ -23,7 +23,7 @@ interface MarvelCDbDataSource {
     suspend fun getUserDeckById(
         deckId: Int,
         cardProvider: suspend (String) -> Card
-    ): Deck
+    ): Result<Deck>
 
     suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card): Result<Deck>
 }

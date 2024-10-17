@@ -5,6 +5,5 @@ data class Pack(
     val name: String,
     val code: String,
     val position: Int,
-    val cards: List<Card>,
-    val url: String,
+    val cards: List<Card>
 )
