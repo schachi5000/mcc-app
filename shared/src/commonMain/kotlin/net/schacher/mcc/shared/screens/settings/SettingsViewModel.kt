@@ -13,13 +13,14 @@ import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
+import net.schacher.mcc.shared.utils.launchAndCollect
 
 class SettingsViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
     private val authRepository: AuthRepository,
-    settingsDao: SettingsDao,
+    private val settingsDao: SettingsDao,
     platformInfo: PlatformInfo
 ) : ViewModel() {
 
@@ -38,32 +39,28 @@ class SettingsViewModel(
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            deckRepository.decks.collect { value ->
-                _state.update { it.copy(deckCount = value.size) }
-            }
+        viewModelScope.launchAndCollect(cardRepository.cards) { value ->
+            _state.update { it.copy(cardCount = value.size) }
         }
 
-        viewModelScope.launch {
-            authRepository.loginState.collect {
-                _state.update { it.copy(guestLogin = authRepository.isGuest()) }
-            }
+        viewModelScope.launchAndCollect(deckRepository.decks) { value ->
+            _state.update { it.copy(deckCount = value.size) }
         }
 
-        viewModelScope.launch {
-            packRepository.packsInCollection.collect { value ->
-                _state.update { it.copy(packsInCollectionCount = value.size) }
-            }
+        viewModelScope.launchAndCollect(authRepository.loginState) {
+            _state.update { it.copy(guestLogin = authRepository.isGuest()) }
         }
 
-        viewModelScope.launch {
-            packRepository.packs.collect { value ->
-                _state.update {
-                    it.copy(
-                        packCount = value.size,
-                        packsInCollectionCount = packRepository.packsInCollection.value.size
-                    )
-                }
+        viewModelScope.launchAndCollect(packRepository.packsInCollection) { value ->
+            _state.update { it.copy(packsInCollectionCount = value.size) }
+        }
+
+        viewModelScope.launchAndCollect(packRepository.packs) { value ->
+            _state.update {
+                it.copy(
+                    packCount = value.size,
+                    packsInCollectionCount = packRepository.packsInCollection.value.size
+                )
             }
         }
     }
@@ -73,27 +70,19 @@ class SettingsViewModel(
             return
         }
 
-        viewModelScope.launch {
+        this.viewModelScope.launch {
             Logger.i { "Wiping database..." }
             cardRepository.deleteAllCardData()
-            deckRepository.deleteAllDeckData()
             packRepository.deleteAllPackData()
+            settingsDao.remove("cards-synced")
             Logger.i { "Wiping complete" }
-
-            _state.update { it.copy(cardCount = 0, deckCount = 0) }
         }
     }
 
     fun onSyncClick() {
         _state.update { it.copy(syncInProgress = true) }
 
-        viewModelScope.launch {
-            try {
-                cardRepository.refreshAllCards()
-            } catch (e: Exception) {
-                Logger.e(e) { "Error refreshing cards" }
-            }
-
+        this.viewModelScope.launch {
             try {
                 packRepository.refreshAllPacks()
             } catch (e: Exception) {

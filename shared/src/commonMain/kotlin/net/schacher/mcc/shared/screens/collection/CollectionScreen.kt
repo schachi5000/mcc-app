@@ -13,12 +13,10 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -26,12 +24,12 @@ import androidx.compose.material.ModalBottomSheetLayout
 import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Switch
 import androidx.compose.material.Text
-import androidx.compose.material.TextButton
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.List
 import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -41,7 +39,6 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
 import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
@@ -52,9 +49,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
-import marvelchampionscompanion.shared.generated.resources.Res
-import marvelchampionscompanion.shared.generated.resources.apply
-import marvelchampionscompanion.shared.generated.resources.cancel
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.BottomSpacer
@@ -62,14 +56,12 @@ import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
 import net.schacher.mcc.shared.design.theme.ContentPadding
-import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.search.Filter
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.utils.replace
-import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -112,19 +104,13 @@ fun CollectionScreen(
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        scrimColor = Color.Black.copy(alpha = 0.75f),
         sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
-        sheetBackgroundColor = MaterialTheme.colors.background,
         sheetContent = {
             BottomSheetContainer {
                 FilterContent(
                     state = state,
-                    onBackClick = { scope.launch { sheetState.hide() } },
                     onSelectPacksClicked = { navController.navigate(AppRoute.Packs) },
-                    onApplyFilerClick = { filters ->
-                        onApplyFilerClick(filters)
-                        scope.launch { sheetState.hide() }
-                    }
+                    onApplyFilerClick = { onApplyFilerClick(it) }
                 )
             }
         }
@@ -220,7 +206,6 @@ fun CollectionScreen(
 @Composable
 fun FilterContent(
     state: UiState,
-    onBackClick: () -> Unit = {},
     onApplyFilerClick: (Set<Filter>) -> Unit = {},
     onSelectPacksClicked: () -> Unit = {},
 ) {
@@ -231,13 +216,21 @@ fun FilterContent(
         )
     }
 
+    LaunchedEffect(showOnlyOwned) {
+        val ownedFilter = selectedFilters.find { it.type == OWNED }
+        val finalFilters =
+            selectedFilters.replace(ownedFilter, Filter(OWNED, showOnlyOwned))
+
+        onApplyFilerClick(finalFilters.toSet())
+    }
+
     Column(
         modifier = Modifier.fillMaxWidth(),
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Text(
             modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
-            text = "Filter",
+            text = "Filter & Appearance",
             color = MaterialTheme.colors.onBackground,
             fontSize = 20.sp,
             fontWeight = FontWeight.Bold
@@ -256,6 +249,8 @@ fun FilterContent(
                 selectedFilters = selectedFilters.replace(
                     filter, filter.copy(active = !filter.active)
                 )
+
+                onApplyFilerClick(selectedFilters.toSet())
             }
         )
 
@@ -272,7 +267,7 @@ fun FilterContent(
             Text("Show only owned")
             Switch(
                 checked = showOnlyOwned,
-                onCheckedChange = { showOnlyOwned = it }
+                onCheckedChange = null
             )
         }
 
@@ -291,49 +286,6 @@ fun FilterContent(
             )
         }
 
-        Row(
-            modifier = Modifier.fillMaxWidth().padding(
-                vertical = 16.dp,
-                horizontal = ContentPadding,
-            )
-        ) {
-            TextButton(
-                modifier = Modifier.weight(1f),
-                onClick = onBackClick,
-                shape = DefaultShape,
-                colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = MaterialTheme.colors.surface
-                )
-            ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = MaterialTheme.colors.primary,
-                    text = stringResource(Res.string.cancel),
-                )
-            }
-
-            Spacer(Modifier.width(16.dp))
-
-            TextButton(
-                modifier = Modifier.weight(1f),
-                shape = DefaultShape,
-                colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = MaterialTheme.colors.primary
-                ),
-                onClick = {
-                    val ownedFilter = selectedFilters.find { it.type == OWNED }
-                    val finalFilters =
-                        selectedFilters.replace(ownedFilter, Filter(OWNED, showOnlyOwned))
-
-                    onApplyFilerClick(finalFilters.toSet())
-                },
-            ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = MaterialTheme.colors.onPrimary,
-                    text = stringResource(Res.string.apply),
-                )
-            }
-        }
+        Spacer(Modifier.height(16.dp))
     }
 }

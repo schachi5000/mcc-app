@@ -5,20 +5,23 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.material.FloatingActionButton
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.setValue
+import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
@@ -35,39 +38,52 @@ import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardBackgroundBox
 import net.schacher.mcc.shared.design.compose.Tag
+import net.schacher.mcc.shared.design.theme.ButtonSize
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.FABPadding
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.repositories.CardRepository
+import net.schacher.mcc.shared.platform.isAndroid
+import net.schacher.mcc.shared.screens.AppRoute
+import net.schacher.mcc.shared.screens.navigate
+import net.schacher.mcc.shared.screens.resultState
 import org.koin.compose.koinInject
+import org.koin.core.parameter.parametersOf
 
 @Composable
 fun CardScreen(
     cardCode: String,
     modifier: Modifier = Modifier,
-    cardRepository: CardRepository = koinInject(),
+    viewModel: CardScreenViewModel = koinInject { parametersOf(cardCode) },
     navController: NavController = koinInject()
 ) {
-    var card by remember { mutableStateOf<Card?>(null) }
-    LaunchedEffect(cardCode) {
-        card = cardRepository.getCard(cardCode)
+
+    val selectedDeckId = navController.resultState<Int?>()?.value
+    selectedDeckId?.let {
+        LaunchedEffect(it) {
+            viewModel.onAddCardToDeck(it, cardCode)
+        }
     }
 
-    card?.let {
-        CardScreen(
-            card = it,
-            modifier = modifier,
-            onCloseClick = { navController.popBackStack() }
-        )
-    }
+    val state = viewModel.state.collectAsState()
+    CardScreen(
+        card = state.value.card,
+        modifier = modifier,
+        onCloseClick = { navController.popBackStack() },
+        onAddToDeckClick = {
+            navController.navigate(AppRoute.SelectDeck)
+        }.takeIf { state.value.canAddToDeck }
+    )
 }
 
 @Composable
 fun CardScreen(
     card: Card,
     modifier: Modifier = Modifier,
-    onCloseClick: () -> Unit
+    onAddToDeckClick: (() -> Unit)?,
+    onCloseClick: () -> Unit,
 ) {
     CardBackgroundBox(
         cardCode = card.code,
@@ -75,13 +91,18 @@ fun CardScreen(
     ) {
         Content(
             card = card,
-            onCloseClick = onCloseClick
+            onAddToDeckClick = onAddToDeckClick,
+            onCloseClick = onCloseClick,
         )
     }
 }
 
 @Composable
-private fun Content(card: Card, onCloseClick: () -> Unit) {
+private fun Content(
+    card: Card,
+    onAddToDeckClick: (() -> Unit)?,
+    onCloseClick: () -> Unit
+) {
     Box(modifier = Modifier.fillMaxSize()) {
         val state = rememberLazyListState()
 
@@ -194,7 +215,29 @@ private fun Content(card: Card, onCloseClick: () -> Unit) {
 
             }
         }
+
         BackButton(onCloseClick)
+
+
+        onAddToDeckClick?.let {
+            FloatingActionButton(
+                onClick = it,
+                modifier = Modifier.align(Alignment.BottomEnd).navigationBarsPadding()
+                    .padding(
+                        end = FABPadding,
+                        bottom = if (isAndroid()) ContentPadding else 0.dp
+                    )
+                    .size(ButtonSize),
+                contentColor = MaterialTheme.colors.onPrimary,
+                backgroundColor = MaterialTheme.colors.primary,
+                shape = DefaultShape
+            ) {
+                Icon(
+                    imageVector = Icons.Rounded.Add,
+                    contentDescription = "Add to deck"
+                )
+            }
+        }
     }
 }
 

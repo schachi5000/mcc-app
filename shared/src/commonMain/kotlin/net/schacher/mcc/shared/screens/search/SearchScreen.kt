@@ -269,10 +269,6 @@ fun SearchFilterChip(
         onClick = onClick,
         selected = selected,
         shape = DefaultShape,
-        border = BorderStroke(
-            width = 1.dp,
-            color = MaterialTheme.colors.background
-        ),
         colors = ChipDefaults.filterChipColors(
             backgroundColor = MaterialTheme.colors.surface,
             selectedContentColor = contentColor,

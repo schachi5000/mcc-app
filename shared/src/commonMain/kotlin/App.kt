@@ -1,11 +1,12 @@
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
-import net.schacher.mcc.shared.datasource.database.DeckDatabaseDao
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.datasource.http.KtorMarvelCDbDataSource
@@ -19,7 +20,9 @@ import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.repositories.SpotlightRepository
 import net.schacher.mcc.shared.screens.app.AppScreen
 import net.schacher.mcc.shared.screens.app.AppViewModel
+import net.schacher.mcc.shared.screens.card.CardScreenViewModel
 import net.schacher.mcc.shared.screens.collection.CollectionViewModel
+import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel
 import net.schacher.mcc.shared.screens.main.MainViewModel
 import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.screens.newdeck.NewDeckViewModel
@@ -30,6 +33,7 @@ import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
+import org.koin.core.module.dsl.viewModel
 import org.koin.core.module.dsl.viewModelOf
 import org.koin.dsl.module
 import pro.schacher.mcc.BuildConfig
@@ -55,16 +59,20 @@ val viewModels = module {
     viewModelOf(::SettingsViewModel)
     viewModelOf(::SpotlightViewModel)
     viewModelOf(::CollectionViewModel)
+    viewModel { (deckId: Int) -> DeckScreenViewModel(deckId, get(), get()) }
+    viewModel { (cardCode: String) -> CardScreenViewModel(cardCode, get(), get(), get()) }
 }
 
 @Composable
 fun App(
     databaseDao: DatabaseDao,
+    onKoinStart: KoinApplication.() -> Unit = {},
+    onQuitApp: () -> Unit = {},
     onLoginClicked: (LoginBridge) -> Unit,
-    onKoinStart: KoinApplication.() -> Unit = {}
 ) {
     val authHandler = AuthRepository(databaseDao as SettingsDao)
     val navController = rememberNavController()
+    val snackbarHostState = remember { SnackbarHostState() }
 
     KoinApplication(application = {
         onKoinStart()
@@ -75,7 +83,6 @@ fun App(
             },
             module {
                 single<CardDatabaseDao> { databaseDao }
-                single<DeckDatabaseDao> { databaseDao }
                 single<PackDatabaseDao> { databaseDao }
                 single<SettingsDao> { databaseDao }
             },
@@ -84,6 +91,9 @@ fun App(
             },
             module {
                 single<NavController> { navController }
+            },
+            module {
+                single<SnackbarHostState> { snackbarHostState }
             },
             network,
             repositories,
@@ -99,7 +109,9 @@ fun App(
                                 authHandler.handleCallbackUrl(callbackUrl)
                             }
                         })
-                })
+                },
+                onQuitApp = onQuitApp
+            )
         }
     }
 }
@@ -117,8 +129,3 @@ interface LoginBridge {
 
     fun isCallbackUrl(url: String): Boolean = url.startsWith("mccapp://callback")
 }
-
-
-
-
-

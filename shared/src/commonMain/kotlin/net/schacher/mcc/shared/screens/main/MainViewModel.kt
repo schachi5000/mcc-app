@@ -3,26 +3,25 @@ package net.schacher.mcc.shared.screens.main
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
-import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.utils.debug
-import kotlin.time.Duration.Companion.seconds
+import net.schacher.mcc.shared.utils.launchAndCollect
 
 class MainViewModel(
     private val cardRepository: CardRepository,
-    private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val settingsDao: SettingsDao
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(UiState())
@@ -36,12 +35,12 @@ class MainViewModel(
     init {
         Logger.debug { "Init MainViewModel" }
         this.viewModelScope.launch {
-            delay(1.seconds)
-            if (!cardRepository.hasCards()) {
+            if (!settingsDao.getBoolean("cards-synced", false)) {
                 Logger.d { "No cards found in repo -> refreshing" }
                 try {
-                    cardRepository.refreshAllCards()
+//                    cardRepository.refreshAllCards()
                     packRepository.refreshAllPacks()
+                    settingsDao.putBoolean("cards-synced", true)
                     _event.emit(Event.DatabaseSynced)
                 } catch (e: Exception) {
                     Logger.e(e) { "Error refreshing cards" }
@@ -50,14 +49,12 @@ class MainViewModel(
             }
         }
 
-        this.viewModelScope.launch {
-            authRepository.loginState.collect {
-                _state.update {
-                    it.copy(
-                        mainScreen = Spotlight,
-                        canShowMyDeckScreen = authRepository.isSignedIn()
-                    )
-                }
+        this.viewModelScope.launchAndCollect(authRepository.loginState) {
+            _state.update {
+                it.copy(
+                    mainScreen = Spotlight,
+                    canShowMyDeckScreen = authRepository.isSignedInAsUser()
+                )
             }
         }
     }

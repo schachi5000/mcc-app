@@ -6,7 +6,7 @@ interface SettingsDao {
 
     fun putString(key: String, value: String): Boolean
 
-    fun getBoolean(key: String): Boolean?
+    fun getBoolean(key: String, default: Boolean): Boolean
 
     fun putBoolean(key: String, value: Boolean): Boolean
 

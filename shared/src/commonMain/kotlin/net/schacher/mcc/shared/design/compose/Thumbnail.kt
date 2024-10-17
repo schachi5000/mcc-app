@@ -18,6 +18,8 @@ import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.design.theme.DeckShape
 import net.schacher.mcc.shared.model.Card
 
+private const val TAG = "Thumbnail"
+
 @Composable
 fun Thumbnail(card: Card, modifier: Modifier = Modifier) {
     CardImage(modifier = modifier.clip(CardShape).aspectRatio(1f).scale(2.5f)
@@ -32,7 +34,7 @@ fun Thumbnail(card: Card, modifier: Modifier = Modifier) {
             )
         },
         onFailure = {
-            Logger.e { "Failed to load image for card: ${card.name}(${card.code}) - ${it.message}" }
+            Logger.e(TAG) { "Failed to load image for card: ${card.name}(${card.code})" }
             Box(
                 Modifier.fillMaxSize()
                     .background(MaterialTheme.colors.surface.copy(alpha = 0.8f), DeckShape)

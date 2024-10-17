@@ -15,7 +15,6 @@ import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
@@ -27,7 +26,6 @@ import marvelchampionscompanion.shared.generated.resources.collection
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
-import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.PagerHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.screens.AppRoute
@@ -59,14 +57,9 @@ internal val topInset = 2 * ContentPadding + 64.dp
 fun MainScreen(
     viewModel: MainViewModel = koinViewModel(),
     navController: NavController = koinInject(),
+    snackbarHostState: SnackbarHostState = koinInject(),
 ) {
     val scope = rememberCoroutineScope()
-
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    BackHandler {
-        viewModel.onLogoutClicked()
-    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

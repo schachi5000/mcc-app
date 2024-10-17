@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.create_new_deck
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
+import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
@@ -58,7 +59,8 @@ fun MyDecksScreen(
     viewModel: MyDecksViewModel = koinViewModel(),
     topInset: Dp,
     onDeckClick: (Deck) -> Unit,
-    onAddDeckClick: () -> Unit
+    onAddDeckClick: () -> Unit = {},
+    onBackPress: (() -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -67,7 +69,8 @@ fun MyDecksScreen(
         topInset = topInset,
         onDeckClick = onDeckClick,
         onAddDeckClick = onAddDeckClick,
-        onRefresh = { viewModel.onRefreshClicked() }
+        onRefresh = { viewModel.onRefreshClicked() },
+        onBackPress = onBackPress
     )
 }
 
@@ -78,7 +81,8 @@ fun MyDecksScreen(
     topInset: Dp = 0.dp,
     onRefresh: () -> Unit,
     onDeckClick: (Deck) -> Unit,
-    onAddDeckClick: () -> Unit
+    onAddDeckClick: () -> Unit,
+    onBackPress: (() -> Unit)? = null
 ) {
     val entries = mutableListOf<ListItem>().also {
         it.addAll(state.decks.map { DeckItem(it) })
@@ -141,6 +145,10 @@ fun MyDecksScreen(
             contentColor = MaterialTheme.colors.onPrimary,
             backgroundColor = MaterialTheme.colors.primary
         )
+
+        onBackPress?.let {
+            BackButton(it)
+        }
     }
 }
 

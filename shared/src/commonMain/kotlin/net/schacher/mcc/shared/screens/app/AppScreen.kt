@@ -10,19 +10,24 @@ import androidx.compose.material.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import net.schacher.mcc.shared.design.compose.Animation
+import net.schacher.mcc.shared.design.compose.BackHandler
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.card.CardScreen
 import net.schacher.mcc.shared.screens.deck.DeckScreen
 import net.schacher.mcc.shared.screens.login.LoginScreen
 import net.schacher.mcc.shared.screens.main.MainScreen
+import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
 import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
 import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
+import net.schacher.mcc.shared.screens.setResultAndPopBackstack
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -30,7 +35,8 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AppScreen(
     appViewModel: AppViewModel = koinViewModel(),
     navController: NavController = koinInject(),
-    onLogInClicked: () -> Unit
+    onLogInClicked: () -> Unit,
+    onQuitApp: () -> Unit
 ) {
     NavHost(
         navController = navController as NavHostController,
@@ -81,6 +87,19 @@ fun AppScreen(
                 CardScreen(cardCode = cardCode)
             }
         }
+
+        composable(AppRoute.SelectDeck.route) {
+            MyDecksScreen(
+                topInset = ContentPadding,
+                onDeckClick = { navController.setResultAndPopBackstack(it.id) },
+                onBackPress = { navController.popBackStack() }
+            )
+        }
+    }
+
+    val currentBackStack by navController.currentBackStack.collectAsState()
+    BackHandler(currentBackStack.last().destination.route == AppRoute.Main.route) {
+        onQuitApp()
     }
 
     val loggedIn = appViewModel.state.collectAsState()

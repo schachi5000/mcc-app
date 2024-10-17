@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.repositories
 
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -11,18 +12,19 @@ import net.schacher.mcc.shared.model.Pack
 
 class PackRepository(
     private val packDatabaseDao: PackDatabaseDao,
-    private val marvelCDbDataSource: MarvelCDbDataSource
+    private val marvelCDbDataSource: MarvelCDbDataSource,
+    private val scope: CoroutineScope = MainScope()
 ) {
     private val _packs = MutableStateFlow<List<Pack>>(emptyList())
 
-    val packs = _packs.asStateFlow()
+    val packs = this._packs.asStateFlow()
 
     private val _packsInCollection = MutableStateFlow<List<String>>(emptyList())
 
-    val packsInCollection = _packsInCollection.asStateFlow()
+    val packsInCollection = this._packsInCollection.asStateFlow()
 
     init {
-        MainScope().launch {
+        this.scope.launch {
             _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
             _packs.emit(packDatabaseDao.getAllPacks())
         }
@@ -44,8 +46,8 @@ class PackRepository(
 
     suspend fun deleteAllPackData() {
         this.packDatabaseDao.wipePackTable()
-        _packsInCollection.emit(emptyList())
-        _packs.emit(emptyList())
+        this._packsInCollection.emit(emptyList())
+        this._packs.emit(emptyList())
     }
 
     fun hasPackInCollection(packCode: String) = this.packsInCollection.value.contains(packCode)
@@ -56,7 +58,7 @@ class PackRepository(
     }
 
     suspend fun removePackFromCollection(packCode: String) {
-        this.packDatabaseDao.removePackToCollection(packCode)
+        this.packDatabaseDao.removePackFromCollection(packCode)
         _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
     }
 }

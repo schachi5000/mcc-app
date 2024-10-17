@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.design.compose
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
@@ -40,7 +42,6 @@ import net.schacher.mcc.shared.model.CardType.SIDE_SCHEME
 import net.schacher.mcc.shared.model.CardType.TREACHERY
 import net.schacher.mcc.shared.model.CardType.VILLAIN
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 const val PORTRAIT_RATIO = 0.715f
@@ -49,27 +50,33 @@ const val LANDSCAPE_RATIO = 1.396f
 @Composable
 fun LabeledCard(
     card: Card,
+    label: String = card.name,
+    showLabel: Boolean = true,
     modifier: Modifier = Modifier.height(196.dp),
     shape: Shape = CardShape,
     onClick: () -> Unit = {}
 ) {
     Column {
         Card(card, modifier, shape, onClick)
-        Text(
-            modifier = Modifier
+        AnimatedVisibility(
+            visible = showLabel,
+            modifier = Modifier.padding(vertical = 4.dp)
                 .sizeIn(maxWidth = 128.dp)
-                .align(Alignment.CenterHorizontally),
-            text = card.name,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onBackground,
-            maxLines = 2,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.SemiBold
-        )
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = label,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.onBackground,
+                maxLines = 2,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Card(
     card: Card,
@@ -99,7 +106,7 @@ fun Card(
                 ShimmerBox(modifier = Modifier.fillMaxSize())
             },
             onFailure = {
-                Logger.e { "Failed to load image for card: ${card.name}(${card.code}) - ${it.message}" }
+                Logger.e { "Failed to load image for card: ${card.name}(${card.code})" }
                 FailureImage(card)
             })
     }
