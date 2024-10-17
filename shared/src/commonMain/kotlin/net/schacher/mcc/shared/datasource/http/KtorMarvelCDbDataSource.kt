@@ -52,13 +52,14 @@ import net.schacher.mcc.shared.repositories.AuthRepository
 import pro.schacher.mcc.BuildConfig
 import kotlin.coroutines.CoroutineContext
 
-class KtorMarvelCDbDataSource(private val authRepository: AuthRepository) : MarvelCDbDataSource {
+class KtorMarvelCDbDataSource(
+    private val authRepository: AuthRepository,
+    private val serviceUrl: String
+) : MarvelCDbDataSource {
 
     private companion object {
         const val TAG = "KtorMarvelCDbDataSource"
     }
-
-    private val serviceUrl: String = BuildConfig.PROXY_URL
 
     private val authHeader: String
         get() = "Bearer ${this.authRepository.accessToken?.token ?: throw IllegalStateException("No access token available")}"
