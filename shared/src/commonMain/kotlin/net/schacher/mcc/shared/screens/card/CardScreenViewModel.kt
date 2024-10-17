@@ -37,18 +37,19 @@ class CardScreenViewModel(
         this.viewModelScope.launch {
             try {
                 deckRepository.addCardToDeck(it, cardCode)
-            }catch (e: Exception){
+            } catch (e: Exception) {
                 Logger.e(e)
             }
         }
     }
 
     private fun canAddToDeck(card: Card): Boolean =
-        this.authRepository.isSignedInAsUser() && listOf<CardType>(
+        this.authRepository.isSignedInAsUser() && listOf(
             CardType.ALLY,
             CardType.ATTACHMENT,
             CardType.RESOURCE,
-            CardType.UPGRADE
+            CardType.UPGRADE,
+            CardType.EVENT,
         ).any {
             it == card.type
         }
