@@ -59,6 +59,7 @@ class KtorMarvelCDbDataSource(
 
     private companion object {
         const val TAG = "KtorMarvelCDbDataSource"
+        const val AUTHORIZATION = "Authorization"
     }
 
     private val authHeader: String
@@ -111,7 +112,7 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getCardsInPack(packCode: String): List<Card> =
         withContextSafe(Dispatchers.IO) {
-            httpClient.get("$serviceUrl/pack/$packCode")
+            httpClient.get("$serviceUrl/packs/$packCode")
                 .body<List<CardDto>>()
                 .map {
                     val card = it.toCard()
@@ -126,7 +127,7 @@ class KtorMarvelCDbDataSource(
         }.getOrNull() ?: emptyList()
 
     override suspend fun getCard(cardCode: String) = withContext(Dispatchers.IO) {
-        httpClient.get("$serviceUrl/card/$cardCode")
+        httpClient.get("$serviceUrl/cards/$cardCode")
             .body<CardDto>()
             .let {
                 val card = it.toCard()
@@ -143,7 +144,9 @@ class KtorMarvelCDbDataSource(
     override suspend fun getSpotlightDecksByDate(
         date: LocalDate, cardProvider: suspend (String) -> Card
     ) = withContextSafe(Dispatchers.IO) {
-        httpClient.get("$serviceUrl/spotlight/${date.toDateString()}")
+        httpClient.get("$serviceUrl/decks/spotlight") {
+            parameter("date", date.toDateString())
+        }
             .body<List<DeckDto>>()
             .map { it.toDeck(cardProvider) }
     }
@@ -151,7 +154,7 @@ class KtorMarvelCDbDataSource(
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
         withContextSafe(Dispatchers.IO) {
             httpClient
-                .get("$serviceUrl/api/oauth2/decks") {
+                .get("$serviceUrl/decks") {
                     headers { append("Authorization", authHeader) }
                 }
                 .body<List<DeckDto>>()
@@ -165,29 +168,30 @@ class KtorMarvelCDbDataSource(
     ): Deck = this.getUserDeckDtoById(deckId).toDeck(cardProvider)
 
     private suspend fun getUserDeckDtoById(deckId: Int) = withContext(Dispatchers.IO) {
-        httpClient.get("$serviceUrl/api/oauth2/deck/load/$deckId") {
-            headers { append("Authorization", authHeader) }
+        httpClient.get("$serviceUrl/decks/$deckId") {
+            headers { append(AUTHORIZATION, authHeader) }
         }.body<DeckDto>()
     }
 
-    override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card): Deck {
-        val slots = deck.cards.toMutableList()
-            .also { it.removeAll { it.code == deck.hero.code } }
-            .groupingBy { it.code }
-            .eachCount()
-            .let { Json.encodeToString(it) }
+    override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card) =
+        withContextSafe(Dispatchers.IO) {
+            val slots = deck.cards.toMutableList()
+                .also { it.removeAll { it.code == deck.hero.code } }
+                .groupingBy { it.code }
+                .eachCount()
+                .let { Json.encodeToString(it) }
 
-        val response = this.httpClient.put("$serviceUrl/api/oauth2/deck/save/${deck.id}") {
-            headers { append("Authorization", authHeader) }
-            parameter("slots", slots)
-        }.body<DeckUpdateResponseDto>()
+            val response = httpClient.put("$serviceUrl/decks/${deck.id}") {
+                headers { append(AUTHORIZATION, authHeader) }
+                parameter("slots", slots)
+            }.body<DeckUpdateResponseDto>()
 
-        if (response.success) {
-            return getUserDeckById(deck.id) { cardProvider(it) }
-        } else {
-            throw Exception("Failed to update deck: ${response.msg?.toString()}")
+            if (response.success) {
+                getUserDeckById(deck.id) { cardProvider(it) }
+            } else {
+                throw Exception("Failed to update deck: ${response.msg?.toString()}")
+            }
         }
-    }
 }
 
 private fun LocalDate.toDateString(): String {
