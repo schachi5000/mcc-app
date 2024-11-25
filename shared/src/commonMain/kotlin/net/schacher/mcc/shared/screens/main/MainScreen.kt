@@ -21,7 +21,6 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import marvelchampionscompanion.shared.generated.resources.Res
@@ -35,6 +34,8 @@ import marvelchampionscompanion.shared.generated.resources.ic_spotlight_selected
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
+import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.platform.isIOs
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.collection.CollectionScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
@@ -53,8 +54,6 @@ import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
-
-internal val topInset = 64.dp
 
 @OptIn(
     ExperimentalResourceApi::class,
@@ -149,7 +148,9 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         backgroundColor = MaterialTheme.colors.background,
     ) {
         Row(
-            modifier = Modifier.fillMaxWidth().heightIn(72.dp),
+            modifier = Modifier.fillMaxWidth()
+                .padding(bottom = ContentPadding.takeIf { isIOs() } ?: 0.dp)
+                .heightIn(72.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
             DefaultBottomNavigationItem(

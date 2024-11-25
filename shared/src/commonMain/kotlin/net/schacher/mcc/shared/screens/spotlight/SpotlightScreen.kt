@@ -1,8 +1,5 @@
 package net.schacher.mcc.shared.screens.spotlight
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -46,8 +43,10 @@ import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.screens.main.topInset
-import net.schacher.mcc.shared.screens.spotlight.ListItem.*
+import net.schacher.mcc.shared.screens.spotlight.ListItem.DeckItem
+import net.schacher.mcc.shared.screens.spotlight.ListItem.HeaderItem
+import net.schacher.mcc.shared.screens.spotlight.ListItem.LoadingItem
+import net.schacher.mcc.shared.screens.spotlight.ListItem.TopHeaderItem
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -83,7 +82,6 @@ fun SpotlightScreen(
         } else {
             state.decks.forEach { (date, decks) ->
                 entries.add(HeaderItem(getLabelByDate(date)))
-
                 decks.forEach { deck ->
                     entries.add(DeckItem(deck))
                 }
@@ -113,19 +111,9 @@ fun SpotlightScreen(
                         }
                         Spacer(Modifier.height(32.dp))
                     }
-
-                    is CombinedItem -> {
-                        entry.decks.forEach { deck ->
-                            DeckListItem(deck = deck) {
-                                onDeckClick(deck)
-                            }
-                            Spacer(Modifier.height(32.dp))
-                        }
-                    }
                 }
             }
         }
-//        }
 
         if (!state.loading && state.decks.isEmpty()) {
             Text(
@@ -135,14 +123,6 @@ fun SpotlightScreen(
                 color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f)
             )
         }
-
-//        AnimatedVisibility(
-//            visible = state.loading,
-//            exit = fadeOut(),
-//            enter = fadeIn()
-//        ) {
-//
-//        }
 
         PullRefreshIndicator(
             modifier = Modifier.align(Alignment.TopCenter)
@@ -186,7 +166,7 @@ private fun Header(label: String) {
 @Composable
 private fun LoadingContent() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Spacer(Modifier.height(topInset + 8.dp))
+        Spacer(Modifier.height(8.dp))
 
         ShimmerBox(
             modifier = Modifier
@@ -207,7 +187,6 @@ private fun LoadingContent() {
 
 private sealed interface ListItem {
     data class DeckItem(val deck: Deck) : ListItem
-    data class CombinedItem(val decks: List<Deck>) : ListItem
     data class HeaderItem(val header: String) : ListItem
     data object TopHeaderItem : ListItem
     data object LoadingItem : ListItem

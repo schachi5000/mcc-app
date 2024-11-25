@@ -141,9 +141,7 @@ fun MyDecksScreen(
         }
 
         PullRefreshIndicator(
-            modifier = Modifier.align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(top = topInset),
+            modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),
             refreshing = state.refreshing,
             state = pullRefreshState,
             contentColor = MaterialTheme.colors.onPrimary,
@@ -152,47 +150,6 @@ fun MyDecksScreen(
 
         onBackPress?.let {
             BackButton(it)
-        }
-    }
-}
-
-@OptIn(ExperimentalResourceApi::class)
-@Composable
-fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
-    var horizontalBias by remember { mutableStateOf(1f) }
-    val alignment by animateHorizontalAlignmentAsState(horizontalBias)
-
-    horizontalBias = if (expanded) 0f else 1f
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = alignment
-    ) {
-        FloatingActionButton(
-            onClick = onClick,
-            modifier = Modifier
-                .padding(vertical = 16.dp, horizontal = 20.dp)
-                .sizeIn(maxHeight = 48.dp, minWidth = 48.dp),
-            contentColor = MaterialTheme.colors.onPrimary,
-            backgroundColor = MaterialTheme.colors.primary,
-            shape = DefaultShape
-        ) {
-            Row(
-                modifier = Modifier.fillMaxHeight().padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = stringResource(Res.string.create_new_deck)
-                )
-
-                AnimatedVisibility(visible = expanded) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        text = stringResource(Res.string.create_new_deck)
-                    )
-                }
-            }
         }
     }
 }
