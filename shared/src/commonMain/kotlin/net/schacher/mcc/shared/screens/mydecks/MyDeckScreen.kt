@@ -43,9 +43,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.create_new_deck
+import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.DeckListItem
+import net.schacher.mcc.shared.design.compose.MainHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
@@ -57,7 +59,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun MyDecksScreen(
     viewModel: MyDecksViewModel = koinViewModel(),
-    topInset: Dp,
+    topInset: Dp = ContentPadding,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit = {},
     onBackPress: (() -> Unit)? = null
@@ -118,12 +120,14 @@ fun MyDecksScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = ContentPadding)
+                .padding(start = ContentPadding)
                 .nestedScroll(nestedScrollConnection)
         ) {
             items(entries.size) { index ->
                 if (index == 0) {
                     Spacer(Modifier.statusBarsPadding().height(topInset))
+                    MainHeader(stringResource(Res.string.my_decks))
+                    Spacer(Modifier.height(ContentPadding))
                 }
 
                 when (val entry = entries[index]) {
@@ -137,9 +141,7 @@ fun MyDecksScreen(
         }
 
         PullRefreshIndicator(
-            modifier = Modifier.align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(top = topInset),
+            modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),
             refreshing = state.refreshing,
             state = pullRefreshState,
             contentColor = MaterialTheme.colors.onPrimary,
@@ -148,48 +150,6 @@ fun MyDecksScreen(
 
         onBackPress?.let {
             BackButton(it)
-        }
-    }
-}
-
-@OptIn(ExperimentalResourceApi::class)
-@Composable
-fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
-    var horizontalBias by remember { mutableStateOf(1f) }
-    val alignment by animateHorizontalAlignmentAsState(horizontalBias)
-
-    horizontalBias = if (expanded) 0f else 1f
-
-    Column(
-        modifier = modifier.fillMaxWidth(),
-        horizontalAlignment = alignment
-    ) {
-        FloatingActionButton(
-            onClick = onClick,
-            modifier = Modifier
-                .padding(vertical = 16.dp, horizontal = 20.dp)
-                .sizeIn(maxHeight = 48.dp, minWidth = 48.dp),
-            contentColor = MaterialTheme.colors.onPrimary,
-            backgroundColor = MaterialTheme.colors.primary,
-            shape = DefaultShape
-        ) {
-            Row(
-                modifier = Modifier.fillMaxHeight()
-                    .padding(8.dp),
-                verticalAlignment = Alignment.CenterVertically
-            ) {
-                Icon(
-                    imageVector = Icons.Rounded.Add,
-                    contentDescription = stringResource(Res.string.create_new_deck)
-                )
-
-                AnimatedVisibility(visible = expanded) {
-                    Text(
-                        modifier = Modifier.padding(horizontal = 4.dp),
-                        text = stringResource(Res.string.create_new_deck)
-                    )
-                }
-            }
         }
     }
 }

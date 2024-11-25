@@ -18,11 +18,6 @@ class DeckScreenViewModel(
     private val deckRepository: DeckRepository,
     spotlightRepository: SpotlightRepository,
 ) : ViewModel() {
-
-    init {
-        Logger.debug { "DeckScreenViewModel init" }
-    }
-
     private val _state = MutableStateFlow(
         UiState(
             deck = deckRepository.getDeckById(deckId) ?: spotlightRepository.getDeckById(deckId)
