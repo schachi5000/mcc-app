@@ -62,6 +62,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
+private const val COLUMN_COUNT = 3
 
 @Composable
 fun DeckScreen(
@@ -223,8 +224,7 @@ private fun Content(
                     }
                 }
 
-                val columnCount = 3
-                val rows = otherCards.chunked(columnCount)
+                val rows = otherCards.chunked(COLUMN_COUNT)
                 items(rows.size) { index ->
                     Row(
                         modifier = Modifier
@@ -271,8 +271,8 @@ private fun Content(
                             }
                         }
 
-                        if (rows[index].size < columnCount) {
-                            repeat(columnCount - rows[index].size) {
+                        if (rows[index].size < COLUMN_COUNT) {
+                            repeat(COLUMN_COUNT - rows[index].size) {
                                 Spacer(modifier = Modifier.weight(1f))
                             }
                         }
