@@ -37,6 +37,7 @@ kotlin {
         |object BuildConfig {
         |  const val OAUTH_URL = "${getLocalProperty("oauth.url")}"
         |  const val PROXY_URL = "${getLocalProperty("proxy.url")}"
+        |  const val SERVICE_URL = "${getLocalProperty("service.url")}"
         |}
         |
       """.trimMargin()

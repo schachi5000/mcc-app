@@ -139,7 +139,6 @@ class DatabaseDao(
             pack.name,
             pack.position.toLong(),
             pack.cards.map { it.code }.toCardCodeString(),
-            pack.url,
             hasPackInCollection(pack.code).toLong()
         )
     }
@@ -208,7 +207,6 @@ private fun database.Pack.toPack(cardProvider: (cardCode: String) -> Card?) = Pa
     name = this.name,
     code = this.code,
     cards = this.cardCodes.toCardCodeList().mapNotNull { cardProvider(it) },
-    url = this.url,
     id = this.id.toInt(),
     position = this.position.toInt()
 )

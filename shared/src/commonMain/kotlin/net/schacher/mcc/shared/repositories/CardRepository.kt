@@ -54,7 +54,7 @@ class CardRepository(
             return card
         }
 
-        return this.marvelCDbDataSource.getCard(cardCode).also { newCard ->
+        return this.marvelCDbDataSource.getCard(cardCode).getOrThrow().also { newCard ->
             this.cardDatabaseDao.addCard(newCard)
             this._cards.update {
                 it.toMutableMap().apply { put(cardCode, newCard) }

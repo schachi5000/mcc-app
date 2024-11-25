@@ -31,7 +31,7 @@ class PackRepository(
     }
 
     suspend fun refreshAllPacks() {
-        val newPacks = this.marvelCDbDataSource.getAllPacks()
+        val newPacks = this.marvelCDbDataSource.getAllPacks().getOrThrow()
 
         Logger.i { "${newPacks.size} packs loaded" }
         try {

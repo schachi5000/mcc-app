@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.screens.card
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
@@ -11,6 +12,7 @@ import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.utils.e
 
 class CardScreenViewModel(
     cardCode: String,
@@ -33,16 +35,21 @@ class CardScreenViewModel(
 
     fun onAddCardToDeck(it: Int, cardCode: String) {
         this.viewModelScope.launch {
-            deckRepository.addCardToDeck(it, cardCode)
+            try {
+                deckRepository.addCardToDeck(it, cardCode)
+            } catch (e: Exception) {
+                Logger.e(e)
+            }
         }
     }
 
     private fun canAddToDeck(card: Card): Boolean =
-        this.authRepository.isSignedInAsUser() && listOf<CardType>(
+        this.authRepository.isSignedInAsUser() && listOf(
             CardType.ALLY,
             CardType.ATTACHMENT,
             CardType.RESOURCE,
-            CardType.UPGRADE
+            CardType.UPGRADE,
+            CardType.EVENT,
         ).any {
             it == card.type
         }

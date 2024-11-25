@@ -39,7 +39,7 @@ import org.koin.dsl.module
 import pro.schacher.mcc.BuildConfig
 
 val network = module {
-    single<MarvelCDbDataSource> { KtorMarvelCDbDataSource(get()) }
+    single<MarvelCDbDataSource> { KtorMarvelCDbDataSource(get(), BuildConfig.SERVICE_URL) }
 }
 
 val repositories = module {
