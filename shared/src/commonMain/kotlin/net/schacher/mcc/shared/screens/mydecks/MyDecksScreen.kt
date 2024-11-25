@@ -1,26 +1,16 @@
 package net.schacher.mcc.shared.screens.mydecks
 
-import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.FloatingActionButton
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -41,18 +31,16 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
-import marvelchampionscompanion.shared.generated.resources.create_new_deck
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.MainHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
-import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -66,6 +54,7 @@ fun MyDecksScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
+    Logger.d { "State updated: $state" }
     MyDecksScreen(
         state = state,
         topInset = topInset,

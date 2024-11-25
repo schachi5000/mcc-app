@@ -14,24 +14,23 @@ import net.schacher.mcc.shared.utils.launchAndCollect
 class MyDecksViewModel(private val deckRepository: DeckRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(
-        UiState(decks = this.deckRepository.decks.value)
+        UiState(
+            decks = this.deckRepository.decks.value,
+            refreshing = true
+        )
     )
 
     val state = _state.asStateFlow()
 
     init {
-        this.viewModelScope.launchAndCollect(this.deckRepository.decks) {
+        this.viewModelScope.launchAndCollect(this.deckRepository.decks) { decks ->
             _state.update {
                 it.copy(
-                    decks = it.decks,
+                    decks = decks,
                     refreshing = false
                 )
             }
         }
-    }
-
-    fun onCreateDeckClick() {
-        // TODO Not yet implemented
     }
 
     fun onRefreshClicked() {
