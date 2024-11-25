@@ -1,33 +1,40 @@
 package net.schacher.mcc.shared.screens.main
 
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.pager.HorizontalPager
 import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.material.BottomNavigation
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.collectAsState
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.times
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.collection
+import marvelchampionscompanion.shared.generated.resources.ic_collection
+import marvelchampionscompanion.shared.generated.resources.ic_collection_selected
+import marvelchampionscompanion.shared.generated.resources.ic_my_decks
+import marvelchampionscompanion.shared.generated.resources.ic_my_decks_selected
+import marvelchampionscompanion.shared.generated.resources.ic_spotlight
+import marvelchampionscompanion.shared.generated.resources.ic_spotlight_selected
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
-import net.schacher.mcc.shared.design.compose.PagerHeader
-import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.collection.CollectionScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
@@ -47,7 +54,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
-internal val topInset = 2 * ContentPadding + 64.dp
+internal val topInset = 64.dp
 
 @OptIn(
     ExperimentalResourceApi::class,
@@ -59,29 +66,47 @@ fun MainScreen(
     navController: NavController = koinInject(),
     snackbarHostState: SnackbarHostState = koinInject(),
 ) {
-    val scope = rememberCoroutineScope()
+    val state = viewModel.state.collectAsState()
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         backgroundColor = MaterialTheme.colors.background,
         snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        bottomBar = {
+            BottomBar(state.value.mainScreen.tabIndex) {
+                viewModel.onTabSelected(it.toMainScreen())
+            }
+        }
     ) {
         Box(
             modifier = Modifier.padding(it)
         ) {
             val pageLabels = listOf(
-                Spotlight, MyDecks,
-                Collection, Settings
+                Spotlight,
+                MyDecks,
+                Collection,
+                Settings
             )
-            val pagerState = rememberPagerState(pageCount = { pageLabels.size })
 
-            HorizontalPager(state = pagerState) { page ->
+            val pagerState = rememberPagerState(
+                pageCount = { pageLabels.size },
+                initialPage = state.value.mainScreen.tabIndex
+            )
+
+            LaunchedEffect(state.value.mainScreen.tabIndex) {
+                pagerState.animateScrollToPage(state.value.mainScreen.tabIndex)
+            }
+
+            HorizontalPager(
+                state = pagerState,
+                userScrollEnabled = false
+            ) { page ->
                 when (page) {
-                    Spotlight.tabIndex -> SpotlightScreen(topInset = topInset) {
+                    Spotlight.tabIndex -> SpotlightScreen {
                         navController.navigate("deck/${it.id}")
                     }
 
-                    MyDecks.tabIndex -> MyDecksScreen(topInset = topInset,
+                    MyDecks.tabIndex -> MyDecksScreen(
                         onDeckClick = {
                             navController.navigate("deck/${it.id}")
                         },
@@ -89,12 +114,11 @@ fun MainScreen(
                             navController.navigate(AppRoute.AddDeck)
                         })
 
-                    Collection.tabIndex -> CollectionScreen(topInset = topInset) {
+                    Collection.tabIndex -> CollectionScreen {
                         navController.navigate("card/${it.code}")
                     }
 
                     Settings.tabIndex -> SettingsScreen(
-                        topInset = topInset,
                         onPackSelectionClick = {
                             navController.navigate(AppRoute.Packs)
                         },
@@ -103,22 +127,8 @@ fun MainScreen(
                         })
                 }
             }
-
-            PagerHeader(
-                modifier = Modifier.fillMaxWidth()
-                    .background(MaterialTheme.colors.background.copy(alpha = .9f))
-                    .statusBarsPadding()
-                    .padding(vertical = ContentPadding * 2),
-                pageLabels = pageLabels.map { it.label },
-                pagerState = pagerState,
-            ) {
-                scope.launch {
-                    pagerState.animateScrollToPage(it)
-                }
-            }
         }
     }
-
 
     LaunchedEffect(Unit) {
         viewModel.event.collect {
@@ -131,6 +141,45 @@ fun MainScreen(
     }
 }
 
+@Composable
+fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
+    BottomNavigation(
+        modifier = Modifier.fillMaxWidth(),
+        elevation = 0.dp,
+        backgroundColor = MaterialTheme.colors.background,
+    ) {
+        Row(
+            modifier = Modifier.fillMaxWidth().heightIn(72.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            DefaultBottomNavigationItem(
+                drawableResource = Res.drawable.ic_spotlight,
+                selectedDrawableResource = Res.drawable.ic_spotlight_selected,
+                color = Color(0xffeb4d4b),
+                selected = (selectedTabIndex == Spotlight.tabIndex),
+                onClick = { onTabSelected(Spotlight.tabIndex) },
+            )
+            DefaultBottomNavigationItem(
+                drawableResource = Res.drawable.ic_my_decks,
+                selectedDrawableResource = Res.drawable.ic_my_decks_selected,
+                selected = (selectedTabIndex == MyDecks.tabIndex),
+                onClick = { onTabSelected(MyDecks.tabIndex) },
+            )
+            DefaultBottomNavigationItem(
+                drawableResource = Res.drawable.ic_collection,
+                selectedDrawableResource = Res.drawable.ic_collection_selected,
+                selected = (selectedTabIndex == Collection.tabIndex),
+                onClick = { onTabSelected(Collection.tabIndex) },
+            )
+            DefaultBottomNavigationItem(
+                imageVector = Icons.Rounded.MoreVert,
+                selected = (selectedTabIndex == Settings.tabIndex),
+                onClick = { onTabSelected(Settings.tabIndex) },
+            )
+        }
+    }
+}
+
 private val MainScreen.tabIndex: Int
     get() = when (this) {
         Spotlight -> 0
@@ -138,6 +187,13 @@ private val MainScreen.tabIndex: Int
         Collection -> 2
         Settings -> 3
     }
+
+private fun Int.toMainScreen(): MainScreen = when (this) {
+    1 -> MyDecks
+    2 -> Collection
+    3 -> Settings
+    else -> Spotlight
+}
 
 private val MainScreen.label: String
     @Composable

@@ -53,7 +53,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SpotlightScreen(
     viewModel: SpotlightViewModel = koinViewModel(),
-    topInset: Dp,
+    topInset: Dp = ContentPadding,
     onDeckClick: (Deck) -> Unit,
 ) {
     val state by viewModel.state.collectAsState()
@@ -132,8 +132,7 @@ fun SpotlightScreen(
 
         PullRefreshIndicator(
             modifier = Modifier.align(Alignment.TopCenter)
-                .statusBarsPadding()
-                .padding(top = topInset),
+                .statusBarsPadding(),
             refreshing = state.loading,
             state = pullRefreshState,
             contentColor = MaterialTheme.colors.onPrimary,
@@ -173,7 +172,7 @@ private fun Header(label: String) {
 @Composable
 private fun LoadingContent() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Spacer(Modifier.statusBarsPadding().height(topInset + 8.dp))
+        Spacer(Modifier.height(topInset + 8.dp))
 
         ShimmerBox(
             modifier = Modifier

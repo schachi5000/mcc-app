@@ -36,7 +36,7 @@ import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.database
 import marvelchampionscompanion.shared.generated.resources.ic_cards
-import marvelchampionscompanion.shared.generated.resources.ic_deck
+import marvelchampionscompanion.shared.generated.resources.ic_my_decks
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
@@ -51,7 +51,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun SettingsScreen(
     settingsViewModel: SettingsViewModel = koinViewModel(),
-    topInset: Dp,
+    topInset: Dp = ContentPadding,
     onPackSelectionClick: () -> Unit,
     onLogoutClicked: () -> Unit
 ) {
@@ -128,11 +128,11 @@ fun SettingsScreen(
             )
 
             OptionsEntry(
-                label = "${state.deckCount} Decks", iconResource = Res.drawable.ic_deck
+                label = "${state.deckCount} Decks", iconResource = Res.drawable.ic_my_decks
             )
 
             OptionsEntry(label = "${state.packsInCollectionCount} of ${state.packCount} Packs",
-                iconResource = Res.drawable.ic_deck,
+                iconResource = Res.drawable.ic_my_decks,
                 onClick = { onPackSelectionClick() })
         }
 

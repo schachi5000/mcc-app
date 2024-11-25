@@ -69,7 +69,7 @@ import org.koin.compose.viewmodel.koinViewModel
 fun CollectionScreen(
     viewModel: CollectionViewModel = koinViewModel(),
     navController: NavController = koinInject(),
-    topInset: Dp,
+    topInset: Dp = ContentPadding,
     onCardClicked: (Card) -> Unit
 ) {
     val state by viewModel.state.collectAsState()

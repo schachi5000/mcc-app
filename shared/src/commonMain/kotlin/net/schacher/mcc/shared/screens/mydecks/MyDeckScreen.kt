@@ -57,7 +57,7 @@ import org.koin.compose.viewmodel.koinViewModel
 @Composable
 fun MyDecksScreen(
     viewModel: MyDecksViewModel = koinViewModel(),
-    topInset: Dp,
+    topInset: Dp = ContentPadding,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit = {},
     onBackPress: (() -> Unit)? = null

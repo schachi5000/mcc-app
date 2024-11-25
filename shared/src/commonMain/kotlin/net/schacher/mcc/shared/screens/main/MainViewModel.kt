@@ -62,6 +62,10 @@ class MainViewModel(
         this.authRepository.logout()
     }
 
+    fun onTabSelected(selection: UiState.MainScreen) {
+        _state.update { it.copy(mainScreen = selection) }
+    }
+
     sealed interface Event {
         data object DatabaseSynced : Event
         data class DeckCreated(val deckName: String) : Event
