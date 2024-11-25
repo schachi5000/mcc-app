@@ -35,18 +35,19 @@ import kotlinx.datetime.TimeZone
 import kotlinx.datetime.toLocalDateTime
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
+import marvelchampionscompanion.shared.generated.resources.spotlight
 import marvelchampionscompanion.shared.generated.resources.today
 import marvelchampionscompanion.shared.generated.resources.two_days_ago
 import marvelchampionscompanion.shared.generated.resources.yesterday
 import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.LoadingDeckListItem
+import net.schacher.mcc.shared.design.compose.MainHeader
 import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.main.topInset
-import net.schacher.mcc.shared.screens.spotlight.ListItem.DeckItem
-import net.schacher.mcc.shared.screens.spotlight.ListItem.HeaderItem
+import net.schacher.mcc.shared.screens.spotlight.ListItem.*
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -76,42 +77,55 @@ fun SpotlightScreen(
             .padding(horizontal = ContentPadding)
             .pullRefresh(pullRefreshState)
     ) {
-        AnimatedVisibility(
-            visible = !state.loading,
-            exit = fadeOut(),
-            enter = fadeIn()
-        ) {
-            val entries = mutableListOf<ListItem>()
+        val entries = mutableListOf<ListItem>(TopHeaderItem)
+        if (state.loading) {
+            entries.add(LoadingItem)
+        } else {
             state.decks.forEach { (date, decks) ->
                 entries.add(HeaderItem(getLabelByDate(date)))
+
                 decks.forEach { deck ->
                     entries.add(DeckItem(deck))
                 }
             }
+        }
 
-            LazyColumn {
-                items(entries.size) { index ->
-                    if (index == 0) {
+        LazyColumn {
+            items(entries.size) { index ->
+                when (val entry = entries[index]) {
+                    is TopHeaderItem -> {
                         Spacer(Modifier.statusBarsPadding().height(topInset))
+                        MainHeader(stringResource(Res.string.spotlight))
                     }
 
-                    when (val entry = entries[index]) {
-                        is HeaderItem -> {
-                            Header(entry.header)
-                            Spacer(Modifier.height(24.dp))
-                        }
+                    is LoadingItem -> {
+                        LoadingContent()
+                    }
 
-                        is DeckItem -> {
-                            DeckListItem(deck = entry.deck) {
-                                onDeckClick(entry.deck)
+                    is HeaderItem -> {
+                        Header(entry.header)
+                        Spacer(Modifier.height(24.dp))
+                    }
+
+                    is DeckItem -> {
+                        DeckListItem(deck = entry.deck) {
+                            onDeckClick(entry.deck)
+                        }
+                        Spacer(Modifier.height(32.dp))
+                    }
+
+                    is CombinedItem -> {
+                        entry.decks.forEach { deck ->
+                            DeckListItem(deck = deck) {
+                                onDeckClick(deck)
                             }
                             Spacer(Modifier.height(32.dp))
                         }
                     }
-
                 }
             }
         }
+//        }
 
         if (!state.loading && state.decks.isEmpty()) {
             Text(
@@ -122,13 +136,13 @@ fun SpotlightScreen(
             )
         }
 
-        AnimatedVisibility(
-            visible = state.loading,
-            exit = fadeOut(),
-            enter = fadeIn()
-        ) {
-            LoadingContent()
-        }
+//        AnimatedVisibility(
+//            visible = state.loading,
+//            exit = fadeOut(),
+//            enter = fadeIn()
+//        ) {
+//
+//        }
 
         PullRefreshIndicator(
             modifier = Modifier.align(Alignment.TopCenter)
@@ -163,7 +177,7 @@ private fun Header(label: String) {
             modifier = Modifier.alignByBaseline(),
             text = label,
             style = MaterialTheme.typography.h5,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colors.onBackground,
         )
     }
@@ -193,5 +207,8 @@ private fun LoadingContent() {
 
 private sealed interface ListItem {
     data class DeckItem(val deck: Deck) : ListItem
+    data class CombinedItem(val decks: List<Deck>) : ListItem
     data class HeaderItem(val header: String) : ListItem
+    data object TopHeaderItem : ListItem
+    data object LoadingItem : ListItem
 }

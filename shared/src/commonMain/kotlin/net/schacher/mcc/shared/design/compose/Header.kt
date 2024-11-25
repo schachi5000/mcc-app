@@ -83,7 +83,7 @@ fun Header(
             modifier = Modifier.alignByBaseline(),
             text = title,
             style = MaterialTheme.typography.h5,
-            fontWeight = FontWeight.Bold,
+            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colors.onBackground,
         )
 
@@ -92,9 +92,25 @@ fun Header(
                 modifier = Modifier.alignByBaseline().padding(start = 8.dp),
                 text = it,
                 style = MaterialTheme.typography.h6,
-                fontWeight = FontWeight.Bold,
+                fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
             )
         }
+    }
+}
+
+@Composable
+fun MainHeader(title: String) {
+    Row(
+        modifier = Modifier.padding(vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.alignByBaseline(),
+            text = title,
+            style = MaterialTheme.typography.h4,
+            fontWeight = FontWeight.SemiBold,
+            color = MaterialTheme.colors.onBackground,
+        )
     }
 }

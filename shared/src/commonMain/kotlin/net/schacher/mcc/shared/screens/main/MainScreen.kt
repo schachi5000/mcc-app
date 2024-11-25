@@ -155,7 +155,6 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
             DefaultBottomNavigationItem(
                 drawableResource = Res.drawable.ic_spotlight,
                 selectedDrawableResource = Res.drawable.ic_spotlight_selected,
-                color = Color(0xffeb4d4b),
                 selected = (selectedTabIndex == Spotlight.tabIndex),
                 onClick = { onTabSelected(Spotlight.tabIndex) },
             )

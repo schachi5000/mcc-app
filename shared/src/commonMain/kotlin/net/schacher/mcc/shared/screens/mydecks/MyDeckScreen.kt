@@ -43,9 +43,11 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.create_new_deck
+import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.DeckListItem
+import net.schacher.mcc.shared.design.compose.MainHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Deck
@@ -118,12 +120,14 @@ fun MyDecksScreen(
 
         LazyColumn(
             modifier = Modifier.fillMaxSize()
-                .padding(horizontal = ContentPadding)
+                .padding(start = ContentPadding)
                 .nestedScroll(nestedScrollConnection)
         ) {
             items(entries.size) { index ->
                 if (index == 0) {
                     Spacer(Modifier.statusBarsPadding().height(topInset))
+                    MainHeader(stringResource(Res.string.my_decks))
+                    Spacer(Modifier.height(ContentPadding))
                 }
 
                 when (val entry = entries[index]) {
@@ -174,8 +178,7 @@ fun AddDeckButton(modifier: Modifier, expanded: Boolean, onClick: () -> Unit) {
             shape = DefaultShape
         ) {
             Row(
-                modifier = Modifier.fillMaxHeight()
-                    .padding(8.dp),
+                modifier = Modifier.fillMaxHeight().padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
                 Icon(

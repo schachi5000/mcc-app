@@ -15,6 +15,9 @@ import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
+import androidx.compose.foundation.lazy.grid.LazyGridItemScope
+import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
@@ -49,12 +52,16 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.collection
+import marvelchampionscompanion.shared.generated.resources.my_decks
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
+import net.schacher.mcc.shared.design.compose.MainHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppRoute
@@ -62,6 +69,8 @@ import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.search.Filter
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.utils.replace
+import org.jetbrains.compose.resources.getString
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -142,13 +151,14 @@ fun CollectionScreen(
                     .padding(horizontal = ContentPadding)
                     .nestedScroll(nestedScrollConnection),
             ) {
-                items(count = 3) {
-                    Spacer(modifier = Modifier.statusBarsPadding().height(topInset))
+                header {
+                    Row(modifier = Modifier.statusBarsPadding().padding(top = topInset)) {
+                        MainHeader(stringResource(Res.string.collection))
+                    }
                 }
 
                 items(count = state.cardsInCollection.size) { index ->
                     val card = state.cardsInCollection[index]
-
                     Column {
                         Card(
                             card = card,
@@ -288,4 +298,10 @@ fun FilterContent(
 
         Spacer(Modifier.height(16.dp))
     }
+}
+
+private fun LazyGridScope.header(
+    content: @Composable LazyGridItemScope.() -> Unit
+) {
+    item(span = { GridItemSpan(this.maxLineSpan) }, content = content)
 }
