@@ -44,20 +44,9 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
                     Spacer(Modifier.size(ContentPadding))
                 }
                 Column {
-                    Card(card = cardRowEntry.cards[it]) {
+                    LabeledCard(card = cardRowEntry.cards[it]) {
                         onCardSelected(cardRowEntry.cards[it])
                     }
-                    Text(
-                        modifier = Modifier.padding(top = 8.dp)
-                            .sizeIn(maxWidth = 128.dp)
-                            .align(Alignment.CenterHorizontally),
-                        text = "${cardRowEntry.cards[it].name}\n",
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colors.onBackground,
-                        maxLines = 2,
-                        fontSize = 15.sp,
-                        fontWeight = FontWeight.SemiBold
-                    )
                 }
 
                 if (it == cardRowEntry.cards.lastIndex) {

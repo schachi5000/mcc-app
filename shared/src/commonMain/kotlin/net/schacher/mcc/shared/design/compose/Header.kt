@@ -20,8 +20,6 @@ fun Header(
             modifier = Modifier.alignByBaseline(),
             text = title,
             style = MaterialTheme.typography.h5,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colors.onBackground,
         )
 
         subTitle?.let {
@@ -29,8 +27,6 @@ fun Header(
                 modifier = Modifier.alignByBaseline().padding(start = 8.dp),
                 text = it,
                 style = MaterialTheme.typography.h6,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
             )
         }
     }
@@ -45,9 +41,7 @@ fun MainHeader(title: String) {
         Text(
             modifier = Modifier.alignByBaseline(),
             text = title,
-            style = MaterialTheme.typography.h4,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colors.onBackground,
+            style = MaterialTheme.typography.h4
         )
     }
 }

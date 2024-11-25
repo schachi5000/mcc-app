@@ -60,7 +60,7 @@ fun LabeledCard(
         Card(card, modifier, shape, onClick)
         AnimatedVisibility(
             visible = showLabel,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.padding(vertical = 8.dp)
                 .sizeIn(maxWidth = 128.dp)
                 .align(Alignment.CenterHorizontally)
         ) {
@@ -68,9 +68,8 @@ fun LabeledCard(
                 text = label,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.onBackground,
+                style = MaterialTheme.typography.caption,
                 maxLines = 2,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
             )
         }
     }

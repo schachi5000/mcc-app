@@ -61,6 +61,7 @@ import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
+import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.MainHeader
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Card
@@ -160,27 +161,13 @@ fun CollectionScreen(
                 items(count = state.cardsInCollection.size) { index ->
                     val card = state.cardsInCollection[index]
                     Column {
-                        Card(
+                        LabeledCard(
                             card = card,
+                            label = card.name,
+                            showLabel = expanded,
                             modifier = Modifier.wrapContentHeight()
                         ) {
                             onCardClicked(card)
-                        }
-
-                        AnimatedVisibility(
-                            visible = expanded,
-                            modifier = Modifier.padding(vertical = 8.dp)
-                                .sizeIn(maxWidth = 128.dp)
-                                .align(Alignment.CenterHorizontally)
-                        ) {
-                            Text(
-                                text = card.name,
-                                textAlign = TextAlign.Center,
-                                color = MaterialTheme.colors.onBackground,
-                                maxLines = 2,
-                                fontSize = 14.sp,
-                                fontWeight = FontWeight.SemiBold
-                            )
                         }
                     }
                 }
@@ -242,8 +229,7 @@ fun FilterContent(
             modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
             text = "Filter & Appearance",
             color = MaterialTheme.colors.onBackground,
-            fontSize = 20.sp,
-            fontWeight = FontWeight.Bold
+            style = MaterialTheme.typography.h6,
         )
 
         FilterFlowRow(

@@ -35,8 +35,8 @@ fun Tag(
             text = text,
             overflow = TextOverflow.Ellipsis,
             maxLines = 1,
+            style = MaterialTheme.typography.body2,
             fontWeight = FontWeight.SemiBold,
-            fontSize = 14.sp,
             color = textColor
         )
     }

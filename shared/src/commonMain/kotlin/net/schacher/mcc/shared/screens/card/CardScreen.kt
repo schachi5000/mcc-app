@@ -129,16 +129,15 @@ private fun Content(
                         modifier = Modifier.padding(top = ContentPadding),
                         text = card.name,
                         maxLines = 2,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 28.sp,
+                        style = MaterialTheme.typography.h5,
                         color = MaterialTheme.colors.onSurface
                     )
 
                     Text(
+                        modifier = Modifier.padding(top = 4.dp),
                         text = card.packName,
                         maxLines = 1,
-                        fontWeight = FontWeight.SemiBold,
-                        fontSize = 18.sp,
+                        style = MaterialTheme.typography.h6,
                         color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
                     )
 
@@ -160,8 +159,8 @@ private fun Content(
                             Text(
                                 modifier = Modifier.fillMaxWidth(),
                                 text = it.toAnnotatedString(),
-                                fontSize = 18.sp,
                                 textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.body1,
                                 fontWeight = FontWeight.SemiBold,
                                 color = MaterialTheme.colors.onSurface
                             )
@@ -171,7 +170,7 @@ private fun Content(
                             Text(
                                 modifier = Modifier.padding(top = 16.dp),
                                 text = it.toAnnotatedString(),
-                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.body1,
                                 color = MaterialTheme.colors.onSurface
                             )
                         }
@@ -180,7 +179,7 @@ private fun Content(
                             Text(
                                 modifier = Modifier.padding(top = 16.dp),
                                 text = it.toAnnotatedString(),
-                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.body1,
                                 color = MaterialTheme.colors.onSurface
                             )
                         }
@@ -194,7 +193,7 @@ private fun Content(
                                     pop()
                                     append(it.toAnnotatedString())
                                 },
-                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.body1,
                                 color = MaterialTheme.colors.onSurface
                             )
                         }
@@ -203,7 +202,7 @@ private fun Content(
                             Text(
                                 modifier = Modifier.padding(top = 32.dp),
                                 text = it,
-                                fontSize = 18.sp,
+                                style = MaterialTheme.typography.body1,
                                 fontStyle = FontStyle.Italic,
                                 color = MaterialTheme.colors.onSurface
                             )
@@ -217,7 +216,6 @@ private fun Content(
         }
 
         BackButton(onCloseClick)
-
 
         onAddToDeckClick?.let {
             FloatingActionButton(

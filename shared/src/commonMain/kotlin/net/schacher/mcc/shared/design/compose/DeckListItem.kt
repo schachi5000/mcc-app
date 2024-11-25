@@ -80,8 +80,7 @@ fun DeckListItem(
                         deck.requiredDecks.size
                     )
                 ).joinToString(" · "),
-                style = MaterialTheme.typography.body2,
-                color = Color.Gray,
+                style = MaterialTheme.typography.subtitle1,
                 maxLines = 2
             )
         }
