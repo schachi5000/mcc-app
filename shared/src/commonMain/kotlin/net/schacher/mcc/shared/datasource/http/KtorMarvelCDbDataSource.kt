@@ -49,6 +49,7 @@ import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.AuthRepository
+import net.schacher.mcc.shared.utils.e
 import kotlin.coroutines.CoroutineContext
 
 class KtorMarvelCDbDataSource(
@@ -147,6 +148,10 @@ class KtorMarvelCDbDataSource(
         }
             .body<List<DeckDto>>()
             .map { it.toDeck(cardProvider) }
+    }.also {
+        it.exceptionOrNull()?.let {
+            Logger.e(it) { "Failed to get spotlight decks" }
+        }
     }
 
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
@@ -158,6 +163,10 @@ class KtorMarvelCDbDataSource(
                 .body<List<DeckDto>>()
                 .map { it.toDeck(cardProvider) }
                 .sortedBy { it.name }
+        }.also {
+            it.exceptionOrNull()?.let {
+                Logger.e(it) { "Failed to get user decks" }
+            }
         }
 
     override suspend fun getUserDeckById(

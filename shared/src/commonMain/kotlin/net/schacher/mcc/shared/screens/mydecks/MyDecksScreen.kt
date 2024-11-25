@@ -54,7 +54,6 @@ fun MyDecksScreen(
 ) {
     val state by viewModel.state.collectAsState()
 
-    Logger.d { "State updated: $state" }
     MyDecksScreen(
         state = state,
         topInset = topInset,
