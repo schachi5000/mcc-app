@@ -1,41 +1,36 @@
 package net.schacher.mcc.shared.screens.mydecks
 
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.utils.launchAndCollect
 
 class MyDecksViewModel(private val deckRepository: DeckRepository) : ViewModel() {
 
     private val _state = MutableStateFlow(
-        UiState(decks = this.deckRepository.decks.value)
+        UiState(
+            decks = this.deckRepository.decks.value,
+            refreshing = true
+        )
     )
 
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
-            deckRepository.decks.collect {
-                _state.update {
-                    it.copy(
-                        decks = it.decks,
-                        refreshing = false
-                    )
-                }
+        this.viewModelScope.launchAndCollect(this.deckRepository.decks) { decks ->
+            _state.update {
+                it.copy(
+                    decks = decks,
+                    refreshing = false
+                )
             }
         }
-
-        viewModelScope.launch {
-            refreshDecks()
-        }
-    }
-
-    fun onCreateDeckClick() {
-        // TODO Not yet implemented
     }
 
     fun onRefreshClicked() {

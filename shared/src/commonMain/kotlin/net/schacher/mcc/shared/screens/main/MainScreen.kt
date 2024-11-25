@@ -1,171 +1,131 @@
 package net.schacher.mcc.shared.screens.main
 
-import androidx.compose.animation.AnimatedContent
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
-import androidx.compose.animation.slideInHorizontally
-import androidx.compose.animation.slideInVertically
-import androidx.compose.animation.slideOutHorizontally
-import androidx.compose.animation.slideOutVertically
-import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.background
+import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.pager.HorizontalPager
+import androidx.compose.foundation.pager.rememberPagerState
 import androidx.compose.material.BottomNavigation
-import androidx.compose.material.ExperimentalMaterialApi
-import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetLayout
-import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.rounded.Settings
-import androidx.compose.material.rememberModalBottomSheetState
+import androidx.compose.material.icons.rounded.MoreVert
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
-import androidx.compose.runtime.snapshotFlow
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.unit.dp
-import kotlinx.coroutines.launch
+import androidx.navigation.NavController
 import marvelchampionscompanion.shared.generated.resources.Res
-import marvelchampionscompanion.shared.generated.resources.decks
-import marvelchampionscompanion.shared.generated.resources.ic_deck
-import marvelchampionscompanion.shared.generated.resources.ic_search
+import marvelchampionscompanion.shared.generated.resources.collection
+import marvelchampionscompanion.shared.generated.resources.ic_collection
+import marvelchampionscompanion.shared.generated.resources.ic_collection_selected
+import marvelchampionscompanion.shared.generated.resources.ic_my_decks
+import marvelchampionscompanion.shared.generated.resources.ic_my_decks_selected
 import marvelchampionscompanion.shared.generated.resources.ic_spotlight
-import marvelchampionscompanion.shared.generated.resources.more
-import marvelchampionscompanion.shared.generated.resources.search
+import marvelchampionscompanion.shared.generated.resources.ic_spotlight_selected
+import marvelchampionscompanion.shared.generated.resources.my_decks
+import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
-import net.schacher.mcc.shared.design.compose.BackHandler
-import net.schacher.mcc.shared.design.compose.CardInfo
-import net.schacher.mcc.shared.design.compose.FreeBottomSheetContainer
-import net.schacher.mcc.shared.design.compose.blurByBottomSheet
-import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.platform.isIOs
-import net.schacher.mcc.shared.screens.deck.DeckScreen
+import net.schacher.mcc.shared.screens.AppRoute
+import net.schacher.mcc.shared.screens.collection.CollectionScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.CardsDatabaseSyncFailed
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DatabaseSynced
 import net.schacher.mcc.shared.screens.main.MainViewModel.Event.DeckCreated
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.CreateDeck
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.DeckScreen
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.FullScreen.PackSelectionScreen
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen
+import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Collection
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.MyDecks
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Search
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Settings
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
-import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.SubScreen.CardMenu
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
-import net.schacher.mcc.shared.screens.newdeck.NewDeckScreen
-import net.schacher.mcc.shared.screens.packselection.PackSelectionScreen
-import net.schacher.mcc.shared.screens.search.SearchScreen
+import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.settings.SettingsScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(ExperimentalMaterialApi::class, ExperimentalResourceApi::class)
+@OptIn(
+    ExperimentalResourceApi::class,
+    ExperimentalFoundationApi::class
+)
 @Composable
-fun MainScreen(viewModel: MainViewModel = koinInject()) {
+fun MainScreen(
+    viewModel: MainViewModel = koinViewModel(),
+    navController: NavController = koinInject(),
+    snackbarHostState: SnackbarHostState = koinInject(),
+) {
     val state = viewModel.state.collectAsState()
-    val scope = rememberCoroutineScope()
 
-    val sheetState = rememberModalBottomSheetState(
-        initialValue = ModalBottomSheetValue.Hidden,
-        skipHalfExpanded = true
-    )
-    val snackbarHostState = remember { SnackbarHostState() }
-
-    BackHandler(
-        enabled = (state.value.subScreen != null ||
-                state.value.fullScreen != null)
-    ) {
-        viewModel.onBackPressed()
-    }
-
-    ModalBottomSheetLayout(
-        sheetState = sheetState,
-        scrimColor = Color.Black.copy(alpha = 0.35f),
-        sheetShape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp),
-        sheetBackgroundColor = MaterialTheme.colors.surface,
-        sheetContent = {
-            state.value.subScreen?.let {
-                when (it) {
-                    is CardMenu -> CardMenuBottomSheet(viewModel, it.card)
-                    else -> {}
-                }
-            }
-        }) {
-
-        Scaffold(
-            modifier = Modifier.fillMaxSize().blurByBottomSheet(sheetState),
-            backgroundColor = MaterialTheme.colors.background,
-            snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-            bottomBar = {
-                BottomBar(state.value.mainScreen.tabIndex, state.value.canShowMyDeckScreen) {
-                    viewModel.onTabSelected(it)
-                }
-            }
-        ) {
-            Box(
-                modifier = Modifier.padding(it)
-            ) {
-                AnimatedContent(
-                    targetState = state.value.mainScreen.tabIndex,
-                    transitionSpec = {
-                        if (targetState > initialState) {
-                            (slideInHorizontally { width -> width } + fadeIn()).togetherWith(
-                                slideOutHorizontally { width -> -width } + fadeOut())
-                        } else {
-                            (slideInHorizontally { width -> -width } + fadeIn()).togetherWith(
-                                slideOutHorizontally { width -> width } + fadeOut())
-                        }
-                    }) { state ->
-                    when (state) {
-                        0 -> MyDecksScreen(
-                            onDeckClick = { viewModel.onDeckClicked(it) },
-                            onAddDeckClick = { viewModel.onNewDeckClicked() }
-                        )
-
-                        1 -> SpotlightScreen {
-                            viewModel.onDeckClicked(it)
-                        }
-
-                        2 -> SearchScreen {
-                            viewModel.onCardClicked(it)
-                        }
-
-                        3 -> SettingsScreen(
-                            onPackSelectionClick = {
-                                viewModel.onPackSelectionClicked()
-                            },
-                            onLogoutClicked = {
-                                viewModel.onLogoutClicked()
-                            })
-                    }
-                }
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        backgroundColor = MaterialTheme.colors.background,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        bottomBar = {
+            BottomBar(state.value.mainScreen.tabIndex) {
+                viewModel.onTabSelected(it.toMainScreen())
             }
         }
-    }
+    ) {
+        Box(
+            modifier = Modifier.padding(it)
+        ) {
+            val pageLabels = listOf(
+                Spotlight,
+                MyDecks,
+                Collection,
+                Settings
+            )
 
-    scope.launch {
-        if (state.value.subScreen != null) {
-            sheetState.show()
-        } else {
-            sheetState.hide()
+            val pagerState = rememberPagerState(
+                pageCount = { pageLabels.size },
+                initialPage = state.value.mainScreen.tabIndex
+            )
+
+            LaunchedEffect(state.value.mainScreen.tabIndex) {
+                pagerState.animateScrollToPage(state.value.mainScreen.tabIndex)
+            }
+
+            HorizontalPager(
+                state = pagerState,
+                userScrollEnabled = false
+            ) { page ->
+                when (page) {
+                    Spotlight.tabIndex -> SpotlightScreen {
+                        navController.navigate("deck/${it.id}")
+                    }
+
+                    MyDecks.tabIndex -> MyDecksScreen(
+                        onDeckClick = {
+                            navController.navigate("deck/${it.id}")
+                        },
+                        onAddDeckClick = {
+                            navController.navigate(AppRoute.AddDeck)
+                        })
+
+                    Collection.tabIndex -> CollectionScreen {
+                        navController.navigate("card/${it.code}")
+                    }
+
+                    Settings.tabIndex -> SettingsScreen(
+                        onPackSelectionClick = {
+                            navController.navigate(AppRoute.Packs)
+                        },
+                        onLogoutClicked = {
+                            viewModel.onLogoutClicked()
+                        })
+                }
+            }
         }
     }
 
@@ -178,103 +138,68 @@ fun MainScreen(viewModel: MainViewModel = koinInject()) {
             }
         }
     }
-
-    LaunchedEffect(sheetState) {
-        snapshotFlow { sheetState.isVisible }.collect { isVisible ->
-            if (!isVisible) {
-                viewModel.onContextMenuClosed()
-            }
-        }
-    }
-
-    AnimatedContent(
-        targetState = state.value.fullScreen,
-        transitionSpec = {
-            (slideInVertically { height -> height } + fadeIn()).togetherWith(
-                slideOutVertically { height -> height } + fadeOut())
-        }
-    ) {
-        when (it) {
-            is DeckScreen -> DeckScreen(
-                it.deck,
-                onCloseClick = { viewModel.onBackPressed() },
-                onDeleteDeckClick = { viewModel.onRemoveDeckClick(it) }
-            )
-
-            is PackSelectionScreen -> PackSelectionScreen {
-                viewModel.onBackPressed()
-            }
-
-            is CreateDeck -> NewDeckScreen(
-                onBackPress = { viewModel.onBackPressed() },
-                onNewDeckSelected = { card, aspect ->
-                    viewModel.onNewDeckHeroSelected(card, aspect)
-                }
-            )
-
-            else -> {
-                Box(modifier = Modifier.fillMaxSize().background(Color.Transparent))
-            }
-        }
-    }
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
-fun BottomBar(selectedTabIndex: Int, canShowMyDecks: Boolean = true, onTabSelected: (Int) -> Unit) {
+fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     BottomNavigation(
-        modifier = Modifier
-            .fillMaxWidth()
-            .heightIn(72.dp)
-            .graphicsLayer {
-                clip = true
-                shape = RoundedCornerShape(topEnd = 16.dp, topStart = 16.dp)
-            },
+        modifier = Modifier.fillMaxWidth(),
         elevation = 0.dp,
-        backgroundColor = MaterialTheme.colors.surface,
+        backgroundColor = MaterialTheme.colors.background,
     ) {
-        Row(Modifier.fillMaxWidth().padding(bottom = if (isIOs()) 16.dp else 0.dp)) {
-            if (canShowMyDecks) {
-                DefaultBottomNavigationItem(
-                    label = stringResource(Res.string.decks),
-                    icon = Res.drawable.ic_deck,
-                    selected = (selectedTabIndex == 0),
-                    onClick = { onTabSelected(0) },
-                )
-            }
+        Row(
+            modifier = Modifier.fillMaxWidth()
+                .padding(bottom = ContentPadding.takeIf { isIOs() } ?: 0.dp)
+                .heightIn(72.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
             DefaultBottomNavigationItem(
-                label = stringResource(Res.string.spotlight),
-                icon = Res.drawable.ic_spotlight,
-                selected = (selectedTabIndex == 1),
-                onClick = { onTabSelected(1) },
+                drawableResource = Res.drawable.ic_spotlight,
+                selectedDrawableResource = Res.drawable.ic_spotlight_selected,
+                selected = (selectedTabIndex == Spotlight.tabIndex),
+                onClick = { onTabSelected(Spotlight.tabIndex) },
             )
             DefaultBottomNavigationItem(
-                label = stringResource(Res.string.search),
-                icon = Res.drawable.ic_search,
-                selected = (selectedTabIndex == 2),
-                onClick = { onTabSelected(2) },
+                drawableResource = Res.drawable.ic_my_decks,
+                selectedDrawableResource = Res.drawable.ic_my_decks_selected,
+                selected = (selectedTabIndex == MyDecks.tabIndex),
+                onClick = { onTabSelected(MyDecks.tabIndex) },
             )
             DefaultBottomNavigationItem(
-                label = stringResource(Res.string.more),
-                icon = { Icon(Icons.Rounded.Settings, "Settings") },
-                selected = (selectedTabIndex == 3),
-                onClick = { onTabSelected(3) },
+                drawableResource = Res.drawable.ic_collection,
+                selectedDrawableResource = Res.drawable.ic_collection_selected,
+                selected = (selectedTabIndex == Collection.tabIndex),
+                onClick = { onTabSelected(Collection.tabIndex) },
+            )
+            DefaultBottomNavigationItem(
+                imageVector = Icons.Rounded.MoreVert,
+                selected = (selectedTabIndex == Settings.tabIndex),
+                onClick = { onTabSelected(Settings.tabIndex) },
             )
         }
-    }
-}
-
-@Composable
-fun CardMenuBottomSheet(mainViewModel: MainViewModel, card: Card) {
-    FreeBottomSheetContainer(modifier = Modifier.fillMaxHeight(0.75f)) {
-        CardInfo(card = card)
     }
 }
 
 private val MainScreen.tabIndex: Int
     get() = when (this) {
-        MyDecks -> 0
-        Spotlight -> 1
-        Search -> 2
+        Spotlight -> 0
+        MyDecks -> 1
+        Collection -> 2
         Settings -> 3
+    }
+
+private fun Int.toMainScreen(): MainScreen = when (this) {
+    1 -> MyDecks
+    2 -> Collection
+    3 -> Settings
+    else -> Spotlight
+}
+
+private val MainScreen.label: String
+    @Composable
+    get() = when (this) {
+        Spotlight -> stringResource(Res.string.spotlight)
+        MyDecks -> stringResource(Res.string.my_decks)
+        Collection -> stringResource(Res.string.collection)
+        Settings -> stringResource(Res.string.settings)
     }

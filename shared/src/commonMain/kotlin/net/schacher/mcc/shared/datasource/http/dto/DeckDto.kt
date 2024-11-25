@@ -15,5 +15,6 @@ data class DeckDto(
     val slots: Map<String, Int>,
     val tags: String,
     val user_id: Int?,
-    val version: String?
+    val version: String?,
+    val problem: String?
 )

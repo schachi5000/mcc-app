@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.screens.newdeck
 
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -20,7 +21,7 @@ class NewDeckViewModel(
     val state = _state.asStateFlow()
 
     init {
-        viewModelScope.launch {
+        this.viewModelScope.launch {
             cardRepository.cards.collect { value ->
                 _state.value = UiState(value.values
                     .filter { it.type == CardType.HERO }

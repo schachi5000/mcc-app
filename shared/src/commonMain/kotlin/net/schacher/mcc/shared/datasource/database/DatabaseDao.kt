@@ -5,12 +5,15 @@ import database.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
+import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableSharedFlow
+import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
-import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.utils.measuringWithContext
@@ -20,22 +23,21 @@ private const val LIST_DELIMITER = ";"
 class DatabaseDao(
     databaseDriverFactory: DatabaseDriverFactory,
     wipeDatabase: Boolean = false,
-    scope: CoroutineScope = CoroutineScope(Dispatchers.Main)
-) :
-    DeckDatabaseDao,
-    CardDatabaseDao,
-    PackDatabaseDao,
-    SettingsDao {
+    scope: CoroutineScope = MainScope()
+) : CardDatabaseDao, PackDatabaseDao, SettingsDao {
 
     private val database = AppDatabase(databaseDriverFactory.createDriver())
 
     private val dbQuery = database.appDatabaseQueries
 
+    private val _onCardAdded = MutableSharedFlow<Card>()
+
+    override val onCardAdded = this._onCardAdded.asSharedFlow()
+
     init {
         if (wipeDatabase) {
             scope.launch {
                 wipeCardTable()
-                wipeDeckTable()
                 wipePackTable()
             }
         }
@@ -47,92 +49,53 @@ class DatabaseDao(
             cards.forEach { addCard(it) }
         }
 
-    override suspend fun addCard(card: Card) = measuringWithContext(Dispatchers.IO, "addCard") {
-        dbQuery.addCard(
-            code = card.code,
-            position = card.position.toLong(),
-            type = card.type?.name,
-            cardSetCode = card.setCode,
-            cardSetName = card.setName,
-            packCode = card.packCode,
-            packName = card.packName,
-            name = card.name,
-            cost = card.cost?.toLong(),
-            aspect = card.aspect?.name,
-            text = card.text,
-            boostText = card.boostText,
-            attackText = card.attackText,
-            quote = card.quote,
-            traits = card.traits,
-            imagePath = card.imagePath,
-            faction = card.faction.name,
-            linkedCardCode = card.linkedCard?.code
-        )
-    }
+    override suspend fun addCard(card: Card) =
+        measuringWithContext(Dispatchers.IO, "addCard") {
+            dbQuery.addCard(
+                code = card.code,
+                position = card.position.toLong(),
+                type = card.type?.name,
+                cardSetCode = card.setCode,
+                cardSetName = card.setName,
+                packCode = card.packCode,
+                packName = card.packName,
+                name = card.name,
+                cost = card.cost?.toLong(),
+                aspect = card.aspect?.name,
+                text = card.text,
+                boostText = card.boostText,
+                attackText = card.attackText,
+                quote = card.quote,
+                traits = card.traits,
+                imagePath = card.imagePath,
+                faction = card.faction.name,
+                linkedCardCode = card.linkedCard?.code
+            )
+        }.also {
+            _onCardAdded.emit(card)
+        }
 
-    override suspend fun getCardByCode(cardCode: String): Card =
+    override suspend fun getCardByCode(cardCode: String): Card? =
         measuringWithContext(Dispatchers.IO, "getCardByCode") {
             dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
-                ?: throw Exception("Card with code $cardCode not found")
         }
 
     override suspend fun getAllCards(): List<Card> =
         measuringWithContext(Dispatchers.IO, "getAllCards") {
-            dbQuery.selectAllCards()
-                .executeAsList()
-                .map {
-                    val card = it.toCard()
-                    val linkedCard = it.linkedCardCode?.let {
-                        dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
-                    }
+            dbQuery.selectAllCards().executeAsList().map {
+                val card = it.toCard()
+                val linkedCard = it.linkedCardCode?.let {
+                    dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+                }?.copy(
+                    linkedCard = card
+                )
 
-                    card.copy(
-                        linkedCard = linkedCard?.copy(
-                            linkedCard = card
-                        )
-                    )
-                }
-
-        }
-
-
-    override suspend fun addDeck(deck: Deck) = measuringWithContext(Dispatchers.IO, "addDeck") {
-        dbQuery.addDeck(
-            deck.id.toLong(),
-            deck.name,
-            deck.aspect?.name,
-            deck.hero.code,
-            deck.cards.map { it.code }.toCardCodeString()
-        )
-    }
-
-    override suspend fun getDecks(): List<Deck> =
-        measuringWithContext(Dispatchers.IO, "getDecks") {
-            dbQuery.selectAllDecks().executeAsList().map {
-                val cards = it.cardCodes.toCardCodeList().map {
-                    getCardByCode(it)
-                }
-
-                Deck(
-                    id = it.id.toInt(),
-                    name = it.name,
-                    hero = getCardByCode(it.heroCardCode),
-                    aspect = it.aspect?.let { Aspect.valueOf(it) },
-                    cards = cards
+                card.copy(
+                    linkedCard = linkedCard
                 )
             }
-        }
 
-    override suspend fun removeDeck(deckId: Int) =
-        measuringWithContext(Dispatchers.IO, "removeDeck") {
-            Logger.i { "Deleting deck $deckId from database" }
-            dbQuery.removeDeckById(deckId.toLong())
         }
-
-    override suspend fun wipeDeckTable() = withContext(Dispatchers.IO) {
-        Logger.i { "Deleting all decks from database" }
-        dbQuery.removeAllDecks()
-    }
 
     override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
         Logger.i { "Deleting all decks from database" }
@@ -151,8 +114,9 @@ class DatabaseDao(
         this.dbQuery.addSetting(key, value)
     }.isSuccess
 
-    override fun getBoolean(key: String): Boolean? =
+    override fun getBoolean(key: String, default: Boolean): Boolean =
         this.dbQuery.getSetting(key).executeAsOneOrNull()?.value_?.toBooleanStrictOrNull()
+            ?: default
 
     override fun putBoolean(key: String, value: Boolean): Boolean = runCatching {
         this.dbQuery.addSetting(key, value.toString())
@@ -168,63 +132,53 @@ class DatabaseDao(
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
         Logger.i { "Adding pack ${pack.name} to database ${hasPackInCollection(pack.code)}" }
 
+        addCards(pack.cards)
         dbQuery.addPack(
             pack.code,
             pack.id.toLong(),
             pack.name,
             pack.position.toLong(),
-            pack.cardCodes.toCardCodeString(),
-            pack.url,
+            pack.cards.map { it.code }.toCardCodeString(),
             hasPackInCollection(pack.code).toLong()
         )
     }
 
     override suspend fun addPacks(packs: List<Pack>) {
         Logger.i { "Adding ${packs.size} packs to database" }
-        packs.forEach { this.addPack(it) }
+        packs.forEach {
+            this.addPack(it)
+        }
     }
 
     private suspend fun getPack(packCode: String): Pack =
-        measuringWithContext(Dispatchers.IO, "getPack") {
-            dbQuery.getPack(packCode)
-                .executeAsOne()
-                .toPack()
+        withContext(Dispatchers.IO) {
+            dbQuery.getPack(packCode).executeAsOne().toPack {
+                runBlocking {
+                    getCardByCode(it) ?: throw IllegalStateException("Card $it not found")
+                }
+            }
         }
 
 
     override suspend fun getAllPacks(): List<Pack> =
         measuringWithContext(Dispatchers.IO, "getAllPacks") {
-            dbQuery.getAllPacks().executeAsList().map { it.toPack() }
+            dbQuery.getAllPacks().executeAsList().map {
+                it.toPack {
+                    runBlocking {
+                        getCardByCode(it)
+                    }
+                }
+            }
         }
 
     override suspend fun addPackToCollection(packCode: String) =
         measuringWithContext(Dispatchers.IO, "addPackToCollection") {
-            val pack = getPack(packCode)
-
-            dbQuery.addPack(
-                pack.code,
-                pack.id.toLong(),
-                pack.name,
-                pack.position.toLong(),
-                pack.cardCodes.toCardCodeString(),
-                pack.url,
-                true.toLong()
-            )
+            dbQuery.addPackToPossession(packCode)
         }
 
-    override suspend fun removePackToCollection(packCode: String) =
+    override suspend fun removePackFromCollection(packCode: String) =
         measuringWithContext(Dispatchers.IO, "removePackToCollection") {
-            val pack = getPack(packCode)
-
-            dbQuery.addPack(
-                pack.code,
-                pack.id.toLong(),
-                pack.name,
-                pack.position.toLong(),
-                pack.cardCodes.toCardCodeString(),
-                pack.url,
-                false.toLong()
-            )
+            dbQuery.removePackFromPossession(packCode)
         }
 
     override suspend fun getPacksInCollection(): List<String> =
@@ -232,9 +186,7 @@ class DatabaseDao(
             dbQuery.getAllPacks()
                 .executeAsList()
                 .filter { it.inPosession.toBoolean() }
-                .map {
-                    it.code
-                }
+                .map { it.code }
         }
 
     override suspend fun hasPackInCollection(packCode: String): Boolean =
@@ -251,11 +203,10 @@ private fun Boolean.toLong() = if (this) 1L else 0L
 
 private fun Long?.toBoolean() = if (this == null) false else this != 0L
 
-private fun database.Pack.toPack() = Pack(
+private fun database.Pack.toPack(cardProvider: (cardCode: String) -> Card?) = Pack(
     name = this.name,
     code = this.code,
-    cardCodes = this.cardCodes.toCardCodeList(),
-    url = this.url,
+    cards = this.cardCodes.toCardCodeList().mapNotNull { cardProvider(it) },
     id = this.id.toInt(),
     position = this.position.toInt()
 )

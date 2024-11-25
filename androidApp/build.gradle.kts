@@ -1,7 +1,8 @@
 plugins {
-    kotlin("multiplatform")
-    id("com.android.application")
-    id("org.jetbrains.compose")
+    alias(libs.plugins.kotlin.multiplatform)
+    alias(libs.plugins.android.application)
+    alias(libs.plugins.jetbrains.compose)
+    alias(libs.plugins.kotlin.compose.compiler)
 }
 
 kotlin {
@@ -16,17 +17,17 @@ kotlin {
 }
 
 android {
-    compileSdk = (findProperty("android.compileSdk") as String).toInt()
+    compileSdk = libs.versions.androidCompileSdk.get().toInt()
     namespace = "net.schacher.mcc"
 
     sourceSets["main"].manifest.srcFile("src/androidMain/AndroidManifest.xml")
 
     defaultConfig {
         applicationId = "net.schacher.mcc"
-        minSdk = (findProperty("android.minSdk") as String).toInt()
-        targetSdk = (findProperty("android.targetSdk") as String).toInt()
+        minSdk = libs.versions.androidMinSdk.get().toInt()
+        targetSdk = libs.versions.androidTargetSdk.get().toInt()
         versionCode = 4
-        versionName = "1.0.0-alpha"
+        versionName = "1.0.0-development"
     }
 
     buildTypes {
@@ -79,5 +80,7 @@ android {
         debugImplementation(libs.androidx.compose.compiler)
         debugImplementation(libs.androidx.compose.tooling)
         implementation(libs.androidx.compose.preview)
+        implementation(libs.androidx.browser)
+        implementation(libs.kermit)
     }
 }

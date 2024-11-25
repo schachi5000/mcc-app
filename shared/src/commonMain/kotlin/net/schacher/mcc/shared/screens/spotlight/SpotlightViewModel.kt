@@ -1,6 +1,7 @@
 package net.schacher.mcc.shared.screens.spotlight
 
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -10,16 +11,14 @@ import kotlinx.datetime.LocalDate
 import kotlinx.datetime.TimeZone
 import kotlinx.datetime.minus
 import kotlinx.datetime.toLocalDateTime
-import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.repositories.CardRepository
+import net.schacher.mcc.shared.repositories.SpotlightRepository
 
 class SpotlightViewModel(
-    private val cardRepository: CardRepository,
-    private val marvelCDbDataSource: MarvelCDbDataSource
+    private val spotlightRepository: SpotlightRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(SpotlightUiState())
+    private val _state = MutableStateFlow(UiState())
 
     val state = _state.asStateFlow()
 
@@ -36,22 +35,31 @@ class SpotlightViewModel(
         this.onRefresh()
     }
 
-    private fun onRefresh() {
-        _state.update { it.copy(loading = true) }
+    fun onRefresh() {
+        if (this.state.value.loading) {
+            return
+        }
+
+        _state.update {
+            it.copy(
+                decks = emptyMap(),
+                loading = true
+            )
+        }
 
         this.viewModelScope.launch {
+            val updatedDecks = mutableMapOf<LocalDate, List<Deck>>()
             dates.forEach { date ->
-                val result = marvelCDbDataSource.getSpotlightDecksByDate(date) {
-                    cardRepository.getCard(it)
+                val spotlightDecks = spotlightRepository.getSpotlightDecks(date)
+
+                if (spotlightDecks.isNotEmpty()) {
+                    updatedDecks[date] = spotlightDecks
                 }
 
-                val decks = result.getOrNull() ?: emptyList()
                 _state.update {
                     it.copy(
-                        decks = it.decks.toMutableMap()
-                            .also { map -> map[date] = decks }
-                            .filter { (_, entries) -> entries.isNotEmpty() },
-                        loading = it.decks.entries.all { it.value.isEmpty() }
+                        decks = updatedDecks,
+                        loading = updatedDecks.isNotEmpty()
                     )
                 }
             }
@@ -61,9 +69,10 @@ class SpotlightViewModel(
             }
         }
     }
+
+    data class UiState(
+        val decks: Map<LocalDate, List<Deck>> = emptyMap(),
+        val loading: Boolean = false
+    )
 }
 
-data class SpotlightUiState(
-    val decks: Map<LocalDate, List<Deck>> = emptyMap(),
-    val loading: Boolean = false
-)

@@ -1,13 +1,59 @@
 <resources>
     <string name="app_name">MCC</string>
-    <string name="database">Datenbank</string>
+    <string name="database">Database</string>
     <string name="delete">Löschen</string>
-    <string name="decks">Decks</string>
+    <string name="my_decks">Meine Decks</string>
+    <string name="cards">Karten</string>
+    <string name="collection">Sammlung</string>
     <string name="spotlight">Spotlight</string>
     <string name="search">Suche</string>
     <string name="more">Mehr</string>
+    <string name="settings">Einstellungen</string>
     <string name="create_new_deck">Neues Deck erstellen</string>
     <string name="login_with_marvelcdb">Anmelden mit MarvelCDB</string>
     <string name="login_as_guest">Weiter als Gast</string>
     <string name="login">Anmelden</string>
+    <string name="login_info_title">Anmeldehinweis</string>
+    <string name="login_info_message">Nach der erfolgreichen Eingabe deiner Anmeldedaten bitte auf ALLOW klicken, um die Anmeldung abzuschließen.</string>
+    <string name="no_decks_found">Keine Decks gefunden</string>
+    <string name="today">Heute</string>
+    <string name="yesterday">Gestern</string>
+    <string name="two_days_ago">Vorgestern</string>
+
+    <string name="aggression">Aggression</string>
+    <string name="protection">Schutz</string>
+    <string name="justice">Gerechtigkeit</string>
+    <string name="leadership">Führung</string>
+
+    <string name="hero">Held</string>
+    <string name="ally">Verbündeter</string>
+    <string name="event">Ereignis</string>
+    <string name="support">Unterstützung</string>
+    <string name="upgrade">Upgrade</string>
+    <string name="resource">Ressource</string>
+    <string name="villain">Schurke</string>
+    <string name="main_scheme">Hauptplan</string>
+    <string name="side_scheme">Nebenplan</string>
+    <string name="player_side_scheme">Spielernebenplan</string>
+    <string name="attachment">Anhang</string>
+    <string name="minion">Scherge</string>
+    <string name="treachery">Verrat</string>
+    <string name="environment">Umgebung</string>
+    <string name="obligation">Verpflichtung</string>
+
+    <string name="remove_card_from_deck">Karte aus Deck entfernen</string>
+
+    <string name="apply">Anwenden</string>
+    <string name="cancel">Abbrechen</string>
+    <string name="ok">Ok</string>
+
+    <plurals name="cards">
+        <item quantity="one">1 Karte</item>
+        <item quantity="other">%1$d Karten</item>
+    </plurals>
+
+    <plurals name="decks">
+        <item quantity="one">1 Deck</item>
+        <item quantity="other">%1$d Decks</item>
+    </plurals>
 </resources>

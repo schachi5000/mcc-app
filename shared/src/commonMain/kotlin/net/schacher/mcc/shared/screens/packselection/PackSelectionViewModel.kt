@@ -1,12 +1,14 @@
 package net.schacher.mcc.shared.screens.packselection
 
-import dev.icerock.moko.mvvm.viewmodel.ViewModel
+import androidx.lifecycle.ViewModel
+import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.PackRepository
+import net.schacher.mcc.shared.utils.launchAndCollect
 
 class PackSelectionViewModel(private val packRepository: PackRepository) : ViewModel() {
 
@@ -19,10 +21,12 @@ class PackSelectionViewModel(private val packRepository: PackRepository) : ViewM
     val state = _state.asStateFlow()
 
     init {
-        this.viewModelScope.launch {
-            packRepository.packs.collect {
-                refresh()
-            }
+        this.viewModelScope.launchAndCollect(packRepository.packs) {
+            refresh()
+        }
+
+        this.viewModelScope.launchAndCollect(packRepository.packsInCollection) {
+            refresh()
         }
     }
 
@@ -43,8 +47,6 @@ class PackSelectionViewModel(private val packRepository: PackRepository) : ViewM
             } else {
                 packRepository.addPackToCollection(packCode)
             }
-
-            refresh()
         }
     }
 }

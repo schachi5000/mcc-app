@@ -18,14 +18,27 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavController
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Pack
 import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
 fun PackSelectionScreen(
-    viewModel: PackSelectionViewModel = koinInject(),
+    viewModel: PackSelectionViewModel = koinViewModel(),
+    navController: NavController = koinInject()
+) {
+    PackSelectionScreen(
+        viewModel = viewModel,
+        onBackPress = { navController.popBackStack() }
+    )
+}
+
+@Composable
+fun PackSelectionScreen(
+    viewModel: PackSelectionViewModel = koinViewModel(),
     onBackPress: () -> Unit
 ) {
     val state by viewModel.state.collectAsState()

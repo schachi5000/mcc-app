@@ -18,17 +18,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.cancel
+import marvelchampionscompanion.shared.generated.resources.ok
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import org.jetbrains.compose.resources.stringResource
 
 @Composable
 fun ConfirmationDialog(
     title: String,
     message: String,
-    onDismiss: () -> Unit,
+    onDismiss: (() -> Unit)? = null,
     onConfirm: () -> Unit
 ) {
     Dialog(
-        onDismissRequest = onDismiss
+        onDismissRequest = onDismiss ?: {},
     ) {
         Card(
             modifier = Modifier.fillMaxWidth(),
@@ -51,22 +55,24 @@ fun ConfirmationDialog(
                 )
 
                 Row(modifier = Modifier.fillMaxWidth().padding(top = 24.dp)) {
-                    OutlinedButton(
-                        onClick = onDismiss,
-                        modifier = Modifier.weight(1f),
-                        shape = DefaultShape
-                    ) {
-                        Text(
-                            text = "Cancel",
-                            modifier = Modifier
-                                .fillMaxWidth()
-                                .wrapContentSize(Alignment.Center),
-                            textAlign = TextAlign.Center,
-                            style = MaterialTheme.typography.button,
-                        )
-                    }
+                    if (onDismiss != null) {
+                        OutlinedButton(
+                            onClick = onDismiss,
+                            modifier = Modifier.weight(1f),
+                            shape = DefaultShape
+                        ) {
+                            Text(
+                                text = stringResource(Res.string.cancel),
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                                    .wrapContentSize(Alignment.Center),
+                                textAlign = TextAlign.Center,
+                                style = MaterialTheme.typography.button,
+                            )
+                        }
 
-                    Spacer(Modifier.width(8.dp))
+                        Spacer(Modifier.width(8.dp))
+                    }
 
                     Button(
                         onClick = onConfirm,
@@ -74,7 +80,7 @@ fun ConfirmationDialog(
                         shape = DefaultShape
                     ) {
                         Text(
-                            text = "Ok",
+                            text = stringResource(Res.string.ok),
                             modifier = Modifier
                                 .fillMaxWidth()
                                 .wrapContentSize(Alignment.Center),

@@ -31,27 +31,52 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.rotate
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.database
 import marvelchampionscompanion.shared.generated.resources.ic_cards
-import marvelchampionscompanion.shared.generated.resources.ic_deck
+import marvelchampionscompanion.shared.generated.resources.ic_my_decks
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.screens.settings.SettingsViewModel.UiState
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
-import org.koin.compose.koinInject
+import org.koin.compose.viewmodel.koinViewModel
 
 @ExperimentalResourceApi
 @Composable
 fun SettingsScreen(
-    settingsViewModel: SettingsViewModel = koinInject(),
+    settingsViewModel: SettingsViewModel = koinViewModel(),
+    topInset: Dp = ContentPadding,
     onPackSelectionClick: () -> Unit,
     onLogoutClicked: () -> Unit
 ) {
     val state by settingsViewModel.state.collectAsState()
+
+    SettingsScreen(
+        state = state,
+        topInset = topInset,
+        onPackSelectionClick = onPackSelectionClick,
+        onLogoutClick = onLogoutClicked,
+        onSyncClick = { settingsViewModel.onSyncClick() },
+        onWipeDatabaseClick = { settingsViewModel.onWipeDatabaseClick() },
+    )
+}
+
+@ExperimentalResourceApi
+@Composable
+fun SettingsScreen(
+    state: UiState,
+    topInset: Dp,
+    onPackSelectionClick: () -> Unit,
+    onLogoutClick: () -> Unit,
+    onSyncClick: () -> Unit,
+    onWipeDatabaseClick: () -> Unit
+) {
     var deleteDatabaseDialog by remember { mutableStateOf(false) }
 
     val infiniteTransition = rememberInfiniteTransition()
@@ -64,16 +89,20 @@ fun SettingsScreen(
     )
 
     Column(
-        modifier = Modifier.fillMaxSize().statusBarsPadding().padding(16.dp),
+        modifier = Modifier.fillMaxSize().statusBarsPadding().padding(
+            top = topInset,
+            start = ContentPadding,
+            end = ContentPadding,
+            bottom = ContentPadding
+        ),
         verticalArrangement = Arrangement.Top,
     ) {
         OptionsGroup(stringResource(Res.string.database)) {
             OptionsEntry(
                 label = "Sync with MarvelCDB",
                 imageVector = Icons.Rounded.Refresh,
-                onClick = {
-                    settingsViewModel.onSyncClick()
-                })
+                onClick = onSyncClick
+            )
 
             OptionsEntry(
                 label = "Alle Einträge löschen",
@@ -99,17 +128,17 @@ fun SettingsScreen(
             )
 
             OptionsEntry(
-                label = "${state.deckCount} Decks", iconResource = Res.drawable.ic_deck
+                label = "${state.deckCount} Decks", iconResource = Res.drawable.ic_my_decks
             )
 
             OptionsEntry(label = "${state.packsInCollectionCount} of ${state.packCount} Packs",
-                iconResource = Res.drawable.ic_deck,
+                iconResource = Res.drawable.ic_my_decks,
                 onClick = { onPackSelectionClick() })
         }
 
         TextButton(
             modifier = Modifier.fillMaxWidth().padding(top = 16.dp),
-            onClick = { onLogoutClicked() },
+            onClick = { onLogoutClick() },
             shape = DefaultShape,
             colors = ButtonDefaults.textButtonColors(
                 backgroundColor = MaterialTheme.colors.surface
@@ -137,7 +166,7 @@ fun SettingsScreen(
             message = "Möchtest du wirklich alle Einträge löschen?",
             onDismiss = { deleteDatabaseDialog = false },
             onConfirm = {
-                settingsViewModel.onWipeDatabaseClick()
+                onWipeDatabaseClick()
                 deleteDatabaseDialog = false
             })
     }

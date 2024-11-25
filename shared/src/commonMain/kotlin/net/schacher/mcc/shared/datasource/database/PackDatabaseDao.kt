@@ -9,7 +9,7 @@ interface PackDatabaseDao {
 
     suspend fun addPackToCollection(packCode: String)
 
-    suspend fun removePackToCollection(packCode: String)
+    suspend fun removePackFromCollection(packCode: String)
 
     suspend fun getPacksInCollection(): List<String>
 

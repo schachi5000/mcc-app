@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.design.compose
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -8,6 +9,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.Card
 import androidx.compose.material.ExperimentalMaterialApi
@@ -25,7 +27,11 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.card_blue_no_image
+import marvelchampionscompanion.shared.generated.resources.card_yellow_no_image
 import net.schacher.mcc.shared.design.theme.CardShape
+import net.schacher.mcc.shared.design.theme.DefaultCardSize
 import net.schacher.mcc.shared.design.theme.SleeveColors
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardOrientation
@@ -36,7 +42,6 @@ import net.schacher.mcc.shared.model.CardType.SIDE_SCHEME
 import net.schacher.mcc.shared.model.CardType.TREACHERY
 import net.schacher.mcc.shared.model.CardType.VILLAIN
 import org.jetbrains.compose.resources.DrawableResource
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
 
 const val PORTRAIT_RATIO = 0.715f
@@ -45,31 +50,37 @@ const val LANDSCAPE_RATIO = 1.396f
 @Composable
 fun LabeledCard(
     card: Card,
+    label: String = card.name,
+    showLabel: Boolean = true,
     modifier: Modifier = Modifier.height(196.dp),
     shape: Shape = CardShape,
     onClick: () -> Unit = {}
 ) {
     Column {
         Card(card, modifier, shape, onClick)
-        Text(
-            modifier = Modifier
+        AnimatedVisibility(
+            visible = showLabel,
+            modifier = Modifier.padding(vertical = 4.dp)
                 .sizeIn(maxWidth = 128.dp)
-                .align(Alignment.CenterHorizontally),
-            text = card.name,
-            textAlign = TextAlign.Center,
-            color = MaterialTheme.colors.onBackground,
-            maxLines = 2,
-            fontSize = 15.sp,
-            fontWeight = FontWeight.SemiBold
-        )
+                .align(Alignment.CenterHorizontally)
+        ) {
+            Text(
+                text = label,
+                textAlign = TextAlign.Center,
+                color = MaterialTheme.colors.onBackground,
+                maxLines = 2,
+                fontSize = 14.sp,
+                fontWeight = FontWeight.SemiBold
+            )
+        }
     }
 }
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalMaterialApi::class)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Card(
     card: Card,
-    modifier: Modifier = Modifier.height(196.dp),
+    modifier: Modifier = Modifier.height(DefaultCardSize),
     shape: Shape = CardShape,
     onClick: () -> Unit = {}
 ) {
@@ -95,16 +106,26 @@ fun Card(
                 ShimmerBox(modifier = Modifier.fillMaxSize())
             },
             onFailure = {
-                Logger.e { "Failed to load image for card: ${card.name}(${card.code}) - ${it.message}" }
-                Image(
-                    modifier = Modifier.fillMaxSize()
-                        .background(card.backSideColor, CardShape)
-                        .border(8.dp, card.backSideColor, CardShape),
-                    painter = painterResource(DrawableResource(card.getFailureResource())),
-                    contentDescription = "Placeholder",
-                )
+                Logger.e { "Failed to load image for card: ${card.name}(${card.code})" }
+                FailureImage(card)
             })
     }
+}
+
+@Composable
+fun FailureImage(card: Card) {
+    FailureImage(card.backSideColor, card.getFailureResource())
+}
+
+@Composable
+fun FailureImage(backgroundColor: Color, resource: DrawableResource) {
+    Image(
+        modifier = Modifier.fillMaxSize()
+            .background(backgroundColor, CardShape)
+            .border(8.dp, backgroundColor, CardShape),
+        painter = painterResource(resource),
+        contentDescription = "Placeholder",
+    )
 }
 
 val Card.backSideColor: Color
@@ -119,7 +140,7 @@ val Card.backSideColor: Color
         else -> SleeveColors.Blue
     }
 
-private fun Card.getFailureResource(): String = when (this.backSideColor) {
-    SleeveColors.Yellow -> "drawable/card_yellow_no_image.png"
-    else -> "drawable/card_blue_no_image.png"
+private fun Card.getFailureResource() = when (this.backSideColor) {
+    SleeveColors.Yellow -> Res.drawable.card_yellow_no_image
+    else -> Res.drawable.card_blue_no_image
 }

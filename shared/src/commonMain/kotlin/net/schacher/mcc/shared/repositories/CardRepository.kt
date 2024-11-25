@@ -1,7 +1,7 @@
 package net.schacher.mcc.shared.repositories
 
-import co.touchlab.kermit.Logger
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -9,35 +9,34 @@ import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.utils.launchAndCollect
 
 class CardRepository(
     private val cardDatabaseDao: CardDatabaseDao,
-    private val marvelCDbDataSource: MarvelCDbDataSource
+    private val marvelCDbDataSource: MarvelCDbDataSource,
+    private val scope: CoroutineScope
 ) {
-
     private val _cards = MutableStateFlow<Map<String, Card>>(emptyMap())
 
     val cards = _cards.asStateFlow()
 
     init {
-        MainScope().launch {
+        this.scope.launch {
             _cards.emit(cardDatabaseDao.getAllCards().toMap())
+        }
+
+        this.scope.launchAndCollect(
+            this.cardDatabaseDao.onCardAdded,
+            Dispatchers.Default
+        ) { card ->
+            _cards.update { it.toMutableMap().apply { put(card.code, card) } }
         }
     }
 
-    suspend fun hasCards(): Boolean = try {
-        cardDatabaseDao.getAllCards().isNotEmpty()
-    } catch (e: Exception) {
-        Logger.e(e) { "Error checking for cards" }
-        false
-    }
-
     suspend fun refreshAllCards() {
-        val result = this.marvelCDbDataSource.getAllCards()
-        Logger.i { "${result.size} cards loaded" }
-        this.cardDatabaseDao.addCards(result)
-
-        _cards.emit(cardDatabaseDao.getAllCards().toMap())
+        this._cards.update {
+            cardDatabaseDao.getAllCards().toMap()
+        }
     }
 
     suspend fun deleteAllCardData() {
@@ -55,9 +54,11 @@ class CardRepository(
             return card
         }
 
-        return this.marvelCDbDataSource.getCard(cardCode).also {
-            this.cardDatabaseDao.addCard(it)
-            _cards.emit(this.cardDatabaseDao.getAllCards().toMap())
+        return this.marvelCDbDataSource.getCard(cardCode).getOrThrow().also { newCard ->
+            this.cardDatabaseDao.addCard(newCard)
+            this._cards.update {
+                it.toMutableMap().apply { put(cardCode, newCard) }
+            }
         }
     }
 

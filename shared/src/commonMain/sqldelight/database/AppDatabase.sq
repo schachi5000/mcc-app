@@ -40,35 +40,6 @@ FROM Card;
 removeAllCards:
 DELETE FROM Card;
 
--- Decks
-CREATE TABLE Deck (
-    id INTEGER NOT NULL PRIMARY KEY,
-    name TEXT NOT NULL,
-    aspect TEXT,
-    heroCardCode TEXT NOT NULL,
-    cardCodes TEXT NOT NULL
-);
-
-addDeck:
-INSERT OR REPLACE INTO Deck(id, name, aspect, heroCardCode, cardCodes)
-VALUES(?, ?, ?, ?, ?);
-
-selectAllDecks:
-SELECT *
-FROM Deck;
-
-selectDeckById:
-SELECT *
-FROM Deck
-WHERE id = ?;
-
-removeDeckById:
-DELETE FROM Deck
-WHERE id = ?;
-
-removeAllDecks:
-DELETE FROM Deck;
-
 -- Packs
 CREATE TABLE Pack (
     code TEXT NOT NULL PRIMARY KEY,
@@ -76,13 +47,12 @@ CREATE TABLE Pack (
     name TEXT NOT NULL,
     position INTEGER NOT NULL,
     cardCodes TEXT NOT NULL,
-    url TEXT NOT NULL,
     inPosession INTEGER DEFAULT 0
 );
 
 addPack:
-INSERT OR REPLACE INTO Pack(code, id, name, position, cardCodes, url, inPosession)
-VALUES(?, ?, ?, ?, ?, ?, ?);
+INSERT OR REPLACE INTO Pack(code, id, name, position, cardCodes,  inPosession)
+VALUES(?, ?, ?, ?, ?,  ?);
 
 getPack:
 SELECT *
@@ -102,6 +72,16 @@ getPacksInPossession:
 SELECT *
 FROM Pack
 WHERE inPosession = 1;
+
+addPackToPossession:
+UPDATE Pack
+SET inPosession = 1
+WHERE code = ?;
+
+removePackFromPossession:
+UPDATE Pack
+SET inPosession = 0
+WHERE code = ?;
 
 removeAllPacks:
 DELETE FROM Pack;

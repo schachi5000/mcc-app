@@ -1,6 +1,6 @@
 package net.schacher.mcc.shared.datasource.database
 
-import com.squareup.sqldelight.db.SqlDriver
+import app.cash.sqldelight.db.SqlDriver
 
 internal const val DATABASE_NAME = "app.db"
 

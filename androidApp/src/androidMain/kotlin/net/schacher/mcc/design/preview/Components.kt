@@ -1,18 +1,18 @@
 package net.schacher.mcc.design.preview
 
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.size
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.design.ThemedPreviews
-import net.schacher.mcc.shared.design.LocalPreview
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.Card
-import net.schacher.mcc.shared.design.compose.CardInfo
 import net.schacher.mcc.shared.design.compose.Deck
-import net.schacher.mcc.shared.design.compose.DeckRow
+import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
 import net.schacher.mcc.shared.design.compose.ShimmerBox
@@ -23,6 +23,7 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
+import net.schacher.mcc.shared.screens.card.CardScreen
 
 
 @ThemedPreviews
@@ -43,10 +44,15 @@ fun DeckPreview() {
 
 @ThemedPreviews
 @Composable
-fun DeckRowPreview() {
-    CompositionLocalProvider(LocalPreview provides true) {
-        MccTheme {
-            DeckRow(deck = previewDeck)
+fun DeckListItemPreview() {
+    MccTheme {
+        Column(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.Center
+        ) {
+            DeckListItem(deck = previewDeck) {
+
+            }
         }
     }
 }
@@ -86,14 +92,12 @@ fun ShimmerBoxPreview() {
 @Composable
 fun CardInfoPreview() {
     MccTheme {
-        CardInfo(
-            card = previewCard
-        )
+        CardScreen(card = previewCard, onCloseClick = {}, onAddToDeckClick = {})
     }
 }
 
 private val previewCard = Card(
-    code = "27078",
+    code = "27001a",
     name = "Preview Card",
     packName = "Preview Pack",
     packCode = "preview",
@@ -114,5 +118,7 @@ private val previewDeck = Deck(
     name = "Preview Deck",
     hero = previewCard,
     aspect = Aspect.LEADERSHIP,
-    cards = listOf(previewCard, previewCard, previewCard)
+    cards = listOf(previewCard, previewCard, previewCard),
+    version = "1.0",
+    problem = null
 )

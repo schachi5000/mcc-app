@@ -19,6 +19,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Card
 
 @Composable
@@ -29,19 +30,9 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
-            Text(
-                modifier = Modifier.alignByBaseline(),
-                text = cardRowEntry.title.uppercase(),
-                fontWeight = FontWeight.Bold,
-                color = MaterialTheme.colors.onBackground,
-                fontSize = 28.sp
-            )
-
-            Text(
-                modifier = Modifier.alignByBaseline(),
-                text = "${cardRowEntry.cards.size}",
-                color = MaterialTheme.colors.onBackground.copy(alpha = 0.75f),
-                fontSize = 17.sp
+            Header(
+                title = cardRowEntry.title,
+                subTitle = cardRowEntry.cards.size.toString()
             )
         }
 
@@ -50,7 +41,7 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
         ) {
             items(cardRowEntry.cards.count()) {
                 if (it == 0) {
-                    Spacer(Modifier.size(16.dp))
+                    Spacer(Modifier.size(ContentPadding))
                 }
                 Column {
                     Card(card = cardRowEntry.cards[it]) {
@@ -70,7 +61,7 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
                 }
 
                 if (it == cardRowEntry.cards.lastIndex) {
-                    Spacer(Modifier.size(16.dp))
+                    Spacer(Modifier.size(ContentPadding))
                 }
             }
         }
