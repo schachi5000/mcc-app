@@ -18,8 +18,6 @@ import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.utils.measuringWithContext
 
-private const val LIST_DELIMITER = ";"
-
 class DatabaseDao(
     databaseDriverFactory: DatabaseDriverFactory,
     wipeDatabase: Boolean = false,
@@ -199,6 +197,8 @@ class DatabaseDao(
         }
 }
 
+private const val LIST_DELIMITER = ";"
+
 private fun String.toCardCodeList() = this.split(LIST_DELIMITER)
 
 private fun List<String>.toCardCodeString() = this.joinToString(LIST_DELIMITER)
@@ -206,14 +206,6 @@ private fun List<String>.toCardCodeString() = this.joinToString(LIST_DELIMITER)
 private fun Boolean.toLong() = if (this) 1L else 0L
 
 private fun Long?.toBoolean() = if (this == null) false else this != 0L
-
-private fun database.Pack.toPack(cardProvider: (cardCode: String) -> Card?) = Pack(
-    name = this.name,
-    code = this.code,
-    cards = this.cardCodes.toCardCodeList().mapNotNull { cardProvider(it) },
-    id = this.id.toInt(),
-    position = this.position.toInt()
-)
 
 private fun database.Pack.toPack(cards: List<Card>) = Pack(
     name = this.name,

@@ -1,6 +1,5 @@
 package net.schacher.mcc.shared.design.compose
 
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonDefaults
 import androidx.compose.material.MaterialTheme
