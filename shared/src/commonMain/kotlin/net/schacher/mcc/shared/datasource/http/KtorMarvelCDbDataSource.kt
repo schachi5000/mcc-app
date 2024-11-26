@@ -49,7 +49,6 @@ import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.AuthRepository
-import net.schacher.mcc.shared.utils.e
 import kotlin.coroutines.CoroutineContext
 
 class KtorMarvelCDbDataSource(
@@ -60,6 +59,8 @@ class KtorMarvelCDbDataSource(
     private companion object {
         const val TAG = "KtorMarvelCDbDataSource"
         const val AUTHORIZATION = "Authorization"
+        const val MAX_RETRY_DELAY_MS = 10000L
+        const val MAX_RETRIES = 2
     }
 
     private val authHeader: String
@@ -82,8 +83,8 @@ class KtorMarvelCDbDataSource(
             level = LogLevel.INFO
         }
         install(HttpRequestRetry) {
-            retryOnServerErrors(maxRetries = 2)
-            exponentialDelay()
+            retryOnServerErrors(maxRetries = MAX_RETRIES)
+            exponentialDelay(maxDelayMs = MAX_RETRY_DELAY_MS)
         }
     }
 

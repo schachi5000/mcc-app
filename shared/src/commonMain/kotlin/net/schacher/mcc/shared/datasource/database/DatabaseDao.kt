@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -21,7 +22,7 @@ import net.schacher.mcc.shared.utils.measuringWithContext
 class DatabaseDao(
     databaseDriverFactory: DatabaseDriverFactory,
     wipeDatabase: Boolean = false,
-    scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
+    scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 ) : CardDatabaseDao, PackDatabaseDao, SettingsDao {
 
     private val database = AppDatabase(databaseDriverFactory.createDriver())
@@ -145,7 +146,13 @@ class DatabaseDao(
         this.dbQuery.getAllSettings().executeAsList().map { it.key to it.value_ }
 
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
-        Logger.i { "Adding pack ${pack.name} to database - hasPackInCollection:${hasPackInCollection(pack.code)}" }
+        Logger.i {
+            "Adding pack ${pack.name} to database - hasPackInCollection:${
+                hasPackInCollection(
+                    pack.code
+                )
+            }"
+        }
 
         addCards(pack.cards)
         dbQuery.addPack(
