@@ -7,11 +7,24 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Header(
+fun Header(title: String) {
+    Row(
+        modifier = Modifier.padding(vertical = 16.dp),
+        verticalAlignment = Alignment.CenterVertically
+    ) {
+        Text(
+            modifier = Modifier.alignByBaseline(),
+            text = title,
+            style = MaterialTheme.typography.h4
+        )
+    }
+}
+
+@Composable
+fun HeaderSmall(
     title: String,
     subTitle: String? = null
 ) {
@@ -29,19 +42,5 @@ fun Header(
                 style = MaterialTheme.typography.h6,
             )
         }
-    }
-}
-
-@Composable
-fun MainHeader(title: String) {
-    Row(
-        modifier = Modifier.padding(vertical = 16.dp),
-        verticalAlignment = Alignment.CenterVertically
-    ) {
-        Text(
-            modifier = Modifier.alignByBaseline(),
-            text = title,
-            style = MaterialTheme.typography.h4
-        )
     }
 }
