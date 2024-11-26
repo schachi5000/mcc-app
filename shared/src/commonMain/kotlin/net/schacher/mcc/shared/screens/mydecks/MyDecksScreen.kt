@@ -31,13 +31,12 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.DeckListItem
-import net.schacher.mcc.shared.design.compose.MainHeader
+import net.schacher.mcc.shared.design.compose.Header
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
@@ -114,7 +113,7 @@ fun MyDecksScreen(
             items(entries.size) { index ->
                 if (index == 0) {
                     Spacer(Modifier.statusBarsPadding().height(topInset))
-                    MainHeader(stringResource(Res.string.my_decks))
+                    Header(stringResource(Res.string.my_decks))
                     Spacer(Modifier.height(ContentPadding))
                 }
 

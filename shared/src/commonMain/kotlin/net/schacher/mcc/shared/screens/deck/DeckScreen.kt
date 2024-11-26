@@ -47,7 +47,7 @@ import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardBackgroundBox
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
-import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.HeaderSmall
 import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.Tag
 import net.schacher.mcc.shared.design.theme.ContentPadding
@@ -217,7 +217,7 @@ private fun Content(
                         verticalAlignment = Alignment.Bottom,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Header(
+                        HeaderSmall(
                             title = "Other Cards",
                             subTitle = otherCards.size.toString()
                         )

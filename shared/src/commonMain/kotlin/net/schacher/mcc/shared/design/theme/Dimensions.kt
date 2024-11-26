@@ -25,3 +25,5 @@ val CardShape = RoundedCornerShape(Card)
 val DeckShape = RoundedCornerShape(Deck)
 
 val DefaultShape = RoundedCornerShape(Default)
+
+val BottomSheetShape = RoundedCornerShape(topStart = Default, topEnd = Default)
