@@ -18,7 +18,8 @@ fun Header(title: String) {
         Text(
             modifier = Modifier.alignByBaseline(),
             text = title,
-            style = MaterialTheme.typography.h4
+            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colors.onBackground,
         )
     }
 }
@@ -32,6 +33,7 @@ fun HeaderSmall(
         Text(
             modifier = Modifier.alignByBaseline(),
             text = title,
+            color = MaterialTheme.colors.onBackground,
             style = MaterialTheme.typography.h5,
         )
 
@@ -39,6 +41,7 @@ fun HeaderSmall(
             Text(
                 modifier = Modifier.alignByBaseline().padding(start = 8.dp),
                 text = it,
+                color = MaterialTheme.colors.onBackground,
                 style = MaterialTheme.typography.h6,
             )
         }
