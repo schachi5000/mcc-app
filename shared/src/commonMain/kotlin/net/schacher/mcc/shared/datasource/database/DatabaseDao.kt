@@ -147,7 +147,7 @@ class DatabaseDao(
         this.dbQuery.getAllSettings().executeAsList().map { it.key to it.value_ }
 
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
-        Logger.i { "Adding pack ${pack.name} to database ${hasPackInCollection(pack.code)}" }
+        Logger.i { "Adding pack ${pack.name} to database - hasPackInCollection:${hasPackInCollection(pack.code)}" }
 
         addCards(pack.cards)
         dbQuery.addPack(

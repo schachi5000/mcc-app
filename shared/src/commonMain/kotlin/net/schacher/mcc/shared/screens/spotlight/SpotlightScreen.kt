@@ -39,6 +39,7 @@ import marvelchampionscompanion.shared.generated.resources.yesterday
 import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.LoadingDeckListItem
 import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.HeaderSmall
 import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
@@ -94,6 +95,7 @@ fun SpotlightScreen(
                     is TopHeaderItem -> {
                         Spacer(Modifier.statusBarsPadding().height(topInset))
                         Header(stringResource(Res.string.spotlight))
+                        Spacer(Modifier.height(ContentPadding))
                     }
 
                     is LoadingItem -> {
@@ -101,7 +103,7 @@ fun SpotlightScreen(
                     }
 
                     is HeaderItem -> {
-                        Header(entry.header)
+                        HeaderSmall(entry.header)
                         Spacer(Modifier.height(24.dp))
                     }
 
@@ -166,8 +168,6 @@ private fun Header(label: String) {
 @Composable
 private fun LoadingContent() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Spacer(Modifier.height(8.dp))
-
         ShimmerBox(
             modifier = Modifier
                 .width(80.dp)

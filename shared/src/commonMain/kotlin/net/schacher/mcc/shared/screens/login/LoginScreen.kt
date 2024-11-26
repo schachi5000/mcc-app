@@ -33,6 +33,8 @@ import marvelchampionscompanion.shared.generated.resources.login_info_title
 import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.splash_screen
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
+import net.schacher.mcc.shared.design.compose.PrimaryButton
+import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import org.jetbrains.compose.resources.painterResource
@@ -86,43 +88,25 @@ fun LoginScreen(
                     horizontal = ContentPadding,
                 ),
         ) {
-            TextButton(
+            PrimaryButton(
                 modifier = Modifier.fillMaxWidth(),
+                label = stringResource(Res.string.login_with_marvelcdb),
                 onClick = {
                     if (confirmationSeen) {
                         onLogInClicked()
                     } else {
                         showingConfirmation = true
                     }
-                },
-                shape = DefaultShape,
-                colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = MaterialTheme.colors.primary
-                )
-            ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = MaterialTheme.colors.onPrimary,
-                    text = stringResource(Res.string.login_with_marvelcdb)
-                )
-            }
+                }
+            )
 
             Spacer(Modifier.height(16.dp))
 
-            TextButton(
+            SecondaryButton(
                 modifier = Modifier.fillMaxWidth(),
-                onClick = onContinueAsGuestClicked,
-                shape = DefaultShape,
-                colors = ButtonDefaults.textButtonColors(
-                    backgroundColor = MaterialTheme.colors.surface
-                )
-            ) {
-                Text(
-                    modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
-                    color = MaterialTheme.colors.primary,
-                    text = stringResource(Res.string.login_as_guest)
-                )
-            }
+                label = stringResource(Res.string.login_as_guest),
+                onClick = onContinueAsGuestClicked
+            )
         }
     }
 
