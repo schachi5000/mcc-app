@@ -23,7 +23,7 @@ private const val LIST_DELIMITER = ";"
 class DatabaseDao(
     databaseDriverFactory: DatabaseDriverFactory,
     wipeDatabase: Boolean = false,
-    scope: CoroutineScope = MainScope()
+    scope: CoroutineScope = CoroutineScope(Dispatchers.IO)
 ) : CardDatabaseDao, PackDatabaseDao, SettingsDao {
 
     private val database = AppDatabase(databaseDriverFactory.createDriver())
@@ -78,6 +78,23 @@ class DatabaseDao(
     override suspend fun getCardByCode(cardCode: String): Card? =
         measuringWithContext(Dispatchers.IO, "getCardByCode") {
             dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
+        }
+
+
+    private suspend fun getCardsByPackCode(packCode: String): List<Card> =
+        measuringWithContext(Dispatchers.IO, "getCardsByPackCode") {
+            dbQuery.selectCardsByPackCode(packCode).executeAsList().map {
+                val card = it.toCard()
+                val linkedCard = it.linkedCardCode?.let {
+                    dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+                }?.copy(
+                    linkedCard = card
+                )
+
+                card.copy(
+                    linkedCard = linkedCard
+                )
+            }
         }
 
     override suspend fun getAllCards(): List<Card> =
@@ -150,24 +167,11 @@ class DatabaseDao(
         }
     }
 
-    private suspend fun getPack(packCode: String): Pack =
-        withContext(Dispatchers.IO) {
-            dbQuery.getPack(packCode).executeAsOne().toPack {
-                runBlocking {
-                    getCardByCode(it) ?: throw IllegalStateException("Card $it not found")
-                }
-            }
-        }
-
-
     override suspend fun getAllPacks(): List<Pack> =
         measuringWithContext(Dispatchers.IO, "getAllPacks") {
             dbQuery.getAllPacks().executeAsList().map {
-                it.toPack {
-                    runBlocking {
-                        getCardByCode(it)
-                    }
-                }
+                val cards = getCardsByPackCode(it.code)
+                it.toPack(cards)
             }
         }
 
@@ -207,6 +211,14 @@ private fun database.Pack.toPack(cardProvider: (cardCode: String) -> Card?) = Pa
     name = this.name,
     code = this.code,
     cards = this.cardCodes.toCardCodeList().mapNotNull { cardProvider(it) },
+    id = this.id.toInt(),
+    position = this.position.toInt()
+)
+
+private fun database.Pack.toPack(cards: List<Card>) = Pack(
+    name = this.name,
+    code = this.code,
+    cards = cards,
     id = this.id.toInt(),
     position = this.position.toInt()
 )

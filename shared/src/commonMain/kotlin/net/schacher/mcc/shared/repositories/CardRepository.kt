@@ -21,7 +21,7 @@ class CardRepository(
     val cards = _cards.asStateFlow()
 
     init {
-        this.scope.launch {
+        this.scope.launch(Dispatchers.Default) {
             _cards.emit(cardDatabaseDao.getAllCards().toMap())
         }
 
