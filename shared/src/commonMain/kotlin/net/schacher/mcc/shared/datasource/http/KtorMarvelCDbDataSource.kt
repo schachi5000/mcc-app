@@ -275,7 +275,7 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
         name = this.name,
         hero = heroCard,
         aspect = this.meta?.parseAspect(),
-        cards = this.slots.entries
+        cards = (this.slots ?: emptyMap()).entries
             .map { entry ->
                 List(entry.value) {
                     cardProvider(entry.key)

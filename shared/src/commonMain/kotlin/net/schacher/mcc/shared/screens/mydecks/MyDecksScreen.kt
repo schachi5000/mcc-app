@@ -35,17 +35,14 @@ import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.create_deck
 import marvelchampionscompanion.shared.generated.resources.login
-import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.Header
-import net.schacher.mcc.shared.design.compose.PrimaryButton
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -84,10 +81,6 @@ fun MyDecksScreen(
         return
     }
 
-    val entries = mutableListOf<ListItem>().also {
-        it.addAll(state.decks.map { DeckItem(it) })
-    }
-
     var expanded by remember { mutableStateOf(false) }
     val nestedScrollConnection = remember {
         object : NestedScrollConnection {
@@ -121,17 +114,15 @@ fun MyDecksScreen(
                 .padding(start = ContentPadding)
                 .nestedScroll(nestedScrollConnection)
         ) {
-            items(entries.size) { index ->
-                if (index == 0) {
-                    Spacer(Modifier.statusBarsPadding().height(topInset))
-                    Header(stringResource(Res.string.my_decks))
-                    Spacer(Modifier.height(ContentPadding))
-                }
+            item {
+                Spacer(Modifier.statusBarsPadding().height(topInset))
+                Header(stringResource(Res.string.my_decks))
+                Spacer(Modifier.height(ContentPadding))
+            }
 
-                when (val entry = entries[index]) {
-                    is DeckItem -> DeckListItem(entry.deck) {
-                        onDeckClick(entry.deck)
-                    }
+            items(state.decks.size) { index ->
+                DeckListItem(state.decks[index]) {
+                    onDeckClick(state.decks[index])
                 }
 
                 Spacer(Modifier.height(32.dp))
@@ -181,8 +172,4 @@ private fun LoginInContent(onLoginClick: () -> Unit) {
             )
         }
     }
-}
-
-private sealed interface ListItem {
-    data class DeckItem(val deck: Deck) : ListItem
 }

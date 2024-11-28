@@ -12,7 +12,7 @@ data class DeckDto(
     val investigator_name: String?,
     val meta: String?,
     val name: String,
-    val slots: Map<String, Int>,
+    val slots: Map<String, Int>?,
     val tags: String,
     val user_id: Int?,
     val version: String?,
