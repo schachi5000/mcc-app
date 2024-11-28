@@ -52,6 +52,7 @@ import net.schacher.mcc.shared.design.compose.HeaderSmall
 import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.Tag
 import net.schacher.mcc.shared.design.theme.BottomSheetColors
+import net.schacher.mcc.shared.design.theme.BottomSheetShape
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.CornerRadius
 import net.schacher.mcc.shared.model.Card
@@ -122,10 +123,8 @@ fun DeckScreen(
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        sheetShape = RoundedCornerShape(
-            topStart = CornerRadius.Default,
-            topEnd = CornerRadius.Default
-        ),
+        sheetShape = BottomSheetShape,
+        sheetBackgroundColor = BottomSheetColors.Background,
         scrimColor = BottomSheetColors.Scrim,
         sheetContent = { OptionBottomSheet(state.options, onOptionClick) }
     ) {
@@ -255,7 +254,7 @@ private fun Content(
                                 if (showOptions) {
                                     Icon(
                                         modifier = Modifier
-                                            .padding(2.dp)
+                                            .padding(4.dp)
                                             .size(32.dp)
                                             .background(
                                                 MaterialTheme.colors.surface.copy(alpha = 0.8f),
@@ -263,9 +262,7 @@ private fun Content(
                                             )
                                             .padding(4.dp)
                                             .align(Alignment.TopEnd)
-                                            .clickable {
-                                                onCardOptionsClick(card)
-                                            },
+                                            .clickable { onCardOptionsClick(card) },
                                         imageVector = Icons.Default.MoreVert,
                                         contentDescription = "Card Options",
                                         tint = MaterialTheme.colors.onSurface

@@ -1,7 +1,9 @@
 package net.schacher.mcc.shared.design.theme
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.darkColors
 import androidx.compose.material.lightColors
+import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
 import net.schacher.mcc.shared.design.theme.AspectColors.Aggression
@@ -36,6 +38,14 @@ const val MIN_CONTRAST_RATIO = 4.0f
 
 object BottomSheetColors {
     val Scrim = Color(0xff000000).copy(alpha = 0.5f)
+
+    val Background: Color
+        @Composable
+        get() = if (MaterialTheme.colors.isLight) {
+            LightColorScheme.background
+        } else {
+            DarkColorScheme.surface
+        }
 }
 
 object SleeveColors {

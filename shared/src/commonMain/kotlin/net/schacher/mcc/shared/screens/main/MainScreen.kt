@@ -48,6 +48,7 @@ import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
+import net.schacher.mcc.shared.design.theme.BottomSheetColors
 import net.schacher.mcc.shared.design.theme.BottomSheetShape
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.platform.isIOs
@@ -93,7 +94,8 @@ fun MainScreen(
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
         sheetShape = BottomSheetShape,
-        scrimColor = MaterialTheme.colors.background.copy(alpha = 0.5f),
+        sheetBackgroundColor = BottomSheetColors.Background,
+        scrimColor = BottomSheetColors.Scrim,
         sheetContent = {
             BottomSheetContainer {
                 bottomSheetContent()
