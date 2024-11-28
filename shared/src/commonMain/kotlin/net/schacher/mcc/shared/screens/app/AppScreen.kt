@@ -54,7 +54,7 @@ fun AppScreen(
         }
 
         composable(AppRoute.Main.route) {
-            MainScreen()
+            MainScreen(onLogInClicked = onLogInClicked)
         }
 
         composable(AppRoute.AddDeck.route) {

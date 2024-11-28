@@ -2,9 +2,11 @@ package net.schacher.mcc.shared.screens.mydecks
 
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
@@ -32,11 +34,13 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.PrimaryButton
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
@@ -49,6 +53,7 @@ fun MyDecksScreen(
     topInset: Dp = ContentPadding,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit = {},
+    onLoginClick: () -> Unit = {},
     onBackPress: (() -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsState()
@@ -59,6 +64,7 @@ fun MyDecksScreen(
         onDeckClick = onDeckClick,
         onAddDeckClick = onAddDeckClick,
         onRefresh = { viewModel.onRefreshClicked() },
+        onLoginClick = onLoginClick,
         onBackPress = onBackPress
     )
 }
@@ -71,8 +77,14 @@ fun MyDecksScreen(
     onRefresh: () -> Unit,
     onDeckClick: (Deck) -> Unit,
     onAddDeckClick: () -> Unit,
+    onLoginClick: () -> Unit = {},
     onBackPress: (() -> Unit)? = null
 ) {
+    if (state.allowLogIn) {
+        LoginInContent(onLoginClick)
+        return
+    }
+
     val entries = mutableListOf<ListItem>().also {
         it.addAll(state.decks.map { DeckItem(it) })
     }
@@ -142,9 +154,24 @@ fun MyDecksScreen(
 }
 
 @Composable
-fun animateHorizontalAlignmentAsState(targetBiasValue: Float): State<BiasAlignment.Horizontal> {
-    val bias by animateFloatAsState(targetBiasValue)
-    return derivedStateOf { BiasAlignment.Horizontal(bias) }
+private fun LoginInContent(onLoginClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(ContentPadding)
+    ) {
+        Header(stringResource(Res.string.my_decks))
+        Spacer(Modifier.height(ContentPadding))
+
+        Box(modifier = Modifier.fillMaxSize()) {
+            PrimaryButton(
+                modifier = Modifier.align(Alignment.Center),
+                onClick = onLoginClick,
+                label = stringResource(Res.string.login_with_marvelcdb)
+            )
+        }
+    }
 }
 
 private sealed interface ListItem {

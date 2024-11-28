@@ -76,6 +76,7 @@ fun MainScreen(
     viewModel: MainViewModel = koinViewModel(),
     navController: NavController = koinInject(),
     snackbarHostState: SnackbarHostState = koinInject(),
+    onLogInClicked: () -> Unit,
 ) {
     val state = viewModel.state.collectAsState()
 
@@ -92,13 +93,14 @@ fun MainScreen(
     ModalBottomSheetLayout(
         sheetState = bottomSheetState,
         sheetShape = BottomSheetShape,
+        scrimColor = MaterialTheme.colors.background.copy(alpha = 0.5f),
         sheetContent = {
             BottomSheetContainer {
                 bottomSheetContent()
             }
         }
     ) {
-        Content(snackbarHostState, state, viewModel, navController) {
+        Content(snackbarHostState, state, viewModel, navController, onLogInClicked) {
             bottomSheetContent = it
 
             scope.launch {
@@ -125,6 +127,7 @@ private fun Content(
     state: State<MainViewModel.UiState>,
     viewModel: MainViewModel,
     navController: NavController,
+    onLogInClicked: () -> Unit,
     onShowBottomSheet: (@Composable () -> Unit) -> Unit,
 ) {
     Scaffold(
@@ -171,7 +174,11 @@ private fun Content(
                         },
                         onAddDeckClick = {
                             navController.navigate(AppRoute.AddDeck)
-                        })
+                        },
+                        onLoginClick = {
+                            viewModel.onLogoutClicked()
+                        }
+                    )
 
                     Collection.tabIndex -> CollectionScreen(
                         onShowBottomSheet = onShowBottomSheet,

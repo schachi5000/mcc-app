@@ -4,16 +4,17 @@ import co.touchlab.kermit.Logger
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.update
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.time.Time
 import net.schacher.mcc.shared.utils.debug
 import kotlin.time.Duration.Companion.seconds
 
 class AuthRepository(private val settingsDao: SettingsDao) {
-    companion object {
-        const val APP_SCHEME = "mccapp"
-        private const val ACCESS_TOKEN = "access_token"
-        private const val EXPIRES_AT = "access_token_expires_at"
+    private companion object {
+        const val TAG = "AuthRepository"
+        const val ACCESS_TOKEN = "access_token"
+        const val EXPIRES_AT = "access_token_expires_at"
     }
 
     private val _loginState = MutableStateFlow(this.loggedIn)
@@ -21,13 +22,14 @@ class AuthRepository(private val settingsDao: SettingsDao) {
     val loginState = _loginState.asStateFlow()
 
     init {
+        Logger.d(TAG) { "AuthRepository initialized" }
         this.restoreAccessToken()
     }
 
     private var userType: UserType? = null
         set(value) {
             field = value
-            Logger.debug { "UserType set to $value" }
+            Logger.d(TAG) { "UserType set to $value" }
 
             this._loginState.value = this.loggedIn
         }
@@ -68,7 +70,7 @@ class AuthRepository(private val settingsDao: SettingsDao) {
 
     fun handleCallbackUrl(callbackUrl: String): Boolean {
         val fixedCallbackUrl = callbackUrl.replace("#", "?")
-        Logger.debug { "Handling callback url: $fixedCallbackUrl" }
+        Logger.d(TAG) { "Handling callback url: $fixedCallbackUrl" }
 
         val accessToken = try {
             this.parseData(fixedCallbackUrl)

@@ -1,37 +1,52 @@
 package net.schacher.mcc.shared.screens.mydecks
 
+import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
+import net.schacher.mcc.shared.utils.debug
 import net.schacher.mcc.shared.utils.launchAndCollect
 
-class MyDecksViewModel(private val deckRepository: DeckRepository) : ViewModel() {
+class MyDecksViewModel(
+    private val deckRepository: DeckRepository,
+    private val authRepository: AuthRepository
+) : ViewModel() {
 
-    private val _state = MutableStateFlow(
-        UiState(
-            decks = this.deckRepository.decks.value,
-            refreshing = true
-        )
-    )
+    private companion object {
+        const val TAG = "MyDecksViewModel"
+    }
+
+    private val _state = MutableStateFlow(this.createState())
 
     val state = _state.asStateFlow()
 
     init {
-        this.viewModelScope.launchAndCollect(this.deckRepository.decks) { decks ->
-            _state.update {
-                it.copy(
-                    decks = decks,
-                    refreshing = false
-                )
-            }
+        this.viewModelScope.launchAndCollect(this.deckRepository.decks) {
+            updateState()
+        }
+
+        this.viewModelScope.launchAndCollect(this.authRepository.loginState) {
+            updateState()
         }
     }
+
+    private fun updateState() {
+        _state.update { createState() }
+    }
+
+    private fun createState(): UiState = UiState(
+        decks = this.deckRepository.decks.value,
+        refreshing = false,
+        allowLogIn = !this.authRepository.isSignedInAsUser()
+    )
 
     fun onRefreshClicked() {
         viewModelScope.launch {
@@ -58,7 +73,8 @@ class MyDecksViewModel(private val deckRepository: DeckRepository) : ViewModel()
 
     data class UiState internal constructor(
         val decks: List<Deck> = emptyList(),
-        val refreshing: Boolean = false
+        val refreshing: Boolean = false,
+        val allowLogIn: Boolean = false
     )
 }
 
