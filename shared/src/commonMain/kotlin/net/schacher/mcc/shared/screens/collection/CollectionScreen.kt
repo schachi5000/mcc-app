@@ -47,6 +47,8 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.collection
+import marvelchampionscompanion.shared.generated.resources.filter
+import marvelchampionscompanion.shared.generated.resources.select_packs
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.ExpandingButton
@@ -186,7 +188,7 @@ fun FilterContent(
     ) {
         Text(
             modifier = Modifier.padding(top = 8.dp, bottom = 16.dp),
-            text = "Filter & Appearance",
+            text = stringResource(Res.string.filter),
             color = MaterialTheme.colors.onBackground,
             style = MaterialTheme.typography.h6,
         )
@@ -218,7 +220,7 @@ fun FilterContent(
         ) {
             SecondaryButton(
                 modifier = Modifier.fillMaxWidth(),
-                label = "Select Packs",
+                label = stringResource(Res.string.select_packs),
                 onClick = onSelectPacksClicked
             )
         }

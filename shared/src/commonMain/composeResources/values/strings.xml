@@ -9,7 +9,7 @@
     <string name="search">Search</string>
     <string name="more">More</string>
     <string name="settings">Settings</string>
-    <string name="create_new_deck">Create new deck</string>
+    <string name="create_deck">Create deck</string>
     <string name="login_with_marvelcdb">Login with MarvelCDB</string>
     <string name="login_as_guest">Continue as Guest</string>
     <string name="login">Login</string>
@@ -19,6 +19,8 @@
     <string name="today">Today</string>
     <string name="yesterday">Yesterday</string>
     <string name="two_days_ago">Two days ago</string>
+    <string name="filter">Filter</string>
+    <string name="select_packs">Select packs</string>
 
     <string name="aggression">Aggression</string>
     <string name="protection">Protection</string>
