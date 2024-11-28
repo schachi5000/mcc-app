@@ -3,6 +3,8 @@ package net.schacher.mcc.shared.screens.main
 import androidx.compose.animation.AnimatedContent
 import androidx.compose.animation.AnimatedContentTransitionScope
 import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
@@ -236,9 +238,9 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
 private fun pagerTransitionSpec(lastState: MainScreen):
         AnimatedContentTransitionScope<MainScreen>.() -> ContentTransform = {
     if (targetState.tabIndex > lastState.tabIndex) {
-        slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+        slideInHorizontally { it } + fadeIn() togetherWith slideOutHorizontally { -it } + fadeOut()
     } else {
-        slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+        slideInHorizontally { -it } + fadeIn() togetherWith slideOutHorizontally { it } + fadeOut()
     }
 }
 
