@@ -34,6 +34,7 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
@@ -50,6 +51,7 @@ import net.schacher.mcc.shared.design.compose.CardRowEntry
 import net.schacher.mcc.shared.design.compose.HeaderSmall
 import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.Tag
+import net.schacher.mcc.shared.design.theme.BottomSheetColors
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.CornerRadius
 import net.schacher.mcc.shared.model.Card
@@ -124,6 +126,7 @@ fun DeckScreen(
             topStart = CornerRadius.Default,
             topEnd = CornerRadius.Default
         ),
+        scrimColor = BottomSheetColors.Scrim,
         sheetContent = { OptionBottomSheet(state.options, onOptionClick) }
     ) {
         Content(

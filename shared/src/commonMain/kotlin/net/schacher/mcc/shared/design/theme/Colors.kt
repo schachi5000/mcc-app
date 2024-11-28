@@ -34,6 +34,10 @@ val DarkColorScheme = darkColors(
 
 const val MIN_CONTRAST_RATIO = 4.0f
 
+object BottomSheetColors {
+    val Scrim = Color(0xff000000).copy(alpha = 0.5f)
+}
+
 object SleeveColors {
     val Blue = Color(0xFF185ea4)
     val Yellow = Color(0xFFe98a02)

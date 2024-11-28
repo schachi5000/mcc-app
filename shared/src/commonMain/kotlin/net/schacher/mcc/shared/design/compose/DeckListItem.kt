@@ -62,7 +62,8 @@ fun DeckListItem(
             Text(
                 text = deck.name,
                 style = MaterialTheme.typography.h6,
-                maxLines = 2
+                maxLines = 2,
+                color = MaterialTheme.colors.onBackground
             )
 
             Text(
@@ -81,6 +82,7 @@ fun DeckListItem(
                     )
                 ).joinToString(" · "),
                 style = MaterialTheme.typography.subtitle1,
+                color = MaterialTheme.colors.onBackground,
                 maxLines = 2
             )
         }
