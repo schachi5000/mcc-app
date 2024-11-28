@@ -34,6 +34,7 @@ import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.create_deck
+import marvelchampionscompanion.shared.generated.resources.login
 import marvelchampionscompanion.shared.generated.resources.login_with_marvelcdb
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
@@ -41,6 +42,7 @@ import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.Header
 import net.schacher.mcc.shared.design.compose.PrimaryButton
+import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
@@ -172,10 +174,10 @@ private fun LoginInContent(onLoginClick: () -> Unit) {
         Spacer(Modifier.height(ContentPadding))
 
         Box(modifier = Modifier.fillMaxSize()) {
-            PrimaryButton(
+            SecondaryButton(
                 modifier = Modifier.align(Alignment.BottomCenter),
                 onClick = onLoginClick,
-                label = stringResource(Res.string.login_with_marvelcdb)
+                label = stringResource(Res.string.login)
             )
         }
     }

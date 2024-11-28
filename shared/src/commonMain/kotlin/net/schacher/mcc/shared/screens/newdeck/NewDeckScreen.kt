@@ -1,27 +1,31 @@
 package net.schacher.mcc.shared.screens.newdeck
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
-import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.spotlight
 import net.schacher.mcc.shared.design.compose.BackButton
-import net.schacher.mcc.shared.design.compose.LabeledCard
+import net.schacher.mcc.shared.design.compose.BottomSpacer
+import net.schacher.mcc.shared.design.compose.CardListItem
+import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.ListItem
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 @Composable
@@ -35,9 +39,7 @@ fun NewDeckScreen(
     NewDeckScreen(
         state = state,
         onCardSelected = { viewModel.onHeroCardSelected(it) },
-        onBackPress = { onBackPress() },
-        onNewDeckSelected = onNewDeckSelected,
-        onDialogDismissed = { viewModel.onBackPress() }
+        onBackPress = { onBackPress() }
     )
 }
 
@@ -45,41 +47,32 @@ fun NewDeckScreen(
 fun NewDeckScreen(
     state: NewDeckViewModel.UiState,
     onCardSelected: (Card) -> Unit,
-    onBackPress: () -> Unit,
-    onNewDeckSelected: (Card, Aspect?) -> Unit,
-    onDialogDismissed: () -> Unit
+    onBackPress: () -> Unit
 ) {
+    val decks = state.allHeroes
     Box(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.background)
-            .statusBarsPadding()
     ) {
-        Column(modifier = Modifier.fillMaxSize()) {
-            Text(
-                modifier = Modifier.padding(16.dp),
-                color = MaterialTheme.colors.onBackground,
-                text = "Select a hero",
-                style = MaterialTheme.typography.h3
-            )
+        LazyColumn(
+            modifier = Modifier.fillMaxSize().padding(horizontal = ContentPadding)
+        ) {
+            item {
+                Spacer(Modifier.statusBarsPadding().height(ContentPadding))
+                Header("Select a hero deck")
+                Spacer(Modifier.height(ContentPadding))
+            }
+            items(decks.size) { index ->
+                ListItem(decks[index], decks[index].name) {
+                    onCardSelected(decks[index])
+                }
 
-            LazyVerticalGrid(
-                modifier = Modifier.fillMaxSize().padding(horizontal = 16.dp),
-                columns = GridCells.Fixed(3),
-                horizontalArrangement = Arrangement.spacedBy(8.dp),
-                verticalArrangement = Arrangement.spacedBy(8.dp),
-            ) {
-                state.allHeroes.forEach { card ->
-                    item {
-                        LabeledCard(
-                            card = card,
-                            onClick = { onNewDeckSelected(card, null) }
-                        )
-                    }
-                }
-                item {
-                    Spacer(Modifier.height(72.dp))
-                }
+                Spacer(Modifier.height(ContentPadding * 2))
+            }
+
+            item {
+                BottomSpacer()
             }
         }
 

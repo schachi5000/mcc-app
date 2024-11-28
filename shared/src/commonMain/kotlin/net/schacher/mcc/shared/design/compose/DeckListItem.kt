@@ -38,6 +38,7 @@ import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.design.theme.isContrastRatioSufficient
 import net.schacher.mcc.shared.localization.label
+import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import org.jetbrains.compose.resources.pluralStringResource
 
@@ -46,13 +47,53 @@ fun DeckListItem(
     deck: Deck,
     onClick: () -> Unit
 ) {
+    ListItem(
+        card = deck.hero,
+        title = deck.name,
+        subtitle = listOfNotNull(
+            deck.aspect?.label,
+            pluralStringResource(
+                Res.plurals.cards,
+                deck.cards.size,
+                deck.cards.size
+            ),
+            pluralStringResource(
+                Res.plurals.decks,
+                deck.requiredDecks.size,
+                deck.requiredDecks.size
+            )
+        ).joinToString(" · "),
+        onClick = onClick
+    )
+}
+
+@Composable
+fun CardListItem(
+    card: Card,
+    onClick: () -> Unit
+) {
+    ListItem(
+        card = card,
+        title = card.name,
+        subtitle = card.type?.label,
+        onClick = onClick
+    )
+}
+
+@Composable
+fun ListItem(
+    card: Card,
+    title: String,
+    subtitle: String? = null,
+    onClick: () -> Unit
+) {
     Row(
         modifier = Modifier.bounceClick().noRippleClickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Thumbnail(
             modifier = Modifier.size(80.dp),
-            card = deck.hero
+            card = card
         )
 
         Column(
@@ -60,31 +101,21 @@ fun DeckListItem(
                 .padding(horizontal = 16.dp)
         ) {
             Text(
-                text = deck.name,
+                text = title,
                 style = MaterialTheme.typography.h6,
                 maxLines = 2,
                 color = MaterialTheme.colors.onBackground
             )
 
-            Text(
-                modifier = Modifier.padding(top = 4.dp),
-                text = listOfNotNull(
-                    deck.aspect?.label,
-                    pluralStringResource(
-                        Res.plurals.cards,
-                        deck.cards.size,
-                        deck.cards.size
-                    ),
-                    pluralStringResource(
-                        Res.plurals.decks,
-                        deck.requiredDecks.size,
-                        deck.requiredDecks.size
-                    )
-                ).joinToString(" · "),
-                style = MaterialTheme.typography.subtitle1,
-                color = MaterialTheme.colors.onBackground,
-                maxLines = 2
-            )
+            subtitle?.let {
+                Text(
+                    modifier = Modifier.padding(top = 4.dp),
+                    text = it,
+                    style = MaterialTheme.typography.subtitle1,
+                    color = MaterialTheme.colors.onBackground,
+                    maxLines = 2
+                )
+            }
         }
     }
 }

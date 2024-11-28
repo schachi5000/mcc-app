@@ -26,7 +26,7 @@ class NewDeckViewModel(
                 _state.value = UiState(value.values
                     .filter { it.type == CardType.HERO }
                     .sortedBy { it.name }
-                    .toSet())
+                    .distinct())
             }
         }
     }
@@ -50,7 +50,7 @@ class NewDeckViewModel(
     }
 
     data class UiState(
-        val allHeroes: Set<Card> = emptySet(),
+        val allHeroes: List<Card> = emptyList(),
         val selectedHero: Card? = null
     )
 }

@@ -104,14 +104,14 @@ fun SpotlightScreen(
 
                     is HeaderItem -> {
                         HeaderSmall(entry.header)
-                        Spacer(Modifier.height(24.dp))
+                        Spacer(Modifier.height(ContentPadding))
                     }
 
                     is DeckItem -> {
                         DeckListItem(deck = entry.deck) {
                             onDeckClick(entry.deck)
                         }
-                        Spacer(Modifier.height(32.dp))
+                        Spacer(Modifier.height(ContentPadding * 2))
                     }
                 }
             }
