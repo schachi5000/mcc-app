@@ -1,5 +1,11 @@
 package net.schacher.mcc.shared.screens.main
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -7,9 +13,6 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.BottomNavigation
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
@@ -143,34 +146,20 @@ private fun Content(
         },
     ) {
         Box(
-            modifier = Modifier.padding(it)
+            modifier = Modifier.padding(it),
         ) {
-            val pageLabels = listOf(
-                Spotlight,
-                MyDecks,
-                Collection,
-                Settings
-            )
+            var previousState by remember { mutableStateOf(state.value.mainScreen) }
 
-            val pagerState = rememberPagerState(
-                pageCount = { pageLabels.size },
-                initialPage = state.value.mainScreen.tabIndex
-            )
-
-            LaunchedEffect(state.value.mainScreen.tabIndex) {
-                pagerState.animateScrollToPage(state.value.mainScreen.tabIndex)
-            }
-
-            HorizontalPager(
-                state = pagerState,
-                userScrollEnabled = false
-            ) { page ->
-                when (page) {
-                    Spotlight.tabIndex -> SpotlightScreen {
+            AnimatedContent(
+                targetState = state.value.mainScreen,
+                transitionSpec = pagerTransitionSpec(previousState)
+            ) {
+                when (it) {
+                    Spotlight -> SpotlightScreen {
                         navController.navigate("deck/${it.id}")
                     }
 
-                    MyDecks.tabIndex -> MyDecksScreen(
+                    MyDecks -> MyDecksScreen(
                         onDeckClick = {
                             navController.navigate("deck/${it.id}")
                         },
@@ -182,13 +171,13 @@ private fun Content(
                         }
                     )
 
-                    Collection.tabIndex -> CollectionScreen(
+                    Collection -> CollectionScreen(
                         onShowBottomSheet = onShowBottomSheet,
                     ) {
                         navController.navigate("card/${it.code}")
                     }
 
-                    Settings.tabIndex -> SettingsScreen(
+                    Settings -> SettingsScreen(
                         onPackSelectionClick = {
                             navController.navigate(AppRoute.Packs)
                         },
@@ -196,10 +185,13 @@ private fun Content(
                             viewModel.onLogoutClicked()
                         })
                 }
+
+                previousState = it
             }
         }
     }
 }
+
 
 @Composable
 fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
@@ -240,6 +232,16 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
         }
     }
 }
+
+private fun pagerTransitionSpec(lastState: MainScreen):
+        AnimatedContentTransitionScope<MainScreen>.() -> ContentTransform = {
+    if (targetState.tabIndex > lastState.tabIndex) {
+        slideInHorizontally { it } togetherWith slideOutHorizontally { -it }
+    } else {
+        slideInHorizontally { -it } togetherWith slideOutHorizontally { it }
+    }
+}
+
 
 private val MainScreen.tabIndex: Int
     get() = when (this) {
