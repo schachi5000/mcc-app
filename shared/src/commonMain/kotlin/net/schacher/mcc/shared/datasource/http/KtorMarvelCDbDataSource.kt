@@ -116,7 +116,7 @@ class KtorMarvelCDbDataSource(
                 .body<List<CardDto>>()
                 .map {
                     val card = it.toCard()
-                    val linkedCard = it.linked_card?.toCard()?.copy(
+                    val linkedCard = it.linkedCard?.toCard()?.copy(
                         linkedCard = card
                     )
 
@@ -131,7 +131,7 @@ class KtorMarvelCDbDataSource(
             .body<CardDto>()
             .let {
                 val card = it.toCard()
-                val linkedCard = it.linked_card?.toCard()?.copy(
+                val linkedCard = it.linkedCard?.toCard()?.copy(
                     linkedCard = card
                 )
 
@@ -212,38 +212,35 @@ private fun LocalDate.toDateString(): String {
 }
 
 private const val LEADERSHIP = "leadership"
-
 private const val JUSTICE = "justice"
-
 private const val AGGRESSION = "aggression"
-
 private const val PROTECTION = "protection"
 
-private fun String.parseAspect(): Aspect? = when {
-    this.contains(JUSTICE) -> Aspect.JUSTICE
-    this.contains(LEADERSHIP) -> Aspect.LEADERSHIP
-    this.contains(AGGRESSION) -> Aspect.AGGRESSION
-    this.contains(PROTECTION) -> Aspect.PROTECTION
+private fun String.parseAspect(): Aspect? = when (this) {
+    JUSTICE -> Aspect.JUSTICE
+    LEADERSHIP -> Aspect.LEADERSHIP
+    AGGRESSION -> Aspect.AGGRESSION
+    PROTECTION -> Aspect.PROTECTION
     else -> null
 }
 
 private fun CardDto.toCard() = Card(
     code = this.code,
     position = this.position,
-    type = this.type_code.toCardType(),
+    type = this.typeCode.toCardType(),
     cost = this.cost,
     name = this.name.trim(),
-    setCode = this.card_set_code,
-    setName = this.card_set_name,
-    packCode = this.pack_code,
-    packName = this.pack_name,
+    setCode = this.cardSetCode,
+    setName = this.cardSetName,
+    packCode = this.packCode,
+    packName = this.packName,
     text = this.text?.replace("\n", "\n\n"),
-    boostText = this.boost_text.cleanUp(),
-    attackText = this.attack_text.cleanUp(),
+    boostText = this.boostText.cleanUp(),
+    attackText = this.attackText.cleanUp(),
     quote = this.flavor.cleanUp(),
-    aspect = this.faction_code.parseAspect(),
+    aspect = this.factionCode.parseAspect(),
     traits = this.traits?.takeIf { it.isNotEmpty() },
-    faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
+    faction = Faction.valueOf(this.factionCode.toUpperCasePreservingASCIIRules()),
 )
 
 private fun String?.cleanUp(): String? =
@@ -269,12 +266,12 @@ private fun String?.toCardType(): CardType? = when (this) {
 }
 
 private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck {
-    val heroCard = cardProvider(this.investigator_code!!)
+    val heroCard = cardProvider(this.heroCode!!)
 
     return Deck(id = this.id,
         name = this.name,
         hero = heroCard,
-        aspect = this.meta?.parseAspect(),
+        aspect = this.aspect?.parseAspect(),
         cards = (this.slots ?: emptyMap()).entries
             .map { entry ->
                 List(entry.value) {
