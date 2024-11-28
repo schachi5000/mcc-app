@@ -11,8 +11,12 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.rounded.List
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
@@ -39,11 +43,15 @@ import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.DeckListItem
+import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.Header
 import net.schacher.mcc.shared.design.compose.PrimaryButton
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.screens.AppRoute
+import net.schacher.mcc.shared.screens.collection.FilterContent
 import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
+import net.schacher.mcc.shared.screens.navigate
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -52,9 +60,8 @@ fun MyDecksScreen(
     viewModel: MyDecksViewModel = koinViewModel(),
     topInset: Dp = ContentPadding,
     onDeckClick: (Deck) -> Unit,
-    onAddDeckClick: () -> Unit = {},
+    onAddDeckClick: (() -> Unit)? = null,
     onLoginClick: () -> Unit = {},
-    onBackPress: (() -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -65,7 +72,6 @@ fun MyDecksScreen(
         onAddDeckClick = onAddDeckClick,
         onRefresh = { viewModel.onRefreshClicked() },
         onLoginClick = onLoginClick,
-        onBackPress = onBackPress
     )
 }
 
@@ -76,9 +82,8 @@ fun MyDecksScreen(
     topInset: Dp = 0.dp,
     onRefresh: () -> Unit,
     onDeckClick: (Deck) -> Unit,
-    onAddDeckClick: () -> Unit,
+    onAddDeckClick: (() -> Unit)? = null,
     onLoginClick: () -> Unit = {},
-    onBackPress: (() -> Unit)? = null
 ) {
     if (state.allowLogIn) {
         LoginInContent(onLoginClick)
@@ -147,8 +152,18 @@ fun MyDecksScreen(
             backgroundColor = MaterialTheme.colors.primary
         )
 
-        onBackPress?.let {
-            BackButton(it)
+        onAddDeckClick?.let {
+            ExpandingButton(
+                label = "Create deck",
+                icon = {
+                    Icon(
+                        Icons.Rounded.Add,
+                        contentDescription = "Create deck"
+                    )
+                },
+                expanded = expanded,
+                onClick = it
+            )
         }
     }
 }
@@ -166,7 +181,7 @@ private fun LoginInContent(onLoginClick: () -> Unit) {
 
         Box(modifier = Modifier.fillMaxSize()) {
             PrimaryButton(
-                modifier = Modifier.align(Alignment.Center),
+                modifier = Modifier.align(Alignment.BottomCenter),
                 onClick = onLoginClick,
                 label = stringResource(Res.string.login_with_marvelcdb)
             )

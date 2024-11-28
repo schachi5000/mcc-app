@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material.ButtonDefaults
+import androidx.compose.material.FloatingActionButton
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.TextButton
@@ -30,7 +31,11 @@ fun PrimaryButton(label: String, modifier: Modifier = Modifier, onClick: () -> U
 }
 
 @Composable
-fun SecondaryButton(label: String, modifier: Modifier = Modifier, onClick: () -> Unit) {
+fun SecondaryButton(
+    label: String,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
     TextButton(
         modifier = modifier,
         onClick = onClick,

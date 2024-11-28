@@ -54,7 +54,7 @@ fun AppScreen(
         }
 
         composable(AppRoute.Main.route) {
-            MainScreen(onLogInClicked = onLogInClicked)
+            MainScreen()
         }
 
         composable(AppRoute.AddDeck.route) {
@@ -91,8 +91,7 @@ fun AppScreen(
         composable(AppRoute.SelectDeck.route) {
             MyDecksScreen(
                 topInset = ContentPadding,
-                onDeckClick = { navController.setResultAndPopBackstack(it.id) },
-                onBackPress = { navController.popBackStack() }
+                onDeckClick = { navController.setResultAndPopBackstack(it.id) }
             )
         }
     }

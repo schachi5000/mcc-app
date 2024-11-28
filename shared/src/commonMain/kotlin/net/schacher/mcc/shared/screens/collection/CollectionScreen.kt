@@ -53,9 +53,11 @@ import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
 import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppRoute
+import net.schacher.mcc.shared.screens.main.BottomSheetDelegate
 import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.search.Filter
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
@@ -69,7 +71,7 @@ fun CollectionScreen(
     viewModel: CollectionViewModel = koinViewModel(),
     navController: NavController = koinInject(),
     topInset: Dp = ContentPadding,
-    onShowBottomSheet: (@Composable () -> Unit) -> Unit,
+    bottomSheetDelegate: BottomSheetDelegate,
     onCardClicked: (Card) -> Unit
 ) {
     val state by viewModel.state.collectAsState()
@@ -79,18 +81,17 @@ fun CollectionScreen(
         navController = navController,
         topInset = topInset,
         onCardClicked = onCardClicked,
-        onShowBottomSheet = onShowBottomSheet,
+        bottomSheetDelegate = bottomSheetDelegate,
         onApplyFilerClick = viewModel::onApplyFilterClicked
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CollectionScreen(
     state: UiState,
     navController: NavController,
     topInset: Dp,
-    onShowBottomSheet: (@Composable () -> Unit) -> Unit,
+    bottomSheetDelegate: BottomSheetDelegate,
     onCardClicked: (Card) -> Unit,
     onApplyFilerClick: (Set<Filter>) -> Unit
 ) {
@@ -156,10 +157,13 @@ fun CollectionScreen(
             },
             expanded = expanded,
             onClick = {
-                onShowBottomSheet {
+                bottomSheetDelegate.show {
                     FilterContent(
                         state = state,
-                        onSelectPacksClicked = { navController.navigate(AppRoute.Packs) },
+                        onSelectPacksClicked = {
+                            bottomSheetDelegate.hide()
+                            navController.navigate(AppRoute.Packs)
+                        },
                         onApplyFilerClick = { onApplyFilerClick(it) }
                     )
                 }
@@ -175,19 +179,6 @@ fun FilterContent(
     onSelectPacksClicked: () -> Unit = {},
 ) {
     var selectedFilters by remember { mutableStateOf(state.filters.toList()) }
-    var showOnlyOwned by remember {
-        mutableStateOf(
-            state.filters.find { it.type == OWNED }?.active ?: false
-        )
-    }
-
-    LaunchedEffect(showOnlyOwned) {
-        val ownedFilter = selectedFilters.find { it.type == OWNED }
-        val finalFilters =
-            selectedFilters.replace(ownedFilter, Filter(OWNED, showOnlyOwned))
-
-        onApplyFilerClick(finalFilters.toSet())
-    }
 
     Column(
         modifier = Modifier.fillMaxWidth(),
@@ -206,9 +197,7 @@ fun FilterContent(
                     start = ContentPadding,
                     end = ContentPadding
                 ),
-            filters = selectedFilters.toMutableSet().also {
-                it.removeAll { it.type == OWNED }
-            },
+            filters = selectedFilters.toMutableSet(),
             onFilterClicked = { filter ->
                 selectedFilters = selectedFilters.replace(
                     filter, filter.copy(active = !filter.active)
@@ -218,35 +207,19 @@ fun FilterContent(
             }
         )
 
-        Spacer(Modifier.height(8.dp))
+        Spacer(Modifier.height(16.dp))
 
         Row(
             modifier = Modifier.fillMaxWidth()
-                .height(64.dp)
-                .clickable { showOnlyOwned = !showOnlyOwned }
-                .padding(horizontal = ContentPadding),
-            horizontalArrangement = Arrangement.SpaceBetween,
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text("Show only owned")
-            Switch(
-                checked = showOnlyOwned,
-                onCheckedChange = null
-            )
-        }
-
-        Row(
-            modifier = Modifier.fillMaxWidth()
-                .height(64.dp)
                 .clickable { onSelectPacksClicked() }
                 .padding(horizontal = ContentPadding),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalAlignment = Alignment.CenterVertically
         ) {
-            Text("My packs")
-            Icon(
-                Icons.AutoMirrored.Rounded.ArrowForward,
-                contentDescription = "Select packs"
+            SecondaryButton(
+                modifier = Modifier.fillMaxWidth(),
+                label = "Select Packs",
+                onClick = onSelectPacksClicked
             )
         }
 

@@ -82,13 +82,26 @@ fun MainScreen(
     viewModel: MainViewModel = koinViewModel(),
     navController: NavController = koinInject(),
     snackbarHostState: SnackbarHostState = koinInject(),
-    onLogInClicked: () -> Unit,
 ) {
     val state = viewModel.state.collectAsState()
 
     val scope = rememberCoroutineScope()
-    var bottomSheetContent by remember { mutableStateOf<@Composable () -> Unit>({}) }
+    var currentContent by remember { mutableStateOf<@Composable () -> Unit>({ }) }
+
     val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val bottomSheetDelegate by remember {
+        mutableStateOf(BottomSheetDelegate(
+            onShow = {
+                currentContent = it
+                scope.launch { bottomSheetState.show() };
+            },
+            onHide = {
+                scope.launch {
+                    bottomSheetState.hide()
+                }
+            }
+        ))
+    }
 
     BackHandler(bottomSheetState.isVisible) {
         scope.launch {
@@ -103,17 +116,17 @@ fun MainScreen(
         scrimColor = BottomSheetColors.Scrim,
         sheetContent = {
             BottomSheetContainer {
-                bottomSheetContent()
+                currentContent()
             }
         }
     ) {
-        Content(snackbarHostState, state, viewModel, navController, onLogInClicked) {
-            bottomSheetContent = it
-
-            scope.launch {
-                bottomSheetState.show()
-            }
-        }
+        Content(
+            snackbarHostState,
+            state,
+            viewModel,
+            navController,
+            bottomSheetDelegate
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -134,8 +147,7 @@ private fun Content(
     state: State<MainViewModel.UiState>,
     viewModel: MainViewModel,
     navController: NavController,
-    onLogInClicked: () -> Unit,
-    onShowBottomSheet: (@Composable () -> Unit) -> Unit,
+    bottomSheetDelegate: BottomSheetDelegate,
 ) {
     Scaffold(
         modifier = Modifier.fillMaxSize(),
@@ -174,7 +186,7 @@ private fun Content(
                     )
 
                     Collection -> CollectionScreen(
-                        onShowBottomSheet = onShowBottomSheet,
+                        bottomSheetDelegate = bottomSheetDelegate,
                     ) {
                         navController.navigate("card/${it.code}")
                     }
@@ -268,3 +280,16 @@ private val MainScreen.label: String
         Collection -> stringResource(Res.string.collection)
         Settings -> stringResource(Res.string.settings)
     }
+
+class BottomSheetDelegate(
+    val onShow: (@Composable () -> Unit) -> Unit = {},
+    val onHide: () -> Unit = {},
+) {
+    fun show(content: @Composable () -> Unit) {
+        this.onShow(content)
+    }
+
+    fun hide() {
+        this.onHide()
+    }
+}
