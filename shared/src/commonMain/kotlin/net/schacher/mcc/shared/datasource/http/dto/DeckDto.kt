@@ -1,7 +1,6 @@
 package net.schacher.mcc.shared.datasource.http.dto
 
 import kotlinx.serialization.Serializable
-import net.schacher.mcc.shared.model.Aspect
 
 @Serializable
 data class DeckDto(
