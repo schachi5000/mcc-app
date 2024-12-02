@@ -130,9 +130,12 @@ fun CollectionScreen(
                 }
             }
 
-            items(count = state.cardsInCollection.size) { index ->
+            items(
+                count = state.cardsInCollection.size,
+                key = { state.cardsInCollection[it].code }
+            ) { index ->
                 val card = state.cardsInCollection[index]
-                Column {
+                Column(modifier = Modifier.animateItem()) {
                     LabeledCard(
                         card = card,
                         label = card.name,

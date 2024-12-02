@@ -120,8 +120,14 @@ fun MyDecksScreen(
                 Spacer(Modifier.height(ContentPadding))
             }
 
-            items(state.decks.size) { index ->
-                DeckListItem(state.decks[index]) {
+            items(
+                count = state.decks.size,
+                key = { state.decks[it].id }
+            ) { index ->
+                DeckListItem(
+                    modifier = Modifier.animateItem(),
+                    deck = state.decks[index]
+                ) {
                     onDeckClick(state.decks[index])
                 }
 

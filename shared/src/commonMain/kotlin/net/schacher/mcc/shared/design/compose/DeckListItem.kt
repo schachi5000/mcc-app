@@ -44,10 +44,12 @@ import org.jetbrains.compose.resources.pluralStringResource
 
 @Composable
 fun DeckListItem(
+    modifier: Modifier = Modifier,
     deck: Deck,
     onClick: () -> Unit
 ) {
     ListItem(
+        modifier = modifier,
         card = deck.hero,
         title = deck.name,
         subtitle = listOfNotNull(
@@ -85,10 +87,11 @@ fun ListItem(
     card: Card,
     title: String,
     subtitle: String? = null,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     Row(
-        modifier = Modifier.bounceClick().noRippleClickable { onClick() },
+        modifier = modifier.bounceClick().noRippleClickable { onClick() },
         verticalAlignment = Alignment.CenterVertically
     ) {
         Thumbnail(
