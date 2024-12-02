@@ -21,6 +21,7 @@
     <string name="two_days_ago">Two days ago</string>
     <string name="filter">Filter</string>
     <string name="select_packs">Select packs</string>
+    <string name="select_hero">Select a hero</string>
 
     <string name="aggression">Aggression</string>
     <string name="protection">Protection</string>

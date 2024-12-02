@@ -16,8 +16,13 @@ import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
@@ -75,7 +80,6 @@ fun LabeledCard(
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Card(
     card: Card,
@@ -83,18 +87,16 @@ fun Card(
     shape: Shape = CardShape,
     onClick: () -> Unit = {}
 ) {
-    val aspectRation = when (card.orientation) {
-        CardOrientation.LANDSCAPE -> LANDSCAPE_RATIO
-        CardOrientation.PORTRAIT -> PORTRAIT_RATIO
-    }
+    var blur by remember { mutableStateOf(0.dp) }
 
     Card(
-        modifier = modifier.aspectRatio(aspectRation),
+        modifier = modifier.aspectRatio(card.aspectRation)
+            .bounceClick{ state -> blur = 4.dp.takeIf { state == ButtonState.Pressed } ?: 0.dp }
+            .noRippleClickable { onClick() },
         shape = shape,
-        onClick = onClick
     ) {
         CardImage(
-            modifier = Modifier.aspectRatio(aspectRation).scale(1.025f),
+            modifier = Modifier.aspectRatio(card.aspectRation).scale(1.025f).blur(blur),
             cardCode = card.code,
             contentDescription = card.name,
             contentScale = ContentScale.FillBounds,
@@ -127,7 +129,13 @@ fun FailureImage(backgroundColor: Color, resource: DrawableResource) {
     )
 }
 
-val Card.backSideColor: Color
+private val Card.aspectRation: Float
+    get() = when (this.orientation) {
+        CardOrientation.LANDSCAPE -> LANDSCAPE_RATIO
+        CardOrientation.PORTRAIT -> PORTRAIT_RATIO
+    }
+
+private val Card.backSideColor: Color
     get() = when (this.type) {
         OBLIGATION,
         TREACHERY,

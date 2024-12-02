@@ -13,27 +13,17 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
-import androidx.compose.foundation.lazy.grid.GridItemSpan
-import androidx.compose.foundation.lazy.grid.LazyGridItemScope
-import androidx.compose.foundation.lazy.grid.LazyGridScope
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.ModalBottomSheetValue
-import androidx.compose.material.Switch
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.rounded.ArrowForward
 import androidx.compose.material.icons.automirrored.rounded.List
-import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -44,25 +34,23 @@ import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.collection
 import marvelchampionscompanion.shared.generated.resources.filter
 import marvelchampionscompanion.shared.generated.resources.select_packs
-import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
 import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.Header
 import net.schacher.mcc.shared.design.compose.SecondaryButton
+import net.schacher.mcc.shared.design.compose.maxSpanItem
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.main.BottomSheetDelegate
 import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.search.Filter
-import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.utils.replace
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -124,7 +112,7 @@ fun CollectionScreen(
                 .padding(horizontal = ContentPadding)
                 .nestedScroll(nestedScrollConnection),
         ) {
-            header {
+            maxSpanItem {
                 Row(modifier = Modifier.statusBarsPadding().padding(top = topInset)) {
                     Header(stringResource(Res.string.collection))
                 }
@@ -147,7 +135,7 @@ fun CollectionScreen(
                 }
             }
 
-            items(count = 3) {
+            maxSpanItem {
                 BottomSpacer()
             }
         }
@@ -230,10 +218,4 @@ fun FilterContent(
 
         Spacer(Modifier.height(16.dp))
     }
-}
-
-private fun LazyGridScope.header(
-    content: @Composable LazyGridItemScope.() -> Unit
-) {
-    item(span = { GridItemSpan(this.maxLineSpan) }, content = content)
 }
