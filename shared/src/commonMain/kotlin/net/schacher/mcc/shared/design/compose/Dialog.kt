@@ -18,6 +18,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.cancel
 import marvelchampionscompanion.shared.generated.resources.ok
@@ -89,6 +90,31 @@ fun ConfirmationDialog(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun ProgressDialog(title: String, dismissible: Boolean = true) {
+    Dialog(
+        properties = DialogProperties(
+            dismissOnClickOutside = !dismissible,
+            dismissOnBackPress = !dismissible
+        ),
+        onDismissRequest = {},
+    ) {
+        Card(
+            modifier = Modifier.fillMaxWidth(),
+            shape = DefaultShape,
+        ) {
+            Column(modifier = Modifier.padding(16.dp)) {
+                Text(
+                    text = title,
+                    modifier = Modifier.fillMaxWidth(),
+                    textAlign = TextAlign.Center,
+                    style = MaterialTheme.typography.h6,
+                )
             }
         }
     }

@@ -11,7 +11,9 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.AlertDialog
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -29,6 +31,7 @@ import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.GridItem
 import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.ProgressDialog
 import net.schacher.mcc.shared.design.compose.maxSpanItem
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Card
@@ -54,13 +57,20 @@ fun NewDeckScreen(
             scope.launch {
                 showDialog = true
                 val result = viewModel.onCreateNewDeck(card, deckName)
-                if(result) {
+                if (result) {
                     onNewDeckCreated()
                 }
             }
         },
         onBackPress = { onBackPress() }
     )
+
+    if (showDialog) {
+        ProgressDialog(
+            title = "Creating deck",
+            dismissible = false
+        )
+    }
 }
 
 @Composable
