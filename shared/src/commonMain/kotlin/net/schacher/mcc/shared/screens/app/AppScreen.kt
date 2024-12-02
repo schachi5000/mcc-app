@@ -65,13 +65,7 @@ fun AppScreen(
         composable(AppRoute.AddDeck.route) {
             NewDeckScreen(
                 onBackPress = { navController.popBackStack() },
-                onNewDeckCreated = {
-                    scope.launch {
-                        snackbarHostState.showSnackbar("Deck created")
-                    }
-
-                    navController.popBackStack()
-                },
+                onNewDeckCreated = { navController.popBackStack() }
             )
         }
 
