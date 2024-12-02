@@ -10,7 +10,11 @@ import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
+import io.ktor.client.request.post
 import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
 import kotlinx.coroutines.CoroutineScope
@@ -21,8 +25,10 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
+import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import kotlinx.serialization.json.JsonElement
 import net.schacher.mcc.shared.datasource.http.dto.CardDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckUpdateResponseDto
@@ -183,6 +189,23 @@ class KtorMarvelCDbDataSource(
         }.body<DeckDto>()
     }
 
+    override suspend fun createDeck(heroCardCode: String, deckName: String?): Result<Boolean> =
+        withContextSafe(Dispatchers.IO) {
+            httpClient.post("$serviceUrl/decks") {
+                headers { append(AUTHORIZATION, authHeader) }
+                contentType(ContentType.Application.Json)
+                setBody(CreateDeckRequestDto(heroCardCode, deckName))
+            }
+                .body<CreateDeckResponseDto>()
+                .let {
+                    if (it.success) {
+                        true
+                    } else {
+                        throw Exception("Failed to create deck: ${it.msg?.toString()}")
+                    }
+                }
+        }
+
     override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card) =
         withContextSafe(Dispatchers.IO) {
             val slots = deck.cards.toMutableList()
@@ -203,6 +226,12 @@ class KtorMarvelCDbDataSource(
             }
         }
 }
+
+@Serializable
+private data class CreateDeckRequestDto(val heroCardCode: String, val deckName: String?)
+
+@Serializable
+private data class CreateDeckResponseDto(val success: Boolean, val msg: JsonElement?)
 
 private fun LocalDate.toDateString(): String {
     val dayOfMonth = this.dayOfMonth.let { if (it < 10) "0$it" else it }
@@ -227,7 +256,7 @@ private fun String.parseAspect(): Aspect? = when (this) {
 private fun CardDto.toCard() = Card(
     code = this.code,
     position = this.position,
-    type = this.typeCode.toCardType(),
+    type = this.type.toCardType(),
     cost = this.cost,
     name = this.name.trim(),
     setCode = this.cardSetCode,
@@ -282,7 +311,8 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
             .toMutableList()
             .also { it.add(0, heroCard) },
         problem = this.problem,
-        version = this.version
+        version = this.version,
+        description = this.description
     )
 }
 

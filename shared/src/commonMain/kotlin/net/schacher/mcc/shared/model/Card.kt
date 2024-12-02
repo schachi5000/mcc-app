@@ -22,7 +22,9 @@ data class Card(
     val traits: String?,
     val aspect: Aspect? = null,
     val linkedCard: Card? = null,
-    val imagePath: String? = null
+    val imagePath: String? = null,
+    val primaryColor: String? = null,
+    val secondaryColor: String? = null,
 ) {
     val orientation = when (type) {
         CardType.SIDE_SCHEME,

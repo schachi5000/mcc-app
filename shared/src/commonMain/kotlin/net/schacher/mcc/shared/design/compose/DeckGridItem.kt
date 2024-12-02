@@ -1,10 +1,8 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyGridItemScope
 import androidx.compose.foundation.lazy.grid.LazyGridScope
@@ -19,7 +17,6 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
@@ -49,8 +46,8 @@ fun DeckGridItem(
             ),
             pluralStringResource(
                 Res.plurals.decks,
-                deck.requiredDecks.size,
-                deck.requiredDecks.size
+                deck.requiredPacks.size,
+                deck.requiredPacks.size
             )
         ).joinToString(" · "),
         onClick = onClick

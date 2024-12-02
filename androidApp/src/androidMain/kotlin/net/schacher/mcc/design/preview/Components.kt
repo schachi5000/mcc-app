@@ -120,5 +120,6 @@ private val previewDeck = Deck(
     aspect = Aspect.LEADERSHIP,
     cards = listOf(previewCard, previewCard, previewCard),
     version = "1.0",
-    problem = null
+    problem = null,
+    description = null
 )

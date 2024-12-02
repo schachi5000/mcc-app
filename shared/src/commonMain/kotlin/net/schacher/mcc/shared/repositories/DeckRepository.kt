@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.repositories
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,10 @@ class DeckRepository(
     private val marvelCDbDataSource: MarvelCDbDataSource,
     authRepository: AuthRepository
 ) {
+    private companion object {
+        const val TAG = "DeckRepository"
+    }
+
     private val scope: CoroutineScope = MainScope()
 
     private val _decks = MutableStateFlow<List<Deck>>(emptyList())
@@ -37,9 +42,17 @@ class DeckRepository(
 
     fun getDeckById(deckId: Int): Deck? = this.decks.value.find { it.id == deckId }
 
-    fun createDeck(heroCard: Card, label: String? = null, aspect: Aspect? = null) {
-        // TODO:
+    suspend fun createDeck(heroCardCode: String, label: String? = null): Result<Boolean> {
+        return this.marvelCDbDataSource.createDeck(heroCardCode, label).also {
+            if (it.isSuccess) {
+                Logger.d(TAG) { "Deck created successfully -> Refreshing all user decks" }
+                refreshAllUserDecks()
+            } else {
+                Logger.e(TAG) { it.exceptionOrNull()?.message ?: "Failed to create deck" }
+            }
+        }
     }
+
 
     fun removeDeck(deckId: Int) {
         _decks.update {

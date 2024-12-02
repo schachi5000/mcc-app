@@ -25,5 +25,7 @@ interface MarvelCDbDataSource {
         cardProvider: suspend (String) -> Card
     ): Result<Deck>
 
+    suspend fun createDeck(heroCardCode: String, deckName: String? = null): Result<Boolean>
+
     suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card): Result<Deck>
 }

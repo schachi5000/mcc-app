@@ -135,7 +135,7 @@ fun CollectionScreen(
                 }
             }
 
-            maxSpanItem {
+            items(count = 3) {
                 BottomSpacer()
             }
         }

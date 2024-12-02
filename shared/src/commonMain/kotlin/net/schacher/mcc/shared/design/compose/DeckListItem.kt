@@ -1,12 +1,10 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -14,7 +12,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -25,20 +22,14 @@ import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.composed
-import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.clip
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.input.pointer.pointerInput
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.cards
 import marvelchampionscompanion.shared.generated.resources.decks
-import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.design.theme.color
-import net.schacher.mcc.shared.design.theme.isContrastRatioSufficient
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
@@ -63,8 +54,8 @@ fun DeckListItem(
             ),
             pluralStringResource(
                 Res.plurals.decks,
-                deck.requiredDecks.size,
-                deck.requiredDecks.size
+                deck.requiredPacks.size,
+                deck.requiredPacks.size
             )
         ).joinToString(" · "),
         onClick = onClick
@@ -126,9 +117,11 @@ fun ListItem(
 }
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {
-    this.clickable(indication = null, interactionSource = remember { MutableInteractionSource() }) {
-        onClick()
-    }
+    this.clickable(
+        indication = null,
+        interactionSource = remember { MutableInteractionSource() },
+        onClick = onClick
+    )
 }
 
 @Composable

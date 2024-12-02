@@ -7,15 +7,18 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.Animation
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.theme.ContentPadding
@@ -35,9 +38,11 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AppScreen(
     appViewModel: AppViewModel = koinViewModel(),
     navController: NavController = koinInject(),
+    snackbarHostState: SnackbarHostState = koinInject(),
     onLogInClicked: () -> Unit,
     onQuitApp: () -> Unit
 ) {
+    val scope = rememberCoroutineScope()
     NavHost(
         navController = navController as NavHostController,
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background),
@@ -60,7 +65,13 @@ fun AppScreen(
         composable(AppRoute.AddDeck.route) {
             NewDeckScreen(
                 onBackPress = { navController.popBackStack() },
-                onNewDeckSelected = { _, _ -> },
+                onNewDeckCreated = {
+                    scope.launch {
+                        snackbarHostState.showSnackbar("Deck created")
+                    }
+
+                    navController.popBackStack()
+                },
             )
         }
 
