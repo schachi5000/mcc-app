@@ -102,7 +102,7 @@ class KtorMarvelCDbDataSource(
             validateResponse { response ->
                 if (response.status != HttpStatusCode.OK) {
                     val error = response.body<ErrorResponseDto>()
-                    throw IOException("[${error.code}] ${error.message}")
+                    throw IOException("${response.status} - ${error.message}")
                 }
             }
         }
@@ -225,8 +225,7 @@ class KtorMarvelCDbDataSource(
             httpClient.put("$serviceUrl/decks/${deck.id}") {
                 headers { append(AUTHORIZATION, authHeader) }
                 parameter("slots", slots)
-            }.body<UpdateDeckResponseDto>()
-
+            }
 
             getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
         }
