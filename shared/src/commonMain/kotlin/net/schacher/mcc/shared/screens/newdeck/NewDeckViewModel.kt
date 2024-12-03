@@ -33,6 +33,10 @@ class NewDeckViewModel(
     }
 
     suspend fun onCreateNewDeck(hero: Card, deckLabel: String? = null): Boolean {
+        if(_state.value.loading){
+            return false
+        }
+
         this._state.update {
             it.copy(loading = true)
         }
