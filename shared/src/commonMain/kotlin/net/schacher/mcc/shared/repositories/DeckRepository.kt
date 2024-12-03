@@ -42,17 +42,13 @@ class DeckRepository(
 
     fun getDeckById(deckId: Int): Deck? = this.decks.value.find { it.id == deckId }
 
-    suspend fun createDeck(heroCardCode: String, label: String? = null): Result<Boolean> {
-        return this.marvelCDbDataSource.createDeck(heroCardCode, label).also {
+    suspend fun createDeck(heroCardCode: String, label: String? = null): Result<Boolean> =
+        this.marvelCDbDataSource.createDeck(heroCardCode, label).also {
             if (it.isSuccess) {
                 Logger.d(TAG) { "Deck created successfully -> Refreshing all user decks" }
                 refreshAllUserDecks()
-            } else {
-                Logger.e(TAG) { it.exceptionOrNull()?.message ?: "Failed to create deck" }
             }
         }
-    }
-
 
     fun removeDeck(deckId: Int) {
         _decks.update {

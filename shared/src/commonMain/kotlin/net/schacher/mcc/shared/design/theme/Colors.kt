@@ -44,7 +44,7 @@ object BottomSheetColors {
         get() = if (MaterialTheme.colors.isLight) {
             LightColorScheme.background
         } else {
-            DarkColorScheme.surface
+            DarkColorScheme.background
         }
 }
 

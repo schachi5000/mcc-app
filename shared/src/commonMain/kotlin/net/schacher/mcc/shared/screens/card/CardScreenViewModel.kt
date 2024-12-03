@@ -21,6 +21,10 @@ class CardScreenViewModel(
     private val deckRepository: DeckRepository
 ) : ViewModel() {
 
+    private companion object {
+        const val TAG = "CardScreenViewModel"
+    }
+
     private val _state: MutableStateFlow<UiState> = runBlocking {
         val card = cardRepository.getCard(cardCode)
         MutableStateFlow(
@@ -38,7 +42,7 @@ class CardScreenViewModel(
             try {
                 deckRepository.addCardToDeck(it, cardCode)
             } catch (e: Exception) {
-                Logger.e(e)
+                Logger.e(TAG) { "Error adding card to deck: $e" }
             }
         }
     }

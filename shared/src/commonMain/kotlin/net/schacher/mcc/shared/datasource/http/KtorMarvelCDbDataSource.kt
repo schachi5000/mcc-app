@@ -4,6 +4,7 @@ import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
@@ -14,9 +15,12 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.HttpStatusCode.Companion
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -25,14 +29,15 @@ import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.ExperimentalSerializationApi
-import kotlinx.serialization.Serializable
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonElement
 import net.schacher.mcc.shared.datasource.http.dto.CardDto
+import net.schacher.mcc.shared.datasource.http.dto.CreateDeckRequestDto
+import net.schacher.mcc.shared.datasource.http.dto.CreateDeckResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
-import net.schacher.mcc.shared.datasource.http.dto.DeckUpdateResponseDto
+import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.PackDto
+import net.schacher.mcc.shared.datasource.http.dto.UpdateDeckResponseDto
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
@@ -91,6 +96,15 @@ class KtorMarvelCDbDataSource(
         install(HttpRequestRetry) {
             retryOnServerErrors(maxRetries = MAX_RETRIES)
             exponentialDelay(maxDelayMs = MAX_RETRY_DELAY_MS)
+        }
+
+        HttpResponseValidator {
+            validateResponse { response ->
+                if (response.status != HttpStatusCode.OK) {
+                    val error = response.body<ErrorResponseDto>()
+                    throw IOException("[${error.code}] ${error.message}")
+                }
+            }
         }
     }
 
@@ -195,15 +209,9 @@ class KtorMarvelCDbDataSource(
                 headers { append(AUTHORIZATION, authHeader) }
                 contentType(ContentType.Application.Json)
                 setBody(CreateDeckRequestDto(heroCardCode, deckName))
+            }.let {
+                true
             }
-                .body<CreateDeckResponseDto>()
-                .let {
-                    if (it.success) {
-                        true
-                    } else {
-                        throw Exception("Failed to create deck: ${it.msg?.toString()}")
-                    }
-                }
         }
 
     override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card) =
@@ -214,24 +222,15 @@ class KtorMarvelCDbDataSource(
                 .eachCount()
                 .let { Json.encodeToString(it) }
 
-            val response = httpClient.put("$serviceUrl/decks/${deck.id}") {
+            httpClient.put("$serviceUrl/decks/${deck.id}") {
                 headers { append(AUTHORIZATION, authHeader) }
                 parameter("slots", slots)
-            }.body<DeckUpdateResponseDto>()
+            }.body<UpdateDeckResponseDto>()
 
-            if (response.success) {
-                getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
-            } else {
-                throw Exception("Failed to update deck: ${response.msg?.toString()}")
-            }
+
+            getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
         }
 }
-
-@Serializable
-private data class CreateDeckRequestDto(val heroCardCode: String, val deckName: String?)
-
-@Serializable
-private data class CreateDeckResponseDto(val success: Boolean, val msg: JsonElement?)
 
 private fun LocalDate.toDateString(): String {
     val dayOfMonth = this.dayOfMonth.let { if (it < 10) "0$it" else it }
