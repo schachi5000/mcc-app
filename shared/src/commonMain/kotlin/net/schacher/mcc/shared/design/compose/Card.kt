@@ -12,7 +12,6 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -27,10 +26,8 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.card_blue_no_image
@@ -59,7 +56,7 @@ fun LabeledCard(
     showLabel: Boolean = true,
     modifier: Modifier = Modifier.height(196.dp),
     shape: Shape = CardShape,
-    onClick: () -> Unit = {}
+    onClick: (() -> Unit)? = null
 ) {
     Column {
         Card(card, modifier, shape, onClick)
@@ -85,14 +82,18 @@ fun Card(
     card: Card,
     modifier: Modifier = Modifier.height(DefaultCardSize),
     shape: Shape = CardShape,
-    onClick: () -> Unit = {}
+    onClick: (() -> Unit)? = null
 ) {
     var blur by remember { mutableStateOf(0.dp) }
 
     Card(
         modifier = modifier.aspectRatio(card.aspectRation)
-            .bounceClick{ state -> blur = 4.dp.takeIf { state == ButtonState.Pressed } ?: 0.dp }
-            .noRippleClickable { onClick() },
+            .applyIf(onClick != null) {
+                bounceClick { state -> blur = 4.dp.takeIf { state == ButtonState.Pressed } ?: 0.dp }
+            }
+            .applyIf(onClick != null) {
+                noRippleClickable { onClick?.invoke() }
+            },
         shape = shape,
     ) {
         CardImage(
