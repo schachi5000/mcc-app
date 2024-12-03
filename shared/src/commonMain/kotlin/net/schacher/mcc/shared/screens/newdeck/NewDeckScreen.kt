@@ -49,13 +49,11 @@ fun NewDeckScreen(
 ) {
     val scope = rememberCoroutineScope()
     val state by viewModel.state.collectAsState()
-    var showDialog by remember { mutableStateOf(false) }
 
     NewDeckScreen(
         state = state,
         onCardSelected = { card, deckName ->
             scope.launch {
-                showDialog = true
                 val result = viewModel.onCreateNewDeck(card, deckName)
                 if (result) {
                     onNewDeckCreated()
@@ -65,7 +63,7 @@ fun NewDeckScreen(
         onBackPress = { onBackPress() }
     )
 
-    if (showDialog) {
+    if (state.loading) {
         ProgressDialog(
             title = "Creating deck",
             dismissible = false
