@@ -35,10 +35,10 @@ jobs:
           file_path: 'local.properties'
           property: |
             oauth.url
-            proxy.url
+            service.url
           value: |
             ${{ secrets.OAUTH_URL }}
-            ${{ secrets.PROXY_URL }}
+            ${{ secrets.SERVICE_URL }}
 
       - name: Generate build number
         id: buildnumber
