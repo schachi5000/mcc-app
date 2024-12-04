@@ -7,6 +7,7 @@ import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
+import io.ktor.client.plugins.HttpTimeout
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
@@ -65,58 +66,19 @@ import net.schacher.mcc.shared.repositories.AuthRepository
 import kotlin.coroutines.CoroutineContext
 
 class KtorMarvelCDbDataSource(
+    private val httpClient: HttpClient,
     private val authRepository: AuthRepository,
     private val serviceUrl: String
 ) : MarvelCDbDataSource {
 
     private companion object {
-        const val TAG = "KtorMarvelCDbDataSource"
         const val AUTHORIZATION = "Authorization"
-        const val MAX_RETRY_DELAY_MS = 10000L
-        const val MAX_RETRIES = 1
     }
 
     private val authHeader: String
-        get() = "Bearer ${this.authRepository.accessToken?.token ?: throw IllegalStateException("No access token available")}"
+        get() = this.authRepository.accessToken?.token?.let { "Bearer $it" }
+            ?: throw IllegalStateException("No access token available")
 
-    @OptIn(ExperimentalSerializationApi::class)
-    private val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                explicitNulls = false
-            })
-        }
-        install(DefaultRequest) {
-            headers {
-                append("Accept-Language", Locale.current.language)
-            }
-        }
-        install(Logging) {
-            logger = object : io.ktor.client.plugins.logging.Logger {
-                override fun log(message: String) {
-                    Logger.d(TAG) { message }
-                }
-            }
-            level = LogLevel.INFO
-        }
-        install(HttpRequestRetry) {
-            maxRetries = MAX_RETRIES
-            exponentialDelay(maxDelayMs = MAX_RETRY_DELAY_MS)
-        }
-
-        HttpResponseValidator {
-            validateResponse { response ->
-                if (response.status != HttpStatusCode.OK) {
-                    val error = response.body<ErrorResponseDto>()
-                    throw ServiceException(
-                        response.status.value,
-                        "${response.status} - ${error.message}"
-                    )
-                }
-            }
-        }
-    }
 
     override suspend fun getAllPacks() = withContextSafe {
         httpClient.get("$serviceUrl/packs")

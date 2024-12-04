@@ -10,6 +10,7 @@ import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
 import net.schacher.mcc.shared.datasource.database.SettingsDao
+import net.schacher.mcc.shared.datasource.http.DefaultClient
 import net.schacher.mcc.shared.datasource.http.KtorMarvelCDbDataSource
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.design.theme.MccTheme
@@ -40,7 +41,13 @@ import org.koin.dsl.module
 import pro.schacher.mcc.BuildConfig
 
 val network = module {
-    single<MarvelCDbDataSource> { KtorMarvelCDbDataSource(get(), BuildConfig.SERVICE_URL) }
+    single<MarvelCDbDataSource> {
+        KtorMarvelCDbDataSource(
+            DefaultClient,
+            get(),
+            BuildConfig.SERVICE_URL,
+        )
+    }
 }
 
 val repositories = module {
