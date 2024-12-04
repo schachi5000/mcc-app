@@ -12,13 +12,16 @@ import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
+import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
+import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.utils.debug
 import net.schacher.mcc.shared.utils.launchAndCollect
 
 class MainViewModel(
     private val cardRepository: CardRepository,
+    private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
     private val authRepository: AuthRepository,
     private val settingsDao: SettingsDao

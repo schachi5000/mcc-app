@@ -4,15 +4,23 @@ import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.HttpRequestRetry
+import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
+import io.ktor.client.request.post
 import io.ktor.client.request.put
+import io.ktor.client.request.setBody
+import io.ktor.http.ContentType
+import io.ktor.http.HttpStatusCode
+import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
+import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
@@ -24,8 +32,10 @@ import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.schacher.mcc.shared.datasource.http.dto.CardDto
+import net.schacher.mcc.shared.datasource.http.dto.CreateDeckRequestDto
+import net.schacher.mcc.shared.datasource.http.dto.CreateDeckResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
-import net.schacher.mcc.shared.datasource.http.dto.DeckUpdateResponseDto
+import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.PackDto
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
@@ -49,7 +59,6 @@ import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.AuthRepository
-import net.schacher.mcc.shared.utils.e
 import kotlin.coroutines.CoroutineContext
 
 class KtorMarvelCDbDataSource(
@@ -60,6 +69,8 @@ class KtorMarvelCDbDataSource(
     private companion object {
         const val TAG = "KtorMarvelCDbDataSource"
         const val AUTHORIZATION = "Authorization"
+        const val MAX_RETRY_DELAY_MS = 10000L
+        const val MAX_RETRIES = 2
     }
 
     private val authHeader: String
@@ -82,12 +93,24 @@ class KtorMarvelCDbDataSource(
             level = LogLevel.INFO
         }
         install(HttpRequestRetry) {
-            retryOnServerErrors(maxRetries = 2)
-            exponentialDelay()
+            retryOnServerErrors(maxRetries = MAX_RETRIES)
+            exponentialDelay(maxDelayMs = MAX_RETRY_DELAY_MS)
+        }
+
+        HttpResponseValidator {
+            validateResponse { response ->
+                if (response.status != HttpStatusCode.OK) {
+                    val error = response.body<ErrorResponseDto>()
+                    throw ServiceException(
+                        response.status.value,
+                        "${response.status} - ${error.message}"
+                    )
+                }
+            }
         }
     }
 
-    override suspend fun getAllPacks() = withContextSafe(Dispatchers.IO) {
+    override suspend fun getAllPacks() = withContextSafe {
         httpClient.get("$serviceUrl/packs")
             .body<List<PackDto>>()
             .map {
@@ -110,12 +133,12 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getCardsInPack(packCode: String) =
-        withContextSafe(Dispatchers.IO) {
+        withContextSafe {
             httpClient.get("$serviceUrl/packs/$packCode")
                 .body<List<CardDto>>()
                 .map {
                     val card = it.toCard()
-                    val linkedCard = it.linked_card?.toCard()?.copy(
+                    val linkedCard = it.linkedCard?.toCard()?.copy(
                         linkedCard = card
                     )
 
@@ -125,12 +148,12 @@ class KtorMarvelCDbDataSource(
                 }
         }
 
-    override suspend fun getCard(cardCode: String) = withContextSafe(Dispatchers.IO) {
+    override suspend fun getCard(cardCode: String) = withContextSafe {
         httpClient.get("$serviceUrl/cards/$cardCode")
             .body<CardDto>()
             .let {
                 val card = it.toCard()
-                val linkedCard = it.linked_card?.toCard()?.copy(
+                val linkedCard = it.linkedCard?.toCard()?.copy(
                     linkedCard = card
                 )
 
@@ -142,7 +165,7 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getSpotlightDecksByDate(
         date: LocalDate, cardProvider: suspend (String) -> Card
-    ) = withContextSafe(Dispatchers.IO) {
+    ) = withContextSafe {
         httpClient.get("$serviceUrl/decks/spotlight") {
             parameter("date", date.toDateString())
         }
@@ -155,7 +178,7 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
-        withContextSafe(Dispatchers.IO) {
+        withContextSafe {
             httpClient
                 .get("$serviceUrl/decks") {
                     headers { append("Authorization", authHeader) }
@@ -176,32 +199,47 @@ class KtorMarvelCDbDataSource(
         this.getUserDeckDtoById(deckId).getOrThrow().toDeck(cardProvider)
     }
 
-    private suspend fun getUserDeckDtoById(deckId: Int) = withContextSafe(Dispatchers.IO) {
+    private suspend fun getUserDeckDtoById(deckId: Int) = withContextSafe {
         httpClient.get("$serviceUrl/decks/$deckId") {
             headers { append(AUTHORIZATION, authHeader) }
         }.body<DeckDto>()
     }
 
+    override suspend fun createDeck(heroCardCode: String, deckName: String?): Result<Int> =
+        withContextSafe {
+            httpClient.post("$serviceUrl/decks") {
+                headers { append(AUTHORIZATION, authHeader) }
+                contentType(ContentType.Application.Json)
+                setBody(CreateDeckRequestDto(heroCardCode, deckName))
+            }
+                .body<CreateDeckResponseDto>()
+                .deckId
+        }
+
     override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card) =
-        withContextSafe(Dispatchers.IO) {
+        withContextSafe {
             val slots = deck.cards.toMutableList()
                 .also { it.removeAll { it.code == deck.hero.code } }
                 .groupingBy { it.code }
                 .eachCount()
                 .let { Json.encodeToString(it) }
 
-            val response = httpClient.put("$serviceUrl/decks/${deck.id}") {
+            httpClient.put("$serviceUrl/decks/${deck.id}") {
                 headers { append(AUTHORIZATION, authHeader) }
                 parameter("slots", slots)
-            }.body<DeckUpdateResponseDto>()
-
-            if (response.success) {
-                getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
-            } else {
-                throw Exception("Failed to update deck: ${response.msg?.toString()}")
             }
+
+            getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
         }
+
+    override suspend fun deleteDeck(deckId: Int): Result<Unit> = withContextSafe {
+        httpClient.delete("$serviceUrl/decks/${deckId}") {
+            headers { append(AUTHORIZATION, authHeader) }
+        }
+    }
 }
+
+class ServiceException(val status: Int, message: String) : IOException("[${status}] $message")
 
 private fun LocalDate.toDateString(): String {
     val dayOfMonth = this.dayOfMonth.let { if (it < 10) "0$it" else it }
@@ -211,38 +249,35 @@ private fun LocalDate.toDateString(): String {
 }
 
 private const val LEADERSHIP = "leadership"
-
 private const val JUSTICE = "justice"
-
 private const val AGGRESSION = "aggression"
-
 private const val PROTECTION = "protection"
 
-private fun String.parseAspect(): Aspect? = when {
-    this.contains(JUSTICE) -> Aspect.JUSTICE
-    this.contains(LEADERSHIP) -> Aspect.LEADERSHIP
-    this.contains(AGGRESSION) -> Aspect.AGGRESSION
-    this.contains(PROTECTION) -> Aspect.PROTECTION
+private fun String.parseAspect(): Aspect? = when (this) {
+    JUSTICE -> Aspect.JUSTICE
+    LEADERSHIP -> Aspect.LEADERSHIP
+    AGGRESSION -> Aspect.AGGRESSION
+    PROTECTION -> Aspect.PROTECTION
     else -> null
 }
 
 private fun CardDto.toCard() = Card(
     code = this.code,
     position = this.position,
-    type = this.type_code.toCardType(),
+    type = this.type.toCardType(),
     cost = this.cost,
     name = this.name.trim(),
-    setCode = this.card_set_code,
-    setName = this.card_set_name,
-    packCode = this.pack_code,
-    packName = this.pack_name,
+    setCode = this.cardSetCode,
+    setName = this.cardSetName,
+    packCode = this.packCode,
+    packName = this.packName,
     text = this.text?.replace("\n", "\n\n"),
-    boostText = this.boost_text.cleanUp(),
-    attackText = this.attack_text.cleanUp(),
+    boostText = this.boostText.cleanUp(),
+    attackText = this.attackText.cleanUp(),
     quote = this.flavor.cleanUp(),
-    aspect = this.faction_code.parseAspect(),
+    aspect = this.factionCode.parseAspect(),
     traits = this.traits?.takeIf { it.isNotEmpty() },
-    faction = Faction.valueOf(this.faction_code.toUpperCasePreservingASCIIRules()),
+    faction = Faction.valueOf(this.factionCode.toUpperCasePreservingASCIIRules()),
 )
 
 private fun String?.cleanUp(): String? =
@@ -268,13 +303,13 @@ private fun String?.toCardType(): CardType? = when (this) {
 }
 
 private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck {
-    val heroCard = cardProvider(this.investigator_code!!)
+    val heroCard = cardProvider(this.heroCode!!)
 
     return Deck(id = this.id,
         name = this.name,
         hero = heroCard,
-        aspect = this.meta?.parseAspect(),
-        cards = this.slots.entries
+        aspect = this.aspect?.parseAspect(),
+        cards = (this.slots ?: emptyMap()).entries
             .map { entry ->
                 List(entry.value) {
                     cardProvider(entry.key)
@@ -284,12 +319,13 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
             .toMutableList()
             .also { it.add(0, heroCard) },
         problem = this.problem,
-        version = this.version
+        version = this.version,
+        description = this.description
     )
 }
 
 private suspend fun <T> withContextSafe(
-    context: CoroutineContext,
+    context: CoroutineContext = Dispatchers.IO,
     block: suspend CoroutineScope.() -> T
 ): Result<T> = withContext(context) {
     runCatching<T> {

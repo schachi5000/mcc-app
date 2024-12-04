@@ -33,6 +33,11 @@ SELECT *
 FROM Card
 WHERE code = ?;
 
+selectCardsByPackCode:
+SELECT *
+FROM Card
+WHERE packCode = ?;
+
 selectAllCards:
 SELECT *
 FROM Card;

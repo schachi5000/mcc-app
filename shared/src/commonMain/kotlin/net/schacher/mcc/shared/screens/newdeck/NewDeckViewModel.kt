@@ -6,6 +6,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.repositories.CardRepository
@@ -26,32 +27,32 @@ class NewDeckViewModel(
                 _state.value = UiState(value.values
                     .filter { it.type == CardType.HERO }
                     .sortedBy { it.name }
-                    .toSet())
+                    .distinct())
             }
         }
     }
 
-    fun onHeroCardSelected(hero: Card) {
-        _state.update {
-            it.copy(selectedHero = hero)
+    suspend fun onCreateNewDeck(hero: Card, deckLabel: String? = null): Boolean {
+        if(_state.value.loading){
+            return false
         }
-    }
 
-    fun onBackPress() {
-        _state.update {
-            it.copy(selectedHero = null)
+        this._state.update {
+            it.copy(loading = true)
         }
-    }
 
-    fun onCreateDeckClicked(hero: Card) {
-        this.viewModelScope.launch {
-            deckRepository.createDeck(heroCard = hero)
+        return withContext(viewModelScope.coroutineContext) {
+            val result = deckRepository.createDeck(hero.code, deckLabel)
+            _state.update {
+                it.copy(loading = false)
+            }
+            result.isSuccess
         }
     }
 
     data class UiState(
-        val allHeroes: Set<Card> = emptySet(),
-        val selectedHero: Card? = null
+        val allHeroes: List<Card> = emptyList(),
+        val loading: Boolean = false
     )
 }
 

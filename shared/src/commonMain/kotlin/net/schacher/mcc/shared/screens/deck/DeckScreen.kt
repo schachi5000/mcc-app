@@ -16,7 +16,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
@@ -30,7 +29,11 @@ import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -47,16 +50,22 @@ import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardBackgroundBox
 import net.schacher.mcc.shared.design.compose.CardRow
 import net.schacher.mcc.shared.design.compose.CardRowEntry
-import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.ConfirmationDialog
+import net.schacher.mcc.shared.design.compose.HeaderSmall
 import net.schacher.mcc.shared.design.compose.LabeledCard
+import net.schacher.mcc.shared.design.compose.ProgressDialog
+import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.Tag
+import net.schacher.mcc.shared.design.theme.BottomSheetColors
+import net.schacher.mcc.shared.design.theme.BottomSheetShape
 import net.schacher.mcc.shared.design.theme.ContentPadding
-import net.schacher.mcc.shared.design.theme.CornerRadius
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
-import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
-import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Option.REMOVE
+import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption.REMOVE
+import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.DeckOption.DELETE
+import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.DeletingDeck
+import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.RemovingCard
 import net.schacher.mcc.shared.utils.defaultSort
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
@@ -69,32 +78,39 @@ fun DeckScreen(
     deckId: Int,
     navController: NavController = koinInject(),
     viewModel: DeckScreenViewModel = koinInject { parametersOf(deckId) },
-    onDeleteDeckClick: (Int) -> Unit,
 ) {
-    val state = viewModel.state.collectAsState()
+    val state = viewModel.state.collectAsState().value
+
+    if (state == null) {
+        navController.popBackStack()
+        return
+    }
 
     DeckScreen(
-        state = state.value,
+        state = state,
         navController = navController,
         onShowCardOptions = { viewModel.onShowCardOptionClicked(it) },
         onCardOptionsDismiss = { viewModel.onCardOptionDismissed() },
-        onOptionClick = { viewModel.onOptionClicked(it) }
+        onOptionClick = { viewModel.onOptionClicked(it) },
+        onDeleteDeckClicked = { viewModel.onDeleteDeckClicked() },
     )
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun DeckScreen(
     state: UiState,
     navController: NavController,
     onShowCardOptions: (Card) -> Unit,
     onCardOptionsDismiss: () -> Unit,
-    onOptionClick: (UiState.Option) -> Unit,
+    onOptionClick: (UiState.CardOption) -> Unit,
+    onDeleteDeckClicked: () -> Unit,
 ) {
 
     val sheetState = rememberModalBottomSheetState(
         initialValue = ModalBottomSheetValue.Hidden,
     )
+
+    var deleteDialog by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
     LaunchedEffect(state.selectedCard) {
@@ -120,35 +136,55 @@ fun DeckScreen(
 
     ModalBottomSheetLayout(
         sheetState = sheetState,
-        sheetShape = RoundedCornerShape(
-            topStart = CornerRadius.Default,
-            topEnd = CornerRadius.Default
-        ),
-        sheetContent = { OptionBottomSheet(state.options, onOptionClick) }
+        sheetShape = BottomSheetShape,
+        sheetBackgroundColor = BottomSheetColors.Background,
+        scrimColor = BottomSheetColors.Scrim,
+        sheetContent = { OptionBottomSheet(state.cardOptions, onOptionClick) }
     ) {
         Content(
-            deck = state.deck,
-            showOptions = state.options.isNotEmpty(),
+            state = state,
             onCloseClick = { navController.popBackStack() },
             onCardClick = { navController.navigate("card/${it.code}") },
             onCardOptionsClick = onShowCardOptions,
+            onDeleteDeckClicked = { deleteDialog = true }
+        )
+    }
+
+    if (deleteDialog) {
+        ConfirmationDialog(title = state.deck.name,
+            message = "Soll das Deck unwiederruflich gelöscht werden?",
+            onDismiss = { deleteDialog = false },
+            onConfirm = {
+                deleteDialog = false
+                onDeleteDeckClicked()
+            })
+    }
+
+    val loading = state.loading
+    if (loading != null) {
+        ProgressDialog(
+            title = when (loading) {
+                DeletingDeck -> "Deleting Deck"
+                RemovingCard -> "Removing Card"
+            },
+            dismissible = false
         )
     }
 }
 
 @Composable
 private fun Content(
-    deck: Deck,
-    showOptions: Boolean,
+    state: UiState,
     onCloseClick: () -> Unit,
     onCardClick: (Card) -> Unit,
     onCardOptionsClick: (Card) -> Unit,
+    onDeleteDeckClicked: () -> Unit,
 ) {
     CardBackgroundBox(
         modifier = Modifier
             .fillMaxSize()
             .background(MaterialTheme.colors.background),
-        cardCode = deck.hero.code,
+        cardCode = state.deck.hero.code,
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
             item {
@@ -161,11 +197,11 @@ private fun Content(
                         horizontal = ContentPadding
                     )
                 ) {
-                    Card(deck.hero) {
-                        onCardClick(deck.hero)
+                    Card(state.deck.hero) {
+                        onCardClick(state.deck.hero)
                     }
 
-                    deck.hero.linkedCard?.let {
+                    state.deck.hero.linkedCard?.let {
                         Card(it) {
                             onCardClick(it)
                         }
@@ -175,10 +211,10 @@ private fun Content(
 
             item {
                 Row(modifier = Modifier.padding(ContentPadding)) {
-                    deck.version?.let {
+                    state.deck.version?.let {
                         Tag(text = "v$it")
                     }
-                    deck.problem?.let {
+                    state.deck.problem?.let {
                         Tag(
                             modifier = Modifier.padding(start = 4.dp),
                             text = it,
@@ -188,8 +224,8 @@ private fun Content(
                 }
             }
 
-            val heroCards = CardRowEntry("Hero cards", deck.cards
-                .filter { it.type != CardType.HERO && it.setCode == deck.hero.setCode }
+            val heroCards = CardRowEntry("Hero cards", state.deck.cards
+                .filter { it.type != CardType.HERO && it.setCode == state.deck.hero.setCode }
                 .distinctBy { it.name }
                 .sortedBy { it.cost ?: 0 })
 
@@ -205,8 +241,8 @@ private fun Content(
                 }
             }
 
-            val otherCards = deck.cards
-                .filter { it.setCode != deck.hero.setCode }
+            val otherCards = state.deck.cards
+                .filter { it.setCode != state.deck.hero.setCode }
                 .distinctBy { it.name }
                 .defaultSort()
 
@@ -217,7 +253,7 @@ private fun Content(
                         verticalAlignment = Alignment.Bottom,
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
-                        Header(
+                        HeaderSmall(
                             title = "Other Cards",
                             subTitle = otherCards.size.toString()
                         )
@@ -238,7 +274,7 @@ private fun Content(
                     ) {
                         rows[index].forEach { card ->
                             Box(Modifier.weight(1f)) {
-                                val cardCount = deck.cards.count { it.code == card.code }
+                                val cardCount = state.deck.cards.count { it.code == card.code }
                                 LabeledCard(
                                     modifier = Modifier.wrapContentHeight(),
                                     label = listOfNotNull(card.name,
@@ -249,10 +285,10 @@ private fun Content(
                                     onCardClick(card)
                                 }
 
-                                if (showOptions) {
+                                if (state.cardOptions.isNotEmpty()) {
                                     Icon(
                                         modifier = Modifier
-                                            .padding(2.dp)
+                                            .padding(4.dp)
                                             .size(32.dp)
                                             .background(
                                                 MaterialTheme.colors.surface.copy(alpha = 0.8f),
@@ -260,9 +296,7 @@ private fun Content(
                                             )
                                             .padding(4.dp)
                                             .align(Alignment.TopEnd)
-                                            .clickable {
-                                                onCardOptionsClick(card)
-                                            },
+                                            .clickable { onCardOptionsClick(card) },
                                         imageVector = Icons.Default.MoreVert,
                                         contentDescription = "Card Options",
                                         tint = MaterialTheme.colors.onSurface
@@ -280,6 +314,18 @@ private fun Content(
                 }
             }
 
+            state.deckOptions.find { it == DELETE }?.let {
+                item {
+                    SecondaryButton(
+                        modifier = Modifier
+                            .padding(horizontal = ContentPadding)
+                            .fillMaxWidth(),
+                        onClick = onDeleteDeckClicked,
+                        label = "Deck löschen"
+                    )
+                }
+            }
+
             item {
                 BottomSpacer()
             }
@@ -291,12 +337,12 @@ private fun Content(
 
 @Composable
 private fun OptionBottomSheet(
-    options: Set<UiState.Option>,
-    onOptionClick: (UiState.Option) -> Unit
+    cardOptions: Set<UiState.CardOption>,
+    onOptionClick: (UiState.CardOption) -> Unit
 ) {
     BottomSheetContainer {
         Column {
-            options.forEach {
+            cardOptions.forEach {
                 Row(modifier = Modifier.fillMaxWidth()
                     .height(64.dp)
                     .clickable { onOptionClick(it) }
@@ -320,8 +366,10 @@ private fun OptionBottomSheet(
     }
 }
 
-private val UiState.Option.label
+private val UiState.CardOption.label
     @Composable
     get() = when (this) {
         REMOVE -> stringResource(Res.string.remove_card_from_deck)
     }
+
+private data class ConfirmationState(val title: String, val message: String)

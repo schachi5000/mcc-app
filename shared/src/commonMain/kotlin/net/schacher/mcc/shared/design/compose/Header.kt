@@ -7,37 +7,10 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 
 @Composable
-fun Header(
-    title: String,
-    subTitle: String? = null
-) {
-    Row(verticalAlignment = Alignment.CenterVertically) {
-        Text(
-            modifier = Modifier.alignByBaseline(),
-            text = title,
-            style = MaterialTheme.typography.h5,
-            fontWeight = FontWeight.SemiBold,
-            color = MaterialTheme.colors.onBackground,
-        )
-
-        subTitle?.let {
-            Text(
-                modifier = Modifier.alignByBaseline().padding(start = 8.dp),
-                text = it,
-                style = MaterialTheme.typography.h6,
-                fontWeight = FontWeight.SemiBold,
-                color = MaterialTheme.colors.onBackground.copy(alpha = 0.5f),
-            )
-        }
-    }
-}
-
-@Composable
-fun MainHeader(title: String) {
+fun Header(title: String) {
     Row(
         modifier = Modifier.padding(vertical = 16.dp),
         verticalAlignment = Alignment.CenterVertically
@@ -46,8 +19,31 @@ fun MainHeader(title: String) {
             modifier = Modifier.alignByBaseline(),
             text = title,
             style = MaterialTheme.typography.h4,
-            fontWeight = FontWeight.SemiBold,
             color = MaterialTheme.colors.onBackground,
         )
+    }
+}
+
+@Composable
+fun HeaderSmall(
+    title: String,
+    subTitle: String? = null
+) {
+    Row(verticalAlignment = Alignment.CenterVertically) {
+        Text(
+            modifier = Modifier.alignByBaseline(),
+            text = title,
+            color = MaterialTheme.colors.onBackground,
+            style = MaterialTheme.typography.h5,
+        )
+
+        subTitle?.let {
+            Text(
+                modifier = Modifier.alignByBaseline().padding(start = 8.dp),
+                text = it,
+                color = MaterialTheme.colors.onBackground,
+                style = MaterialTheme.typography.h6,
+            )
+        }
     }
 }

@@ -21,9 +21,9 @@ koin-compose = "4.0.0"
 kotlin = "2.0.20"
 sql-delight = "2.0.2"
 serialization = "1.6.3"
-androidx-compose = "1.6.8"
+androidx-compose = "1.7.1"
 androidx-compose-compiler = "1.5.14"
-jetbrains-compose = "1.6.11"
+jetbrains-compose = "1.7.1"
 
 [libraries]
 androidx-browser = { module = "androidx.browser:browser", version.ref = "browser" }

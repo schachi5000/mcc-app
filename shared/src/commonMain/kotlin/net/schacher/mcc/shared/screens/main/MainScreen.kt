@@ -1,5 +1,13 @@
 package net.schacher.mcc.shared.screens.main
 
+import androidx.compose.animation.AnimatedContent
+import androidx.compose.animation.AnimatedContentTransitionScope
+import androidx.compose.animation.ContentTransform
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.slideInHorizontally
+import androidx.compose.animation.slideOutHorizontally
+import androidx.compose.animation.togetherWith
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
@@ -7,22 +15,34 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
+import androidx.compose.material.CircularProgressIndicator
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.ModalBottomSheetLayout
+import androidx.compose.material.ModalBottomSheetValue
 import androidx.compose.material.Scaffold
 import androidx.compose.material.SnackbarHost
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.MoreVert
+import androidx.compose.material.rememberModalBottomSheetState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.collection
 import marvelchampionscompanion.shared.generated.resources.ic_collection
@@ -34,6 +54,11 @@ import marvelchampionscompanion.shared.generated.resources.ic_spotlight_selected
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
+import net.schacher.mcc.shared.design.compose.BackHandler
+import net.schacher.mcc.shared.design.compose.BottomSheetContainer
+import net.schacher.mcc.shared.design.compose.ProgressDialog
+import net.schacher.mcc.shared.design.theme.BottomSheetColors
+import net.schacher.mcc.shared.design.theme.BottomSheetShape
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.platform.isIOs
 import net.schacher.mcc.shared.screens.AppRoute
@@ -55,10 +80,7 @@ import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
 
-@OptIn(
-    ExperimentalResourceApi::class,
-    ExperimentalFoundationApi::class
-)
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun MainScreen(
     viewModel: MainViewModel = koinViewModel(),
@@ -67,66 +89,48 @@ fun MainScreen(
 ) {
     val state = viewModel.state.collectAsState()
 
-    Scaffold(
-        modifier = Modifier.fillMaxSize(),
-        backgroundColor = MaterialTheme.colors.background,
-        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
-        bottomBar = {
-            BottomBar(state.value.mainScreen.tabIndex) {
-                viewModel.onTabSelected(it.toMainScreen())
+    val scope = rememberCoroutineScope()
+    var currentContent by remember { mutableStateOf<@Composable () -> Unit>({ }) }
+
+    val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val bottomSheetDelegate by remember {
+        mutableStateOf(BottomSheetDelegate(
+            onShow = {
+                currentContent = it
+                scope.launch { bottomSheetState.show() };
+            },
+            onHide = {
+                scope.launch {
+                    bottomSheetState.hide()
+                }
+            }
+        ))
+    }
+
+    BackHandler(bottomSheetState.isVisible) {
+        scope.launch {
+            bottomSheetState.hide()
+        }
+    }
+
+    ModalBottomSheetLayout(
+        sheetState = bottomSheetState,
+        sheetShape = BottomSheetShape,
+        sheetBackgroundColor = BottomSheetColors.Background,
+        scrimColor = BottomSheetColors.Scrim,
+        sheetContent = {
+            BottomSheetContainer {
+                currentContent()
             }
         }
     ) {
-        Box(
-            modifier = Modifier.padding(it)
-        ) {
-            val pageLabels = listOf(
-                Spotlight,
-                MyDecks,
-                Collection,
-                Settings
-            )
-
-            val pagerState = rememberPagerState(
-                pageCount = { pageLabels.size },
-                initialPage = state.value.mainScreen.tabIndex
-            )
-
-            LaunchedEffect(state.value.mainScreen.tabIndex) {
-                pagerState.animateScrollToPage(state.value.mainScreen.tabIndex)
-            }
-
-            HorizontalPager(
-                state = pagerState,
-                userScrollEnabled = false
-            ) { page ->
-                when (page) {
-                    Spotlight.tabIndex -> SpotlightScreen {
-                        navController.navigate("deck/${it.id}")
-                    }
-
-                    MyDecks.tabIndex -> MyDecksScreen(
-                        onDeckClick = {
-                            navController.navigate("deck/${it.id}")
-                        },
-                        onAddDeckClick = {
-                            navController.navigate(AppRoute.AddDeck)
-                        })
-
-                    Collection.tabIndex -> CollectionScreen {
-                        navController.navigate("card/${it.code}")
-                    }
-
-                    Settings.tabIndex -> SettingsScreen(
-                        onPackSelectionClick = {
-                            navController.navigate(AppRoute.Packs)
-                        },
-                        onLogoutClicked = {
-                            viewModel.onLogoutClicked()
-                        })
-                }
-            }
-        }
+        Content(
+            snackbarHostState,
+            state,
+            viewModel,
+            navController,
+            bottomSheetDelegate
+        )
     }
 
     LaunchedEffect(Unit) {
@@ -139,6 +143,73 @@ fun MainScreen(
         }
     }
 }
+
+@OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
+@Composable
+private fun Content(
+    snackbarHostState: SnackbarHostState,
+    state: State<MainViewModel.UiState>,
+    viewModel: MainViewModel,
+    navController: NavController,
+    bottomSheetDelegate: BottomSheetDelegate,
+) {
+    Scaffold(
+        modifier = Modifier.fillMaxSize(),
+        backgroundColor = MaterialTheme.colors.background,
+        snackbarHost = { SnackbarHost(hostState = snackbarHostState) },
+        bottomBar = {
+            BottomBar(state.value.mainScreen.tabIndex) {
+                viewModel.onTabSelected(it.toMainScreen())
+            }
+        },
+    ) {
+        Box(
+            modifier = Modifier.padding(it),
+        ) {
+            var previousState by remember { mutableStateOf(state.value.mainScreen) }
+
+            AnimatedContent(
+                targetState = state.value.mainScreen,
+                transitionSpec = pagerTransitionSpec(previousState)
+            ) {
+                when (it) {
+                    Spotlight -> SpotlightScreen {
+                        navController.navigate("deck/${it.id}")
+                    }
+
+                    MyDecks -> MyDecksScreen(
+                        onDeckClick = {
+                            navController.navigate("deck/${it.id}")
+                        },
+                        onAddDeckClick = {
+                            navController.navigate(AppRoute.AddDeck)
+                        },
+                        onLoginClick = {
+                            viewModel.onLogoutClicked()
+                        }
+                    )
+
+                    Collection -> CollectionScreen(
+                        bottomSheetDelegate = bottomSheetDelegate,
+                    ) {
+                        navController.navigate("card/${it.code}")
+                    }
+
+                    Settings -> SettingsScreen(
+                        onPackSelectionClick = {
+                            navController.navigate(AppRoute.Packs)
+                        },
+                        onLogoutClicked = {
+                            viewModel.onLogoutClicked()
+                        })
+                }
+
+                previousState = it
+            }
+        }
+    }
+}
+
 
 @Composable
 fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
@@ -180,6 +251,16 @@ fun BottomBar(selectedTabIndex: Int, onTabSelected: (Int) -> Unit) {
     }
 }
 
+private fun pagerTransitionSpec(lastState: MainScreen):
+        AnimatedContentTransitionScope<MainScreen>.() -> ContentTransform = {
+    if (targetState.tabIndex > lastState.tabIndex) {
+        slideInHorizontally { it } + fadeIn() togetherWith slideOutHorizontally { -it } + fadeOut()
+    } else {
+        slideInHorizontally { -it } + fadeIn() togetherWith slideOutHorizontally { it } + fadeOut()
+    }
+}
+
+
 private val MainScreen.tabIndex: Int
     get() = when (this) {
         Spotlight -> 0
@@ -203,3 +284,16 @@ private val MainScreen.label: String
         Collection -> stringResource(Res.string.collection)
         Settings -> stringResource(Res.string.settings)
     }
+
+class BottomSheetDelegate(
+    val onShow: (@Composable () -> Unit) -> Unit = {},
+    val onHide: () -> Unit = {},
+) {
+    fun show(content: @Composable () -> Unit) {
+        this.onShow(content)
+    }
+
+    fun hide() {
+        this.onHide()
+    }
+}

@@ -4,17 +4,17 @@ import kotlinx.serialization.Serializable
 
 @Serializable
 data class DeckDto(
-    val date_creation: String,
-    val date_update: String,
-    val description_md: String?,
+    val createdOn: String?,
+    val updatedOn: String?,
+    val description: String?,
     val id: Int,
-    val investigator_code: String?,
-    val investigator_name: String?,
-    val meta: String?,
+    val heroCode: String?,
+    val heroName: String?,
+    val aspect: String?,
     val name: String,
-    val slots: Map<String, Int>,
-    val tags: String,
-    val user_id: Int?,
+    val slots: Map<String, Int>?,
+    val tags: String?,
+    val userId: Int?,
     val version: String?,
     val problem: String?
 )

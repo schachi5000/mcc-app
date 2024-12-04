@@ -38,7 +38,8 @@ import marvelchampionscompanion.shared.generated.resources.two_days_ago
 import marvelchampionscompanion.shared.generated.resources.yesterday
 import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.LoadingDeckListItem
-import net.schacher.mcc.shared.design.compose.MainHeader
+import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.HeaderSmall
 import net.schacher.mcc.shared.design.compose.ShimmerBox
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
@@ -93,7 +94,8 @@ fun SpotlightScreen(
                 when (val entry = entries[index]) {
                     is TopHeaderItem -> {
                         Spacer(Modifier.statusBarsPadding().height(topInset))
-                        MainHeader(stringResource(Res.string.spotlight))
+                        Header(stringResource(Res.string.spotlight))
+                        Spacer(Modifier.height(ContentPadding))
                     }
 
                     is LoadingItem -> {
@@ -101,15 +103,15 @@ fun SpotlightScreen(
                     }
 
                     is HeaderItem -> {
-                        Header(entry.header)
-                        Spacer(Modifier.height(24.dp))
+                        HeaderSmall(entry.header)
+                        Spacer(Modifier.height(ContentPadding))
                     }
 
                     is DeckItem -> {
                         DeckListItem(deck = entry.deck) {
                             onDeckClick(entry.deck)
                         }
-                        Spacer(Modifier.height(32.dp))
+                        Spacer(Modifier.height(ContentPadding * 2))
                     }
                 }
             }
@@ -166,8 +168,6 @@ private fun Header(label: String) {
 @Composable
 private fun LoadingContent() {
     Column(modifier = Modifier.fillMaxSize()) {
-        Spacer(Modifier.height(8.dp))
-
         ShimmerBox(
             modifier = Modifier
                 .width(80.dp)

@@ -1,26 +1,38 @@
 package net.schacher.mcc.shared.design.compose
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.wrapContentSize
 import androidx.compose.material.Button
 import androidx.compose.material.Card
+import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.OutlinedButton
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.StrokeCap
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.max
 import androidx.compose.ui.window.Dialog
+import androidx.compose.ui.window.DialogProperties
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.cancel
 import marvelchampionscompanion.shared.generated.resources.ok
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import org.jetbrains.compose.resources.stringResource
 
@@ -38,7 +50,7 @@ fun ConfirmationDialog(
             modifier = Modifier.fillMaxWidth(),
             shape = DefaultShape,
         ) {
-            Column(modifier = Modifier.padding(16.dp)) {
+            Column(modifier = Modifier.padding(ContentPadding)) {
                 Text(
                     text = title,
                     modifier = Modifier.fillMaxWidth(),
@@ -48,7 +60,7 @@ fun ConfirmationDialog(
                 Text(
                     text = message,
                     modifier = Modifier
-                        .padding(top = 16.dp)
+                        .padding(ContentPadding)
                         .wrapContentSize(Alignment.Center),
                     textAlign = TextAlign.Center,
                     style = MaterialTheme.typography.body1,
@@ -89,6 +101,44 @@ fun ConfirmationDialog(
                         )
                     }
                 }
+            }
+        }
+    }
+}
+
+@Composable
+fun ProgressDialog(title: String, dismissible: Boolean = true) {
+    Dialog(
+        properties = DialogProperties(
+            dismissOnClickOutside = !dismissible,
+            dismissOnBackPress = !dismissible
+        ),
+        onDismissRequest = {},
+    ) {
+        Card(
+            shape = DefaultShape,
+            contentColor = MaterialTheme.colors.onSurface
+        ) {
+            Column(
+                modifier = Modifier.padding(ContentPadding),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                CircularProgressIndicator(
+                    modifier = Modifier.padding(bottom = ContentPadding, top = 6.dp)
+                        .size(52.dp),
+                    color = MaterialTheme.colors.primary,
+                    strokeWidth = 5.dp,
+                    strokeCap = StrokeCap.Round
+                )
+
+                Text(
+                    modifier = Modifier.sizeIn(minWidth = 200.dp),
+                    text = title,
+                    maxLines = 2,
+                    textAlign = TextAlign.Center,
+                    color = MaterialTheme.colors.onSurface,
+                    style = MaterialTheme.typography.body1,
+                )
             }
         }
     }

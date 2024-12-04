@@ -1,29 +1,30 @@
 package net.schacher.mcc.shared.screens.mydecks
 
-import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.material.ExperimentalMaterialApi
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.rounded.Add
 import androidx.compose.material.pullrefresh.PullRefreshIndicator
 import androidx.compose.material.pullrefresh.pullRefresh
 import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.State
 import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.derivedStateOf
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
-import androidx.compose.ui.BiasAlignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.input.nestedscroll.NestedScrollConnection
@@ -31,16 +32,17 @@ import androidx.compose.ui.input.nestedscroll.NestedScrollSource
 import androidx.compose.ui.input.nestedscroll.nestedScroll
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.create_deck
+import marvelchampionscompanion.shared.generated.resources.login
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.no_decks_found
-import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.DeckListItem
-import net.schacher.mcc.shared.design.compose.MainHeader
+import net.schacher.mcc.shared.design.compose.ExpandingButton
+import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.model.Deck
-import net.schacher.mcc.shared.screens.mydecks.ListItem.DeckItem
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
@@ -49,8 +51,8 @@ fun MyDecksScreen(
     viewModel: MyDecksViewModel = koinViewModel(),
     topInset: Dp = ContentPadding,
     onDeckClick: (Deck) -> Unit,
-    onAddDeckClick: () -> Unit = {},
-    onBackPress: (() -> Unit)? = null
+    onAddDeckClick: (() -> Unit)? = null,
+    onLoginClick: () -> Unit = {},
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -60,7 +62,7 @@ fun MyDecksScreen(
         onDeckClick = onDeckClick,
         onAddDeckClick = onAddDeckClick,
         onRefresh = { viewModel.onRefreshClicked() },
-        onBackPress = onBackPress
+        onLoginClick = onLoginClick,
     )
 }
 
@@ -71,11 +73,12 @@ fun MyDecksScreen(
     topInset: Dp = 0.dp,
     onRefresh: () -> Unit,
     onDeckClick: (Deck) -> Unit,
-    onAddDeckClick: () -> Unit,
-    onBackPress: (() -> Unit)? = null
+    onAddDeckClick: (() -> Unit)? = null,
+    onLoginClick: () -> Unit = {},
 ) {
-    val entries = mutableListOf<ListItem>().also {
-        it.addAll(state.decks.map { DeckItem(it) })
+    if (state.allowLogIn) {
+        LoginInContent(onLoginClick)
+        return
     }
 
     var expanded by remember { mutableStateOf(false) }
@@ -111,17 +114,21 @@ fun MyDecksScreen(
                 .padding(start = ContentPadding)
                 .nestedScroll(nestedScrollConnection)
         ) {
-            items(entries.size) { index ->
-                if (index == 0) {
-                    Spacer(Modifier.statusBarsPadding().height(topInset))
-                    MainHeader(stringResource(Res.string.my_decks))
-                    Spacer(Modifier.height(ContentPadding))
-                }
+            item {
+                Spacer(Modifier.statusBarsPadding().height(topInset))
+                Header(stringResource(Res.string.my_decks))
+                Spacer(Modifier.height(ContentPadding))
+            }
 
-                when (val entry = entries[index]) {
-                    is DeckItem -> DeckListItem(entry.deck) {
-                        onDeckClick(entry.deck)
-                    }
+            items(
+                count = state.decks.size,
+                key = { state.decks[it].id }
+            ) { index ->
+                DeckListItem(
+                    modifier = Modifier.animateItem(),
+                    deck = state.decks[index]
+                ) {
+                    onDeckClick(state.decks[index])
                 }
 
                 Spacer(Modifier.height(32.dp))
@@ -136,18 +143,39 @@ fun MyDecksScreen(
             backgroundColor = MaterialTheme.colors.primary
         )
 
-        onBackPress?.let {
-            BackButton(it)
+        onAddDeckClick?.let {
+            ExpandingButton(
+                label = stringResource(Res.string.create_deck),
+                icon = {
+                    Icon(
+                        Icons.Rounded.Add,
+                        contentDescription = stringResource(Res.string.create_deck)
+                    )
+                },
+                expanded = expanded,
+                onClick = it
+            )
         }
     }
 }
 
 @Composable
-fun animateHorizontalAlignmentAsState(targetBiasValue: Float): State<BiasAlignment.Horizontal> {
-    val bias by animateFloatAsState(targetBiasValue)
-    return derivedStateOf { BiasAlignment.Horizontal(bias) }
-}
+private fun LoginInContent(onLoginClick: () -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxSize()
+            .statusBarsPadding()
+            .navigationBarsPadding()
+            .padding(ContentPadding)
+    ) {
+        Header(stringResource(Res.string.my_decks))
+        Spacer(Modifier.height(ContentPadding))
 
-private sealed interface ListItem {
-    data class DeckItem(val deck: Deck) : ListItem
+        Box(modifier = Modifier.fillMaxSize()) {
+            SecondaryButton(
+                modifier = Modifier.align(Alignment.BottomCenter),
+                onClick = onLoginClick,
+                label = stringResource(Res.string.login)
+            )
+        }
+    }
 }

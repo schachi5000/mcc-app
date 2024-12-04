@@ -6,6 +6,7 @@ import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
@@ -18,12 +19,10 @@ import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.utils.measuringWithContext
 
-private const val LIST_DELIMITER = ";"
-
 class DatabaseDao(
     databaseDriverFactory: DatabaseDriverFactory,
     wipeDatabase: Boolean = false,
-    scope: CoroutineScope = MainScope()
+    scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 ) : CardDatabaseDao, PackDatabaseDao, SettingsDao {
 
     private val database = AppDatabase(databaseDriverFactory.createDriver())
@@ -80,6 +79,23 @@ class DatabaseDao(
             dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
         }
 
+
+    private suspend fun getCardsByPackCode(packCode: String): List<Card> =
+        measuringWithContext(Dispatchers.IO, "getCardsByPackCode") {
+            dbQuery.selectCardsByPackCode(packCode).executeAsList().map {
+                val card = it.toCard()
+                val linkedCard = it.linkedCardCode?.let {
+                    dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+                }?.copy(
+                    linkedCard = card
+                )
+
+                card.copy(
+                    linkedCard = linkedCard
+                )
+            }
+        }
+
     override suspend fun getAllCards(): List<Card> =
         measuringWithContext(Dispatchers.IO, "getAllCards") {
             dbQuery.selectAllCards().executeAsList().map {
@@ -130,7 +146,13 @@ class DatabaseDao(
         this.dbQuery.getAllSettings().executeAsList().map { it.key to it.value_ }
 
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
-        Logger.i { "Adding pack ${pack.name} to database ${hasPackInCollection(pack.code)}" }
+        Logger.i {
+            "Adding pack ${pack.name} to database - hasPackInCollection:${
+                hasPackInCollection(
+                    pack.code
+                )
+            }"
+        }
 
         addCards(pack.cards)
         dbQuery.addPack(
@@ -150,24 +172,11 @@ class DatabaseDao(
         }
     }
 
-    private suspend fun getPack(packCode: String): Pack =
-        withContext(Dispatchers.IO) {
-            dbQuery.getPack(packCode).executeAsOne().toPack {
-                runBlocking {
-                    getCardByCode(it) ?: throw IllegalStateException("Card $it not found")
-                }
-            }
-        }
-
-
     override suspend fun getAllPacks(): List<Pack> =
         measuringWithContext(Dispatchers.IO, "getAllPacks") {
             dbQuery.getAllPacks().executeAsList().map {
-                it.toPack {
-                    runBlocking {
-                        getCardByCode(it)
-                    }
-                }
+                val cards = getCardsByPackCode(it.code)
+                it.toPack(cards)
             }
         }
 
@@ -195,6 +204,8 @@ class DatabaseDao(
         }
 }
 
+private const val LIST_DELIMITER = ";"
+
 private fun String.toCardCodeList() = this.split(LIST_DELIMITER)
 
 private fun List<String>.toCardCodeString() = this.joinToString(LIST_DELIMITER)
@@ -203,10 +214,10 @@ private fun Boolean.toLong() = if (this) 1L else 0L
 
 private fun Long?.toBoolean() = if (this == null) false else this != 0L
 
-private fun database.Pack.toPack(cardProvider: (cardCode: String) -> Card?) = Pack(
+private fun database.Pack.toPack(cards: List<Card>) = Pack(
     name = this.name,
     code = this.code,
-    cards = this.cardCodes.toCardCodeList().mapNotNull { cardProvider(it) },
+    cards = cards,
     id = this.id.toInt(),
     position = this.position.toInt()
 )

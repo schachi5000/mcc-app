@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.repositories
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -17,6 +18,10 @@ class DeckRepository(
     private val marvelCDbDataSource: MarvelCDbDataSource,
     authRepository: AuthRepository
 ) {
+    private companion object {
+        const val TAG = "DeckRepository"
+    }
+
     private val scope: CoroutineScope = MainScope()
 
     private val _decks = MutableStateFlow<List<Deck>>(emptyList())
@@ -37,17 +42,26 @@ class DeckRepository(
 
     fun getDeckById(deckId: Int): Deck? = this.decks.value.find { it.id == deckId }
 
-    fun createDeck(heroCard: Card, label: String? = null, aspect: Aspect? = null) {
-        // TODO:
-    }
-
-    fun removeDeck(deckId: Int) {
-        _decks.update {
-            it.toMutableList().also {
-                it.removeAll { it.id == deckId }
+    suspend fun createDeck(heroCardCode: String, label: String? = null): Result<Int> =
+        this.marvelCDbDataSource.createDeck(heroCardCode, label).also {
+            val deckId = it.getOrNull()
+            if (deckId != null) {
+                Logger.d(TAG) { "Deck[$deckId] created successfully" }
+                refreshAllUserDecks()
             }
         }
-    }
+
+    suspend fun removeDeck(deckId: Int): Boolean =
+        this.marvelCDbDataSource.deleteDeck(deckId).also {
+            if (it.isSuccess) {
+                Logger.d(TAG) { "Deck[$deckId] deleted successfully" }
+                _decks.update { decks ->
+                    decks.toMutableList()
+                        .also { it.removeAll { deck -> deck.id == deckId } }
+                }
+                refreshAllUserDecks()
+            }
+        }.isSuccess
 
     suspend fun addCardToDeck(deckId: Int, cardCode: String) {
         val card = this.cardRepository.getCard(cardCode)

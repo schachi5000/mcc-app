@@ -12,20 +12,22 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.material.Card
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.card_blue_no_image
@@ -54,13 +56,13 @@ fun LabeledCard(
     showLabel: Boolean = true,
     modifier: Modifier = Modifier.height(196.dp),
     shape: Shape = CardShape,
-    onClick: () -> Unit = {}
+    onClick: (() -> Unit)? = null
 ) {
     Column {
         Card(card, modifier, shape, onClick)
         AnimatedVisibility(
             visible = showLabel,
-            modifier = Modifier.padding(vertical = 4.dp)
+            modifier = Modifier.padding(vertical = 8.dp)
                 .sizeIn(maxWidth = 128.dp)
                 .align(Alignment.CenterHorizontally)
         ) {
@@ -68,34 +70,34 @@ fun LabeledCard(
                 text = label,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.onBackground,
+                style = MaterialTheme.typography.caption,
                 maxLines = 2,
-                fontSize = 14.sp,
-                fontWeight = FontWeight.SemiBold
             )
         }
     }
 }
 
-@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun Card(
     card: Card,
     modifier: Modifier = Modifier.height(DefaultCardSize),
     shape: Shape = CardShape,
-    onClick: () -> Unit = {}
+    onClick: (() -> Unit)? = null
 ) {
-    val aspectRation = when (card.orientation) {
-        CardOrientation.LANDSCAPE -> LANDSCAPE_RATIO
-        CardOrientation.PORTRAIT -> PORTRAIT_RATIO
-    }
+    var blur by remember { mutableStateOf(0.dp) }
 
     Card(
-        modifier = modifier.aspectRatio(aspectRation),
+        modifier = modifier.aspectRatio(card.aspectRation)
+            .applyIf(onClick != null) {
+                bounceClick { state -> blur = 4.dp.takeIf { state == ButtonState.Pressed } ?: 0.dp }
+            }
+            .applyIf(onClick != null) {
+                noRippleClickable { onClick?.invoke() }
+            },
         shape = shape,
-        onClick = onClick
     ) {
         CardImage(
-            modifier = Modifier.aspectRatio(aspectRation).scale(1.025f),
+            modifier = Modifier.aspectRatio(card.aspectRation).scale(1.025f).blur(blur),
             cardCode = card.code,
             contentDescription = card.name,
             contentScale = ContentScale.FillBounds,
@@ -128,7 +130,13 @@ fun FailureImage(backgroundColor: Color, resource: DrawableResource) {
     )
 }
 
-val Card.backSideColor: Color
+private val Card.aspectRation: Float
+    get() = when (this.orientation) {
+        CardOrientation.LANDSCAPE -> LANDSCAPE_RATIO
+        CardOrientation.PORTRAIT -> PORTRAIT_RATIO
+    }
+
+private val Card.backSideColor: Color
     get() = when (this.type) {
         OBLIGATION,
         TREACHERY,

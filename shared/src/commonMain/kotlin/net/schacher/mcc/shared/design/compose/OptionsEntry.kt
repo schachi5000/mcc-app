@@ -38,7 +38,6 @@ fun OptionsGroup(title: String = "", content: @Composable () -> Unit) {
             Text(
                 modifier = Modifier.padding(start = 16.dp, top = 16.dp, end = 16.dp, bottom = 8.dp),
                 text = title,
-                fontSize = 15.sp,
                 fontWeight = FontWeight.SemiBold,
                 color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
                 maxLines = 1,
@@ -67,7 +66,6 @@ fun OptionsEntry(label: String, imageVector: ImageVector, onClick: (() -> Unit)?
     )
 }
 
-@OptIn(ExperimentalResourceApi::class)
 @Composable
 fun OptionsEntry(label: String, iconResource: DrawableResource, onClick: (() -> Unit)? = null) {
     OptionsEntry(

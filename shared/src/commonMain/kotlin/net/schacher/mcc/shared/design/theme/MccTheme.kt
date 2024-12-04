@@ -7,7 +7,8 @@ import androidx.compose.runtime.Composable
 @Composable
 fun MccTheme(content: @Composable () -> Unit) {
     MaterialTheme(
-        colors = if (isSystemInDarkTheme()) DarkColorScheme else LightColorScheme
+        colors = if (isSystemInDarkTheme()) DarkColorScheme else LightColorScheme,
+        typography = MccTypography
     ) {
         content()
     }
