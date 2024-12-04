@@ -1,8 +1,10 @@
 package net.schacher.mcc.shared.datasource.http
 
+import androidx.compose.ui.text.intl.Locale
 import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
@@ -16,6 +18,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
+import io.ktor.http.Headers
 import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
@@ -70,7 +73,7 @@ class KtorMarvelCDbDataSource(
         const val TAG = "KtorMarvelCDbDataSource"
         const val AUTHORIZATION = "Authorization"
         const val MAX_RETRY_DELAY_MS = 10000L
-        const val MAX_RETRIES = 2
+        const val MAX_RETRIES = 1
     }
 
     private val authHeader: String
@@ -84,6 +87,11 @@ class KtorMarvelCDbDataSource(
                 explicitNulls = false
             })
         }
+        install(DefaultRequest) {
+            headers {
+                append("Accept-Language", Locale.current.language)
+            }
+        }
         install(Logging) {
             logger = object : io.ktor.client.plugins.logging.Logger {
                 override fun log(message: String) {
@@ -93,7 +101,7 @@ class KtorMarvelCDbDataSource(
             level = LogLevel.INFO
         }
         install(HttpRequestRetry) {
-            retryOnServerErrors(maxRetries = MAX_RETRIES)
+            maxRetries = MAX_RETRIES
             exponentialDelay(maxDelayMs = MAX_RETRY_DELAY_MS)
         }
 
