@@ -42,21 +42,26 @@ class DeckRepository(
 
     fun getDeckById(deckId: Int): Deck? = this.decks.value.find { it.id == deckId }
 
-    suspend fun createDeck(heroCardCode: String, label: String? = null): Result<Boolean> =
+    suspend fun createDeck(heroCardCode: String, label: String? = null): Result<Int> =
         this.marvelCDbDataSource.createDeck(heroCardCode, label).also {
-            if (it.isSuccess) {
-                Logger.d(TAG) { "Deck created successfully -> Refreshing all user decks" }
+            val deckId = it.getOrNull()
+            if (deckId != null) {
+                Logger.d(TAG) { "Deck[$deckId] created successfully" }
                 refreshAllUserDecks()
             }
         }
 
-    fun removeDeck(deckId: Int) {
-        _decks.update {
-            it.toMutableList().also {
-                it.removeAll { it.id == deckId }
+    suspend fun removeDeck(deckId: Int): Boolean =
+        this.marvelCDbDataSource.deleteDeck(deckId).also {
+            if (it.isSuccess) {
+                Logger.d(TAG) { "Deck[$deckId] deleted successfully" }
+                _decks.update { decks ->
+                    decks.toMutableList()
+                        .also { it.removeAll { deck -> deck.id == deckId } }
+                }
+                refreshAllUserDecks()
             }
-        }
-    }
+        }.isSuccess
 
     suspend fun addCardToDeck(deckId: Int, cardCode: String) {
         val card = this.cardRepository.getCard(cardCode)

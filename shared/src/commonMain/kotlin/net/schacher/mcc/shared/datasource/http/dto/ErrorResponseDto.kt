@@ -6,8 +6,5 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class ErrorResponseDto(
     val error: String,
-    val message: String
-) {
-    constructor(httpStatusCode: HttpStatusCode, message: String) :
-            this(httpStatusCode.description, message)
-}
+    val message: String?
+)

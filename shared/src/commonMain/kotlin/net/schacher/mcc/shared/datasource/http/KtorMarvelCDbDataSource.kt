@@ -8,6 +8,7 @@ import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
 import io.ktor.client.request.parameter
@@ -16,7 +17,6 @@ import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
 import io.ktor.http.HttpStatusCode
-import io.ktor.http.HttpStatusCode.Companion
 import io.ktor.http.contentType
 import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
@@ -37,7 +37,6 @@ import net.schacher.mcc.shared.datasource.http.dto.CreateDeckResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
 import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.PackDto
-import net.schacher.mcc.shared.datasource.http.dto.UpdateDeckResponseDto
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
@@ -102,13 +101,16 @@ class KtorMarvelCDbDataSource(
             validateResponse { response ->
                 if (response.status != HttpStatusCode.OK) {
                     val error = response.body<ErrorResponseDto>()
-                    throw IOException("${response.status} - ${error.message}")
+                    throw ServiceException(
+                        response.status.value,
+                        "${response.status} - ${error.message}"
+                    )
                 }
             }
         }
     }
 
-    override suspend fun getAllPacks() = withContextSafe(Dispatchers.IO) {
+    override suspend fun getAllPacks() = withContextSafe {
         httpClient.get("$serviceUrl/packs")
             .body<List<PackDto>>()
             .map {
@@ -131,7 +133,7 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getCardsInPack(packCode: String) =
-        withContextSafe(Dispatchers.IO) {
+        withContextSafe {
             httpClient.get("$serviceUrl/packs/$packCode")
                 .body<List<CardDto>>()
                 .map {
@@ -146,7 +148,7 @@ class KtorMarvelCDbDataSource(
                 }
         }
 
-    override suspend fun getCard(cardCode: String) = withContextSafe(Dispatchers.IO) {
+    override suspend fun getCard(cardCode: String) = withContextSafe {
         httpClient.get("$serviceUrl/cards/$cardCode")
             .body<CardDto>()
             .let {
@@ -163,7 +165,7 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getSpotlightDecksByDate(
         date: LocalDate, cardProvider: suspend (String) -> Card
-    ) = withContextSafe(Dispatchers.IO) {
+    ) = withContextSafe {
         httpClient.get("$serviceUrl/decks/spotlight") {
             parameter("date", date.toDateString())
         }
@@ -176,7 +178,7 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
-        withContextSafe(Dispatchers.IO) {
+        withContextSafe {
             httpClient
                 .get("$serviceUrl/decks") {
                     headers { append("Authorization", authHeader) }
@@ -197,25 +199,25 @@ class KtorMarvelCDbDataSource(
         this.getUserDeckDtoById(deckId).getOrThrow().toDeck(cardProvider)
     }
 
-    private suspend fun getUserDeckDtoById(deckId: Int) = withContextSafe(Dispatchers.IO) {
+    private suspend fun getUserDeckDtoById(deckId: Int) = withContextSafe {
         httpClient.get("$serviceUrl/decks/$deckId") {
             headers { append(AUTHORIZATION, authHeader) }
         }.body<DeckDto>()
     }
 
-    override suspend fun createDeck(heroCardCode: String, deckName: String?): Result<Boolean> =
-        withContextSafe(Dispatchers.IO) {
+    override suspend fun createDeck(heroCardCode: String, deckName: String?): Result<Int> =
+        withContextSafe {
             httpClient.post("$serviceUrl/decks") {
                 headers { append(AUTHORIZATION, authHeader) }
                 contentType(ContentType.Application.Json)
                 setBody(CreateDeckRequestDto(heroCardCode, deckName))
-            }.let {
-                true
             }
+                .body<CreateDeckResponseDto>()
+                .deckId
         }
 
     override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card) =
-        withContextSafe(Dispatchers.IO) {
+        withContextSafe {
             val slots = deck.cards.toMutableList()
                 .also { it.removeAll { it.code == deck.hero.code } }
                 .groupingBy { it.code }
@@ -229,7 +231,15 @@ class KtorMarvelCDbDataSource(
 
             getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
         }
+
+    override suspend fun deleteDeck(deckId: Int): Result<Unit> = withContextSafe {
+        httpClient.delete("$serviceUrl/decks/${deckId}") {
+            headers { append(AUTHORIZATION, authHeader) }
+        }
+    }
 }
+
+class ServiceException(val status: Int, message: String) : IOException("[${status}] $message")
 
 private fun LocalDate.toDateString(): String {
     val dayOfMonth = this.dayOfMonth.let { if (it < 10) "0$it" else it }
@@ -315,7 +325,7 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
 }
 
 private suspend fun <T> withContextSafe(
-    context: CoroutineContext,
+    context: CoroutineContext = Dispatchers.IO,
     block: suspend CoroutineScope.() -> T
 ): Result<T> = withContext(context) {
     runCatching<T> {

@@ -18,7 +18,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
-import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.design.compose.Animation
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.theme.ContentPadding
@@ -78,10 +77,7 @@ fun AppScreen(
             arguments = AppRoute.Deck.navArguments
         ) {
             it.arguments?.getInt("deckId")?.let { deckId ->
-                DeckScreen(
-                    deckId = deckId,
-                    onDeleteDeckClick = {}
-                )
+                DeckScreen(deckId = deckId)
             }
         }
         composable(
