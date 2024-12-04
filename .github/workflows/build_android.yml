@@ -4,7 +4,6 @@ name:
 on:
   push:
     branches-ignore:
-      - main
       - release
 
 concurrency:
