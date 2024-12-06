@@ -226,7 +226,6 @@ private fun Content(
 
             val heroCards = CardRowEntry("Hero cards", state.deck.cards
                 .filter { it.type != CardType.HERO && it.setCode == state.deck.hero.setCode }
-                .distinctBy { it.name }
                 .sortedBy { it.cost ?: 0 })
 
             item {
@@ -243,7 +242,6 @@ private fun Content(
 
             val otherCards = state.deck.cards
                 .filter { it.setCode != state.deck.hero.setCode }
-                .distinctBy { it.name }
                 .defaultSort()
 
             if (otherCards.isNotEmpty()) {
@@ -277,9 +275,7 @@ private fun Content(
                                 val cardCount = state.deck.cards.count { it.code == card.code }
                                 LabeledCard(
                                     modifier = Modifier.wrapContentHeight(),
-                                    label = listOfNotNull(card.name,
-                                        cardCount.takeIf { it > 1 }?.let { "($it)" })
-                                        .joinToString(" "),
+                                    label = card.name,
                                     card = card
                                 ) {
                                     onCardClick(card)

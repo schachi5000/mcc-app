@@ -54,6 +54,8 @@ fun LabeledCard(
     card: Card,
     label: String = card.name,
     showLabel: Boolean = true,
+    minLines: Int = 1,
+    maxLines: Int = 2,
     modifier: Modifier = Modifier.height(196.dp),
     shape: Shape = CardShape,
     onClick: (() -> Unit)? = null
@@ -71,7 +73,8 @@ fun LabeledCard(
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.onBackground,
                 style = MaterialTheme.typography.caption,
-                maxLines = 2,
+                maxLines = maxLines,
+                minLines = minLines
             )
         }
     }

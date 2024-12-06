@@ -37,7 +37,10 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
                     Spacer(Modifier.size(ContentPadding))
                 }
                 Column {
-                    LabeledCard(card = cardRowEntry.cards[it]) {
+                    LabeledCard(
+                        card = cardRowEntry.cards[it],
+                        minLines = 2
+                    ) {
                         onCardSelected(cardRowEntry.cards[it])
                     }
                 }
