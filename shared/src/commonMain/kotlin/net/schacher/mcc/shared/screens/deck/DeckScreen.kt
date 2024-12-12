@@ -14,9 +14,11 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
@@ -60,11 +62,14 @@ import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.ProgressDialog
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.Tag
+import net.schacher.mcc.shared.design.compose.applyIf
 import net.schacher.mcc.shared.design.compose.noRippleClickable
 import net.schacher.mcc.shared.design.theme.BottomSheetColors
 import net.schacher.mcc.shared.design.theme.BottomSheetShape
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.color
+import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
@@ -202,19 +207,28 @@ private fun Content(
             item {
                 Spacer(Modifier.statusBarsPadding().height(ContentPadding))
             }
+
             item {
                 Row(
                     modifier = Modifier.padding(
                         vertical = ContentPadding,
                         horizontal = ContentPadding
-                    )
+                    ).fillMaxWidth(),
+                    horizontalArrangement = Arrangement.Center
                 ) {
-                    Card(state.deck.hero) {
+                    Card(
+                        card = state.deck.hero,
+                        parallaxEffect = true
+                    ) {
                         onCardClick(state.deck.hero)
                     }
 
                     state.deck.hero.linkedCard?.let {
-                        Card(it) {
+                        Spacer(Modifier.size(ContentPadding))
+                        Card(
+                            card = it,
+                            parallaxEffect = true
+                        ) {
                             onCardClick(it)
                         }
                     }
@@ -222,16 +236,51 @@ private fun Content(
             }
 
             item {
-                Row(modifier = Modifier.padding(ContentPadding)) {
-                    state.deck.version?.let {
-                        Tag(text = "v$it")
+                Column(modifier = Modifier.padding(horizontal = ContentPadding)) {
+                    Text(
+                        text = state.deck.name,
+                        maxLines = 2,
+                        style = MaterialTheme.typography.h5,
+                        color = MaterialTheme.colors.onSurface
+                    )
+
+                    Text(
+                        modifier = Modifier.padding(top = 4.dp),
+                        text = state.deck.hero.name,
+                        maxLines = 1,
+                        style = MaterialTheme.typography.h6,
+                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
+                    )
+                }
+            }
+
+            item {
+                LazyRow(
+                    modifier = Modifier.padding(
+                        start = ContentPadding,
+                        top = 8.dp,
+                        bottom = ContentPadding
+                    ),
+                    horizontalArrangement = Arrangement.spacedBy(4.dp)
+                ) {
+                    state.deck.aspect?.let {
+                        item {
+                            Tag(text = it.label, color = it.color)
+                        }
                     }
+
+                    state.deck.version?.let {
+                        item { Tag(text = "v$it") }
+                    }
+
                     state.deck.problem?.let {
-                        Tag(
-                            modifier = Modifier.padding(start = 4.dp),
-                            text = it,
-                            color = MaterialTheme.colors.error
-                        )
+                        item {
+                            Tag(
+                                modifier = Modifier.padding(start = 4.dp),
+                                text = it,
+                                color = MaterialTheme.colors.error
+                            )
+                        }
                     }
                 }
             }
