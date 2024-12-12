@@ -120,6 +120,7 @@ private fun Content(
                     ) {
                         Card(
                             card = card,
+                            parallaxEffect = true,
                             modifier = Modifier.sizeIn(maxWidth = 260.dp)
                                 .padding(vertical = ContentPadding)
                         )

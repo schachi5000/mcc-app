@@ -1,6 +1,12 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.FastOutSlowInEasing
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -25,6 +31,7 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
@@ -48,6 +55,7 @@ import org.jetbrains.compose.resources.painterResource
 
 const val PORTRAIT_RATIO = 0.715f
 const val LANDSCAPE_RATIO = 1.396f
+const val PARALLAX_DURATION_MS = 5000
 
 @Composable
 fun LabeledCard(
@@ -58,10 +66,11 @@ fun LabeledCard(
     maxLines: Int = 2,
     modifier: Modifier = Modifier.height(196.dp),
     shape: Shape = CardShape,
+    parallaxEffect: Boolean = false,
     onClick: (() -> Unit)? = null
 ) {
     Column {
-        Card(card, modifier, shape, onClick)
+        Card(card, modifier, shape, parallaxEffect, onClick)
         AnimatedVisibility(
             visible = showLabel,
             modifier = Modifier.padding(vertical = 8.dp)
@@ -85,9 +94,38 @@ fun Card(
     card: Card,
     modifier: Modifier = Modifier.height(DefaultCardSize),
     shape: Shape = CardShape,
+    parallaxEffect: Boolean = false,
     onClick: (() -> Unit)? = null
 ) {
     var blur by remember { mutableStateOf(0.dp) }
+
+    val infiniteTransition = rememberInfiniteTransition()
+    val rotationX by infiniteTransition.animateFloat(
+        initialValue = -0.5f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = PARALLAX_DURATION_MS, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    val rotationY by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = -0.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = PARALLAX_DURATION_MS, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    val rotationZ by infiniteTransition.animateFloat(
+        initialValue = -0.5f,
+        targetValue = 0.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = PARALLAX_DURATION_MS, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
 
     Card(
         modifier = modifier.aspectRatio(card.aspectRation)
@@ -96,11 +134,20 @@ fun Card(
             }
             .applyIf(onClick != null) {
                 noRippleClickable { onClick?.invoke() }
+            }
+            .applyIf(parallaxEffect) {
+                graphicsLayer(
+                    rotationX = rotationX,
+                    rotationY = rotationY,
+                    rotationZ = rotationZ,
+                )
             },
         shape = shape,
     ) {
         CardImage(
-            modifier = Modifier.aspectRatio(card.aspectRation).scale(1.025f).blur(blur),
+            modifier = Modifier.aspectRatio(card.aspectRation)
+                .scale(1.025f)
+                .blur(blur),
             cardCode = card.code,
             contentDescription = card.name,
             contentScale = ContentScale.FillBounds,
