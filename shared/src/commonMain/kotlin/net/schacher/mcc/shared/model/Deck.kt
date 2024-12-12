@@ -10,5 +10,5 @@ data class Deck(
     val version: String?,
     val problem: String? = null
 ) {
-    val requiredPacks = cards.map { it.packCode }.toSet()
+    val requiredPacks = this.cards.map { it.packCode }.toSet()
 }

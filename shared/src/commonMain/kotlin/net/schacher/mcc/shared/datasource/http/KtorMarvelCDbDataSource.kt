@@ -102,28 +102,31 @@ class KtorMarvelCDbDataSource(
             .awaitAll()
     }
 
-    override suspend fun getCardsInPack(packCode: String) =
-        withContextSafe {
-            httpClient.get("$serviceUrl/packs/$packCode")
-                .body<List<CardDto>>()
-                .map {
-                    val card = it.toCard()
-                    val linkedCard = it.linkedCard?.toCard()?.copy(
-                        linkedCard = card
-                    )
+    override suspend fun getCardsInPack(packCode: String) = withContextSafe {
+        httpClient.get("$serviceUrl/packs/$packCode")
+            .body<List<CardDto>>()
+            .map {
+                val card = it.toCard()
+                var linkedCard = it.linkedCard?.toCard()
 
-                    card.copy(
-                        linkedCard = linkedCard
-                    )
-                }
-        }
+                linkedCard = linkedCard?.copy(
+                    linkedCard = card
+                )
+
+                card.copy(
+                    linkedCard = linkedCard
+                )
+            }
+    }
 
     override suspend fun getCard(cardCode: String) = withContextSafe {
         httpClient.get("$serviceUrl/cards/$cardCode")
             .body<CardDto>()
             .let {
                 val card = it.toCard()
-                val linkedCard = it.linkedCard?.toCard()?.copy(
+                var linkedCard = it.linkedCard?.toCard()
+
+                linkedCard = linkedCard?.copy(
                     linkedCard = card
                 )
 
@@ -134,7 +137,8 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getSpotlightDecksByDate(
-        date: LocalDate, cardProvider: suspend (String) -> Card
+        date: LocalDate,
+        cardProvider: suspend (String) -> Card
     ) = withContextSafe {
         httpClient.get("$serviceUrl/decks/spotlight") {
             parameter("date", date.toDateString())

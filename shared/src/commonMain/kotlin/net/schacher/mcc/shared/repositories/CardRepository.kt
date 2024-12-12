@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.repositories
 
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -9,6 +10,7 @@ import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.utils.launchAndCollect
 
 class CardRepository(
@@ -21,7 +23,7 @@ class CardRepository(
     val cards = _cards.asStateFlow()
 
     init {
-        this.scope.launch(Dispatchers.Default) {
+        this.scope.launch {
             _cards.emit(cardDatabaseDao.getAllCards().toMap())
         }
 
@@ -41,7 +43,7 @@ class CardRepository(
 
     suspend fun deleteAllCardData() {
         this.cardDatabaseDao.wipeCardTable()
-        _cards.emit(this.cardDatabaseDao.getAllCards().toMap())
+        _cards.emit(emptyMap())
     }
 
     suspend fun getCard(cardCode: String): Card {
@@ -56,14 +58,12 @@ class CardRepository(
 
         return this.marvelCDbDataSource.getCard(cardCode).getOrThrow().also { newCard ->
             this.cardDatabaseDao.addCard(newCard)
+
             this._cards.update {
                 it.toMutableMap().apply { put(cardCode, newCard) }
             }
         }
     }
-
-    fun getCardsBySetCode(setCode: String): List<Card> =
-        this.cards.value.values.filter { it.setCode == setCode }.distinctBy { it.code }
 }
 
 private fun List<Card>.toMap(): Map<String, Card> = this.associateBy { it.code }

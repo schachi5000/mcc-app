@@ -78,7 +78,18 @@ class DatabaseDao(
 
     override suspend fun getCardByCode(cardCode: String): Card? =
         measuringWithContext(Dispatchers.IO, "getCardByCode", TAG) {
-            dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
+            val card = dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
+            var linkedCard = card?.linkedCard?.code?.let {
+                dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+            }
+
+            linkedCard = linkedCard?.copy(
+                linkedCard = card
+            )
+
+            card?.copy(
+                linkedCard = linkedCard
+            )
         }
 
 
@@ -86,9 +97,11 @@ class DatabaseDao(
         measuringWithContext(Dispatchers.IO, "getCardsByPackCode", TAG) {
             dbQuery.selectCardsByPackCode(packCode).executeAsList().map {
                 val card = it.toCard()
-                val linkedCard = it.linkedCardCode?.let {
+                var linkedCard = it.linkedCardCode?.let {
                     dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
-                }?.copy(
+                }
+
+                linkedCard = linkedCard?.copy(
                     linkedCard = card
                 )
 
@@ -102,9 +115,11 @@ class DatabaseDao(
         measuringWithContext(Dispatchers.IO, "getAllCards", TAG) {
             dbQuery.selectAllCards().executeAsList().map {
                 val card = it.toCard()
-                val linkedCard = it.linkedCardCode?.let {
-                    dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
-                }?.copy(
+                var linkedCard = it.linkedCardCode?.let {
+                    dbQuery.selectCardByCode(it).executeAsOneOrNull()?.toCard()
+                }
+
+                linkedCard = linkedCard?.copy(
                     linkedCard = card
                 )
 

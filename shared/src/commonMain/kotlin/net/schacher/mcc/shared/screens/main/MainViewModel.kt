@@ -37,7 +37,7 @@ class MainViewModel(
 
     init {
         Logger.debug { "Init MainViewModel" }
-        this.viewModelScope.launch {
+        this.viewModelScope.launch() {
             if (!settingsDao.getBoolean("cards-synced", false)) {
                 Logger.d { "No cards found in repo -> refreshing" }
                 try {
@@ -51,7 +51,7 @@ class MainViewModel(
             }
         }
 
-        this.viewModelScope.launchAndCollect(authRepository.loginState) {
+        this.viewModelScope.launchAndCollect(this.authRepository.loginState) {
             _state.update {
                 it.copy(
                     mainScreen = Spotlight,

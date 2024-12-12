@@ -44,6 +44,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.description
 import marvelchampionscompanion.shared.generated.resources.remove_card_from_deck
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BackHandler
@@ -238,7 +239,7 @@ private fun Content(
             if (state.deck.description != null) {
                 item {
                     Column(Modifier.fillMaxWidth().padding(ContentPadding)) {
-                        HeaderSmall(title = "Description")
+                        HeaderSmall(title = stringResource(Res.string.description))
 
                         Text(
                             modifier = Modifier.padding(top = ContentPadding)
