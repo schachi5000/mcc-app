@@ -15,9 +15,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
 import androidx.compose.material.BottomNavigation
-import androidx.compose.material.CircularProgressIndicator
 import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
@@ -39,7 +37,6 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
@@ -56,7 +53,6 @@ import marvelchampionscompanion.shared.generated.resources.settings
 import marvelchampionscompanion.shared.generated.resources.spotlight
 import net.schacher.mcc.shared.design.compose.BackHandler
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
-import net.schacher.mcc.shared.design.compose.ProgressDialog
 import net.schacher.mcc.shared.design.theme.BottomSheetColors
 import net.schacher.mcc.shared.design.theme.BottomSheetShape
 import net.schacher.mcc.shared.design.theme.ContentPadding
@@ -73,7 +69,7 @@ import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Set
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
 import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
 import net.schacher.mcc.shared.screens.navigate
-import net.schacher.mcc.shared.screens.settings.SettingsScreen
+import net.schacher.mcc.shared.screens.settings.MoreScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
@@ -195,7 +191,7 @@ private fun Content(
                         navController.navigate("card/${it.code}")
                     }
 
-                    Settings -> SettingsScreen(
+                    Settings -> MoreScreen(
                         onPackSelectionClick = {
                             navController.navigate(AppRoute.Packs)
                         },

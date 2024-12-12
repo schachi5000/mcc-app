@@ -40,22 +40,22 @@ import net.schacher.mcc.shared.design.compose.OptionsGroup
 import net.schacher.mcc.shared.design.compose.maxSpanItem
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
-import net.schacher.mcc.shared.screens.settings.SettingsViewModel.UiState
+import net.schacher.mcc.shared.screens.settings.MoreViewModel.UiState
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
 private const val GRID_COUNT = 2
 
 @Composable
-fun SettingsScreen(
-    settingsViewModel: SettingsViewModel = koinViewModel(),
+fun MoreScreen(
+    settingsViewModel: MoreViewModel = koinViewModel(),
     topInset: Dp = ContentPadding,
     onPackSelectionClick: () -> Unit,
     onLogoutClicked: () -> Unit
 ) {
     val state by settingsViewModel.state.collectAsState()
 
-    SettingsScreen(
+    MoreScreen(
         state = state,
         topInset = topInset,
         onPackSelectionClick = onPackSelectionClick,
@@ -66,7 +66,7 @@ fun SettingsScreen(
 }
 
 @Composable
-fun SettingsScreen(
+fun MoreScreen(
     state: UiState,
     topInset: Dp,
     onPackSelectionClick: () -> Unit,

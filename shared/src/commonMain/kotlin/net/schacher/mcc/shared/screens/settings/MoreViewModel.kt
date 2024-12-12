@@ -9,7 +9,6 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.SettingsDao
-import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.platform.PlatformInfo
 import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
@@ -17,7 +16,7 @@ import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.utils.launchAndCollect
 
-class SettingsViewModel(
+class MoreViewModel(
     private val cardRepository: CardRepository,
     private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,

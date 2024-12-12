@@ -1,7 +1,6 @@
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
@@ -30,7 +29,7 @@ import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.screens.newdeck.NewDeckViewModel
 import net.schacher.mcc.shared.screens.packselection.PackSelectionViewModel
 import net.schacher.mcc.shared.screens.search.SearchViewModel
-import net.schacher.mcc.shared.screens.settings.SettingsViewModel
+import net.schacher.mcc.shared.screens.settings.MoreViewModel
 import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
@@ -64,7 +63,7 @@ val viewModels = module {
     viewModelOf(::SearchViewModel)
     viewModelOf(::PackSelectionViewModel)
     viewModelOf(::MyDecksViewModel)
-    viewModelOf(::SettingsViewModel)
+    viewModelOf(::MoreViewModel)
     viewModelOf(::SpotlightViewModel)
     viewModelOf(::CollectionViewModel)
     viewModel { (deckId: Int) -> DeckScreenViewModel(deckId, get(), get()) }
