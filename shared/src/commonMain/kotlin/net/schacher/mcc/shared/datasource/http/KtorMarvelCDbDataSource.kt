@@ -252,6 +252,8 @@ private fun CardDto.toCard() = Card(
     aspect = this.factionCode.parseAspect(),
     traits = this.traits?.takeIf { it.isNotEmpty() },
     faction = Faction.valueOf(this.factionCode.toUpperCasePreservingASCIIRules()),
+    primaryColor = this.primaryColor,
+    secondaryColor = this.secondaryColor,
 )
 
 private fun String?.cleanUp(): String? =

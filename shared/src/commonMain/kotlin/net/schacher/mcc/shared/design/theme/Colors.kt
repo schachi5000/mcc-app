@@ -81,3 +81,32 @@ fun Color.getContrastRation(foreground: Color): Float {
 fun Color.isContrastRatioSufficient(foreground: Color): Boolean {
     return getContrastRation(foreground) >= MIN_CONTRAST_RATIO
 }
+
+fun Color.Companion.parseColor(colorString: String): Color {
+    // Remove the '#' if it exists
+    val cleanedHex = colorString.removePrefix("#")
+
+    // Parse the hex string
+    val colorInt = cleanedHex.toLong(16)
+
+    // Extract components
+    return when (cleanedHex.length) {
+        6 -> {
+            // If no alpha is provided, assume it's fully opaque
+            val r = (colorInt shr 16 and 0xFF).toFloat() / 255
+            val g = (colorInt shr 8 and 0xFF).toFloat() / 255
+            val b = (colorInt and 0xFF).toFloat() / 255
+            Color(r, g, b, 1f)
+        }
+        8 -> {
+            // If alpha is included
+            val a = (colorInt shr 24 and 0xFF).toFloat() / 255
+            val r = (colorInt shr 16 and 0xFF).toFloat() / 255
+            val g = (colorInt shr 8 and 0xFF).toFloat() / 255
+            val b = (colorInt and 0xFF).toFloat() / 255
+            Color(r, g, b, a)
+        }
+
+        else -> throw IllegalArgumentException("Invalid hex color: $colorString")
+    }
+}

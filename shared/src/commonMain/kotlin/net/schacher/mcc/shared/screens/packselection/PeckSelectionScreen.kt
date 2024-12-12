@@ -70,7 +70,9 @@ fun PackSelectionScreen(
             }
         }
 
-        BackButton(onBackPress)
+        BackButton{
+            onBackPress()
+        }
     }
 }
 

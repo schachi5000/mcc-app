@@ -70,7 +70,9 @@ class DatabaseDao(
                 traits = card.traits,
                 imagePath = card.imagePath,
                 faction = card.faction.name,
-                linkedCardCode = card.linkedCard?.code
+                linkedCardCode = card.linkedCard?.code,
+                primaryColor = card.primaryColor,
+                secondaryColor = card.secondaryColor
             )
         }.also {
             _onCardAdded.emit(card)
@@ -257,5 +259,7 @@ private fun database.Card.toCard() = Card(
     traits = this.traits,
     faction = Faction.valueOf(this.faction),
     setCode = this.cardSetCode,
-    setName = this.cardSetName
+    setName = this.cardSetName,
+    primaryColor = this.primaryColor,
+    secondaryColor = this.secondaryColor
 )

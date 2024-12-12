@@ -24,6 +24,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.AnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
@@ -43,6 +44,7 @@ import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.design.theme.FABPadding
 import net.schacher.mcc.shared.design.theme.color
+import net.schacher.mcc.shared.design.theme.parseColor
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.platform.isAndroid
@@ -216,7 +218,9 @@ private fun Content(
             }
         }
 
-        BackButton(onCloseClick)
+        BackButton {
+            onCloseClick()
+        }
 
         onAddToDeckClick?.let {
             FloatingActionButton(

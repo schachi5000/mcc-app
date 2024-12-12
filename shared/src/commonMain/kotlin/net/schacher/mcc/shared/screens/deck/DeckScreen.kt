@@ -365,7 +365,9 @@ private fun Content(
             }
         }
 
-        BackButton(onCloseClick)
+        BackButton {
+            onCloseClick()
+        }
     }
 }
 
