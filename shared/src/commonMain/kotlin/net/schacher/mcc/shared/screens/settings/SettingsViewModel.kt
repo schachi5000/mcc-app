@@ -3,11 +3,13 @@ package net.schacher.mcc.shared.screens.settings
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import co.touchlab.kermit.Logger
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.SettingsDao
+import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.platform.PlatformInfo
 import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
@@ -27,7 +29,8 @@ class SettingsViewModel(
     private val _state = MutableStateFlow(
         UiState(
             cardCount = cardRepository.cards.value.size,
-            deckCount = deckRepository.decks.value.size,
+            cardsInCollection = 0,
+            userDeckCount = deckRepository.decks.value.size,
             packCount = packRepository.packs.value.size,
             packsInCollectionCount = packRepository.packsInCollection.value.size,
             settingsValues = settingsDao.getAllEntries(),
@@ -44,7 +47,7 @@ class SettingsViewModel(
         }
 
         viewModelScope.launchAndCollect(deckRepository.decks) { value ->
-            _state.update { it.copy(deckCount = value.size) }
+            _state.update { it.copy(userDeckCount = value.size) }
         }
 
         viewModelScope.launchAndCollect(authRepository.loginState) {
@@ -52,7 +55,12 @@ class SettingsViewModel(
         }
 
         viewModelScope.launchAndCollect(packRepository.packsInCollection) { value ->
-            _state.update { it.copy(packsInCollectionCount = value.size) }
+            _state.update {
+                it.copy(packsInCollectionCount = value.size,
+                    cardsInCollection = cardRepository.cards.value.values
+                        .filter { packRepository.hasCardInCollection(it) }
+                        .size)
+            }
         }
 
         viewModelScope.launchAndCollect(packRepository.packs) { value ->
@@ -60,6 +68,16 @@ class SettingsViewModel(
                 it.copy(
                     packCount = value.size,
                     packsInCollectionCount = packRepository.packsInCollection.value.size
+                )
+            }
+        }
+
+        viewModelScope.launch(Dispatchers.Default) {
+            _state.update {
+                it.copy(
+                    cardsInCollection = cardRepository.cards.value.values
+                        .filter { packRepository.hasCardInCollection(it) }
+                        .size
                 )
             }
         }
@@ -92,7 +110,7 @@ class SettingsViewModel(
             _state.update {
                 it.copy(
                     cardCount = cardRepository.cards.value.size,
-                    deckCount = deckRepository.decks.value.size,
+                    userDeckCount = deckRepository.decks.value.size,
                     packCount = packRepository.packs.value.size,
                     packsInCollectionCount = packRepository.packsInCollection.value.size,
                     syncInProgress = false
@@ -103,7 +121,8 @@ class SettingsViewModel(
 
     data class UiState internal constructor(
         val cardCount: Int,
-        val deckCount: Int,
+        val cardsInCollection: Int,
+        val userDeckCount: Int,
         val packCount: Int,
         val packsInCollectionCount: Int,
         val syncInProgress: Boolean = false,

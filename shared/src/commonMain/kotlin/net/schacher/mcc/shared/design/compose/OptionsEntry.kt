@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
@@ -20,6 +21,8 @@ import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.painterResource
@@ -96,6 +99,41 @@ fun OptionsEntry(label: String, icon: @Composable () -> Unit, onClick: (() -> Un
         Text(
             text = label,
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+        )
+    }
+}
+
+@Composable
+fun OptionsGridEntry(
+    label: String,
+    value: String,
+    modifier: Modifier = Modifier,
+    onClick: (() -> Unit)? = null
+) {
+    Column(
+        modifier = modifier
+            .background(
+                color = MaterialTheme.colors.surface,
+                shape = DefaultShape
+            )
+            .clickable(enabled = onClick != null, onClick = { onClick?.invoke() })
+            .padding(ContentPadding),
+        horizontalAlignment = Alignment.Start,
+        verticalArrangement = Arrangement.SpaceBetween
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.body1,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
+            maxLines = 3
+        )
+
+        Text(
+            modifier = Modifier.padding(top = ContentPadding),
+            text = value,
+            maxLines = 2,
+            style = MaterialTheme.typography.h4,
+            color = MaterialTheme.colors.onSurface,
         )
     }
 }

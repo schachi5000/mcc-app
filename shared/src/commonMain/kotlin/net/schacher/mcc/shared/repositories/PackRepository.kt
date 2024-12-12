@@ -8,6 +8,7 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
+import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Pack
 
 class PackRepository(
@@ -51,6 +52,9 @@ class PackRepository(
     }
 
     fun hasPackInCollection(packCode: String) = this.packsInCollection.value.contains(packCode)
+
+    fun hasCardInCollection(card: Card) =
+        this.packsInCollection.value.any { it.contains(card.packCode) }
 
     suspend fun addPackToCollection(packCode: String) {
         this.packDatabaseDao.addPackToCollection(packCode)
