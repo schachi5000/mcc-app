@@ -25,7 +25,7 @@
 
     <string name="cards_in_collection">Karten in deiner Sammlung</string>
     <string name="cards_in_database">Karten in lokaler Datenbank</string>
-    <string name="owned_packs">Packs in Besitz</string>
+    <string name="owned_packs">Packs in Sammlung</string>
     <string name="of">von</string>
 
     <string name="sync_with_marvelcdb">Daten von MarvelCDB herunterladen</string>

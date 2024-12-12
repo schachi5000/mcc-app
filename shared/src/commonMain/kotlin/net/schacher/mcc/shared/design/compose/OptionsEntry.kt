@@ -111,7 +111,8 @@ fun OptionsGridEntry(
             text = label,
             style = MaterialTheme.typography.body1,
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.7f),
-            maxLines = 3
+            maxLines = 3,
+            minLines = 2
         )
 
         Text(
