@@ -13,6 +13,7 @@
     <string name="login_with_marvelcdb">Login with MarvelCDB</string>
     <string name="login_as_guest">Continue as Guest</string>
     <string name="login">Login</string>
+    <string name="logout">Logout</string>
     <string name="login_info_title">Information</string>
     <string name="login_info_message">After successfully entering your MarvelCDB credentials click ALLOW to finish the login process.</string>
     <string name="no_decks_found">No decks found</string>
@@ -22,6 +23,16 @@
     <string name="filter">Filter</string>
     <string name="select_packs">Select packs</string>
     <string name="select_hero">Select a hero</string>
+
+    <string name="cards_in_collection">Cards in your collection</string>
+    <string name="cards_in_database">Cards in local database</string>
+    <string name="owned_packs">Owned packs</string>
+    <string name="of">of</string>
+
+    <string name="sync_with_marvelcdb">Sync data with MarvelCDB</string>
+    <string name="delete_local_data">Delete local database</string>
+    <string name="delete_database_dialog_title">Delete local database</string>
+    <string name="delete_database_dialog_message">Do you really want to delete all local cards?</string>
 
     <string name="aggression">Aggression</string>
     <string name="protection">Protection</string>

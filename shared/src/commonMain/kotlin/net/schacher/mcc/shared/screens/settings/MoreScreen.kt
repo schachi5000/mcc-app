@@ -30,8 +30,19 @@ import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.cards_in_collection
+import marvelchampionscompanion.shared.generated.resources.cards_in_database
 import marvelchampionscompanion.shared.generated.resources.database
+import marvelchampionscompanion.shared.generated.resources.delete_database_dialog_message
+import marvelchampionscompanion.shared.generated.resources.delete_database_dialog_title
+import marvelchampionscompanion.shared.generated.resources.delete_local_data
+import marvelchampionscompanion.shared.generated.resources.login
+import marvelchampionscompanion.shared.generated.resources.logout
 import marvelchampionscompanion.shared.generated.resources.more
+import marvelchampionscompanion.shared.generated.resources.my_decks
+import marvelchampionscompanion.shared.generated.resources.of
+import marvelchampionscompanion.shared.generated.resources.owned_packs
+import marvelchampionscompanion.shared.generated.resources.sync_with_marvelcdb
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.Header
 import net.schacher.mcc.shared.design.compose.OptionsEntry
@@ -91,35 +102,44 @@ fun MoreScreen(
         }
 
         item {
-            OptionsGridEntry("Cards in your collection", state.cardsInCollection.toString())
-        }
-
-        item {
-            OptionsGridEntry("Cards in local database", state.cardCount.toString())
-        }
-
-        item {
-            OptionsGridEntry("My decks", state.userDeckCount.toString())
+            OptionsGridEntry(
+                stringResource(Res.string.my_decks),
+                state.userDeckCount.toString()
+            )
         }
 
         item {
             OptionsGridEntry(
-                "Owned packs",
-                "${state.packsInCollectionCount} of ${state.packCount}",
+                stringResource(Res.string.owned_packs),
+                "${state.packsInCollectionCount} ${stringResource(Res.string.of)} ${state.packCount}",
             ) { onPackSelectionClick() }
+        }
+
+        item {
+            OptionsGridEntry(
+                stringResource(Res.string.cards_in_collection),
+                state.cardsInCollection.toString()
+            )
+        }
+
+        item {
+            OptionsGridEntry(
+                stringResource(Res.string.cards_in_database),
+                state.cardCount.toString()
+            )
         }
 
         maxSpanItem {
             Column {
                 OptionsGroup(stringResource(Res.string.database)) {
                     OptionsEntry(
-                        label = "Sync with MarvelCDB",
+                        label = stringResource(Res.string.sync_with_marvelcdb),
                         imageVector = Icons.Rounded.Refresh,
                         onClick = onSyncClick
                     )
 
                     OptionsEntry(
-                        label = "Alle Einträge löschen",
+                        label = stringResource(Res.string.delete_local_data),
                         imageVector = Icons.Rounded.Delete,
                         onClick = { deleteDatabaseDialog = true })
                 }
@@ -135,7 +155,11 @@ fun MoreScreen(
                     Text(
                         modifier = Modifier.padding(horizontal = 16.dp, vertical = 8.dp),
                         color = MaterialTheme.colors.primary,
-                        text = if (state.guestLogin) "Login" else "Logout"
+                        text = if (state.guestLogin) {
+                            stringResource(Res.string.login)
+                        } else {
+                            stringResource(Res.string.logout)
+                        }
                     )
                 }
 
@@ -152,8 +176,8 @@ fun MoreScreen(
     }
 
     if (deleteDatabaseDialog) {
-        ConfirmationDialog(title = "Datenbank löschen",
-            message = "Möchtest du wirklich alle Einträge löschen?",
+        ConfirmationDialog(title = stringResource(Res.string.delete_database_dialog_title),
+            message = stringResource(Res.string.delete_database_dialog_message),
             onDismiss = { deleteDatabaseDialog = false },
             onConfirm = {
                 onWipeDatabaseClick()

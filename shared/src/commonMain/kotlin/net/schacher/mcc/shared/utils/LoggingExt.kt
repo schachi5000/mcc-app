@@ -20,11 +20,19 @@ fun <T> measureAndLog(label: String? = null, block: () -> T): T = measureTimedVa
 
 
 suspend fun <T> measuringWithContext(
-    dispatcher: CoroutineDispatcher, label: String? = null, block: suspend () -> T
+    dispatcher: CoroutineDispatcher,
+    label: String? = null,
+    tag: String? = null,
+    block: suspend () -> T
 ): T = measureTimedValue { withContext(dispatcher) { block() } }
-    .also { logDuration(label, it.duration) }
+    .also { logDuration(label, it.duration, tag) }
     .value
 
-private fun logDuration(label: String?, duration: kotlin.time.Duration) {
-    Logger.i { "[$label] took ${duration.toString(DurationUnit.MILLISECONDS, 2)}" }
+private fun logDuration(label: String?, duration: kotlin.time.Duration, tag: String? = null) {
+    val message = "[$label] took ${duration.toString(DurationUnit.MILLISECONDS, 2)}"
+    if (tag != null) {
+        Logger.i(tag) { message }
+    } else {
+        Logger.i { message }
+    }
 }

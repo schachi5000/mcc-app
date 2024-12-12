@@ -5,12 +5,10 @@ import database.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.launch
-import kotlinx.coroutines.runBlocking
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
@@ -24,6 +22,10 @@ class DatabaseDao(
     wipeDatabase: Boolean = false,
     scope: CoroutineScope = CoroutineScope(SupervisorJob() + Dispatchers.IO)
 ) : CardDatabaseDao, PackDatabaseDao, SettingsDao {
+
+    private companion object {
+        const val TAG = "DatabaseDao"
+    }
 
     private val database = AppDatabase(databaseDriverFactory.createDriver())
 
@@ -43,7 +45,7 @@ class DatabaseDao(
     }
 
     override suspend fun addCards(cards: List<Card>) =
-        measuringWithContext(Dispatchers.IO, "addCards") {
+        measuringWithContext(Dispatchers.IO, "addCards", TAG) {
             Logger.i { "Adding ${cards.size} cards to database" }
             cards.forEach { addCard(it) }
         }
@@ -75,13 +77,13 @@ class DatabaseDao(
         }
 
     override suspend fun getCardByCode(cardCode: String): Card? =
-        measuringWithContext(Dispatchers.IO, "getCardByCode") {
+        measuringWithContext(Dispatchers.IO, "getCardByCode", TAG) {
             dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
         }
 
 
     private suspend fun getCardsByPackCode(packCode: String): List<Card> =
-        measuringWithContext(Dispatchers.IO, "getCardsByPackCode") {
+        measuringWithContext(Dispatchers.IO, "getCardsByPackCode", TAG) {
             dbQuery.selectCardsByPackCode(packCode).executeAsList().map {
                 val card = it.toCard()
                 val linkedCard = it.linkedCardCode?.let {
@@ -97,7 +99,7 @@ class DatabaseDao(
         }
 
     override suspend fun getAllCards(): List<Card> =
-        measuringWithContext(Dispatchers.IO, "getAllCards") {
+        measuringWithContext(Dispatchers.IO, "getAllCards", TAG) {
             dbQuery.selectAllCards().executeAsList().map {
                 val card = it.toCard()
                 val linkedCard = it.linkedCardCode?.let {
@@ -173,7 +175,7 @@ class DatabaseDao(
     }
 
     override suspend fun getAllPacks(): List<Pack> =
-        measuringWithContext(Dispatchers.IO, "getAllPacks") {
+        measuringWithContext(Dispatchers.IO, "getAllPacks", TAG) {
             dbQuery.getAllPacks().executeAsList().map {
                 val cards = getCardsByPackCode(it.code)
                 it.toPack(cards)
@@ -181,17 +183,17 @@ class DatabaseDao(
         }
 
     override suspend fun addPackToCollection(packCode: String) =
-        measuringWithContext(Dispatchers.IO, "addPackToCollection") {
+        measuringWithContext(Dispatchers.IO, "addPackToCollection", TAG) {
             dbQuery.addPackToPossession(packCode)
         }
 
     override suspend fun removePackFromCollection(packCode: String) =
-        measuringWithContext(Dispatchers.IO, "removePackToCollection") {
+        measuringWithContext(Dispatchers.IO, "removePackToCollection", TAG) {
             dbQuery.removePackFromPossession(packCode)
         }
 
     override suspend fun getPacksInCollection(): List<String> =
-        measuringWithContext(Dispatchers.IO, "getPacksInCollection") {
+        measuringWithContext(Dispatchers.IO, "getPacksInCollection", TAG) {
             dbQuery.getAllPacks()
                 .executeAsList()
                 .filter { it.inPosession.toBoolean() }
@@ -199,7 +201,7 @@ class DatabaseDao(
         }
 
     override suspend fun hasPackInCollection(packCode: String): Boolean =
-        measuringWithContext(Dispatchers.IO, "hasPackInCollection") {
+        measuringWithContext(Dispatchers.IO, "hasPackInCollection", TAG) {
             dbQuery.getPack(packCode).executeAsOneOrNull()?.inPosession.toBoolean()
         }
 }

@@ -23,6 +23,16 @@
     <string name="select_packs">Packs wählen</string>
     <string name="select_hero">Wähle einen Helden</string>
 
+    <string name="cards_in_collection">Karten in deiner Sammlung</string>
+    <string name="cards_in_database">Karten in lokaler Datenbank</string>
+    <string name="owned_packs">Packs in Besitz</string>
+    <string name="of">von</string>
+
+    <string name="sync_with_marvelcdb">Daten von MarvelCDB herunterladen</string>
+    <string name="delete_local_data">Lokale Datenbank löschen</string>
+    <string name="delete_database_dialog_title">Lokale Datenbank löschen</string>
+    <string name="delete_database_dialog_message">Sollen alle lokele Kartendaten gelöscht werden?</string>
+
     <string name="aggression">Aggression</string>
     <string name="protection">Schutz</string>
     <string name="justice">Gerechtigkeit</string>
