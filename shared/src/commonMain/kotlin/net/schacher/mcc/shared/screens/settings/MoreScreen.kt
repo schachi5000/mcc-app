@@ -55,7 +55,7 @@ import net.schacher.mcc.shared.screens.settings.MoreViewModel.UiState
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
 
-private const val GRID_COUNT = 2
+private const val GRID_CELL_SIZE = 2
 
 @Composable
 fun MoreScreen(
@@ -88,7 +88,7 @@ fun MoreScreen(
     var deleteDatabaseDialog by remember { mutableStateOf(false) }
 
     LazyVerticalGrid(
-        columns = GridCells.Fixed(GRID_COUNT),
+        columns = GridCells.Fixed(GRID_CELL_SIZE),
         modifier = Modifier.fillMaxWidth().padding(horizontal = ContentPadding),
         horizontalArrangement = Arrangement.spacedBy(ContentPadding),
         verticalArrangement = Arrangement.spacedBy(ContentPadding),
