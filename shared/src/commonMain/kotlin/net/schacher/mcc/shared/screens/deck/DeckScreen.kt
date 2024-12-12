@@ -1,5 +1,7 @@
 package net.schacher.mcc.shared.screens.deck
 
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -37,6 +39,7 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
@@ -56,9 +59,11 @@ import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.ProgressDialog
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.Tag
+import net.schacher.mcc.shared.design.compose.noRippleClickable
 import net.schacher.mcc.shared.design.theme.BottomSheetColors
 import net.schacher.mcc.shared.design.theme.BottomSheetShape
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
@@ -180,6 +185,12 @@ private fun Content(
     onCardOptionsClick: (Card) -> Unit,
     onDeleteDeckClicked: () -> Unit,
 ) {
+    var expandedDescription by remember { mutableStateOf(false) }
+    val maxLines by animateIntAsState(
+        targetValue = if (expandedDescription) 100 else 4,
+        animationSpec = spring()
+    )
+
     CardBackgroundBox(
         modifier = Modifier
             .fillMaxSize()
@@ -193,7 +204,7 @@ private fun Content(
             item {
                 Row(
                     modifier = Modifier.padding(
-                        vertical = 16.dp,
+                        vertical = ContentPadding,
                         horizontal = ContentPadding
                     )
                 ) {
@@ -219,6 +230,32 @@ private fun Content(
                             modifier = Modifier.padding(start = 4.dp),
                             text = it,
                             color = MaterialTheme.colors.error
+                        )
+                    }
+                }
+            }
+
+            if (state.deck.description != null) {
+                item {
+                    Column(Modifier.fillMaxWidth().padding(ContentPadding)) {
+                        HeaderSmall(title = "Description")
+
+                        Text(
+                            modifier = Modifier.padding(top = ContentPadding)
+                                .fillMaxWidth()
+                                .background(
+                                    color = MaterialTheme.colors.surface,
+                                    shape = DefaultShape
+                                )
+                                .noRippleClickable {
+                                    expandedDescription = !expandedDescription
+                                }
+                                .padding(ContentPadding),
+                            text = state.deck.description,
+                            style = MaterialTheme.typography.body1,
+                            maxLines = maxLines,
+                            overflow = TextOverflow.Ellipsis,
+                            color = MaterialTheme.colors.onBackground,
                         )
                     }
                 }
