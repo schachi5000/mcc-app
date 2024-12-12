@@ -47,6 +47,8 @@ import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.description
+import marvelchampionscompanion.shared.generated.resources.hero_cards
+import marvelchampionscompanion.shared.generated.resources.other_cards
 import marvelchampionscompanion.shared.generated.resources.remove_card_from_deck
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BackHandler
@@ -311,11 +313,13 @@ private fun Content(
                 }
             }
 
-            val heroCards = CardRowEntry("Hero cards", state.deck.cards
-                .filter { it.type != CardType.HERO && it.setCode == state.deck.hero.setCode }
-                .sortedBy { it.cost ?: 0 })
-
             item {
+                val heroCards = CardRowEntry(
+                    title = stringResource(Res.string.hero_cards),
+                    cards = state.deck.cards
+                        .filter { it.type != CardType.HERO && it.setCode == state.deck.hero.setCode }
+                        .sortedBy { it.cost ?: 0 })
+
                 CardRow(
                     modifier = Modifier.padding(
                         horizontal = ContentPadding,
@@ -339,7 +343,7 @@ private fun Content(
                         horizontalArrangement = Arrangement.SpaceBetween
                     ) {
                         HeaderSmall(
-                            title = "Other Cards",
+                            title = stringResource(Res.string.other_cards),
                             subTitle = otherCards.size.toString()
                         )
                     }

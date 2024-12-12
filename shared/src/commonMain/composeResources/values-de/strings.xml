@@ -23,6 +23,8 @@
     <string name="select_packs">Packs wählen</string>
     <string name="select_hero">Wähle einen Helden</string>
     <string name="description">Beschreibung</string>
+    <string name="hero_cards">Heldenkarten</string>
+    <string name="other_cards">Andere Karten</string>
 
     <string name="cards_in_collection">Karten in deiner Sammlung</string>
     <string name="cards_in_database">Karten in lokaler Datenbank</string>
