@@ -216,19 +216,24 @@ private fun Content(
                         vertical = ContentPadding,
                         horizontal = ContentPadding
                     ).fillMaxWidth(),
-                    horizontalArrangement = Arrangement.Center
+                    horizontalArrangement = if (state.deck.hero.linkedCard != null) {
+                        Arrangement.SpaceBetween
+                    } else {
+                        Arrangement.Center
+                    }
                 ) {
                     Card(
                         card = state.deck.hero,
+                        modifier = Modifier.fillParentMaxWidth(0.45f),
                         parallaxEffect = true
                     ) {
                         onCardClick(state.deck.hero)
                     }
 
                     state.deck.hero.linkedCard?.let {
-                        Spacer(Modifier.size(ContentPadding))
                         Card(
                             card = it,
+                            modifier = Modifier.fillParentMaxWidth(0.45f),
                             parallaxEffect = true
                         ) {
                             onCardClick(it)
