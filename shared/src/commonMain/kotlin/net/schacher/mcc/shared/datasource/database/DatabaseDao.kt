@@ -9,8 +9,6 @@ import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.MutableSharedFlow
-import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
@@ -35,10 +33,6 @@ class DatabaseDao(
     private val database = AppDatabase(databaseDriverFactory.createDriver())
 
     private val dbQuery = database.appDatabaseQueries
-
-    private val _onCardAdded = MutableSharedFlow<Card>()
-
-    override val onCardAdded = this._onCardAdded.asSharedFlow()
 
     init {
         if (wipeDatabase) {
@@ -79,8 +73,6 @@ class DatabaseDao(
                 primaryColor = card.primaryColor,
                 secondaryColor = card.secondaryColor
             )
-        }.also {
-            _onCardAdded.emit(card)
         }
 
     override suspend fun getCardByCode(cardCode: String): Card? =
