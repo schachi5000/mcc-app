@@ -1,13 +1,18 @@
 package net.schacher.mcc.shared.datasource.database
 
+import app.cash.sqldelight.coroutines.asFlow
+import app.cash.sqldelight.coroutines.mapToList
 import co.touchlab.kermit.Logger
 import database.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
 import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.asSharedFlow
+import kotlinx.coroutines.flow.map
+import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import net.schacher.mcc.shared.model.Aspect
@@ -51,7 +56,7 @@ class DatabaseDao(
         }
 
     override suspend fun addCard(card: Card) =
-        measuringWithContext(Dispatchers.IO, "addCard") {
+        measuringWithContext(Dispatchers.IO, "addCard", TAG) {
             dbQuery.addCard(
                 code = card.code,
                 position = card.position.toLong(),
@@ -95,41 +100,22 @@ class DatabaseDao(
         }
 
 
-    private suspend fun getCardsByPackCode(packCode: String): List<Card> =
-        measuringWithContext(Dispatchers.IO, "getCardsByPackCode", TAG) {
-            dbQuery.selectCardsByPackCode(packCode).executeAsList().map {
+    override fun getCards(): Flow<List<Card>> = dbQuery.selectAllCards()
+        .asFlow()
+        .mapToList(Dispatchers.IO)
+        .map { cardEntries ->
+            cardEntries.map {
                 val card = it.toCard()
-                var linkedCard = it.linkedCardCode?.let {
-                    dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+                val linkedCard = it.linkedCardCode?.let { linkedCardCode ->
+                    cardEntries.find { it.code == linkedCardCode }
+                        ?.toCard()
+                        ?.copy(linkedCard = card)
                 }
-
-                linkedCard = linkedCard?.copy(
-                    linkedCard = card
-                )
 
                 card.copy(
                     linkedCard = linkedCard
                 )
             }
-        }
-
-    override suspend fun getAllCards(): List<Card> =
-        measuringWithContext(Dispatchers.IO, "getAllCards", TAG) {
-            dbQuery.selectAllCards().executeAsList().map {
-                val card = it.toCard()
-                var linkedCard = it.linkedCardCode?.let {
-                    dbQuery.selectCardByCode(it).executeAsOneOrNull()?.toCard()
-                }
-
-                linkedCard = linkedCard?.copy(
-                    linkedCard = card
-                )
-
-                card.copy(
-                    linkedCard = linkedCard
-                )
-            }
-
         }
 
     override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
@@ -191,13 +177,6 @@ class DatabaseDao(
         }
     }
 
-    override suspend fun getAllPacks(): List<Pack> =
-        measuringWithContext(Dispatchers.IO, "getAllPacks", TAG) {
-            dbQuery.getAllPacks().executeAsList().map {
-                val cards = getCardsByPackCode(it.code)
-                it.toPack(cards)
-            }
-        }
 
     override suspend fun addPackToCollection(packCode: String) =
         measuringWithContext(Dispatchers.IO, "addPackToCollection", TAG) {
@@ -209,13 +188,43 @@ class DatabaseDao(
             dbQuery.removePackFromPossession(packCode)
         }
 
-    override suspend fun getPacksInCollection(): List<String> =
-        measuringWithContext(Dispatchers.IO, "getPacksInCollection", TAG) {
-            dbQuery.getAllPacks()
-                .executeAsList()
-                .filter { it.inPosession.toBoolean() }
-                .map { it.code }
+    override fun getAllPacks(): Flow<List<Pack>> = this.dbQuery.getAllPacks()
+        .asFlow()
+        .mapToList(Dispatchers.IO)
+        .map {
+            it.map { pack ->
+                val cards = getCardsByPackCode(pack.code)
+                pack.toPack(cards)
+            }
         }
+
+    private suspend fun getCardsByPackCode(packCode: String): List<Card> =
+        measuringWithContext(Dispatchers.IO, "getCardsByPackCode", TAG) {
+            dbQuery.selectCardsByPackCode(packCode).executeAsList().map {
+                val card = it.toCard()
+                var linkedCard = it.linkedCardCode?.let {
+                    dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+                }
+
+                linkedCard = linkedCard?.copy(
+                    linkedCard = card
+                )
+
+                card.copy(
+                    linkedCard = linkedCard
+                )
+            }
+        }
+
+
+    override fun getPacksInCollection(): Flow<List<String>> =
+        dbQuery.getAllPacks()
+            .asFlow()
+            .mapToList(Dispatchers.IO)
+            .mapNotNull {
+                it.filter { it.inPosession.toBoolean() }
+                    .map { it.code }
+            }
 
     override suspend fun hasPackInCollection(packCode: String): Boolean =
         measuringWithContext(Dispatchers.IO, "hasPackInCollection", TAG) {

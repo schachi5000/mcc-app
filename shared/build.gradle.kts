@@ -72,6 +72,7 @@ kotlin {
                 implementation(libs.kotlinx.datetime)
                 implementation(libs.kotlinx.viewmodel.compose)
                 implementation(libs.sqldelight)
+                implementation(libs.sqldelight.coroutines)
                 implementation(compose.components.resources)
             }
         }

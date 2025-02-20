@@ -23,8 +23,8 @@ class NewDeckViewModel(
 
     init {
         this.viewModelScope.launch {
-            cardRepository.cards.collect { value ->
-                _state.value = UiState(value.values
+            cardRepository.cards.collect { cards ->
+                _state.value = UiState(cards
                     .filter { it.type == CardType.HERO }
                     .sortedBy { it.name }
                     .distinct())

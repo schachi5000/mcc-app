@@ -56,7 +56,7 @@ class MoreViewModel(
         viewModelScope.launchAndCollect(packRepository.packsInCollection) { value ->
             _state.update {
                 it.copy(packsInCollectionCount = value.size,
-                    cardsInCollection = cardRepository.cards.value.values
+                    cardsInCollection = cardRepository.cards.value
                         .filter { packRepository.hasCardInCollection(it) }
                         .size)
             }
@@ -74,7 +74,7 @@ class MoreViewModel(
         viewModelScope.launch(Dispatchers.Default) {
             _state.update {
                 it.copy(
-                    cardsInCollection = cardRepository.cards.value.values
+                    cardsInCollection = cardRepository.cards.value
                         .filter { packRepository.hasCardInCollection(it) }
                         .size
                 )
