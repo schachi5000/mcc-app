@@ -6,7 +6,6 @@ import androidx.compose.material.lightColors
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.luminance
-import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.design.theme.AspectColors.Aggression
 import net.schacher.mcc.shared.design.theme.AspectColors.Justice
 import net.schacher.mcc.shared.design.theme.AspectColors.Leadership
@@ -80,9 +79,7 @@ fun Color.getContrastRation(foreground: Color): Float {
 }
 
 fun Color.isContrastRatioSufficient(foreground: Color): Boolean {
-    return getContrastRation(foreground).also {
-        AppLogger.d { "Ratio: $it" }
-    } >= MIN_CONTRAST_RATIO
+    return getContrastRation(foreground) >= MIN_CONTRAST_RATIO
 }
 
 fun Color.Companion.parseColor(colorString: String): Color {
@@ -101,6 +98,7 @@ fun Color.Companion.parseColor(colorString: String): Color {
             val b = (colorInt and 0xFF).toFloat() / 255
             Color(r, g, b, 1f)
         }
+
         8 -> {
             // If alpha is included
             val a = (colorInt shr 24 and 0xFF).toFloat() / 255
