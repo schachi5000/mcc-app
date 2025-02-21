@@ -49,7 +49,7 @@ class DatabaseDao(
             cards.forEach { addCard(it) }
         }
 
-    override suspend fun addCard(card: Card) =
+    override suspend fun addCard(card: Card) {
         measuringWithContext(Dispatchers.IO, "addCard", TAG) {
             dbQuery.addCard(
                 code = card.code,
@@ -73,21 +73,48 @@ class DatabaseDao(
                 primaryColor = card.primaryColor,
                 secondaryColor = card.secondaryColor
             )
+
+            card.linkedCard?.let {
+                dbQuery.addCard(
+                    code = it.code,
+                    position = it.position.toLong(),
+                    type = it.type?.name,
+                    cardSetCode = it.setCode,
+                    cardSetName = it.setName,
+                    packCode = it.packCode,
+                    packName = it.packName,
+                    name = it.name,
+                    cost = it.cost?.toLong(),
+                    aspect = it.aspect?.name,
+                    text = it.text,
+                    boostText = it.boostText,
+                    attackText = it.attackText,
+                    quote = it.quote,
+                    traits = it.traits,
+                    imagePath = it.imagePath,
+                    faction = it.faction.name,
+                    linkedCardCode = it.linkedCard?.code,
+                    primaryColor = it.primaryColor,
+                    secondaryColor = it.secondaryColor
+                )
+            }
         }
+    }
 
     override suspend fun getCardByCode(cardCode: String): Card? =
         measuringWithContext(Dispatchers.IO, "getCardByCode", TAG) {
-            val card = dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()?.toCard()
-            var linkedCard = card?.linkedCard?.code?.let {
-                dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+            val cardEntry = dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()
+            val linkedCard = cardEntry?.linkedCardCode?.let {
+                dbQuery.selectCardByCode(it)
+                    .executeAsOneOrNull()
+                    ?.toCard()
             }
 
-            linkedCard = linkedCard?.copy(
-                linkedCard = card
-            )
-
+            val card = cardEntry?.toCard()
             card?.copy(
-                linkedCard = linkedCard
+                linkedCard = linkedCard?.copy(
+                    linkedCard = card
+                )
             )
         }
 
@@ -95,7 +122,21 @@ class DatabaseDao(
     override fun getCards(): Flow<List<Card>> = dbQuery.selectAllCards()
         .asFlow()
         .mapToList(Dispatchers.IO)
-        .map { it.map { cardEntry -> cardEntry.toCard() } }
+        .map {
+            val directory = it.associateBy { it.code }
+            it.map { cardEntry ->
+                val card = cardEntry.toCard()
+                val linkedCard = cardEntry.linkedCardCode?.let {
+                    directory[it]?.toCard()
+                }
+
+                card.copy(
+                    linkedCard = linkedCard?.copy(
+                        linkedCard = card
+                    )
+                )
+            }
+        }
 
     override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
         Logger.i { "Deleting all decks from database" }
@@ -129,33 +170,6 @@ class DatabaseDao(
     override fun getAllEntries(): List<Pair<String, Any>> =
         this.dbQuery.getAllSettings().executeAsList().map { it.key to it.value_ }
 
-    private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
-        Logger.i {
-            "Adding pack ${pack.name} to database - hasPackInCollection:${
-                hasPackInCollection(
-                    pack.code
-                )
-            }"
-        }
-
-        addCards(pack.cards)
-        dbQuery.addPack(
-            pack.code,
-            pack.id.toLong(),
-            pack.name,
-            pack.position.toLong(),
-            pack.cards.map { it.code }.toCardCodeString(),
-            hasPackInCollection(pack.code).toLong()
-        )
-    }
-
-    override suspend fun addPacks(packs: List<Pack>) {
-        Logger.i { "Adding ${packs.size} packs to database" }
-        packs.forEach {
-            this.addPack(it)
-        }
-    }
-
 
     override suspend fun addPackToCollection(packCode: String) =
         measuringWithContext(Dispatchers.IO, "addPackToCollection", TAG) {
@@ -177,24 +191,47 @@ class DatabaseDao(
             }
         }
 
+    override suspend fun addPacks(packs: List<Pack>) {
+        Logger.i { "Adding ${packs.size} packs to database" }
+        packs.forEach { this.addPack(it) }
+    }
+
+    private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
+        Logger.i {
+            "Adding pack ${pack.name} to database - hasPackInCollection:${
+                hasPackInCollection(pack.code)
+            }"
+        }
+
+        addCards(pack.cards)
+        dbQuery.addPack(
+            pack.code,
+            pack.id.toLong(),
+            pack.name,
+            pack.position.toLong(),
+            pack.cards.map { it.code }.toCardCodeString(),
+            hasPackInCollection(pack.code).toLong()
+        )
+    }
+
     private suspend fun getCardsByPackCode(packCode: String): List<Card> =
         measuringWithContext(Dispatchers.IO, "getCardsByPackCode", TAG) {
             dbQuery.selectCardsByPackCode(packCode)
                 .executeAsList()
                 .map {
-                val card = it.toCard()
-                var linkedCard = it.linkedCardCode?.let {
-                    dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+                    val card = it.toCard()
+                    var linkedCard = it.linkedCardCode?.let {
+                        dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
+                    }
+
+                    linkedCard = linkedCard?.copy(
+                        linkedCard = card
+                    )
+
+                    card.copy(
+                        linkedCard = linkedCard
+                    )
                 }
-
-                linkedCard = linkedCard?.copy(
-                    linkedCard = card
-                )
-
-                card.copy(
-                    linkedCard = linkedCard
-                )
-            }
         }
 
 

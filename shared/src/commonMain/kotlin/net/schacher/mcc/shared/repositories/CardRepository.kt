@@ -23,10 +23,6 @@ class CardRepository(
     }
 
     suspend fun getCard(cardCode: String): Card {
-        this.cards.value.find { it.code == cardCode }?.let {
-            return it
-        }
-
         this.cardDatabaseDao.getCardByCode(cardCode)?.let { card ->
             return card
         }

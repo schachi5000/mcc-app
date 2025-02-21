@@ -44,6 +44,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
+import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.description
@@ -271,11 +272,10 @@ private fun Content(
                     horizontalArrangement = Arrangement.spacedBy(4.dp)
                 ) {
                     state.deck.aspect?.let {
-                        item {
-                            Tag(text = it.label, color = it.color)
-                        }
+                        item { Tag(text = it.label, color = it.color) }
                     }
 
+                    item { Tag(text = state.deck.id.toString()) }
                     state.deck.version?.let {
                         item { Tag(text = "v$it") }
                     }
