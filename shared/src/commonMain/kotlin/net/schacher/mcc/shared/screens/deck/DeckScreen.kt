@@ -326,7 +326,7 @@ private fun Content(
                 CardRow(
                     modifier = Modifier.padding(
                         horizontal = ContentPadding,
-                        vertical = 16.dp,
+                        vertical = ContentPadding,
                     ),
                     cardRowEntry = heroCards
                 ) {
@@ -408,7 +408,11 @@ private fun Content(
                 item {
                     SecondaryButton(
                         modifier = Modifier
-                            .padding(horizontal = ContentPadding)
+                            .padding(
+                                start = ContentPadding,
+                                end = ContentPadding,
+                                top = ContentPadding
+                            )
                             .fillMaxWidth(),
                         onClick = onDeleteDeckClicked,
                         label = "Deck löschen"
