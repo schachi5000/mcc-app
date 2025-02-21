@@ -91,7 +91,7 @@ class CollectionViewModel(
         }
 }
 
-data class UiState internal constructor(
+data class UiState(
     val cardsInCollection: List<Card>,
     val filters: Set<Filter> = setOf(
         Filter(AGGRESSION, false),

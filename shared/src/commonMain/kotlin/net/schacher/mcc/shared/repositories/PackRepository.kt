@@ -1,17 +1,13 @@
 package net.schacher.mcc.shared.repositories
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
-import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.model.Pack
 
 class PackRepository(
     private val packDatabaseDao: PackDatabaseDao,
@@ -33,11 +29,11 @@ class PackRepository(
     suspend fun refreshAllPacks() {
         val newPacks = this.marvelCDbDataSource.getAllPacks().getOrThrow()
 
-        Logger.i { "${newPacks.size} packs loaded" }
+        AppLogger.i { "${newPacks.size} packs loaded" }
         try {
             this.packDatabaseDao.addPacks(newPacks)
         } catch (e: Exception) {
-            Logger.e { "Error adding packs to database: ${e.message}" }
+            AppLogger.e { "Error adding packs to database: ${e.message}" }
         }
     }
 

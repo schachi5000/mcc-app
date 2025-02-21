@@ -1,14 +1,12 @@
 package net.schacher.mcc.shared.repositories
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
-import net.schacher.mcc.shared.model.Aspect
-import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.utils.launchAndCollect
 import net.schacher.mcc.shared.utils.replace
@@ -46,7 +44,7 @@ class DeckRepository(
         this.marvelCDbDataSource.createDeck(heroCardCode, label).also {
             val deckId = it.getOrNull()
             if (deckId != null) {
-                Logger.d(TAG) { "Deck[$deckId] created successfully" }
+                AppLogger.d(TAG) { "Deck[$deckId] created successfully" }
                 refreshAllUserDecks()
             }
         }
@@ -54,7 +52,7 @@ class DeckRepository(
     suspend fun removeDeck(deckId: Int): Boolean =
         this.marvelCDbDataSource.deleteDeck(deckId).also {
             if (it.isSuccess) {
-                Logger.d(TAG) { "Deck[$deckId] deleted successfully" }
+                AppLogger.d(TAG) { "Deck[$deckId] deleted successfully" }
                 _decks.update { decks ->
                     decks.toMutableList()
                         .also { it.removeAll { deck -> deck.id == deckId } }

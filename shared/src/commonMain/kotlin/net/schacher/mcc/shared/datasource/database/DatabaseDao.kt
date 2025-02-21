@@ -2,7 +2,6 @@ package net.schacher.mcc.shared.datasource.database
 
 import app.cash.sqldelight.coroutines.asFlow
 import app.cash.sqldelight.coroutines.mapToList
-import co.touchlab.kermit.Logger
 import database.AppDatabase
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
@@ -13,6 +12,7 @@ import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.mapNotNull
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
@@ -45,7 +45,7 @@ class DatabaseDao(
 
     override suspend fun addCards(cards: List<Card>) =
         measuringWithContext(Dispatchers.IO, "addCards", TAG) {
-            Logger.i { "Adding ${cards.size} cards to database" }
+            AppLogger.i { "Adding ${cards.size} cards to database" }
             cards.forEach { addCard(it) }
         }
 
@@ -139,12 +139,12 @@ class DatabaseDao(
         }
 
     override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
-        Logger.i { "Deleting all decks from database" }
+        AppLogger.i { "Deleting all decks from database" }
         dbQuery.removeAllPacks()
     }
 
     override suspend fun wipeCardTable() = withContext(Dispatchers.IO) {
-        Logger.i { "Deleting all cards from database" }
+        AppLogger.i { "Deleting all cards from database" }
         dbQuery.removeAllCards()
     }
 
@@ -192,15 +192,15 @@ class DatabaseDao(
         }
 
     override suspend fun addPacks(packs: List<Pack>) {
-        Logger.i { "Adding ${packs.size} packs to database" }
+        AppLogger.i { "Adding ${packs.size} packs to database" }
         packs.forEach { this.addPack(it) }
     }
 
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
-        Logger.i {
-            "Adding pack ${pack.name} to database - hasPackInCollection:${
-                hasPackInCollection(pack.code)
-            }"
+        val hasPackInCollection = hasPackInCollection(pack.code)
+
+        AppLogger.i {
+            "Adding pack ${pack.name} to database - hasPackInCollection:$hasPackInCollection"
         }
 
         addCards(pack.cards)
@@ -210,7 +210,7 @@ class DatabaseDao(
             pack.name,
             pack.position.toLong(),
             pack.cards.map { it.code }.toCardCodeString(),
-            hasPackInCollection(pack.code).toLong()
+            hasPackInCollection.toLong()
         )
     }
 

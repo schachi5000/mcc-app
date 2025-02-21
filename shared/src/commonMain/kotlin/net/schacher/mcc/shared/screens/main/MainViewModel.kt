@@ -9,13 +9,11 @@ import kotlinx.coroutines.flow.asSharedFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.repositories.AuthRepository
-import net.schacher.mcc.shared.repositories.CardRepository
-import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.screens.main.MainViewModel.UiState.MainScreen.Spotlight
-import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.utils.debug
 import net.schacher.mcc.shared.utils.launchAndCollect
 
@@ -34,7 +32,7 @@ class MainViewModel(
     val event = _event.asSharedFlow()
 
     init {
-        Logger.debug { "Init MainViewModel" }
+        AppLogger.debug { "Init MainViewModel" }
         this.viewModelScope.launch() {
             if (!settingsDao.getBoolean("cards-synced", false)) {
                 Logger.d { "No cards found in repo -> refreshing" }
@@ -43,7 +41,7 @@ class MainViewModel(
                     settingsDao.putBoolean("cards-synced", true)
                     _event.emit(Event.DatabaseSynced)
                 } catch (e: Exception) {
-                    Logger.e(e) { "Error refreshing cards" }
+                    AppLogger.e(e) { "Error refreshing cards" }
                     _event.emit(Event.CardsDatabaseSyncFailed(e))
                 }
             }
@@ -73,7 +71,7 @@ class MainViewModel(
         data class CardsDatabaseSyncFailed(val exception: Exception) : Event
     }
 
-    data class UiState internal constructor(
+    data class UiState(
         val mainScreen: MainScreen = Spotlight,
         val canShowMyDeckScreen: Boolean = false,
     ) {

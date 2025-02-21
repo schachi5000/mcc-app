@@ -1,16 +1,7 @@
 package net.schacher.mcc.shared.datasource.http
 
-import androidx.compose.ui.text.intl.Locale
-import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.DefaultRequest
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.HttpResponseValidator
-import io.ktor.client.plugins.HttpTimeout
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -19,10 +10,7 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
-import io.ktor.http.Headers
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.CoroutineScope
@@ -32,14 +20,13 @@ import kotlinx.coroutines.async
 import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.dto.CardDto
 import net.schacher.mcc.shared.datasource.http.dto.CreateDeckRequestDto
 import net.schacher.mcc.shared.datasource.http.dto.CreateDeckResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
-import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.PackDto
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
@@ -85,7 +72,7 @@ class KtorMarvelCDbDataSource(
             .body<List<PackDto>>()
             .map {
                 async(Dispatchers.IO) {
-                    Logger.d { "Processing Pack: ${it.name}" }
+                    AppLogger.d { "Processing Pack: ${it.name}" }
                     val cards = getCardsInPack(it.code).getOrThrow()
 
                     Pack(
@@ -96,7 +83,7 @@ class KtorMarvelCDbDataSource(
                         cardCodes = cards.map { it.code },
                         position = it.position
                     ).also {
-                        Logger.d { "Processing done: ${it.name}" }
+                        AppLogger.d { "Processing done: ${it.name}" }
                     }
                 }
             }
@@ -148,7 +135,7 @@ class KtorMarvelCDbDataSource(
             .map { it.toDeck(cardProvider) }
     }.also {
         it.exceptionOrNull()?.let {
-            Logger.e(it) { "Failed to get spotlight decks" }
+            AppLogger.e(it) { "Failed to get spotlight decks" }
         }
     }
 
@@ -163,7 +150,7 @@ class KtorMarvelCDbDataSource(
                 .sortedBy { it.name }
         }.also {
             it.exceptionOrNull()?.let {
-                Logger.e(it) { "Failed to get user decks" }
+                AppLogger.e(it) { "Failed to get user decks" }
             }
         }
 

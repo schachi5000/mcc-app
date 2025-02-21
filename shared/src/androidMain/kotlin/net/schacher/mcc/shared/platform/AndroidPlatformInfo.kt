@@ -14,7 +14,7 @@ class AndroidPlatformInfo(context: Context) : PlatformInfo {
     override val platform: Platform = Platform.ANDROID
 
     override val version: String =
-        context.packageManager.getPackageInfo(context.packageName, 0).versionName
+        context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "unknown"
 
     override fun toString(): String {
         return "AndroidPlatformInfo(platform=$platform, version='$version')"

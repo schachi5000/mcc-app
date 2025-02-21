@@ -35,10 +35,10 @@ import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.card_blue_no_image
 import marvelchampionscompanion.shared.generated.resources.card_yellow_no_image
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.design.theme.CardShape
 import net.schacher.mcc.shared.design.theme.DefaultCardSize
 import net.schacher.mcc.shared.design.theme.SleeveColors
@@ -158,7 +158,7 @@ fun Card(
                 ShimmerBox(modifier = Modifier.fillMaxSize())
             },
             onFailure = {
-                Logger.e { "Failed to load image for card: ${card.name}(${card.code})" }
+                AppLogger.e { "Failed to load image for card: ${card.name}(${card.code})" }
                 FailureImage(card)
             })
     }

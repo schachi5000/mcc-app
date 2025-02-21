@@ -1,7 +1,6 @@
 package net.schacher.mcc.shared.datasource.http
 
 import androidx.compose.ui.text.intl.Locale
-import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
 import io.ktor.client.plugins.DefaultRequest
@@ -16,6 +15,7 @@ import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
 import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
 
 private const val TAG = "HttpClient"
@@ -39,7 +39,7 @@ val DefaultClient = HttpClient {
     install(Logging) {
         logger = object : io.ktor.client.plugins.logging.Logger {
             override fun log(message: String) {
-                Logger.d(TAG) { message }
+                AppLogger.d(TAG) { message }
             }
         }
         level = LogLevel.INFO

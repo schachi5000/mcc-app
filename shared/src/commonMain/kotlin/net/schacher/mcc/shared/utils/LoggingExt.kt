@@ -3,10 +3,15 @@ package net.schacher.mcc.shared.utils
 import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.withContext
+import net.schacher.mcc.shared.AppLogger
 import kotlin.time.DurationUnit
 import kotlin.time.measureTimedValue
 
 fun Logger.Companion.debug(message: () -> String) {
+    i("DEBUG") { message() }
+}
+
+fun AppLogger.debug(message: () -> String) {
     i("DEBUG") { message() }
 }
 
@@ -31,8 +36,8 @@ suspend fun <T> measuringWithContext(
 private fun logDuration(label: String?, duration: kotlin.time.Duration, tag: String? = null) {
     val message = "[$label] took ${duration.toString(DurationUnit.MILLISECONDS, 2)}"
     if (tag != null) {
-        Logger.i(tag) { message }
+        AppLogger.i(tag) { message }
     } else {
-        Logger.i { message }
+        AppLogger.i { message }
     }
 }

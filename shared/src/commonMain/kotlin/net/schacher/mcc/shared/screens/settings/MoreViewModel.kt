@@ -2,12 +2,12 @@ package net.schacher.mcc.shared.screens.settings
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.platform.PlatformInfo
 import net.schacher.mcc.shared.repositories.AuthRepository
@@ -88,11 +88,11 @@ class MoreViewModel(
         }
 
         this.viewModelScope.launch {
-            Logger.i { "Wiping database..." }
+            AppLogger.i { "Wiping database..." }
             cardRepository.deleteAllCardData()
             packRepository.deleteAllPackData()
             settingsDao.remove("cards-synced")
-            Logger.i { "Wiping complete" }
+            AppLogger.i { "Wiping complete" }
         }
     }
 
@@ -103,7 +103,7 @@ class MoreViewModel(
             try {
                 packRepository.refreshAllPacks()
             } catch (e: Exception) {
-                Logger.e(e) { "Error refreshing packs" }
+                AppLogger.e(e) { "Error refreshing packs" }
             }
 
             _state.update {
@@ -118,7 +118,7 @@ class MoreViewModel(
         }
     }
 
-    data class UiState internal constructor(
+    data class UiState(
         val cardCount: Int,
         val cardsInCollection: Int,
         val userDeckCount: Int,
