@@ -1,7 +1,6 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.FastOutSlowInEasing
 import androidx.compose.animation.core.LinearEasing
 import androidx.compose.animation.core.RepeatMode
 import androidx.compose.animation.core.animateFloat
@@ -29,7 +28,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
@@ -81,9 +82,15 @@ fun LabeledCard(
                 text = label,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.onBackground,
-                style = MaterialTheme.typography.caption,
+                style = MaterialTheme.typography.caption.copy(
+                    shadow = Shadow(
+                        color = MaterialTheme.colors.background,
+                        offset = Offset.Zero,
+                        blurRadius = 16.dp.value
+                    ),
+                ),
                 maxLines = maxLines,
-                minLines = minLines
+                minLines = minLines,
             )
         }
     }

@@ -7,6 +7,8 @@ import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.unit.dp
 
 @Composable
@@ -34,7 +36,13 @@ fun HeaderSmall(
             modifier = Modifier.alignByBaseline(),
             text = title,
             color = MaterialTheme.colors.onBackground,
-            style = MaterialTheme.typography.h5,
+            style = MaterialTheme.typography.h5.copy(
+                shadow = Shadow(
+                    color = MaterialTheme.colors.background,
+                    offset = Offset.Zero,
+                    blurRadius = 16.dp.value
+                )
+            ),
         )
 
         subTitle?.let {
@@ -42,7 +50,13 @@ fun HeaderSmall(
                 modifier = Modifier.alignByBaseline().padding(start = 8.dp),
                 text = it,
                 color = MaterialTheme.colors.onBackground,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.h6.copy(
+                    shadow = Shadow(
+                        color = MaterialTheme.colors.background,
+                        offset = Offset.Zero,
+                        blurRadius = 16.dp.value
+                    )
+                ),
             )
         }
     }

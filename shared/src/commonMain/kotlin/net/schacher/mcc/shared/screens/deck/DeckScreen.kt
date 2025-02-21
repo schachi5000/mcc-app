@@ -41,6 +41,8 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
@@ -349,7 +351,13 @@ private fun TitleSection(state: UiState) {
         Text(
             text = state.deck.name,
             maxLines = 2,
-            style = MaterialTheme.typography.h5,
+            style = MaterialTheme.typography.h5.copy(
+                shadow = Shadow(
+                    color = MaterialTheme.colors.background,
+                    offset = Offset.Zero,
+                    blurRadius = 16.dp.value
+                )
+            ),
             color = MaterialTheme.colors.onSurface
         )
 
@@ -357,7 +365,13 @@ private fun TitleSection(state: UiState) {
             modifier = Modifier.padding(top = 4.dp),
             text = state.deck.hero.name,
             maxLines = 1,
-            style = MaterialTheme.typography.h6,
+            style = MaterialTheme.typography.h6.copy(
+                shadow = Shadow(
+                    color = MaterialTheme.colors.background,
+                    offset = Offset.Zero,
+                    blurRadius = 16.dp.value
+                )
+            ),
             color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
         )
     }
