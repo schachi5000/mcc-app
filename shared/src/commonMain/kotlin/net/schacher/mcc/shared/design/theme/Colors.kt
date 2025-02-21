@@ -29,7 +29,7 @@ val DarkColorScheme = darkColors(
     primary = primary,
     onPrimary = Color(0xFFFFFFFF),
     background = Color(0xff000000),
-    onBackground = Color(0xFFf4f4f4),
+    onBackground = Color(0xFFf9f9f9),
     surface = Color(0xff14171f),
     onSurface = Color(0xFFf0f0f0),
 )

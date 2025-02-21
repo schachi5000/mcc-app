@@ -111,7 +111,7 @@ fun MoreScreen(
         item {
             OptionsGridEntry(
                 stringResource(Res.string.owned_packs),
-                "${state.packsInCollectionCount} ${stringResource(Res.string.of)} ${state.packCount}",
+                "${state.packsInCollectionCount}",
             ) { onPackSelectionClick() }
         }
 

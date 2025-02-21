@@ -294,20 +294,18 @@ private fun Content(
 
             if (state.deck.description != null) {
                 item {
-                    Column(Modifier.fillMaxWidth().padding(ContentPadding)) {
-                        HeaderSmall(title = stringResource(Res.string.description))
-
+                    Column(Modifier.fillMaxWidth()
+                        .padding(ContentPadding)
+                        .background(
+                            color = MaterialTheme.colors.surface,
+                            shape = DefaultShape
+                        )
+                        .padding(ContentPadding)
+                        .noRippleClickable { expandedDescription = !expandedDescription })
+                    {
                         Text(
-                            modifier = Modifier.padding(top = ContentPadding)
-                                .fillMaxWidth()
-                                .background(
-                                    color = MaterialTheme.colors.surface,
-                                    shape = DefaultShape
-                                )
-                                .noRippleClickable {
-                                    expandedDescription = !expandedDescription
-                                }
-                                .padding(ContentPadding),
+                            modifier = Modifier
+                                .fillMaxWidth(),
                             text = state.deck.description,
                             style = MaterialTheme.typography.body1,
                             maxLines = maxLines,
