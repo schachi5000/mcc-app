@@ -14,13 +14,13 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.layout.sizeIn
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
@@ -44,10 +44,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
-import marvelchampionscompanion.shared.generated.resources.description
 import marvelchampionscompanion.shared.generated.resources.hero_cards
 import marvelchampionscompanion.shared.generated.resources.other_cards
 import marvelchampionscompanion.shared.generated.resources.remove_card_from_deck
@@ -65,7 +63,6 @@ import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.ProgressDialog
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.Tag
-import net.schacher.mcc.shared.design.compose.applyIf
 import net.schacher.mcc.shared.design.compose.noRippleClickable
 import net.schacher.mcc.shared.design.theme.BottomSheetColors
 import net.schacher.mcc.shared.design.theme.BottomSheetShape
@@ -194,12 +191,6 @@ private fun Content(
     onCardOptionsClick: (Card) -> Unit,
     onDeleteDeckClicked: () -> Unit,
 ) {
-    var expandedDescription by remember { mutableStateOf(false) }
-    val maxLines by animateIntAsState(
-        targetValue = if (expandedDescription) 100 else 4,
-        animationSpec = spring()
-    )
-
     CardBackgroundBox(
         modifier = Modifier
             .fillMaxSize()
@@ -207,202 +198,18 @@ private fun Content(
         cardCode = state.deck.hero.code,
     ) {
         LazyColumn(modifier = Modifier.fillMaxSize()) {
-            item {
-                Spacer(Modifier.statusBarsPadding().height(ContentPadding))
-            }
-
-            item {
-                Row(
-                    modifier = Modifier.padding(
-                        vertical = ContentPadding,
-                        horizontal = ContentPadding
-                    ).fillMaxWidth(),
-                    horizontalArrangement = if (state.deck.hero.linkedCard != null) {
-                        Arrangement.SpaceBetween
-                    } else {
-                        Arrangement.Center
-                    }
-                ) {
-                    Card(
-                        card = state.deck.hero,
-                        modifier = Modifier.fillParentMaxWidth(0.45f),
-                        parallaxEffect = true
-                    ) {
-                        onCardClick(state.deck.hero)
-                    }
-
-                    state.deck.hero.linkedCard?.let {
-                        Card(
-                            card = it,
-                            modifier = Modifier.fillParentMaxWidth(0.45f),
-                            parallaxEffect = true
-                        ) {
-                            onCardClick(it)
-                        }
-                    }
-                }
-            }
-
-            item {
-                Column(modifier = Modifier.padding(horizontal = ContentPadding)) {
-                    Text(
-                        text = state.deck.name,
-                        maxLines = 2,
-                        style = MaterialTheme.typography.h5,
-                        color = MaterialTheme.colors.onSurface
-                    )
-
-                    Text(
-                        modifier = Modifier.padding(top = 4.dp),
-                        text = state.deck.hero.name,
-                        maxLines = 1,
-                        style = MaterialTheme.typography.h6,
-                        color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
-                    )
-                }
-            }
-
-            item {
-                LazyRow(
-                    modifier = Modifier.padding(
-                        start = ContentPadding,
-                        top = 8.dp,
-                        bottom = ContentPadding
-                    ),
-                    horizontalArrangement = Arrangement.spacedBy(4.dp)
-                ) {
-                    state.deck.aspect?.let {
-                        item { Tag(text = it.label, color = it.color) }
-                    }
-
-                    item { Tag(text = state.deck.id.toString()) }
-                    state.deck.version?.let {
-                        item { Tag(text = "v$it") }
-                    }
-
-                    state.deck.problem?.let {
-                        item {
-                            Tag(
-                                modifier = Modifier.padding(start = 4.dp),
-                                text = it,
-                                color = MaterialTheme.colors.error
-                            )
-                        }
-                    }
-                }
-            }
+            item { Spacer(Modifier.statusBarsPadding().height(ContentPadding)) }
+            item { HeroSection(state, onCardClick) }
+            item { TitleSection(state) }
+            item { TagSection(state) }
 
             if (state.deck.description != null) {
-                item {
-                    Column(Modifier.fillMaxWidth()
-                        .padding(ContentPadding)
-                        .background(
-                            color = MaterialTheme.colors.surface,
-                            shape = DefaultShape
-                        )
-                        .padding(ContentPadding)
-                        .noRippleClickable { expandedDescription = !expandedDescription })
-                    {
-                        Text(
-                            modifier = Modifier
-                                .fillMaxWidth(),
-                            text = state.deck.description,
-                            style = MaterialTheme.typography.body1,
-                            maxLines = maxLines,
-                            overflow = TextOverflow.Ellipsis,
-                            color = MaterialTheme.colors.onBackground,
-                        )
-                    }
-                }
+                item { DescriptionSection(state.deck.description) }
             }
 
-            item {
-                val heroCards = CardRowEntry(
-                    title = stringResource(Res.string.hero_cards),
-                    cards = state.deck.cards
-                        .filter { it.type != CardType.HERO && it.setCode == state.deck.hero.setCode }
-                        .sortedBy { it.cost ?: 0 })
+            item { HeroCardsSection(state, onCardClick) }
 
-                CardRow(
-                    modifier = Modifier.padding(
-                        horizontal = ContentPadding,
-                        vertical = ContentPadding,
-                    ),
-                    cardRowEntry = heroCards
-                ) {
-                    onCardClick(it)
-                }
-            }
-
-            val otherCards = state.deck.cards
-                .filter { it.setCode != state.deck.hero.setCode }
-                .defaultSort()
-
-            if (otherCards.isNotEmpty()) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(ContentPadding),
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        HeaderSmall(
-                            title = stringResource(Res.string.other_cards),
-                            subTitle = otherCards.size.toString()
-                        )
-                    }
-                }
-
-                val rows = otherCards.chunked(COLUMN_COUNT)
-                items(rows.size) { index ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                start = ContentPadding,
-                                end = ContentPadding,
-                                top = 8.dp
-                            ),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        rows[index].forEach { card ->
-                            Box(Modifier.weight(1f)) {
-                                val cardCount = state.deck.cards.count { it.code == card.code }
-                                LabeledCard(
-                                    modifier = Modifier.wrapContentHeight(),
-                                    label = card.name,
-                                    card = card
-                                ) {
-                                    onCardClick(card)
-                                }
-
-                                if (state.cardOptions.isNotEmpty()) {
-                                    Icon(
-                                        modifier = Modifier
-                                            .padding(4.dp)
-                                            .size(32.dp)
-                                            .background(
-                                                MaterialTheme.colors.surface.copy(alpha = 0.8f),
-                                                CircleShape
-                                            )
-                                            .padding(4.dp)
-                                            .align(Alignment.TopEnd)
-                                            .clickable { onCardOptionsClick(card) },
-                                        imageVector = Icons.Default.MoreVert,
-                                        contentDescription = "Card Options",
-                                        tint = MaterialTheme.colors.onSurface
-                                    )
-                                }
-                            }
-                        }
-
-                        if (rows[index].size < COLUMN_COUNT) {
-                            repeat(COLUMN_COUNT - rows[index].size) {
-                                Spacer(modifier = Modifier.weight(1f))
-                            }
-                        }
-                    }
-                }
-            }
+            otherCardsSection(state, onCardClick, onCardOptionsClick)
 
             state.deckOptions.find { it == DELETE }?.let {
                 item {
@@ -415,7 +222,7 @@ private fun Content(
                             )
                             .fillMaxWidth(),
                         onClick = onDeleteDeckClicked,
-                        label = "Deck löschen"
+                        label = UiState.CardOption.REMOVE.label
                     )
                 }
             }
@@ -428,6 +235,210 @@ private fun Content(
         BackButton {
             onCloseClick()
         }
+    }
+}
+
+private fun LazyListScope.otherCardsSection(
+    state: UiState,
+    onCardClick: (Card) -> Unit,
+    onCardOptionsClick: (Card) -> Unit
+) {
+    val otherCards = state.deck.cards
+        .filter { it.setCode != state.deck.hero.setCode }
+        .defaultSort()
+
+    if (otherCards.isNotEmpty()) {
+        item {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(ContentPadding),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                HeaderSmall(
+                    title = stringResource(Res.string.other_cards),
+                    subTitle = otherCards.size.toString()
+                )
+            }
+        }
+
+        val rows = otherCards.chunked(COLUMN_COUNT)
+        items(rows.size) { index ->
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(
+                        start = ContentPadding,
+                        end = ContentPadding,
+                        top = 8.dp
+                    ),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                rows[index].forEach { card ->
+                    Box(Modifier.weight(1f)) {
+                        LabeledCard(
+                            modifier = Modifier.wrapContentHeight(),
+                            label = card.name,
+                            card = card
+                        ) {
+                            onCardClick(card)
+                        }
+
+                        if (state.cardOptions.isNotEmpty()) {
+                            Icon(
+                                modifier = Modifier
+                                    .padding(4.dp)
+                                    .size(32.dp)
+                                    .background(
+                                        MaterialTheme.colors.surface.copy(alpha = 0.8f),
+                                        CircleShape
+                                    )
+                                    .padding(4.dp)
+                                    .align(Alignment.TopEnd)
+                                    .clickable { onCardOptionsClick(card) },
+                                imageVector = Icons.Default.MoreVert,
+                                contentDescription = UiState.CardOption.REMOVE.label,
+                                tint = MaterialTheme.colors.onSurface
+                            )
+                        }
+                    }
+                }
+
+                if (rows[index].size < COLUMN_COUNT) {
+                    repeat(COLUMN_COUNT - rows[index].size) {
+                        Spacer(modifier = Modifier.weight(1f))
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LazyItemScope.HeroSection(state: UiState, onCardClick: (Card) -> Unit) {
+    Row(
+        modifier = Modifier.padding(ContentPadding).fillMaxWidth(),
+        horizontalArrangement = if (state.deck.hero.linkedCard != null) {
+            Arrangement.SpaceBetween
+        } else {
+            Arrangement.Center
+        }
+    ) {
+        Card(
+            card = state.deck.hero,
+            modifier = Modifier.fillParentMaxWidth(0.45f),
+            parallaxEffect = true
+        ) {
+            onCardClick(state.deck.hero)
+        }
+
+        state.deck.hero.linkedCard?.let {
+            Card(
+                card = it,
+                modifier = Modifier.fillParentMaxWidth(0.45f),
+                parallaxEffect = true
+            ) {
+                onCardClick(it)
+            }
+        }
+    }
+}
+
+@Composable
+private fun TitleSection(state: UiState) {
+    Column(modifier = Modifier.padding(horizontal = ContentPadding)) {
+        Text(
+            text = state.deck.name,
+            maxLines = 2,
+            style = MaterialTheme.typography.h5,
+            color = MaterialTheme.colors.onSurface
+        )
+
+        Text(
+            modifier = Modifier.padding(top = 4.dp),
+            text = state.deck.hero.name,
+            maxLines = 1,
+            style = MaterialTheme.typography.h6,
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
+        )
+    }
+}
+
+@Composable
+private fun TagSection(state: UiState) {
+    LazyRow(
+        modifier = Modifier.padding(
+            start = ContentPadding,
+            top = 8.dp,
+            bottom = ContentPadding
+        ),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        state.deck.aspect?.let {
+            item { Tag(text = it.label, color = it.color) }
+        }
+
+        item { Tag(text = state.deck.id.toString()) }
+        state.deck.version?.let {
+            item { Tag(text = "v$it") }
+        }
+
+        state.deck.problem?.let {
+            item {
+                Tag(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = it,
+                    color = MaterialTheme.colors.error
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DescriptionSection(description: String) {
+    var expandedDescription by remember { mutableStateOf(false) }
+    val maxLines by animateIntAsState(
+        targetValue = if (expandedDescription) 100 else 4,
+        animationSpec = spring()
+    )
+
+    Column(Modifier.fillMaxWidth()
+        .padding(ContentPadding)
+        .background(
+            color = MaterialTheme.colors.surface,
+            shape = DefaultShape
+        )
+        .padding(ContentPadding)
+        .noRippleClickable { expandedDescription = !expandedDescription })
+    {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = description,
+            style = MaterialTheme.typography.body1,
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colors.onBackground,
+        )
+    }
+}
+
+@Composable
+private fun HeroCardsSection(state: UiState, onCardClick: (Card) -> Unit) {
+    val heroCards = CardRowEntry(
+        title = stringResource(Res.string.hero_cards),
+        cards = state.deck.cards
+            .filter { it.type != CardType.HERO && it.setCode == state.deck.hero.setCode }
+            .sortedBy { it.cost ?: 0 })
+
+    CardRow(
+        modifier = Modifier.padding(
+            horizontal = ContentPadding,
+            vertical = ContentPadding,
+        ),
+        cardRowEntry = heroCards
+    ) {
+        onCardClick(it)
     }
 }
 
