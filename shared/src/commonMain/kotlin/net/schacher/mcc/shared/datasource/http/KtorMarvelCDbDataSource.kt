@@ -84,15 +84,16 @@ class KtorMarvelCDbDataSource(
         httpClient.get("$serviceUrl/packs")
             .body<List<PackDto>>()
             .map {
-                async(Dispatchers.Default) {
+                async(Dispatchers.IO) {
                     Logger.d { "Processing Pack: ${it.name}" }
                     val cards = getCardsInPack(it.code).getOrThrow()
 
                     Pack(
+                        id = it.id,
                         code = it.code,
                         name = it.name,
                         cards = cards,
-                        id = it.id,
+                        cardCodes = cards.map { it.code },
                         position = it.position
                     ).also {
                         Logger.d { "Processing done: ${it.name}" }
@@ -254,6 +255,7 @@ private fun CardDto.toCard() = Card(
     faction = Faction.valueOf(this.factionCode.toUpperCasePreservingASCIIRules()),
     primaryColor = this.primaryColor,
     secondaryColor = this.secondaryColor,
+    linkedCardCode = this.linkedCard?.code,
 )
 
 private fun String?.cleanUp(): String? =

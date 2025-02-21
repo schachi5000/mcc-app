@@ -95,20 +95,7 @@ class DatabaseDao(
     override fun getCards(): Flow<List<Card>> = dbQuery.selectAllCards()
         .asFlow()
         .mapToList(Dispatchers.IO)
-        .map { cardEntries ->
-            cardEntries.map {
-                val card = it.toCard()
-                val linkedCard = it.linkedCardCode?.let { linkedCardCode ->
-                    cardEntries.find { it.code == linkedCardCode }
-                        ?.toCard()
-                        ?.copy(linkedCard = card)
-                }
-
-                card.copy(
-                    linkedCard = linkedCard
-                )
-            }
-        }
+        .map { it.map { cardEntry -> cardEntry.toCard() } }
 
     override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
         Logger.i { "Deleting all decks from database" }
@@ -192,7 +179,9 @@ class DatabaseDao(
 
     private suspend fun getCardsByPackCode(packCode: String): List<Card> =
         measuringWithContext(Dispatchers.IO, "getCardsByPackCode", TAG) {
-            dbQuery.selectCardsByPackCode(packCode).executeAsList().map {
+            dbQuery.selectCardsByPackCode(packCode)
+                .executeAsList()
+                .map {
                 val card = it.toCard()
                 var linkedCard = it.linkedCardCode?.let {
                     dbQuery.selectCardByCode(it).executeAsList().firstOrNull()?.toCard()
@@ -239,6 +228,7 @@ private fun database.Pack.toPack(cards: List<Card>) = Pack(
     code = this.code,
     cards = cards,
     id = this.id.toInt(),
+    cardCodes = this.cardCodes.toCardCodeList(),
     position = this.position.toInt()
 )
 

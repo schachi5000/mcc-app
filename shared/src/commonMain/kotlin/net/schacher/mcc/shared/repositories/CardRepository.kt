@@ -10,7 +10,7 @@ import net.schacher.mcc.shared.model.Card
 class CardRepository(
     private val cardDatabaseDao: CardDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource,
-    private val scope: CoroutineScope
+    scope: CoroutineScope
 ) {
     val cards = this.cardDatabaseDao.getCards().stateIn(
         scope = scope,

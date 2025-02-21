@@ -16,7 +16,7 @@ import net.schacher.mcc.shared.model.Pack
 class PackRepository(
     private val packDatabaseDao: PackDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource,
-    private val scope: CoroutineScope = MainScope()
+    scope: CoroutineScope = MainScope()
 ) {
     val packs = this.packDatabaseDao.getAllPacks().stateIn(
         scope = scope,

@@ -20,8 +20,6 @@ import net.schacher.mcc.shared.utils.debug
 import net.schacher.mcc.shared.utils.launchAndCollect
 
 class MainViewModel(
-    private val cardRepository: CardRepository,
-    private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
     private val authRepository: AuthRepository,
     private val settingsDao: SettingsDao
