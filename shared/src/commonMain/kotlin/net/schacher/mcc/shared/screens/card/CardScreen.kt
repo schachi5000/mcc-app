@@ -144,9 +144,9 @@ private fun Content(
                         modifier = Modifier.padding(top = 8.dp),
                         horizontalArrangement = Arrangement.spacedBy(4.dp)
                     ) {
-                        item { card.aspect?.let { Tag(text = it.label, color = it.color) } }
+                        card.aspect?.let { item { Tag(text = it.label, color = it.color) } }
                         item { Tag(text = card.code) }
-                        item { card.type?.let { Tag(text = it.label) } }
+                        card.type?.let { item { Tag(text = it.label) } }
                     }
                 }
             }
@@ -198,7 +198,7 @@ private fun Content(
                     )
                 }
             }
-            
+
             card.quote?.let {
                 item {
                     Text(
