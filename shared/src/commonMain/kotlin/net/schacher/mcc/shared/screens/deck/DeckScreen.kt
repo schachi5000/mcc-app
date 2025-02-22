@@ -48,6 +48,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.delete
 import marvelchampionscompanion.shared.generated.resources.hero_cards
 import marvelchampionscompanion.shared.generated.resources.other_cards
 import marvelchampionscompanion.shared.generated.resources.remove_card_from_deck
@@ -224,7 +225,7 @@ private fun Content(
                             )
                             .fillMaxWidth(),
                         onClick = onDeleteDeckClicked,
-                        label = UiState.CardOption.REMOVE.label
+                        label = UiState.DeckOption.DELETE.label
                     )
                 }
             }
@@ -492,5 +493,12 @@ private val UiState.CardOption.label
     get() = when (this) {
         REMOVE -> stringResource(Res.string.remove_card_from_deck)
     }
+
+private val UiState.DeckOption.label
+    @Composable
+    get() = when (this) {
+        DELETE -> stringResource(Res.string.delete)
+    }
+
 
 private data class ConfirmationState(val title: String, val message: String)
