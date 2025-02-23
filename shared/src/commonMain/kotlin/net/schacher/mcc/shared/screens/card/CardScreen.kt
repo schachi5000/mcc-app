@@ -25,6 +25,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import net.schacher.mcc.shared.design.compose.BackButton
@@ -242,34 +243,47 @@ private fun Content(
     }
 }
 
+private val annotatedRegex = "<b>(.*?)</b>|<i>(.*?)</i>|([^<]*)".toRegex()
 
-private val boldRegex = Regex("<b>(.*?)</b>|\\[\\[(.*?)]]|\\[(.*?)]")
+private const val PHYSICAL = "[physical]"
+private const val MENTAL = "[mental]"
+private const val STAR = "[star]"
+private const val CRISIS = "[crisis]"
+private const val ENERGY = "[energy]"
 
-private val italicRegex = Regex("<i>(.*?)</i>")
-
-private const val EMOJI_HERO = "\uD83D\uDE42"
+private const val EMOJI_HERO = "\uD83E\uDDB8\u200D♂\uFE0F"
+private const val EMOJI_FIST = "\uD83D\uDC4A"
+private const val EMOJI_ENERGY = "⚡"
+private const val EMOJI_ATOM = "⚛\uFE0F"
+private const val EMOJI_BRAIN = "\uD83E\uDDE0"
+private const val EMOJI_STAR = "⭐"
+private const val EMOJI_EXCLAMATION = "❗"
 
 private fun String.toAnnotatedString(): AnnotatedString {
     val value = this
 
-    // Could be handled more elegantly, but this works for now
-    val boldStrings = boldRegex.findAll(value).map {
-        it.value.replace("<b>", "")
-            .replace("</b>", "")
-            .replace("[", "")
-            .replace("]", "")
-            .replace("per_hero", EMOJI_HERO)
-            .replace("per_player", EMOJI_HERO)
-    }.toList()
-
     return buildAnnotatedString {
-        value.split(boldRegex).forEachIndexed { index, s ->
-            append(s)
+        annotatedRegex.findAll(value).forEach { match ->
+            when {
+                match.groups[1] != null -> { // Bold
+                    match.groups[1]?.let {
+                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                            append(it.value)
+                        }
+                    }
+                }
 
-            if (index < boldStrings.count()) {
-                pushStyle(SpanStyle(fontWeight = FontWeight.Bold))
-                append(boldStrings[index])
-                pop()
+                match.groups[2] != null -> { // Italic
+                    match.groups[2]?.let {
+                        withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
+                            append(it.value)
+                        }
+                    }
+                }
+
+                match.groups[3] != null -> { // Normal text
+                    match.groups[3]?.let { append(it.value) }
+                }
             }
         }
     }
