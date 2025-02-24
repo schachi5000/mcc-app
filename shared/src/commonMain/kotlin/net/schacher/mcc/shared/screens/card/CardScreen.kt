@@ -37,6 +37,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.backside
 import marvelchampionscompanion.shared.generated.resources.ic_energy
 import marvelchampionscompanion.shared.generated.resources.ic_mental
 import marvelchampionscompanion.shared.generated.resources.ic_physical
@@ -49,6 +50,8 @@ import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardBackgroundBox
+import net.schacher.mcc.shared.design.compose.HeaderSmall
+import net.schacher.mcc.shared.design.compose.ListItem
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.Tag
 import net.schacher.mcc.shared.design.theme.ContentPadding
@@ -60,6 +63,7 @@ import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.resultState
 import org.jetbrains.compose.resources.DrawableResource
 import org.jetbrains.compose.resources.painterResource
+import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
@@ -237,11 +241,7 @@ private fun Content(
 
             card.linkedCard?.let {
                 item {
-                    SecondaryButton(
-                        modifier = Modifier.fillMaxWidth(),
-                        onClick = { onLinkedCardClick(it.code) },
-                        label = it.name
-                    )
+                    LinkedCard(it, onLinkedCardClick)
                 }
             }
 
@@ -263,6 +263,24 @@ private fun Content(
         BackButton {
             onCloseClick()
         }
+    }
+}
+
+@Composable
+private fun LinkedCard(card: Card, onCardClick: (String) -> Unit) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
+        verticalArrangement = Arrangement.spacedBy(16.dp)
+    ) {
+        HeaderSmall(title = stringResource(Res.string.backside))
+
+        ListItem(
+            modifier = Modifier.fillMaxWidth(),
+            card = card,
+            subtitle = card.traits,
+            title = card.name,
+            onClick = { onCardClick(card.code) }
+        )
     }
 }
 
