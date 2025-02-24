@@ -12,6 +12,9 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.lazy.rememberLazyListState
+import androidx.compose.foundation.text.InlineTextContent
+import androidx.compose.foundation.text.appendInlineContent
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
@@ -20,6 +23,8 @@ import androidx.compose.runtime.collectAsState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.text.AnnotatedString
+import androidx.compose.ui.text.Placeholder
+import androidx.compose.ui.text.PlaceholderVerticalAlign
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.font.FontStyle
@@ -27,7 +32,17 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.ic_energy
+import marvelchampionscompanion.shared.generated.resources.ic_mental
+import marvelchampionscompanion.shared.generated.resources.ic_physical
+import marvelchampionscompanion.shared.generated.resources.ic_player
+import marvelchampionscompanion.shared.generated.resources.ic_search
+import marvelchampionscompanion.shared.generated.resources.ic_spotlight
+import marvelchampionscompanion.shared.generated.resources.ic_star
+import marvelchampionscompanion.shared.generated.resources.ic_wild
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
@@ -41,6 +56,8 @@ import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.resultState
+import org.jetbrains.compose.resources.DrawableResource
+import org.jetbrains.compose.resources.painterResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
 
@@ -169,6 +186,7 @@ private fun Content(
                 item {
                     Text(
                         text = it.toAnnotatedString(),
+                        inlineContent = getInlineContent(),
                         style = MaterialTheme.typography.body1,
                         color = MaterialTheme.colors.onSurface
                     )
@@ -179,6 +197,7 @@ private fun Content(
                 item {
                     Text(
                         text = it.toAnnotatedString(),
+                        inlineContent = getInlineContent(),
                         style = MaterialTheme.typography.body1,
                         color = MaterialTheme.colors.onSurface
                     )
@@ -194,6 +213,7 @@ private fun Content(
                             pop()
                             append(it.toAnnotatedString())
                         },
+                        inlineContent = getInlineContent(),
                         style = MaterialTheme.typography.body1,
                         color = MaterialTheme.colors.onSurface
                     )
@@ -203,7 +223,6 @@ private fun Content(
             card.quote?.let {
                 item {
                     Text(
-                        modifier = Modifier.padding(top = ContentPadding),
                         text = it,
                         style = MaterialTheme.typography.body1,
                         fontStyle = FontStyle.Italic,
@@ -243,21 +262,7 @@ private fun Content(
     }
 }
 
-private val annotatedRegex = "<b>(.*?)</b>|<i>(.*?)</i>|([^<]*)".toRegex()
-
-private const val PHYSICAL = "[physical]"
-private const val MENTAL = "[mental]"
-private const val STAR = "[star]"
-private const val CRISIS = "[crisis]"
-private const val ENERGY = "[energy]"
-
-private const val EMOJI_HERO = "\uD83E\uDDB8\u200D♂\uFE0F"
-private const val EMOJI_FIST = "\uD83D\uDC4A"
-private const val EMOJI_ENERGY = "⚡"
-private const val EMOJI_ATOM = "⚛\uFE0F"
-private const val EMOJI_BRAIN = "\uD83E\uDDE0"
-private const val EMOJI_STAR = "⭐"
-private const val EMOJI_EXCLAMATION = "❗"
+private val annotatedRegex = "<b>(.*?)</b>|<i>(.*?)</i>|\\[(.*?)]|([^<\\[]+)".toRegex()
 
 private fun String.toAnnotatedString(): AnnotatedString {
     val value = this
@@ -265,26 +270,62 @@ private fun String.toAnnotatedString(): AnnotatedString {
     return buildAnnotatedString {
         annotatedRegex.findAll(value).forEach { match ->
             when {
-                match.groups[1] != null -> { // Bold
-                    match.groups[1]?.let {
-                        withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
-                            append(it.value)
-                        }
+                match.groups[1] != null -> match.groups[1]?.let {
+                    withStyle(style = SpanStyle(fontWeight = FontWeight.Bold)) {
+                        append(it.value)
                     }
                 }
 
-                match.groups[2] != null -> { // Italic
-                    match.groups[2]?.let {
-                        withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
-                            append(it.value)
-                        }
+
+                match.groups[2] != null -> match.groups[2]?.let {
+                    withStyle(style = SpanStyle(fontStyle = FontStyle.Italic)) {
+                        append(it.value)
                     }
                 }
 
-                match.groups[3] != null -> { // Normal text
-                    match.groups[3]?.let { append(it.value) }
+                match.groups[3] != null -> match.groups[3]?.let {
+                    appendInlineContent(it.value, it.value)
+                }
+
+                match.groups[4] != null -> match.groups[4]?.let {
+                    append(it.value)
                 }
             }
         }
     }
+}
+
+private const val PHYSICAL = "physical"
+private const val MENTAL = "mental"
+private const val STAR = "star"
+private const val CRISIS = "crisis"
+private const val ENERGY = "energy"
+private const val WILD = "wild"
+private const val HERO = "hero"
+private const val TECH = "Tech"
+
+private fun getInlineContent(): Map<String, InlineTextContent> {
+    val inlineIcon: (DrawableResource) -> InlineTextContent = { resource ->
+        InlineTextContent(
+            Placeholder(20.sp, 20.sp, PlaceholderVerticalAlign.Center)
+        ) {
+            Icon(
+                painter = painterResource(resource),
+                tint = MaterialTheme.colors.onSurface,
+                contentDescription = "inline icon",
+                modifier = Modifier.fillMaxSize()
+            )
+        }
+    }
+
+    return mutableMapOf(
+        PHYSICAL to inlineIcon(Res.drawable.ic_physical),
+        MENTAL to inlineIcon(Res.drawable.ic_mental),
+        STAR to inlineIcon(Res.drawable.ic_star),
+        TECH to inlineIcon(Res.drawable.ic_search),
+        ENERGY to inlineIcon(Res.drawable.ic_energy),
+        WILD to inlineIcon(Res.drawable.ic_wild),
+        HERO to inlineIcon(Res.drawable.ic_player),
+        CRISIS to inlineIcon(Res.drawable.ic_spotlight),
+    )
 }
