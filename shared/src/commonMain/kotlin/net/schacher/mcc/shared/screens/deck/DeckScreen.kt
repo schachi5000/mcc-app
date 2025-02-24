@@ -320,29 +320,16 @@ private fun LazyListScope.otherCardsSection(
 private fun LazyItemScope.HeroSection(state: UiState, onCardClick: (Card) -> Unit) {
     Row(
         modifier = Modifier.padding(ContentPadding).fillMaxWidth(),
-        horizontalArrangement = if (state.deck.hero.linkedCard != null) {
-            Arrangement.SpaceBetween
-        } else {
-            Arrangement.Center
-        }
+        horizontalArrangement = Arrangement.Center
     ) {
         Card(
             card = state.deck.hero,
-            modifier = Modifier.fillParentMaxWidth(0.45f),
+            modifier = Modifier.fillParentMaxWidth(0.60f),
             parallaxEffect = true
         ) {
             onCardClick(state.deck.hero)
         }
 
-        state.deck.hero.linkedCard?.let {
-            Card(
-                card = it,
-                modifier = Modifier.fillParentMaxWidth(0.45f),
-                parallaxEffect = true
-            ) {
-                onCardClick(it)
-            }
-        }
     }
 }
 
