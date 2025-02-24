@@ -29,6 +29,8 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.format
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.cards_in_collection
 import marvelchampionscompanion.shared.generated.resources.cards_in_database
@@ -40,7 +42,6 @@ import marvelchampionscompanion.shared.generated.resources.login
 import marvelchampionscompanion.shared.generated.resources.logout
 import marvelchampionscompanion.shared.generated.resources.more
 import marvelchampionscompanion.shared.generated.resources.my_decks
-import marvelchampionscompanion.shared.generated.resources.of
 import marvelchampionscompanion.shared.generated.resources.owned_packs
 import marvelchampionscompanion.shared.generated.resources.sync_with_marvelcdb
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
@@ -171,6 +172,15 @@ fun MoreScreen(
                     color = MaterialTheme.colors.onBackground,
                     text = state.versionName
                 )
+
+                state.sessionExpiresAt?.let {
+                    Text(
+                        modifier = Modifier.padding(16.dp).fillMaxWidth().alpha(0.5f),
+                        textAlign = TextAlign.Center,
+                        color = MaterialTheme.colors.onBackground,
+                        text = it.format(LocalDateTime.Formats.ISO)
+                    )
+                }
             }
         }
     }

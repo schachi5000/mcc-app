@@ -7,6 +7,10 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Instant
+import kotlinx.datetime.LocalDateTime
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.platform.PlatformInfo
@@ -34,7 +38,7 @@ class MoreViewModel(
             packsInCollectionCount = packRepository.packsInCollection.value.size,
             settingsValues = settingsDao.getAllEntries(),
             versionName = platformInfo.version,
-            guestLogin = authRepository.isGuest()
+            guestLogin = authRepository.isGuest(),
         )
     )
 
@@ -50,7 +54,15 @@ class MoreViewModel(
         }
 
         viewModelScope.launchAndCollect(authRepository.loginState) {
-            _state.update { it.copy(guestLogin = authRepository.isGuest()) }
+            _state.update {
+                it.copy(
+                    guestLogin = authRepository.isGuest(),
+                    sessionExpiresAt = authRepository.accessToken?.expiresAt?.let {
+                        Instant.fromEpochMilliseconds(it)
+                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                    }
+                )
+            }
         }
 
         viewModelScope.launchAndCollect(packRepository.packsInCollection) { value ->
@@ -127,7 +139,8 @@ class MoreViewModel(
         val syncInProgress: Boolean = false,
         val settingsValues: List<Pair<String, Any>> = emptyList(),
         val versionName: String,
-        val guestLogin: Boolean
+        val guestLogin: Boolean,
+        val sessionExpiresAt: LocalDateTime? = null,
     )
 }
 
