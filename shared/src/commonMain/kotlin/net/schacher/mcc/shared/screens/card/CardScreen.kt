@@ -3,8 +3,10 @@ package net.schacher.mcc.shared.screens.card
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.sizeIn
@@ -127,9 +129,11 @@ private fun Content(
                 Column(
                     modifier = Modifier.fillMaxWidth()
                         .statusBarsPadding()
-                        .padding(top = ContentPadding),
+                        .padding(vertical = ContentPadding),
                     horizontalAlignment = Alignment.CenterHorizontally
                 ) {
+                    Spacer(Modifier.statusBarsPadding().height(ContentPadding))
+
                     Card(
                         card = card,
                         parallaxEffect = true,
