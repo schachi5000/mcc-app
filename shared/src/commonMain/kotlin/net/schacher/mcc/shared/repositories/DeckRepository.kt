@@ -40,6 +40,11 @@ class DeckRepository(
 
     fun getDeckById(deckId: Int): Deck? = this.decks.value.find { it.id == deckId }
 
+    fun getDecksWithCard(cardCode: String): List<Deck> =
+        this.decks.value.filter {
+            it.hero.code == cardCode || it.cards.any { it.code == cardCode }
+        }
+
     suspend fun createDeck(heroCardCode: String, label: String? = null): Result<Int> =
         this.marvelCDbDataSource.createDeck(heroCardCode, label).also {
             val deckId = it.getOrNull()

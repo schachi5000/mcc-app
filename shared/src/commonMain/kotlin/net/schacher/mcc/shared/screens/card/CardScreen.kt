@@ -50,6 +50,7 @@ import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.Card
 import net.schacher.mcc.shared.design.compose.CardBackgroundBox
+import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.HeaderSmall
 import net.schacher.mcc.shared.design.compose.ListItem
 import net.schacher.mcc.shared.design.compose.SecondaryButton
@@ -58,6 +59,7 @@ import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.resultState
@@ -85,21 +87,25 @@ fun CardScreen(
     val state = viewModel.state.collectAsState()
     CardScreen(
         card = state.value.card,
+        foundInDecks = state.value.foundInDecks,
         modifier = modifier,
         onCloseClick = { navController.popBackStack() },
         onLinkedCardClick = { navController.navigate("card/${it}") },
         onAddToDeckClick = { navController.navigate(AppRoute.SelectDeck) }
-            .takeIf { state.value.canAddToDeck }
+            .takeIf { state.value.canAddToDeck },
+        onDeckClick = { navController.navigate("deck/${it.id}") }
     )
 }
 
 @Composable
 fun CardScreen(
     card: Card,
-    modifier: Modifier = Modifier,
     onAddToDeckClick: (() -> Unit)?,
     onLinkedCardClick: (String) -> Unit,
+    onDeckClick: (Deck) -> Unit,
     onCloseClick: () -> Unit,
+    foundInDecks: List<Deck> = emptyList(),
+    modifier: Modifier = Modifier,
 ) {
     CardBackgroundBox(
         cardCode = card.code,
@@ -107,9 +113,11 @@ fun CardScreen(
     ) {
         Content(
             card = card,
+            foundInDecks = foundInDecks,
             onAddToDeckClick = onAddToDeckClick,
             onCloseClick = onCloseClick,
-            onLinkedCardClick = onLinkedCardClick
+            onLinkedCardClick = onLinkedCardClick,
+            onDeckClick = onDeckClick
         )
     }
 }
@@ -117,8 +125,10 @@ fun CardScreen(
 @Composable
 private fun Content(
     card: Card,
+    foundInDecks: List<Deck>,
     onAddToDeckClick: (() -> Unit)?,
     onCloseClick: () -> Unit,
+    onDeckClick: (Deck) -> Unit,
     onLinkedCardClick: (String) -> Unit,
 ) {
     Box(modifier = Modifier.fillMaxSize()) {
@@ -176,6 +186,8 @@ private fun Content(
                     }
                 }
             }
+
+
 
             card.traits?.let {
                 item {
@@ -239,12 +251,6 @@ private fun Content(
                 }
             }
 
-            card.linkedCard?.let {
-                item {
-                    LinkedCard(it, onLinkedCardClick)
-                }
-            }
-
             onAddToDeckClick?.let {
                 item {
                     SecondaryButton(
@@ -252,6 +258,18 @@ private fun Content(
                         onClick = it,
                         label = "Add to deck"
                     )
+                }
+            }
+
+            card.linkedCard?.let {
+                item {
+                    LinkedCard(it, onLinkedCardClick)
+                }
+            }
+
+            if (foundInDecks.isNotEmpty()) {
+                item {
+                    FoundInDecks(foundInDecks, onDeckClick)
                 }
             }
 
@@ -281,6 +299,19 @@ private fun LinkedCard(card: Card, onCardClick: (String) -> Unit) {
             title = card.name,
             onClick = { onCardClick(card.code) }
         )
+    }
+}
+
+@Composable
+private fun FoundInDecks(decks: List<Deck>, onDeckClick: (Deck) -> Unit) {
+    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
+        HeaderSmall("Found in decks")
+
+        decks.forEach {
+            DeckListItem(deck = it) {
+                onDeckClick(it)
+            }
+        }
     }
 }
 

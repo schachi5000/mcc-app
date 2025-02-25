@@ -9,6 +9,7 @@ import kotlinx.coroutines.runBlocking
 import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
+import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
@@ -26,10 +27,13 @@ class CardScreenViewModel(
 
     private val _state: MutableStateFlow<UiState> = runBlocking {
         val card = cardRepository.getCard(cardCode)
+        val decks = deckRepository.getDecksWithCard(cardCode)
+
         MutableStateFlow(
             UiState(
                 card = card,
-                canAddToDeck = canAddToDeck(card)
+                canAddToDeck = canAddToDeck(card),
+                foundInDecks = decks
             )
         )
     }
@@ -59,6 +63,7 @@ class CardScreenViewModel(
 
     data class UiState(
         val card: Card,
+        val foundInDecks: List<Deck> = emptyList(),
         val canAddToDeck: Boolean = false
     )
 }

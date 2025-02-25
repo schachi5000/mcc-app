@@ -96,7 +96,8 @@ fun CardInfoPreview() {
             card = previewCard,
             onCloseClick = {},
             onAddToDeckClick = {},
-            onLinkedCardClick = {})
+            onLinkedCardClick = {},
+            onDeckClick = {})
     }
 }
 
