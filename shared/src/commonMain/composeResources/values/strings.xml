@@ -2,6 +2,7 @@
     <string name="app_name">MCC</string>
     <string name="database">Database</string>
     <string name="delete">Delete</string>
+    <string name="add_to_deck">Add to deck</string>
     <string name="my_decks">My Decks</string>
     <string name="cards">Cards</string>
     <string name="collection">Collection</string>
@@ -26,6 +27,7 @@
     <string name="description">Description</string>
     <string name="hero_cards">Hero cards</string>
     <string name="other_cards">Other cards</string>
+    <string name="found_in_decks">Found in decks</string>
 
     <string name="cards_in_collection">Cards in your collection</string>
     <string name="cards_in_database">Cards in local database</string>

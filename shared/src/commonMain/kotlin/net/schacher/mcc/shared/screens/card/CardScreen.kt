@@ -37,7 +37,9 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.add_to_deck
 import marvelchampionscompanion.shared.generated.resources.backside
+import marvelchampionscompanion.shared.generated.resources.found_in_decks
 import marvelchampionscompanion.shared.generated.resources.ic_energy
 import marvelchampionscompanion.shared.generated.resources.ic_mental
 import marvelchampionscompanion.shared.generated.resources.ic_physical
@@ -256,7 +258,7 @@ private fun Content(
                     SecondaryButton(
                         modifier = Modifier.fillMaxWidth(),
                         onClick = it,
-                        label = "Add to deck"
+                        label = stringResource(Res.string.add_to_deck),
                     )
                 }
             }
@@ -287,8 +289,8 @@ private fun Content(
 @Composable
 private fun LinkedCard(card: Card, onCardClick: (String) -> Unit) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = 16.dp),
-        verticalArrangement = Arrangement.spacedBy(16.dp)
+        modifier = Modifier.fillMaxWidth().padding(vertical = ContentPadding),
+        verticalArrangement = Arrangement.spacedBy(ContentPadding)
     ) {
         HeaderSmall(title = stringResource(Res.string.backside))
 
@@ -304,8 +306,8 @@ private fun LinkedCard(card: Card, onCardClick: (String) -> Unit) {
 
 @Composable
 private fun FoundInDecks(decks: List<Deck>, onDeckClick: (Deck) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(16.dp)) {
-        HeaderSmall("Found in decks")
+    Column(verticalArrangement = Arrangement.spacedBy(ContentPadding)) {
+        HeaderSmall(stringResource(Res.string.found_in_decks))
 
         decks.forEach {
             DeckListItem(deck = it) {
