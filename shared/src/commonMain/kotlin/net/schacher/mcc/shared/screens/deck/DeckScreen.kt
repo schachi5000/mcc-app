@@ -18,7 +18,6 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyItemScope
-import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.Icon
@@ -74,13 +73,11 @@ import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption.REMOVE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.DeckOption.DELETE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.DeletingDeck
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.RemovingCard
-import net.schacher.mcc.shared.utils.defaultSort
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -200,19 +197,24 @@ private fun Content(
             .background(MaterialTheme.colors.background),
         cardCode = state.deck.hero.code,
     ) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
-            item { Spacer(Modifier.statusBarsPadding().height(ContentPadding)) }
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(ContentPadding)
+        ) {
             item { HeroSection(state, onCardClick) }
-            item { TitleSection(state) }
-            item { TagSection(state) }
+            item {
+                Column(Modifier.padding(horizontal = ContentPadding)) {
+                    TitleSection(state)
+                    TagSection(state)
+                }
+            }
 
             if (state.deck.description != null) {
                 item { DescriptionSection(state.deck.description) }
             }
 
             item { HeroCardsSection(state, onCardClick) }
-
-            otherCardsSection(state, onCardClick, onCardOptionsClick)
+            item { OtherCardsSection(state, onCardClick, onCardOptionsClick) }
 
             state.deckOptions.find { it == DELETE }?.let {
                 item {
@@ -241,17 +243,15 @@ private fun Content(
     }
 }
 
-private fun LazyListScope.otherCardsSection(
+@Composable
+private fun OtherCardsSection(
     state: UiState,
     onCardClick: (Card) -> Unit,
     onCardOptionsClick: (Card) -> Unit
 ) {
-    val otherCards = state.deck.cards
-        .filter { it.setCode != state.deck.hero.setCode }
-        .defaultSort()
+    if (state.otherCards.isNotEmpty()) {
 
-    if (otherCards.isNotEmpty()) {
-        item {
+        Column {
             Row(
                 modifier = Modifier.fillMaxWidth().padding(ContentPadding),
                 verticalAlignment = Alignment.Bottom,
@@ -259,56 +259,56 @@ private fun LazyListScope.otherCardsSection(
             ) {
                 HeaderSmall(
                     title = stringResource(Res.string.other_cards),
-                    subTitle = otherCards.size.toString()
+                    subTitle = state.otherCards.size.toString()
                 )
             }
-        }
 
-        val rows = otherCards.chunked(COLUMN_COUNT)
-        items(rows.size) { index ->
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .padding(
-                        start = ContentPadding,
-                        end = ContentPadding,
-                        top = 8.dp
-                    ),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                rows[index].forEach { card ->
-                    Box(Modifier.weight(1f)) {
-                        LabeledCard(
-                            modifier = Modifier.wrapContentHeight(),
-                            label = card.name,
-                            card = card
-                        ) {
-                            onCardClick(card)
-                        }
+            val rows = state.otherCards.chunked(3)
+            for (index in rows.indices) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = ContentPadding,
+                            end = ContentPadding,
+                            top = if (index == 0) 0.dp else 8.dp
+                        ),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                ) {
+                    rows[index].forEach { card ->
+                        Box(Modifier.weight(1f)) {
+                            LabeledCard(
+                                modifier = Modifier.wrapContentHeight(),
+                                label = card.name,
+                                card = card
+                            ) {
+                                onCardClick(card)
+                            }
 
-                        if (state.cardOptions.isNotEmpty()) {
-                            Icon(
-                                modifier = Modifier
-                                    .padding(4.dp)
-                                    .size(32.dp)
-                                    .background(
-                                        MaterialTheme.colors.surface.copy(alpha = 0.8f),
-                                        CircleShape
-                                    )
-                                    .padding(4.dp)
-                                    .align(Alignment.TopEnd)
-                                    .clickable { onCardOptionsClick(card) },
-                                imageVector = Icons.Default.MoreVert,
-                                contentDescription = UiState.CardOption.REMOVE.label,
-                                tint = MaterialTheme.colors.onSurface
-                            )
+                            if (state.cardOptions.isNotEmpty()) {
+                                Icon(
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .size(32.dp)
+                                        .background(
+                                            MaterialTheme.colors.surface.copy(alpha = 0.8f),
+                                            CircleShape
+                                        )
+                                        .padding(4.dp)
+                                        .align(Alignment.TopEnd)
+                                        .clickable { onCardOptionsClick(card) },
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = UiState.CardOption.REMOVE.label,
+                                    tint = MaterialTheme.colors.onSurface
+                                )
+                            }
                         }
                     }
-                }
 
-                if (rows[index].size < COLUMN_COUNT) {
-                    repeat(COLUMN_COUNT - rows[index].size) {
-                        Spacer(modifier = Modifier.weight(1f))
+                    if (rows[index].size < COLUMN_COUNT) {
+                        repeat(COLUMN_COUNT - rows[index].size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
                     }
                 }
             }
@@ -319,12 +319,12 @@ private fun LazyListScope.otherCardsSection(
 @Composable
 private fun LazyItemScope.HeroSection(state: UiState, onCardClick: (Card) -> Unit) {
     Row(
-        modifier = Modifier.padding(ContentPadding).fillMaxWidth(),
+        modifier = Modifier.statusBarsPadding().padding(ContentPadding).fillMaxWidth(),
         horizontalArrangement = Arrangement.Center
     ) {
         Card(
             card = state.deck.hero,
-            modifier = Modifier.fillParentMaxWidth(0.60f),
+            modifier = Modifier.padding(top = ContentPadding).fillParentMaxWidth(0.60f),
             parallaxEffect = true
         ) {
             onCardClick(state.deck.hero)
@@ -335,7 +335,7 @@ private fun LazyItemScope.HeroSection(state: UiState, onCardClick: (Card) -> Uni
 
 @Composable
 private fun TitleSection(state: UiState) {
-    Column(modifier = Modifier.padding(horizontal = ContentPadding)) {
+    Column {
         Text(
             text = state.deck.name,
             maxLines = 2,
@@ -368,11 +368,7 @@ private fun TitleSection(state: UiState) {
 @Composable
 private fun TagSection(state: UiState) {
     LazyRow(
-        modifier = Modifier.padding(
-            start = ContentPadding,
-            top = 8.dp,
-            bottom = ContentPadding
-        ),
+        modifier = Modifier.padding(top = 8.dp),
         horizontalArrangement = Arrangement.spacedBy(4.dp)
     ) {
         state.deck.aspect?.let {
@@ -405,7 +401,11 @@ private fun DescriptionSection(description: String) {
     )
 
     Column(Modifier.fillMaxWidth()
-        .padding(ContentPadding)
+        .padding(
+            start = ContentPadding,
+            top = ContentPadding,
+            end = ContentPadding
+        )
         .background(
             color = MaterialTheme.colors.surface,
             shape = DefaultShape
@@ -429,9 +429,8 @@ private fun DescriptionSection(description: String) {
 private fun HeroCardsSection(state: UiState, onCardClick: (Card) -> Unit) {
     val heroCards = CardRowEntry(
         title = stringResource(Res.string.hero_cards),
-        cards = state.deck.cards
-            .filter { it.type != CardType.HERO && it.setCode == state.deck.hero.setCode }
-            .sortedBy { it.cost ?: 0 })
+        cards = state.heroCards
+    )
 
     CardRow(
         modifier = Modifier.padding(
