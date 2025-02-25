@@ -289,7 +289,7 @@ private fun Content(
 @Composable
 private fun LinkedCard(card: Card, onCardClick: (String) -> Unit) {
     Column(
-        modifier = Modifier.fillMaxWidth().padding(vertical = ContentPadding),
+        modifier = Modifier.fillMaxWidth().padding(top = ContentPadding),
         verticalArrangement = Arrangement.spacedBy(ContentPadding)
     ) {
         HeaderSmall(title = stringResource(Res.string.backside))
@@ -306,7 +306,10 @@ private fun LinkedCard(card: Card, onCardClick: (String) -> Unit) {
 
 @Composable
 private fun FoundInDecks(decks: List<Deck>, onDeckClick: (Deck) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(ContentPadding)) {
+    Column(
+        modifier = Modifier.fillMaxWidth().padding(top = ContentPadding),
+        verticalArrangement = Arrangement.spacedBy(ContentPadding)
+    ) {
         HeaderSmall(stringResource(Res.string.found_in_decks))
 
         decks.forEach {
