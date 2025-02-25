@@ -74,7 +74,7 @@ fun LabeledCard(
         Card(card, modifier, shape, parallaxEffect, onClick)
         AnimatedVisibility(
             visible = showLabel,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(top = 8.dp)
                 .sizeIn(maxWidth = 128.dp)
                 .align(Alignment.CenterHorizontally)
         ) {

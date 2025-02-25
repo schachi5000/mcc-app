@@ -271,7 +271,8 @@ private fun OtherCardsSection(
                         .padding(
                             start = ContentPadding,
                             end = ContentPadding,
-                            top = if (index == 0) 0.dp else 8.dp
+                            top = if (index == 0) 0.dp else 8.dp,
+                            bottom = if (index <= rows.size - 1) 8.dp else 0.dp
                         ),
                     horizontalArrangement = Arrangement.spacedBy(8.dp)
                 ) {
