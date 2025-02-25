@@ -433,10 +433,7 @@ private fun HeroCardsSection(state: UiState, onCardClick: (Card) -> Unit) {
     )
 
     CardRow(
-        modifier = Modifier.padding(
-            horizontal = ContentPadding,
-            vertical = ContentPadding,
-        ),
+        modifier = Modifier.padding(top = ContentPadding),
         cardRowEntry = heroCards
     ) {
         onCardClick(it)

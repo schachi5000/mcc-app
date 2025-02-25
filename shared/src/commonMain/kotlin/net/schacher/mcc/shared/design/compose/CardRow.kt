@@ -5,6 +5,7 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyRow
@@ -17,9 +18,14 @@ import net.schacher.mcc.shared.model.Card
 
 @Composable
 fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Card) -> Unit) {
-    Column(modifier = Modifier.fillMaxWidth().wrapContentHeight()) {
+    Column(modifier = modifier.fillMaxWidth().wrapContentHeight()) {
         Row(
-            modifier = modifier.fillMaxWidth(),
+            modifier = Modifier.fillMaxWidth()
+                .padding(
+                    start = ContentPadding,
+                    bottom = ContentPadding,
+                    end = ContentPadding
+                ),
             verticalAlignment = Alignment.Bottom,
             horizontalArrangement = Arrangement.SpaceBetween
         ) {
@@ -29,9 +35,7 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
             )
         }
 
-        LazyRow(
-            horizontalArrangement = Arrangement.spacedBy(12.dp)
-        ) {
+        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
             items(cardRowEntry.cards.count()) {
                 if (it == 0) {
                     Spacer(Modifier.size(ContentPadding))
@@ -44,13 +48,8 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
                         onCardSelected(cardRowEntry.cards[it])
                     }
                 }
-
-                if (it == cardRowEntry.cards.lastIndex) {
-                    Spacer(Modifier.size(ContentPadding))
-                }
             }
         }
-        Spacer(Modifier.size(16.dp))
     }
 }
 
