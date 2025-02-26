@@ -3,9 +3,9 @@ package net.schacher.mcc.shared.repositories
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.datetime.Clock
 import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.SettingsDao
-import net.schacher.mcc.shared.time.Time
 import kotlin.time.Duration.Companion.seconds
 
 class AuthRepository(private val settingsDao: SettingsDao) {
@@ -89,7 +89,7 @@ class AuthRepository(private val settingsDao: SettingsDao) {
         AccessToken(token = it.parameters["access_token"]
             ?: throw IllegalArgumentException("No access token found"),
             expiresAt = it.parameters["expires_in"]?.toLongOrNull()
-                ?.let { Time.currentTimeMillis + it.seconds.inWholeMilliseconds }
+                ?.let { Clock.System.now().toEpochMilliseconds() + it.seconds.inWholeMilliseconds }
                 ?: throw IllegalArgumentException("No expiration time found"))
     }
 
@@ -106,7 +106,7 @@ class AuthRepository(private val settingsDao: SettingsDao) {
     }
 
     private fun isAccessTokenValid(accessToken: AccessToken?): Boolean =
-        (accessToken?.expiresAt ?: 0) > Time.currentTimeMillis
+        (accessToken?.expiresAt ?: 0) > Clock.System.now().toEpochMilliseconds()
 
     fun isGuest(): Boolean = this.userType is UserType.Guest
 

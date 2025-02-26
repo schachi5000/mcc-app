@@ -7,10 +7,8 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.datetime.Clock
 import kotlinx.datetime.Instant
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.TimeZone
-import kotlinx.datetime.toLocalDateTime
 import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.SettingsDao
 import net.schacher.mcc.shared.platform.PlatformInfo
@@ -19,6 +17,7 @@ import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
 import net.schacher.mcc.shared.utils.launchAndCollect
+import kotlin.time.Duration
 
 class MoreViewModel(
     private val cardRepository: CardRepository,
@@ -57,9 +56,8 @@ class MoreViewModel(
             _state.update {
                 it.copy(
                     guestLogin = authRepository.isGuest(),
-                    sessionExpiresAt = authRepository.accessToken?.expiresAt?.let {
-                        Instant.fromEpochMilliseconds(it)
-                            .toLocalDateTime(TimeZone.currentSystemDefault())
+                    sessionExpiresIn = authRepository.accessToken?.expiresAt?.let {
+                        (Instant.fromEpochMilliseconds(it) - Clock.System.now()).absoluteValue
                     }
                 )
             }
@@ -140,7 +138,7 @@ class MoreViewModel(
         val settingsValues: List<Pair<String, Any>> = emptyList(),
         val versionName: String,
         val guestLogin: Boolean,
-        val sessionExpiresAt: LocalDateTime? = null,
+        val sessionExpiresIn: Duration? = null,
     )
 }
 

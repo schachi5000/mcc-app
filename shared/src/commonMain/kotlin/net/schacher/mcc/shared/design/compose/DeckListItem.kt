@@ -5,6 +5,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.awaitFirstDown
 import androidx.compose.foundation.gestures.waitForUpOrCancellation
 import androidx.compose.foundation.interaction.MutableInteractionSource
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -28,8 +29,9 @@ import androidx.compose.ui.input.pointer.pointerInput
 import androidx.compose.ui.unit.dp
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.cards
-import marvelchampionscompanion.shared.generated.resources.decks
+import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
@@ -37,40 +39,30 @@ import org.jetbrains.compose.resources.pluralStringResource
 
 @Composable
 fun DeckListItem(
-    modifier: Modifier = Modifier,
     deck: Deck,
+    modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
     ListItem(
         modifier = modifier,
         card = deck.hero,
         title = deck.name,
-        subtitle = listOfNotNull(
-            deck.aspect?.label,
-            pluralStringResource(
-                Res.plurals.cards,
-                deck.cards.size,
-                deck.cards.size
-            ),
-            pluralStringResource(
-                Res.plurals.decks,
-                deck.requiredPacks.size,
-                deck.requiredPacks.size
-            )
-        ).joinToString(" · "),
-        onClick = onClick
-    )
-}
-
-@Composable
-fun CardListItem(
-    card: Card,
-    onClick: () -> Unit
-) {
-    ListItem(
-        card = card,
-        title = card.name,
-        subtitle = card.type?.label,
+        subtitle = {
+            Row(
+                modifier = Modifier.padding(top = 4.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                deck.aspect?.let { Tag(text = it.label, color = it.color) }
+                pluralStringResource(
+                    Res.plurals.cards,
+                    deck.cards.size,
+                    deck.cards.size
+                ).let {
+                    Subtitle(it)
+                }
+            }
+        },
         onClick = onClick
     )
 }
@@ -80,6 +72,33 @@ fun ListItem(
     card: Card,
     title: String,
     subtitle: String? = null,
+    modifier: Modifier = Modifier,
+    onClick: () -> Unit
+) {
+    ListItem(
+        card = card,
+        title = title,
+        subtitle = {
+            subtitle?.let {
+                Text(
+                    modifier = Modifier.padding(top = 4.dp),
+                    text = it,
+                    style = MaterialTheme.typography.subtitle1,
+                    color = MaterialTheme.colors.onBackground,
+                    maxLines = 2
+                )
+            }
+        },
+        modifier = modifier,
+        onClick = onClick
+    )
+}
+
+@Composable
+fun ListItem(
+    card: Card,
+    title: String,
+    subtitle: (@Composable () -> Unit)? = null,
     modifier: Modifier = Modifier,
     onClick: () -> Unit
 ) {
@@ -94,7 +113,7 @@ fun ListItem(
 
         Column(
             modifier = Modifier.fillMaxWidth()
-                .padding(horizontal = 16.dp)
+                .padding(horizontal = ContentPadding)
         ) {
             Text(
                 text = title,
@@ -103,17 +122,20 @@ fun ListItem(
                 color = MaterialTheme.colors.onBackground
             )
 
-            subtitle?.let {
-                Text(
-                    modifier = Modifier.padding(top = 4.dp),
-                    text = it,
-                    style = MaterialTheme.typography.subtitle1,
-                    color = MaterialTheme.colors.onBackground,
-                    maxLines = 2
-                )
-            }
+            subtitle?.let { it() }
         }
     }
+}
+
+@Composable
+private fun Subtitle(text: String, modifier: Modifier = Modifier) {
+    Text(
+        modifier = modifier,
+        text = text,
+        style = MaterialTheme.typography.subtitle1,
+        color = MaterialTheme.colors.onBackground,
+        maxLines = 2
+    )
 }
 
 fun Modifier.noRippleClickable(onClick: () -> Unit): Modifier = composed {

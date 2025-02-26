@@ -19,6 +19,7 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.rounded.Delete
 import androidx.compose.material.icons.rounded.Refresh
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -29,8 +30,10 @@ import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
-import kotlinx.datetime.LocalDateTime
-import kotlinx.datetime.format
+import kotlinx.coroutines.delay
+import kotlinx.datetime.Instant
+import kotlinx.datetime.TimeZone
+import kotlinx.datetime.toLocalDateTime
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.cards_in_collection
 import marvelchampionscompanion.shared.generated.resources.cards_in_database
@@ -44,6 +47,7 @@ import marvelchampionscompanion.shared.generated.resources.more
 import marvelchampionscompanion.shared.generated.resources.my_decks
 import marvelchampionscompanion.shared.generated.resources.owned_packs
 import marvelchampionscompanion.shared.generated.resources.sync_with_marvelcdb
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.design.compose.ConfirmationDialog
 import net.schacher.mcc.shared.design.compose.Header
 import net.schacher.mcc.shared.design.compose.OptionsEntry
@@ -55,6 +59,7 @@ import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.screens.settings.MoreViewModel.UiState
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.viewmodel.koinViewModel
+import kotlin.time.Duration.Companion.seconds
 
 private const val GRID_CELL_SIZE = 2
 
@@ -159,7 +164,23 @@ fun MoreScreen(
                         text = if (state.guestLogin) {
                             stringResource(Res.string.login)
                         } else {
-                            stringResource(Res.string.logout)
+                            var timeLeft by remember { mutableStateOf(state.sessionExpiresIn) }
+                            AppLogger.d { timeLeft.toString() }
+                            LaunchedEffect(timeLeft) {
+                                val remaining = timeLeft ?: return@LaunchedEffect
+                                while (remaining > 0.seconds) {
+                                    delay(1.seconds)
+                                    timeLeft = remaining - 1.seconds
+                                }
+                            }
+
+                            val formatedTime = timeLeft?.inWholeMilliseconds?.let {
+                                val instant = Instant.fromEpochMilliseconds(it)
+                                    .toLocalDateTime(TimeZone.currentSystemDefault())
+                                "${instant.time.hour}h ${instant.time.minute} min"
+                            }
+
+                            "${stringResource(Res.string.logout)} | $formatedTime"
                         }
                     )
                 }
@@ -172,15 +193,6 @@ fun MoreScreen(
                     color = MaterialTheme.colors.onBackground,
                     text = state.versionName
                 )
-
-                state.sessionExpiresAt?.let {
-                    Text(
-                        modifier = Modifier.padding(16.dp).fillMaxWidth().alpha(0.5f),
-                        textAlign = TextAlign.Center,
-                        color = MaterialTheme.colors.onBackground,
-                        text = it.format(LocalDateTime.Formats.ISO)
-                    )
-                }
             }
         }
     }
