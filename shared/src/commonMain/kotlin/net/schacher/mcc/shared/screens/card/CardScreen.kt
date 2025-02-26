@@ -92,10 +92,10 @@ fun CardScreen(
         foundInDecks = state.value.foundInDecks,
         modifier = modifier,
         onCloseClick = { navController.popBackStack() },
-        onLinkedCardClick = { navController.navigate("card/${it}") },
+        onLinkedCardClick = { navController.navigate(AppRoute.toCard(it)) },
         onAddToDeckClick = { navController.navigate(AppRoute.SelectDeck) }
             .takeIf { state.value.canAddToDeck },
-        onDeckClick = { navController.navigate("deck/${it.id}") }
+        onDeckClick = { navController.navigate(AppRoute.toDeck(it.id)) }
     )
 }
 
