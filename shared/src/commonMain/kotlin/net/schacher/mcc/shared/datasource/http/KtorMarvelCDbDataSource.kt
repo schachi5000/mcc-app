@@ -232,6 +232,10 @@ class KtorMarvelCDbDataSource(
             headers { append(AUTHORIZATION, authHeader) }
         }
     }
+
+    override suspend fun getCardImage(cardCode: String): Result<ByteArray> = withContextSafe {
+        httpClient.get("$serviceUrl/cards/$cardCode/image").body<ByteArray>()
+    }
 }
 
 class ServiceException(val status: Int, message: String) : IOException("[${status}] $message")

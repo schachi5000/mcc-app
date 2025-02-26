@@ -146,6 +146,19 @@ class DatabaseDao(
             }
         }
 
+    private val cardCache = mutableMapOf<String, ByteArray>()
+
+    override suspend fun getCardImage(cardCode: String): ByteArray? {
+        return cardCache[cardCode]?.also {
+            AppLogger.d(TAG) { "Retrieving image for $cardCode from cache" }
+        }
+    }
+
+    override suspend fun addCardImage(cardCode: String, image: ByteArray) {
+        AppLogger.d(TAG) { "Adding image to cache for $cardCode" }
+        cardCache[cardCode] = image
+    }
+
     override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
         AppLogger.i { "Deleting all decks from database" }
         dbQuery.removeAllPacks()

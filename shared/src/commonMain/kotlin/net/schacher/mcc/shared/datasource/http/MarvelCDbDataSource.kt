@@ -35,4 +35,6 @@ interface MarvelCDbDataSource {
     suspend fun updateDeck(deck: Deck,  cardProvider: suspend (List<String>) -> List<Card>): Result<Deck>
 
     suspend fun deleteDeck(deckId: Int): Result<Unit>
+
+    suspend fun getCardImage(cardCode: String): Result<ByteArray>
 }
