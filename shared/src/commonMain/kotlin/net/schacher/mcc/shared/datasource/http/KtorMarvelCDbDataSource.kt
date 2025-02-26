@@ -154,20 +154,22 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getSpotlightDecksByDate(
         date: LocalDate,
-        cardProvider: suspend (String) -> Card
+        cardProvider: suspend (List<String>) -> List<Card>
     ) = withContextSafe {
         httpClient.get("$serviceUrl/decks/spotlight") {
             parameter("date", date.toDateString())
         }
             .body<List<DeckDto>>()
-            .map { it.toDeck(cardProvider) }
+            .map {
+                it.toDeck(cardProvider)
+            }
     }.also {
         it.exceptionOrNull()?.let {
             AppLogger.e(it) { "Failed to get spotlight decks" }
         }
     }
 
-    override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
+    override suspend fun getUserDecks(cardProvider: suspend (List<String>) -> List<Card>) =
         withContextSafe {
             httpClient
                 .get("$serviceUrl/decks") {
@@ -184,7 +186,7 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getUserDeckById(
         deckId: Int,
-        cardProvider: suspend (String) -> Card
+        cardProvider: suspend (List<String>) -> List<Card>
     ) = runCatching {
         this.getUserDeckDtoById(deckId).getOrThrow().toDeck(cardProvider)
     }
@@ -206,7 +208,10 @@ class KtorMarvelCDbDataSource(
                 .deckId
         }
 
-    override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card) =
+    override suspend fun updateDeck(
+        deck: Deck,
+        cardProvider: suspend (List<String>) -> List<Card>
+    ) =
         withContextSafe {
             val slots = deck.cards.toMutableList()
                 .also { it.removeAll { it.code == deck.hero.code } }
@@ -295,8 +300,14 @@ private fun String?.toCardType(): CardType? = when (this) {
     else -> null
 }
 
-private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck {
-    val heroCard = cardProvider(this.heroCode!!)
+private suspend fun DeckDto.toDeck(cardProvider: suspend (List<String>) -> List<Card>): Deck {
+    val cardCodes = mutableListOf(this.heroCode!!).also {
+        it.addAll(this.slots?.keys ?: emptyList())
+    }
+
+    val uniqueCardsInDeck = cardProvider.invoke(cardCodes)
+    val heroCard = uniqueCardsInDeck.find { it.code == this.heroCode }
+        ?: throw IllegalStateException("Hero not found")
 
     return Deck(id = this.id,
         name = this.name,
@@ -305,7 +316,8 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
         cards = (this.slots ?: emptyMap()).entries
             .map { entry ->
                 List(entry.value) {
-                    cardProvider(entry.key)
+                    uniqueCardsInDeck.find { it.code == entry.key }
+                        ?: throw IllegalStateException("Card not found: ${entry.key}")
                 }
             }
             .flatten()

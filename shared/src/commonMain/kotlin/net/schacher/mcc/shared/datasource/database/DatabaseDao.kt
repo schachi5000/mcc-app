@@ -51,73 +51,81 @@ class DatabaseDao(
 
     override suspend fun addCard(card: Card) {
         measuringWithContext(Dispatchers.IO, "addCard", TAG) {
-            dbQuery.addCard(
-                code = card.code,
-                position = card.position.toLong(),
-                type = card.type?.name,
-                cardSetCode = card.setCode,
-                cardSetName = card.setName,
-                packCode = card.packCode,
-                packName = card.packName,
-                name = card.name,
-                cost = card.cost?.toLong(),
-                aspect = card.aspect?.name,
-                text = card.text,
-                boostText = card.boostText,
-                attackText = card.attackText,
-                quote = card.quote,
-                traits = card.traits,
-                imagePath = card.imagePath,
-                faction = card.faction.name,
-                linkedCardCode = card.linkedCard?.code,
-                primaryColor = card.primaryColor,
-                secondaryColor = card.secondaryColor
-            )
-
-            card.linkedCard?.let {
+            database.transaction {
                 dbQuery.addCard(
-                    code = it.code,
-                    position = it.position.toLong(),
-                    type = it.type?.name,
-                    cardSetCode = it.setCode,
-                    cardSetName = it.setName,
-                    packCode = it.packCode,
-                    packName = it.packName,
-                    name = it.name,
-                    cost = it.cost?.toLong(),
-                    aspect = it.aspect?.name,
-                    text = it.text,
-                    boostText = it.boostText,
-                    attackText = it.attackText,
-                    quote = it.quote,
-                    traits = it.traits,
-                    imagePath = it.imagePath,
-                    faction = it.faction.name,
-                    linkedCardCode = it.linkedCard?.code,
-                    primaryColor = it.primaryColor,
-                    secondaryColor = it.secondaryColor
+                    code = card.code,
+                    position = card.position.toLong(),
+                    type = card.type?.name,
+                    cardSetCode = card.setCode,
+                    cardSetName = card.setName,
+                    packCode = card.packCode,
+                    packName = card.packName,
+                    name = card.name,
+                    cost = card.cost?.toLong(),
+                    aspect = card.aspect?.name,
+                    text = card.text,
+                    boostText = card.boostText,
+                    attackText = card.attackText,
+                    quote = card.quote,
+                    traits = card.traits,
+                    imagePath = card.imagePath,
+                    faction = card.faction.name,
+                    linkedCardCode = card.linkedCard?.code,
+                    primaryColor = card.primaryColor,
+                    secondaryColor = card.secondaryColor
                 )
+
+                card.linkedCard?.let {
+                    dbQuery.addCard(
+                        code = it.code,
+                        position = it.position.toLong(),
+                        type = it.type?.name,
+                        cardSetCode = it.setCode,
+                        cardSetName = it.setName,
+                        packCode = it.packCode,
+                        packName = it.packName,
+                        name = it.name,
+                        cost = it.cost?.toLong(),
+                        aspect = it.aspect?.name,
+                        text = it.text,
+                        boostText = it.boostText,
+                        attackText = it.attackText,
+                        quote = it.quote,
+                        traits = it.traits,
+                        imagePath = it.imagePath,
+                        faction = it.faction.name,
+                        linkedCardCode = it.linkedCard?.code,
+                        primaryColor = it.primaryColor,
+                        secondaryColor = it.secondaryColor
+                    )
+                }
             }
         }
     }
 
-    override suspend fun getCardByCode(cardCode: String): Card? =
-        measuringWithContext(Dispatchers.IO, "getCardByCode", TAG) {
-            val cardEntry = dbQuery.selectCardByCode(cardCode).executeAsOneOrNull()
-            val linkedCard = cardEntry?.linkedCardCode?.let {
-                dbQuery.selectCardByCode(it)
-                    .executeAsOneOrNull()
-                    ?.toCard()
-            }
+    override suspend fun getCardsByCodes(cardCodes: List<String>): List<Card> =
+        measuringWithContext(Dispatchers.IO, "getCardsByCodes[${cardCodes.size}]", TAG) {
+            dbQuery.selectCardsByCodes(cardCodes)
+                .executeAsList()
+                .map {
+                    val card = it.toCard()
+                    var linkedCard = it.linkedCardCode?.let {
+                        dbQuery.selectCardByCode(it).executeAsOneOrNull()?.toCard()
+                    }
 
-            val card = cardEntry?.toCard()
-            card?.copy(
-                linkedCard = linkedCard?.copy(
-                    linkedCard = card
-                )
-            )
+                    linkedCard = linkedCard?.copy(
+                        linkedCard = card
+                    )
+
+                    card.copy(
+                        linkedCard = linkedCard
+                    )
+                }
+
         }
 
+    override suspend fun getCardByCode(cardCode: String): Card? =
+        this.getCardsByCodes(listOf(cardCode)).firstOrNull()
 
     override fun getCards(): Flow<List<Card>> = dbQuery.selectAllCards()
         .asFlow()
@@ -215,7 +223,7 @@ class DatabaseDao(
     }
 
     private suspend fun getCardsByPackCode(packCode: String): List<Card> =
-        measuringWithContext(Dispatchers.IO, "getCardsByPackCode", TAG) {
+        measuringWithContext(Dispatchers.IO, "getCardsByPackCode[$packCode]", TAG) {
             dbQuery.selectCardsByPackCode(packCode)
                 .executeAsList()
                 .map {

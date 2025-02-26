@@ -76,7 +76,7 @@ class DeckRepository(
         )
 
         val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck) {
-            cardRepository.getCard(it)
+            cardRepository.getCards(it)
         }.getOrThrow()
 
         _decks.update { it.toMutableList().replace(deck, updateDeck) }
@@ -96,7 +96,7 @@ class DeckRepository(
         )
 
         val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck) {
-            cardRepository.getCard(it)
+            cardRepository.getCards(it)
         }.getOrThrow()
 
         _decks.update { it.toMutableList().replace(deck, updateDeck) }
@@ -105,7 +105,7 @@ class DeckRepository(
 
     suspend fun refreshAllUserDecks() {
         val decks = this.marvelCDbDataSource.getUserDecks {
-            this.cardRepository.getCard(it)
+            this.cardRepository.getCards(it)
         }.getOrNull() ?: return
 
         _decks.emit(decks)

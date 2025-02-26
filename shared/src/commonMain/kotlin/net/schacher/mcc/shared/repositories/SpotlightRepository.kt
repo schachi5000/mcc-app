@@ -30,7 +30,7 @@ class SpotlightRepository(
                     }
 
                     marvelCDbDataSource.getSpotlightDecksByDate(localDate) {
-                        cardRepository.getCard(it)
+                        cardRepository.getCards(it)
                     }
                         .getOrNull()
                         ?.also { send(Pair(localDate, it)) }

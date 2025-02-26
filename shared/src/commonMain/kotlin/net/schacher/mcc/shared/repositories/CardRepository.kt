@@ -12,6 +12,10 @@ class CardRepository(
     private val marvelCDbDataSource: MarvelCDbDataSource,
     scope: CoroutineScope
 ) {
+    companion object {
+        const val TAG = "CardRepository"
+    }
+
     val cards = this.cardDatabaseDao.getCards().stateIn(
         scope = scope,
         started = SharingStarted.WhileSubscribed(),
@@ -20,6 +24,21 @@ class CardRepository(
 
     suspend fun deleteAllCardData() {
         this.cardDatabaseDao.wipeCardTable()
+    }
+
+    suspend fun getCards(cardCodes: List<String>): List<Card> {
+        val databaseCards = this.cardDatabaseDao.getCardsByCodes(cardCodes)
+        val missingCardCodes = cardCodes.filter { cardCode ->
+            databaseCards.all { it.code != cardCode }
+        }
+
+        val serverCards = missingCardCodes.map {
+            this.marvelCDbDataSource.getCard(it).getOrThrow().also { newCard ->
+                this.cardDatabaseDao.addCard(newCard)
+            }
+        }
+
+        return databaseCards + serverCards
     }
 
     suspend fun getCard(cardCode: String): Card {
