@@ -36,6 +36,8 @@ class SpotlightViewModel(
     }
 
     fun onRefresh() {
+        return
+
         if (this.state.value.loading) {
             return
         }

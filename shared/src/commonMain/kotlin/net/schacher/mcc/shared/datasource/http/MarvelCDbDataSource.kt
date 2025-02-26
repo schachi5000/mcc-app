@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.datasource.http
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.datetime.LocalDate
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
@@ -7,7 +8,11 @@ import net.schacher.mcc.shared.model.Pack
 
 interface MarvelCDbDataSource {
 
-    suspend fun getAllPacks(): Result<List<Pack>>
+    suspend fun getAllPackCodes(): Result<List<String>>
+
+    fun getPacks(packCodes: List<String>): Flow<Pack>
+
+    fun getAllPacks(): Flow<Pack>
 
     suspend fun getCardsInPack(packCode: String): Result<List<Card>>
 

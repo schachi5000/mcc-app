@@ -23,7 +23,6 @@ fun <T> measureAndLog(label: String? = null, block: () -> T): T = measureTimedVa
     .also { logDuration(label, it.duration) }
     .value
 
-
 suspend fun <T> measuringWithContext(
     dispatcher: CoroutineDispatcher,
     label: String? = null,

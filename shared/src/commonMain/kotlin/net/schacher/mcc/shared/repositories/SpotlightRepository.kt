@@ -19,6 +19,10 @@ class SpotlightRepository(
         this.state.value.values.flatten().find { it.id == deckId }
 
     suspend fun getSpotlightDecks(localDate: LocalDate): List<Deck> {
+        this.state.value[localDate]?.let {
+            return it
+        }
+
         val spotlight = this.marvelCDbDataSource.getSpotlightDecksByDate(localDate) {
             this.cardRepository.getCard(it)
         }.getOrNull()

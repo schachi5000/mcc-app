@@ -16,8 +16,9 @@ import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.channelFlow
+import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.encodeToString
@@ -66,28 +67,55 @@ class KtorMarvelCDbDataSource(
         get() = this.authRepository.accessToken?.token?.let { "Bearer $it" }
             ?: throw IllegalStateException("No access token available")
 
-
-    override suspend fun getAllPacks() = withContextSafe {
+    override suspend fun getAllPackCodes(): Result<List<String>> = withContextSafe {
         httpClient.get("$serviceUrl/packs")
             .body<List<PackDto>>()
-            .map {
-                async(Dispatchers.IO) {
-                    AppLogger.d { "Processing Pack: ${it.name}" }
-                    val cards = getCardsInPack(it.code).getOrThrow()
+            .map { it.code }
+    }
 
-                    Pack(
-                        id = it.id,
-                        code = it.code,
-                        name = it.name,
-                        cards = cards,
-                        cardCodes = cards.map { it.code },
-                        position = it.position
-                    ).also {
-                        AppLogger.d { "Processing done: ${it.name}" }
-                    }
+    override fun getPacks(packCodes: List<String>) = channelFlow {
+        httpClient.get("$serviceUrl/packs").body<List<PackDto>>()
+            .filter { packCodes.contains(it.code) }
+            .forEach { packDto ->
+                launch {
+                    AppLogger.d { "Processing Pack: ${packDto.name}" }
+                    val cards = getCardsInPack(packDto.code).getOrThrow()
+
+                    send(
+                        Pack(
+                            id = packDto.id,
+                            code = packDto.code,
+                            name = packDto.name,
+                            cards = cards,
+                            cardCodes = cards.map { it.code },
+                            position = packDto.position
+                        )
+                    )
                 }
+                AppLogger.d { "Processing done: ${packDto.name}" }
             }
-            .awaitAll()
+    }
+
+    override fun getAllPacks(): Flow<Pack> = channelFlow {
+        httpClient.get("$serviceUrl/packs").body<List<PackDto>>()
+            .forEach { packDto ->
+                launch {
+                    AppLogger.d { "Processing Pack: ${packDto.name}" }
+                    val cards = getCardsInPack(packDto.code).getOrThrow()
+
+                    send(
+                        Pack(
+                            id = packDto.id,
+                            code = packDto.code,
+                            name = packDto.name,
+                            cards = cards,
+                            cardCodes = cards.map { it.code },
+                            position = packDto.position
+                        )
+                    )
+                }
+                AppLogger.d { "Processing done: ${packDto.name}" }
+            }
     }
 
     override suspend fun getCardsInPack(packCode: String) = withContextSafe {

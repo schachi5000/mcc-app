@@ -11,9 +11,9 @@ import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
 import io.ktor.client.request.headers
+import io.ktor.client.statement.bodyAsText
 import io.ktor.http.HttpStatusCode
 import io.ktor.serialization.kotlinx.json.json
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.json.Json
 import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
@@ -23,7 +23,6 @@ private const val REQUEST_TIMEOUT_MS = 10000L
 private const val MAX_RETRY_DELAY_MS = 10000L
 private const val MAX_RETRIES = 1
 
-@OptIn(ExperimentalSerializationApi::class)
 val DefaultClient = HttpClient {
     install(ContentNegotiation) {
         json(Json {
@@ -55,10 +54,13 @@ val DefaultClient = HttpClient {
     HttpResponseValidator {
         validateResponse { response ->
             if (response.status != HttpStatusCode.OK) {
-                val error = response.body<ErrorResponseDto>()
+                val errorMessage = runCatching {
+                    response.body<ErrorResponseDto>()
+                }.getOrNull()?.message ?: response.bodyAsText()
+
                 throw ServiceException(
                     status = response.status.value,
-                    message = "${response.status} - ${error.message}"
+                    message = "${response.status} - $errorMessage"
                 )
             }
         }

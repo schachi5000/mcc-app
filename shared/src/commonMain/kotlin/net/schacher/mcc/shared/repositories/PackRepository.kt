@@ -27,13 +27,14 @@ class PackRepository(
     )
 
     suspend fun refreshAllPacks() {
-        val newPacks = this.marvelCDbDataSource.getAllPacks().getOrThrow()
-
-        AppLogger.i { "${newPacks.size} packs loaded" }
-        try {
-            this.packDatabaseDao.addPacks(newPacks)
-        } catch (e: Exception) {
-            AppLogger.e { "Error adding packs to database: ${e.message}" }
+        AppLogger.d("PackRepository") { "Refreshing all packs" }
+        this.marvelCDbDataSource.getAllPacks().collect {
+            AppLogger.i("PackRepository") { "Pack [${it.name}] loaded" }
+            try {
+                this.packDatabaseDao.addPacks(listOf(it))
+            } catch (e: Exception) {
+                AppLogger.e { "Error adding pack [${it.name}] to database: ${e.message}" }
+            }
         }
     }
 
