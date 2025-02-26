@@ -44,6 +44,7 @@ fun CardImage(
     databaseDao: CardDatabaseDao = koinInject(),
     marvelCDbDataSource: MarvelCDbDataSource = koinInject()
 ) {
+
     CompositionLocalProvider(
         LocalKamelConfig provides getKamelConfig(
             databaseDao,
@@ -73,14 +74,14 @@ fun getKamelConfig(
     databaseDao: CardDatabaseDao,
     marvelCDbDataSource: MarvelCDbDataSource
 ) = KamelConfig {
-//    takeFrom(KamelConfig.Default)
     imageBitmapDecoder()
-
     fetcher(object : Fetcher<String> {
         override val inputDataKClass: KClass<String>
             get() = String::class
+
         override val source: DataSource
-            get() = DataSource.Memory
+            get() = DataSource.Disk
+
         override val String.isSupported: Boolean
             get() = true
 
@@ -90,17 +91,13 @@ fun getKamelConfig(
         ): Flow<Resource<ByteReadChannel>> = flow {
             var cardImage = databaseDao.getCardImage(data)
             if (cardImage == null) {
-                cardImage = marvelCDbDataSource.getCardImage(data).getOrNull()?.also {
+                cardImage = marvelCDbDataSource.getCardImage(data).getOrThrow().also {
                     databaseDao.addCardImage(data, it)
                 }
             }
 
-            if (cardImage != null) {
-                val byteReadChannel = ByteReadChannel(cardImage)
-                emit(Resource.Success(byteReadChannel, source))
-            } else {
-                emit(Resource.Failure(Exception("Failed to load image")))
-            }
+            val byteReadChannel = ByteReadChannel(cardImage)
+            emit(Resource.Success(byteReadChannel, source))
         }
     })
 }

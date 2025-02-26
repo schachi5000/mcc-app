@@ -19,6 +19,8 @@ import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.utils.measuringWithContext
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class DatabaseDao(
     databaseDriverFactory: DatabaseDriverFactory,
@@ -146,18 +148,19 @@ class DatabaseDao(
             }
         }
 
-    private val cardCache = mutableMapOf<String, ByteArray>()
-
-    override suspend fun getCardImage(cardCode: String): ByteArray? {
-        return cardCache[cardCode]?.also {
-            AppLogger.d(TAG) { "Retrieving image for $cardCode from cache" }
+    @OptIn(ExperimentalEncodingApi::class)
+    override suspend fun getCardImage(cardCode: String): ByteArray? = withContext(Dispatchers.IO) {
+        dbQuery.getImage(cardCode).executeAsOneOrNull()?.let {
+            Base64.decode(it.base64Image)
         }
     }
 
-    override suspend fun addCardImage(cardCode: String, image: ByteArray) {
-        AppLogger.d(TAG) { "Adding image to cache for $cardCode" }
-        cardCache[cardCode] = image
-    }
+    @OptIn(ExperimentalEncodingApi::class)
+    override suspend fun addCardImage(cardCode: String, image: ByteArray) =
+        withContext(Dispatchers.IO) {
+            val base64 = Base64.encode(image)
+            dbQuery.addImage(cardCode, base64)
+        }
 
     override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
         AppLogger.i { "Deleting all decks from database" }
