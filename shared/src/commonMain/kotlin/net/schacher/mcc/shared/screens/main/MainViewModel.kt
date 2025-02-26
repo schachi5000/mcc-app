@@ -16,7 +16,11 @@ class MainViewModel(
     private val authRepository: AuthRepository,
 ) : ViewModel() {
 
-    private val _state = MutableStateFlow(UiState())
+    private val _state = MutableStateFlow(
+        UiState(
+            mainScreen = if (authRepository.isSignedInAsUser()) MyDecks else Spotlight,
+        )
+    )
 
     val state = _state.asStateFlow()
 
@@ -25,10 +29,10 @@ class MainViewModel(
     val event = _event.asSharedFlow()
 
     init {
-        this.viewModelScope.launchAndCollect(this.authRepository.loginState) { loggedIn ->
+        this.viewModelScope.launchAndCollect(this.authRepository.loginState) {
             _state.update {
                 it.copy(
-                    mainScreen = if (loggedIn) MyDecks else Spotlight,
+                    mainScreen = if (authRepository.isSignedInAsUser()) MyDecks else Spotlight,
                 )
             }
         }
@@ -49,7 +53,7 @@ class MainViewModel(
     }
 
     data class UiState(
-        val mainScreen: MainScreen = Spotlight,
+        val mainScreen: MainScreen,
     ) {
         sealed interface MainScreen {
             data object Spotlight : MainScreen

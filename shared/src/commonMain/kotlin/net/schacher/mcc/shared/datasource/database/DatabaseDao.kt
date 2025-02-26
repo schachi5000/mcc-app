@@ -244,6 +244,11 @@ class DatabaseDao(
                     .map { it.code }
             }
 
+    override suspend fun hasPack(packCode: String): Boolean =
+        measuringWithContext(Dispatchers.IO, "hasPack", TAG) {
+            dbQuery.getPack(packCode).executeAsOneOrNull() != null
+        }
+
     override suspend fun hasPackInCollection(packCode: String): Boolean =
         measuringWithContext(Dispatchers.IO, "hasPackInCollection", TAG) {
             dbQuery.getPack(packCode).executeAsOneOrNull()?.inPosession.toBoolean()

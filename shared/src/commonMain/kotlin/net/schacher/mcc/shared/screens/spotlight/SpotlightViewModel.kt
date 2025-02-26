@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.screens.spotlight
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
@@ -36,8 +37,6 @@ class SpotlightViewModel(
     }
 
     fun onRefresh() {
-        return
-
         if (this.state.value.loading) {
             return
         }
@@ -52,18 +51,20 @@ class SpotlightViewModel(
         this.viewModelScope.launch {
             val updatedDecks = mutableMapOf<LocalDate, List<Deck>>()
             dates.forEach { date ->
-                val spotlightDecks = spotlightRepository.getSpotlightDecks(date)
+                async {
+                    val spotlightDecks = spotlightRepository.getSpotlightDecks(date)
 
-                if (spotlightDecks.isNotEmpty()) {
-                    updatedDecks[date] = spotlightDecks
-                }
+                    if (spotlightDecks.isNotEmpty()) {
+                        updatedDecks[date] = spotlightDecks
+                    }
 
-                _state.update {
-                    it.copy(
-                        decks = updatedDecks,
-                        loading = updatedDecks.isNotEmpty()
-                    )
-                }
+                    _state.update {
+                        it.copy(
+                            decks = updatedDecks,
+                            loading = updatedDecks.isNotEmpty()
+                        )
+                    }
+                }.await()
             }
 
             _state.update {

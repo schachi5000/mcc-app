@@ -14,6 +14,8 @@ interface PackDatabaseDao {
 
     suspend fun removePackFromCollection(packCode: String)
 
+    suspend fun hasPack(packCode: String): Boolean
+
     suspend fun hasPackInCollection(packCode: String): Boolean
 
     suspend fun wipePackTable()

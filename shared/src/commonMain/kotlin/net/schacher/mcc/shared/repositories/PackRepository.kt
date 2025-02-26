@@ -8,6 +8,7 @@ import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Card
+import kotlin.time.measureTimedValue
 
 class PackRepository(
     private val packDatabaseDao: PackDatabaseDao,
@@ -28,7 +29,15 @@ class PackRepository(
 
     suspend fun refreshAllPacks() {
         AppLogger.d("PackRepository") { "Refreshing all packs" }
-        this.marvelCDbDataSource.getAllPacks().collect {
+        val packCodes = measureTimedValue {
+            this.marvelCDbDataSource.getAllPackCodes().getOrNull() ?: emptyList()
+        }.also {
+            AppLogger.d("PackRepository") { "All pack codes loaded in ${it.duration}" }
+        }.value
+
+        val unknownPackCodes = packCodes.filter { !this.packDatabaseDao.hasPack(it) }
+
+        this.marvelCDbDataSource.getPacks(unknownPackCodes).collect {
             AppLogger.i("PackRepository") { "Pack [${it.name}] loaded" }
             try {
                 this.packDatabaseDao.addPacks(listOf(it))

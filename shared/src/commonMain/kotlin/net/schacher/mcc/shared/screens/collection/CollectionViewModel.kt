@@ -48,10 +48,9 @@ class CollectionViewModel(
 
     private fun refresh() {
         this.viewModelScope.launch {
-            val cards = getFilteredCards(_state.value.filters
-                .filter { it.active }
-                .toMutableList()
-            )
+            val activeFilter = _state.value.filters.filter { it.active }
+            val cards = getFilteredCards(activeFilter)
+
             _state.update {
                 it.copy(cardsInCollection = cards)
             }
