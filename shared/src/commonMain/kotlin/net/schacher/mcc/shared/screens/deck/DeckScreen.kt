@@ -73,6 +73,7 @@ import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption.REMOVE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.DeckOption.DELETE
@@ -155,7 +156,7 @@ fun DeckScreen(
         Content(
             state = state,
             onCloseClick = { navController.popBackStack() },
-            onCardClick = { navController.navigate("card/${it.code}") },
+            onCardClick = { navController.navigate(AppRoute.toCard(it.code)) },
             onCardOptionsClick = onShowCardOptions,
             onDeleteDeckClicked = { deleteDialog = true }
         )

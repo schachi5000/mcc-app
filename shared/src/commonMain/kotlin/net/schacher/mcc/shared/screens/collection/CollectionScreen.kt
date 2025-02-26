@@ -41,8 +41,8 @@ import marvelchampionscompanion.shared.generated.resources.select_packs
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
-import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.maxSpanItem
 import net.schacher.mcc.shared.design.theme.ContentPadding
@@ -62,7 +62,7 @@ fun CollectionScreen(
     navController: NavController = koinInject(),
     topInset: Dp = ContentPadding,
     bottomSheetDelegate: BottomSheetDelegate,
-    onCardClicked: (Card) -> Unit
+    onCardClicked: ((Card) -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -70,7 +70,9 @@ fun CollectionScreen(
         state = state,
         navController = navController,
         topInset = topInset,
-        onCardClicked = onCardClicked,
+        onCardClicked = onCardClicked ?: { card ->
+            navController.navigate(AppRoute.toCard(card.code))
+        },
         bottomSheetDelegate = bottomSheetDelegate,
         onApplyFilerClick = viewModel::onApplyFilterClicked
     )

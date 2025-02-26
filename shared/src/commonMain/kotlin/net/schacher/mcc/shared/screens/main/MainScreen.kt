@@ -187,9 +187,7 @@ private fun Content(
 
                     Collection -> CollectionScreen(
                         bottomSheetDelegate = bottomSheetDelegate,
-                    ) {
-                        navController.navigate("card/${it.code}")
-                    }
+                    )
 
                     Settings -> MoreScreen(
                         onPackSelectionClick = {
