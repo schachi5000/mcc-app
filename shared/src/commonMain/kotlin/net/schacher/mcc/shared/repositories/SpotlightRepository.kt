@@ -1,8 +1,11 @@
 package net.schacher.mcc.shared.repositories
 
+import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.flow.update
+import kotlinx.coroutines.launch
 import kotlinx.datetime.LocalDate
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Deck
@@ -18,23 +21,27 @@ class SpotlightRepository(
     fun getDeckById(deckId: Int): Deck? =
         this.state.value.values.flatten().find { it.id == deckId }
 
-    suspend fun getSpotlightDecks(localDate: LocalDate): List<Deck> {
-        this.state.value[localDate]?.let {
-            return it
-        }
+    fun getSpotlightDecks(localDates: List<LocalDate>): Flow<Pair<LocalDate, List<Deck>>> =
+        channelFlow {
+            localDates.forEach { localDate ->
+                launch {
+                    state.value[localDate]?.let {
+                        send(Pair(localDate, it))
+                    }
 
-        val spotlight = this.marvelCDbDataSource.getSpotlightDecksByDate(localDate) {
-            this.cardRepository.getCard(it)
-        }.getOrNull()
-
-        if (spotlight != null) {
-            _state.update {
-                it.toMutableMap().apply {
-                    put(localDate, spotlight)
+                    marvelCDbDataSource.getSpotlightDecksByDate(localDate) {
+                        cardRepository.getCard(it)
+                    }
+                        .getOrNull()
+                        ?.also { send(Pair(localDate, it)) }
+                        ?.also { decks ->
+                            _state.update {
+                                it.toMutableMap().apply {
+                                    put(localDate, decks)
+                                }
+                            }
+                        }
                 }
             }
         }
-
-        return spotlight ?: emptyList()
-    }
 }

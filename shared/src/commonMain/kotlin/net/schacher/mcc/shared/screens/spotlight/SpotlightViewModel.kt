@@ -2,9 +2,9 @@ package net.schacher.mcc.shared.screens.spotlight
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import kotlinx.coroutines.async
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -49,27 +49,20 @@ class SpotlightViewModel(
         }
 
         this.viewModelScope.launch {
-            val updatedDecks = mutableMapOf<LocalDate, List<Deck>>()
-            dates.forEach { date ->
-                async {
-                    val spotlightDecks = spotlightRepository.getSpotlightDecks(date)
-
-                    if (spotlightDecks.isNotEmpty()) {
-                        updatedDecks[date] = spotlightDecks
-                    }
-
+            spotlightRepository.getSpotlightDecks(dates)
+                .onCompletion { _state.update { it.copy(loading = false) } }
+                .collect { spotlight ->
                     _state.update {
+                        val newMap = it.decks.toMutableMap().also {
+                            it[spotlight.first] = spotlight.second
+                        }
+
                         it.copy(
-                            decks = updatedDecks,
-                            loading = updatedDecks.isNotEmpty()
+                            decks = newMap,
+                            loading = !newMap.any { it.value.isNotEmpty() }
                         )
                     }
-                }.await()
-            }
-
-            _state.update {
-                it.copy(loading = false)
-            }
+                }
         }
     }
 
