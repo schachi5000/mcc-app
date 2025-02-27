@@ -22,8 +22,7 @@ import io.kamel.image.config.imageBitmapDecoder
 import io.ktor.utils.io.ByteReadChannel
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
-import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
+import net.schacher.mcc.shared.usecases.GetCardImageUseCase
 import org.koin.compose.koinInject
 import kotlin.reflect.KClass
 
@@ -41,15 +40,11 @@ fun CardImage(
     onFailure: @Composable (BoxScope.(Throwable) -> Unit)? = null,
     contentAlignment: Alignment = Alignment.Center,
     animationSpec: FiniteAnimationSpec<Float>? = null,
-    databaseDao: CardDatabaseDao = koinInject(),
-    marvelCDbDataSource: MarvelCDbDataSource = koinInject()
+    getCardImageUseCase: GetCardImageUseCase = koinInject(),
 ) {
 
     CompositionLocalProvider(
-        LocalKamelConfig provides getKamelConfig(
-            databaseDao,
-            marvelCDbDataSource
-        )
+        LocalKamelConfig provides getKamelConfig(getCardImageUseCase)
     ) {
         KamelImage(
             resource = asyncPainterResource(
@@ -70,10 +65,7 @@ fun CardImage(
     }
 }
 
-fun getKamelConfig(
-    databaseDao: CardDatabaseDao,
-    marvelCDbDataSource: MarvelCDbDataSource
-) = KamelConfig {
+fun getKamelConfig(getCardImageUseCase: GetCardImageUseCase) = KamelConfig {
     imageBitmapDecoder()
     fetcher(object : Fetcher<String> {
         override val inputDataKClass: KClass<String>
@@ -89,13 +81,7 @@ fun getKamelConfig(
             data: String,
             resourceConfig: ResourceConfig
         ): Flow<Resource<ByteReadChannel>> = flow {
-            var cardImage = databaseDao.getCardImage(data)
-            if (cardImage == null) {
-                cardImage = marvelCDbDataSource.getCardImage(data).getOrThrow().also {
-                    databaseDao.addCardImage(data, it)
-                }
-            }
-
+            val cardImage = getCardImageUseCase.invoke(data)
             val byteReadChannel = ByteReadChannel(cardImage)
             emit(Resource.Success(byteReadChannel, source))
         }

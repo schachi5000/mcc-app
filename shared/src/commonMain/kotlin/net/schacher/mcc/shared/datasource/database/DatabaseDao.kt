@@ -221,7 +221,7 @@ class DatabaseDao(
     }
 
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
-        val hasPackInCollection = hasPackInCollection(pack.code)
+        val hasPackInCollection = isPackInPossession(pack.code)
 
         AppLogger.i {
             "Adding pack ${pack.name} to database - hasPackInCollection:$hasPackInCollection"
@@ -273,9 +273,9 @@ class DatabaseDao(
             dbQuery.getPack(packCode).executeAsOneOrNull() != null
         }
 
-    override suspend fun hasPackInCollection(packCode: String): Boolean =
+    override suspend fun isPackInPossession(packCode: String): Boolean =
         measuringWithContext(Dispatchers.IO, "hasPackInCollection", TAG) {
-            dbQuery.getPack(packCode).executeAsOneOrNull()?.inPosession.toBoolean()
+            dbQuery.isPackInPossession(packCode).executeAsOneOrNull().toBoolean()
         }
 }
 
