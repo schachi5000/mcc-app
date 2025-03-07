@@ -18,6 +18,8 @@ interface MarvelCDbDataSource {
 
     suspend fun getCard(cardCode: String): Result<Card>
 
+    suspend fun getCards(cardCodes: List<String>): Result<List<Card>>
+
     suspend fun getSpotlightDecksByDate(
         date: LocalDate,
         cardProvider: suspend (List<String>) -> List<Card>
@@ -32,7 +34,10 @@ interface MarvelCDbDataSource {
 
     suspend fun createDeck(heroCardCode: String, deckName: String? = null): Result<Int>
 
-    suspend fun updateDeck(deck: Deck,  cardProvider: suspend (List<String>) -> List<Card>): Result<Deck>
+    suspend fun updateDeck(
+        deck: Deck,
+        cardProvider: suspend (List<String>) -> List<Card>
+    ): Result<Deck>
 
     suspend fun deleteDeck(deckId: Int): Result<Unit>
 

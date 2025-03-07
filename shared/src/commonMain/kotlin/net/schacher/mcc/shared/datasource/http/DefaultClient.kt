@@ -7,6 +7,7 @@ import io.ktor.client.plugins.DefaultRequest
 import io.ktor.client.plugins.HttpRequestRetry
 import io.ktor.client.plugins.HttpResponseValidator
 import io.ktor.client.plugins.HttpTimeout
+import io.ktor.client.plugins.compression.ContentEncoding
 import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
 import io.ktor.client.plugins.logging.LogLevel
 import io.ktor.client.plugins.logging.Logging
@@ -19,8 +20,8 @@ import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
 
 private const val TAG = "HttpClient"
-private const val REQUEST_TIMEOUT_MS = 10000L
-private const val MAX_RETRY_DELAY_MS = 10000L
+private const val REQUEST_TIMEOUT_MS = 5000L
+private const val MAX_RETRY_DELAY_MS = 5000L
 private const val MAX_RETRIES = 1
 
 val DefaultClient = HttpClient {
@@ -29,6 +30,10 @@ val DefaultClient = HttpClient {
             ignoreUnknownKeys = true
             explicitNulls = false
         })
+    }
+    install(ContentEncoding) {
+        gzip()
+        deflate()
     }
     install(DefaultRequest) {
         headers {
@@ -60,7 +65,7 @@ val DefaultClient = HttpClient {
 
                 throw ServiceException(
                     status = response.status.value,
-                    message = "${response.status} - $errorMessage"
+                    message = errorMessage
                 )
             }
         }

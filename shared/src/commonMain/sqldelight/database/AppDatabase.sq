@@ -1,7 +1,3 @@
-import database.Card;
-import kotlin.String;
-import kotlin.collections.List;
-
 --- Cards
 CREATE TABLE Card (
     code TEXT NOT NULL PRIMARY KEY,
