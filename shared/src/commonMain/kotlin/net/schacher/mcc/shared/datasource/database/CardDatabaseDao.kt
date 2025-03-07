@@ -14,5 +14,9 @@ interface CardDatabaseDao {
 
     suspend fun getCardByCode(cardCode: String): Card?
 
+    suspend fun addCardImage(cardCode: String, image: ByteArray)
+
+    suspend fun getCardImage(cardCode: String): ByteArray?
+
     suspend fun wipeCardTable()
 }

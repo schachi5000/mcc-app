@@ -19,6 +19,8 @@ import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.utils.measuringWithContext
+import kotlin.io.encoding.Base64
+import kotlin.io.encoding.ExperimentalEncodingApi
 
 class DatabaseDao(
     databaseDriverFactory: DatabaseDriverFactory,
@@ -146,6 +148,20 @@ class DatabaseDao(
             }
         }
 
+    @OptIn(ExperimentalEncodingApi::class)
+    override suspend fun getCardImage(cardCode: String): ByteArray? = withContext(Dispatchers.IO) {
+        dbQuery.getImage(cardCode).executeAsOneOrNull()?.let {
+            Base64.decode(it.base64Image)
+        }
+    }
+
+    @OptIn(ExperimentalEncodingApi::class)
+    override suspend fun addCardImage(cardCode: String, image: ByteArray) =
+        withContext(Dispatchers.IO) {
+            val base64 = Base64.encode(image)
+            dbQuery.addImage(cardCode, base64)
+        }
+
     override suspend fun wipePackTable() = withContext(Dispatchers.IO) {
         AppLogger.i { "Deleting all decks from database" }
         dbQuery.removeAllPacks()
@@ -205,7 +221,7 @@ class DatabaseDao(
     }
 
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
-        val hasPackInCollection = hasPackInCollection(pack.code)
+        val hasPackInCollection = isPackInPossession(pack.code)
 
         AppLogger.i {
             "Adding pack ${pack.name} to database - hasPackInCollection:$hasPackInCollection"
@@ -257,9 +273,9 @@ class DatabaseDao(
             dbQuery.getPack(packCode).executeAsOneOrNull() != null
         }
 
-    override suspend fun hasPackInCollection(packCode: String): Boolean =
+    override suspend fun isPackInPossession(packCode: String): Boolean =
         measuringWithContext(Dispatchers.IO, "hasPackInCollection", TAG) {
-            dbQuery.getPack(packCode).executeAsOneOrNull()?.inPosession.toBoolean()
+            dbQuery.isPackInPossession(packCode).executeAsOneOrNull().toBoolean()
         }
 }
 

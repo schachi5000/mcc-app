@@ -32,11 +32,10 @@ class CardRepository(
             databaseCards.all { it.code != cardCode }
         }
 
-        val serverCards = missingCardCodes.map {
-            this.marvelCDbDataSource.getCard(it).getOrThrow().also { newCard ->
-                this.cardDatabaseDao.addCard(newCard)
-            }
-        }
+        val serverCards = this.marvelCDbDataSource.getCards(missingCardCodes).getOrNull()
+            ?.takeIf { it.isNotEmpty() }
+            ?.also { this.cardDatabaseDao.addCards(it) }
+            ?: emptyList()
 
         return databaseCards + serverCards
     }

@@ -1,7 +1,3 @@
-import database.Card;
-import kotlin.String;
-import kotlin.collections.List;
-
 --- Cards
 CREATE TABLE Card (
     code TEXT NOT NULL PRIMARY KEY,
@@ -49,6 +45,21 @@ FROM Card;
 
 removeAllCards:
 DELETE FROM Card;
+
+--- Images
+CREATE TABLE Image (
+    code TEXT NOT NULL PRIMARY KEY,
+    base64Image TEXT NOT NULL
+);
+
+addImage:
+INSERT OR REPLACE INTO Image(code, base64Image)
+VALUES(?, ?);
+
+getImage:
+SELECT *
+FROM Image
+WHERE code = ?;
 
 -- Packs
 CREATE TABLE Pack (

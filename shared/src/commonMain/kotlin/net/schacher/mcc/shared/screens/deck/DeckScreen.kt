@@ -49,7 +49,6 @@ import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.delete
 import marvelchampionscompanion.shared.generated.resources.hero_cards
-import marvelchampionscompanion.shared.generated.resources.other_cards
 import marvelchampionscompanion.shared.generated.resources.remove_card_from_deck
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BackHandler
@@ -75,6 +74,7 @@ import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
+import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption.REMOVE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.DeckOption.DELETE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.DeletingDeck
@@ -114,7 +114,7 @@ fun DeckScreen(
     navController: NavController,
     onShowCardOptions: (Card) -> Unit,
     onCardOptionsDismiss: () -> Unit,
-    onOptionClick: (UiState.CardOption) -> Unit,
+    onOptionClick: (CardOption) -> Unit,
     onDeleteDeckClicked: () -> Unit,
 ) {
 
@@ -215,7 +215,25 @@ private fun Content(
             }
 
             item { HeroCardsSection(state, onCardClick) }
-            item { OtherCardsSection(state, onCardClick, onCardOptionsClick) }
+            item {
+                CardGridSection(
+                    state.aspectCards.firstOrNull()?.aspect?.label ?: "Aspect",
+                    state.aspectCards,
+                    state.cardOptions,
+                    onCardClick,
+                    onCardOptionsClick
+                )
+            }
+
+            item {
+                CardGridSection(
+                    "Basic",
+                    state.basicCards,
+                    state.cardOptions,
+                    onCardClick,
+                    onCardOptionsClick
+                )
+            }
 
             state.deckOptions.find { it == DELETE }?.let {
                 item {
@@ -245,12 +263,14 @@ private fun Content(
 }
 
 @Composable
-private fun OtherCardsSection(
-    state: UiState,
+private fun CardGridSection(
+    title: String,
+    cards: List<Card>,
+    cardOptions: Set<CardOption>,
     onCardClick: (Card) -> Unit,
     onCardOptionsClick: (Card) -> Unit
 ) {
-    if (state.otherCards.isNotEmpty()) {
+    if (cards.isNotEmpty()) {
 
         Column {
             Row(
@@ -259,12 +279,12 @@ private fun OtherCardsSection(
                 horizontalArrangement = Arrangement.SpaceBetween
             ) {
                 HeaderSmall(
-                    title = stringResource(Res.string.other_cards),
-                    subTitle = state.otherCards.size.toString()
+                    title = title,
+                    subTitle = cards.size.toString(),
                 )
             }
 
-            val rows = state.otherCards.chunked(3)
+            val rows = cards.chunked(3)
             for (index in rows.indices) {
                 Row(
                     modifier = Modifier
@@ -287,7 +307,7 @@ private fun OtherCardsSection(
                                 onCardClick(card)
                             }
 
-                            if (state.cardOptions.isNotEmpty()) {
+                            if (cardOptions.isNotEmpty()) {
                                 Icon(
                                     modifier = Modifier
                                         .padding(4.dp)
@@ -300,7 +320,7 @@ private fun OtherCardsSection(
                                         .align(Alignment.TopEnd)
                                         .clickable { onCardOptionsClick(card) },
                                     imageVector = Icons.Default.MoreVert,
-                                    contentDescription = UiState.CardOption.REMOVE.label,
+                                    contentDescription = REMOVE.label,
                                     tint = MaterialTheme.colors.onSurface
                                 )
                             }
@@ -444,8 +464,8 @@ private fun HeroCardsSection(state: UiState, onCardClick: (Card) -> Unit) {
 
 @Composable
 private fun OptionBottomSheet(
-    cardOptions: Set<UiState.CardOption>,
-    onOptionClick: (UiState.CardOption) -> Unit
+    cardOptions: Set<CardOption>,
+    onOptionClick: (CardOption) -> Unit
 ) {
     BottomSheetContainer {
         Column {
@@ -473,7 +493,7 @@ private fun OptionBottomSheet(
     }
 }
 
-private val UiState.CardOption.label
+private val CardOption.label
     @Composable
     get() = when (this) {
         REMOVE -> stringResource(Res.string.remove_card_from_deck)

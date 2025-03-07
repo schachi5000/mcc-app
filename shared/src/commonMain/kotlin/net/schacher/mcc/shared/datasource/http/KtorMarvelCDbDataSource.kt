@@ -25,6 +25,7 @@ import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
 import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.dto.CardDto
+import net.schacher.mcc.shared.datasource.http.dto.CardsRequestDto
 import net.schacher.mcc.shared.datasource.http.dto.CreateDeckRequestDto
 import net.schacher.mcc.shared.datasource.http.dto.CreateDeckResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
@@ -52,6 +53,7 @@ import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.AuthRepository
 import kotlin.coroutines.CoroutineContext
+import kotlin.time.measureTimedValue
 
 class KtorMarvelCDbDataSource(
     private val httpClient: HttpClient,
@@ -74,12 +76,21 @@ class KtorMarvelCDbDataSource(
     }
 
     override fun getPacks(packCodes: List<String>) = channelFlow {
+        if (packCodes.isEmpty()) {
+            close()
+            return@channelFlow
+        }
+
         httpClient.get("$serviceUrl/packs").body<List<PackDto>>()
             .filter { packCodes.contains(it.code) }
             .forEach { packDto ->
                 launch {
-                    AppLogger.d { "Processing Pack: ${packDto.name}" }
-                    val cards = getCardsInPack(packDto.code).getOrThrow()
+                    val cards = measureTimedValue {
+                        AppLogger.d { "Processing Pack: ${packDto.name}" }
+                        getCardsInPack(packDto.code).getOrThrow()
+                    }.also {
+                        AppLogger.d { "Processing done: ${packDto.name} in ${it.duration}" }
+                    }.value
 
                     send(
                         Pack(
@@ -139,6 +150,30 @@ class KtorMarvelCDbDataSource(
         httpClient.get("$serviceUrl/cards/$cardCode")
             .body<CardDto>()
             .let {
+                val card = it.toCard()
+                var linkedCard = it.linkedCard?.toCard()
+
+                linkedCard = linkedCard?.copy(
+                    linkedCard = card
+                )
+
+                card.copy(
+                    linkedCard = linkedCard
+                )
+            }
+    }
+
+    override suspend fun getCards(cardCodes: List<String>) = withContextSafe {
+        if (cardCodes.isEmpty()) {
+            return@withContextSafe emptyList()
+        }
+
+        httpClient.post("$serviceUrl/cards") {
+            contentType(ContentType.Application.Json)
+            setBody(CardsRequestDto(cardCodes))
+        }
+            .body<List<CardDto>>()
+            .map {
                 val card = it.toCard()
                 var linkedCard = it.linkedCard?.toCard()
 
@@ -231,6 +266,10 @@ class KtorMarvelCDbDataSource(
         httpClient.delete("$serviceUrl/decks/${deckId}") {
             headers { append(AUTHORIZATION, authHeader) }
         }
+    }
+
+    override suspend fun getCardImage(cardCode: String): Result<ByteArray> = withContextSafe {
+        httpClient.get("$serviceUrl/cards/$cardCode/image").body<ByteArray>()
     }
 }
 

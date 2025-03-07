@@ -9,6 +9,7 @@ import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.SpotlightRepository
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption.REMOVE
@@ -120,8 +121,12 @@ class DeckScreenViewModel(
             .filter { it.type != CardType.HERO && it.setCode == deck.hero.setCode }
             .sortedBy { it.cost ?: 0 }
 
-        val otherCards: List<Card> = this.deck.cards
-            .filter { it.setCode != deck.hero.setCode }
+        val aspectCards: List<Card> = this.deck.cards
+            .filter { it.setCode != deck.hero.setCode && it.aspect != null }
+            .defaultSort()
+
+        val basicCards: List<Card> = this.deck.cards
+            .filter { it.setCode != deck.hero.setCode && it.faction == Faction.BASIC }
             .defaultSort()
 
         enum class CardOption {
