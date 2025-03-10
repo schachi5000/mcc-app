@@ -47,6 +47,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.basic
 import marvelchampionscompanion.shared.generated.resources.delete
 import marvelchampionscompanion.shared.generated.resources.hero_cards
 import marvelchampionscompanion.shared.generated.resources.remove_card_from_deck
@@ -227,7 +228,7 @@ private fun Content(
 
             item {
                 CardGridSection(
-                    "Basic",
+                    stringResource(Res.string.basic),
                     state.basicCards,
                     state.cardOptions,
                     onCardClick,

@@ -126,5 +126,6 @@ private val previewDeck = Deck(
     cards = listOf(previewCard, previewCard, previewCard),
     version = "1.0",
     problem = null,
+    cardsCodes = listOf(previewCard.code),
     description = null
 )

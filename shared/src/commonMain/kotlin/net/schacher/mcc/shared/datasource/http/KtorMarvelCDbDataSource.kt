@@ -362,6 +362,7 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (List<String>) -> List<
             .flatten()
             .toMutableList()
             .also { it.add(0, heroCard) },
+        cardsCodes = cardCodes.toMutableList().also { it.add(heroCard.code) },
         problem = this.problem,
         version = this.version,
         description = this.description

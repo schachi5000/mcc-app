@@ -43,9 +43,7 @@ fun CardImage(
     getCardImageUseCase: GetCardImageUseCase = koinInject(),
 ) {
 
-    CompositionLocalProvider(
-        LocalKamelConfig provides getKamelConfig(getCardImageUseCase)
-    ) {
+    CompositionLocalProvider(LocalKamelConfig provides getKamelConfig(getCardImageUseCase)) {
         KamelImage(
             resource = asyncPainterResource(
                 data = cardCode,
