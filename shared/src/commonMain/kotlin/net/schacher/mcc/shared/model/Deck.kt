@@ -10,6 +10,4 @@ data class Deck(
     val description: String? = null,
     val version: String?,
     val problem: String? = null
-) {
-    val requiredPacks = this.cards.map { it.packCode }.toSet()
-}
+)
