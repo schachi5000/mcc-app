@@ -34,6 +34,7 @@ import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.CardType.ALLY
+import net.schacher.mcc.shared.model.CardType.ALTER_EGO
 import net.schacher.mcc.shared.model.CardType.ATTACHMENT
 import net.schacher.mcc.shared.model.CardType.ENVIRONMENT
 import net.schacher.mcc.shared.model.CardType.EVENT
@@ -322,6 +323,7 @@ private fun String?.cleanUp(): String? =
 
 private fun String?.toCardType(): CardType? = when (this) {
     "hero" -> HERO
+    "alter_ego" -> ALTER_EGO
     "ally" -> ALLY
     "event" -> EVENT
     "support" -> SUPPORT

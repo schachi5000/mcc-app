@@ -71,6 +71,7 @@ class CollectionViewModel(
             val showOnlyOwned = updatedFilter.findAndRemove { it.type == OWNED }?.active ?: false
 
             cardRepository.cards.value
+                .filter { it.type != CardType.ALTER_EGO }
                 .filter { !showOnlyOwned || packRepository.hasPackInCollection(it.packCode) }
                 .filter { card ->
                     updatedFilter.isEmpty() || updatedFilter.any {

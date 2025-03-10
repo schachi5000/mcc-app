@@ -4,6 +4,7 @@ import androidx.compose.runtime.Composable
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.aggression
 import marvelchampionscompanion.shared.generated.resources.ally
+import marvelchampionscompanion.shared.generated.resources.alter_ego
 import marvelchampionscompanion.shared.generated.resources.attachment
 import marvelchampionscompanion.shared.generated.resources.environment
 import marvelchampionscompanion.shared.generated.resources.event
@@ -29,6 +30,7 @@ val CardType.label: String
     @Composable
     get() = when (this) {
         CardType.HERO -> stringResource(Res.string.hero)
+        CardType.ALTER_EGO -> stringResource(Res.string.alter_ego)
         CardType.ALLY -> stringResource(Res.string.ally)
         CardType.EVENT -> stringResource(Res.string.event)
         CardType.SUPPORT -> stringResource(Res.string.support)
