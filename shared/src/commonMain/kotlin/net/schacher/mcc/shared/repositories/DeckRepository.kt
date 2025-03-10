@@ -7,12 +7,14 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
+import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.utils.launchAndCollect
 import net.schacher.mcc.shared.utils.replace
 
 class DeckRepository(
     private val cardRepository: CardRepository,
+    private val spotlightRepository: SpotlightRepository,
     private val marvelCDbDataSource: MarvelCDbDataSource,
     authRepository: AuthRepository
 ) {
@@ -38,11 +40,29 @@ class DeckRepository(
 
     fun hasDeck(deckId: Int): Boolean = this.getDeckById(deckId) != null
 
-    fun getDeckById(deckId: Int): Deck? = this.decks.value.find { it.id == deckId }
+    fun getDeckById(deckId: Int): Deck? {
+        this.spotlightRepository.getDeckById(deckId)?.let {
+            return it
+        }
 
-    fun getDecksWithCard(cardCode: String): List<Deck> =
+        return this.decks.value.find { it.id == deckId }
+    }
+
+    suspend fun getCardsInDeck(deckId: Int): List<Card> {
+        this.spotlightRepository.getDeckById(deckId)?.let {
+            return cardRepository.getCards(it.cardCodes)
+        }
+
+        this.getDeckById(deckId)?.let {
+            return cardRepository.getCards(it.cardCodes)
+        }
+
+        return emptyList()
+    }
+
+    fun getDecksContainingCard(cardCode: String): List<Deck> =
         this.decks.value.filter {
-            it.hero.code == cardCode || it.cards.any { it.code == cardCode }
+            it.hero.code == cardCode || it.cardCodes.any { it == cardCode }
         }
 
     suspend fun createDeck(heroCardCode: String, label: String? = null): Result<Int> =
@@ -72,7 +92,7 @@ class DeckRepository(
             ?: throw IllegalArgumentException("Deck with id $deckId not found")
 
         val newDeck = deck.copy(
-            cards = deck.cards + card
+            cardCodes = deck.cardCodes + card.code
         )
 
         val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck) {
@@ -87,12 +107,12 @@ class DeckRepository(
         val deck = this.decks.value.find { it.id == deckId }
             ?: throw IllegalArgumentException("Deck with id $deckId not found")
 
-        if (!deck.cards.contains(card)) {
+        if (!deck.cardCodes.contains(card.code)) {
             throw IllegalArgumentException("Card with code $cardCode not found in deck with id $deckId")
         }
 
         val newDeck = deck.copy(
-            cards = deck.cards - card
+            cardCodes = deck.cardCodes - card.code
         )
 
         val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck) {

@@ -248,9 +248,9 @@ class KtorMarvelCDbDataSource(
         cardProvider: suspend (List<String>) -> List<Card>
     ) =
         withContextSafe {
-            val slots = deck.cards.toMutableList()
-                .also { it.removeAll { it.code == deck.hero.code } }
-                .groupingBy { it.code }
+            val slots = deck.cardCodes.toMutableList()
+                .also { it.removeAll { it == deck.hero.code } }
+                .groupingBy { it }
                 .eachCount()
                 .let { Json.encodeToString(it) }
 
@@ -344,25 +344,15 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (List<String>) -> List<
         it.addAll(this.slots?.keys ?: emptyList())
     }
 
-    val uniqueCardsInDeck = cardProvider.invoke(cardCodes)
-    val heroCard = uniqueCardsInDeck.find { it.code == this.heroCode }
+//    val uniqueCardsInDeck = cardProvider.invoke(cardCodes)
+    val heroCard = cardProvider(listOf(this.heroCode)).find { it.code == this.heroCode }
         ?: throw IllegalStateException("Hero not found")
 
     return Deck(id = this.id,
         name = this.name,
         hero = heroCard,
         aspect = this.aspect?.parseAspect(),
-        cards = (this.slots ?: emptyMap()).entries
-            .map { entry ->
-                List(entry.value) {
-                    uniqueCardsInDeck.find { it.code == entry.key }
-                        ?: throw IllegalStateException("Card not found: ${entry.key}")
-                }
-            }
-            .flatten()
-            .toMutableList()
-            .also { it.add(0, heroCard) },
-        cardsCodes = cardCodes.toMutableList().also { it.add(heroCard.code) },
+        cardCodes = cardCodes,
         problem = this.problem,
         version = this.version,
         description = this.description

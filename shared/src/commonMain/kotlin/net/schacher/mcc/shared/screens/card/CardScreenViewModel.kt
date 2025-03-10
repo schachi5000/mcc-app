@@ -27,7 +27,7 @@ class CardScreenViewModel(
 
     private val _state: MutableStateFlow<UiState> = runBlocking {
         val card = cardRepository.getCard(cardCode)
-        val decks = deckRepository.getDecksWithCard(cardCode)
+        val decks = deckRepository.getDecksContainingCard(cardCode)
 
         MutableStateFlow(
             UiState(

@@ -11,7 +11,6 @@ import androidx.compose.ui.unit.dp
 import net.schacher.mcc.design.ThemedPreviews
 import net.schacher.mcc.shared.design.compose.BottomSheetContainer
 import net.schacher.mcc.shared.design.compose.Card
-import net.schacher.mcc.shared.design.compose.Deck
 import net.schacher.mcc.shared.design.compose.DeckListItem
 import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
@@ -31,14 +30,6 @@ import net.schacher.mcc.shared.screens.card.CardScreen
 fun CardPreview() {
     MccTheme {
         Card(card = previewCard)
-    }
-}
-
-@ThemedPreviews
-@Composable
-fun DeckPreview() {
-    MccTheme {
-        Deck(deck = previewDeck)
     }
 }
 
@@ -123,9 +114,8 @@ private val previewDeck = Deck(
     name = "Preview Deck",
     hero = previewCard,
     aspect = Aspect.LEADERSHIP,
-    cards = listOf(previewCard, previewCard, previewCard),
     version = "1.0",
     problem = null,
-    cardsCodes = listOf(previewCard.code),
+    cardCodes = listOf(previewCard.code),
     description = null
 )

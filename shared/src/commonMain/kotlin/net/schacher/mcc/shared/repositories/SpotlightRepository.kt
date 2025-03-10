@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.repositories
 
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
@@ -24,7 +25,7 @@ class SpotlightRepository(
     fun getSpotlightDecks(localDates: List<LocalDate>): Flow<Pair<LocalDate, List<Deck>>> =
         channelFlow {
             localDates.forEach { localDate ->
-                launch {
+                launch(Dispatchers.Default) {
                     state.value[localDate]?.let {
                         send(Pair(localDate, it))
                     }

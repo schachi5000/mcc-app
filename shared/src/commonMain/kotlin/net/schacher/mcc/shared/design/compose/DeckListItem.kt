@@ -56,8 +56,8 @@ fun DeckListItem(
                 deck.aspect?.let { Tag(text = it.label, color = it.color) }
                 pluralStringResource(
                     Res.plurals.cards,
-                    deck.cards.size,
-                    deck.cards.size
+                    deck.cardCodes.size,
+                    deck.cardCodes.size
                 ).let {
                     Subtitle(it)
                 }

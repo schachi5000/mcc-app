@@ -6,12 +6,13 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.runBlocking
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.model.Faction
+import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
-import net.schacher.mcc.shared.repositories.SpotlightRepository
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption.REMOVE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.DeckOption.DELETE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.DeletingDeck
@@ -21,29 +22,32 @@ import net.schacher.mcc.shared.utils.defaultSort
 class DeckScreenViewModel(
     deckId: Int,
     private val deckRepository: DeckRepository,
-    spotlightRepository: SpotlightRepository,
+    private val cardRepository: CardRepository,
 ) : ViewModel() {
-    private val _state = MutableStateFlow<UiState?>(
+    private val _state = MutableStateFlow<UiState?>(runBlocking {
+        val deck = deckRepository.getDeckById(deckId)
+            ?: throw IllegalArgumentException("Deck not found")
+        val userDeck = isUserDeck(deckId)
+
         UiState(
-            deck = this.deckRepository.getDeckById(deckId)
-                ?: spotlightRepository.getDeckById(deckId)
-                ?: throw IllegalArgumentException("Deck not found"),
-            cardOptions = if (this.isUserDeck(deckId)) {
+            deck = deck,
+            cardOptions = if (userDeck) {
                 setOf(REMOVE)
             } else {
                 emptySet()
             },
-            deckOptions = if (this.isUserDeck(deckId)) {
+            cards = cardRepository.getCards(deck.cardCodes),
+            deckOptions = if (userDeck) {
                 setOf(DELETE)
             } else {
                 emptySet()
             },
         )
-    )
-
-    private fun isUserDeck(deckId: Int): Boolean = this.deckRepository.hasDeck(deckId)
+    })
 
     val state = _state.asStateFlow()
+
+    private fun isUserDeck(deckId: Int): Boolean = this.deckRepository.hasDeck(deckId)
 
     fun onDeleteDeckClicked() {
         val deckId = this.state.value?.deck?.id ?: return
@@ -112,20 +116,21 @@ class DeckScreenViewModel(
 
     data class UiState(
         val deck: Deck,
+        val cards: List<Card>,
         val selectedCard: Card? = null,
         val cardOptions: Set<CardOption>,
         val deckOptions: Set<DeckOption>,
         val loading: Loading? = null,
     ) {
-        val heroCards = deck.cards
+        val heroCards = cards
             .filter { it.type != CardType.HERO && it.setCode == deck.hero.setCode }
             .sortedBy { it.cost ?: 0 }
 
-        val aspectCards: List<Card> = this.deck.cards
+        val aspectCards: List<Card> = this.cards
             .filter { it.setCode != deck.hero.setCode && it.aspect != null }
             .defaultSort()
 
-        val basicCards: List<Card> = this.deck.cards
+        val basicCards: List<Card> = this.cards
             .filter { it.setCode != deck.hero.setCode && it.faction == Faction.BASIC }
             .defaultSort()
 

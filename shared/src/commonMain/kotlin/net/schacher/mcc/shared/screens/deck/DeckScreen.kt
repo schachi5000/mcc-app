@@ -94,8 +94,13 @@ fun DeckScreen(
 ) {
     val state = viewModel.state.collectAsState().value
 
+//    if (state == null) {
+//        navController.popBackStack()
+//        return
+//    }
+
     if (state == null) {
-        navController.popBackStack()
+        ProgressDialog(title = "Loading Deck", dismissible = false)
         return
     }
 

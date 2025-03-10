@@ -25,7 +25,7 @@ class AppViewModel(
             }
         }
 
-        this.viewModelScope.launch() {
+        this.viewModelScope.launch {
             try {
                 packRepository.refreshAllPacks()
             } catch (e: Exception) {

@@ -5,8 +5,7 @@ data class Deck(
     val name: String,
     val hero: Card,
     val aspect: Aspect?,
-    val cards: List<Card>,
-    val cardsCodes: List<String>,
+    val cardCodes: List<String>,
     val description: String? = null,
     val version: String?,
     val problem: String? = null
