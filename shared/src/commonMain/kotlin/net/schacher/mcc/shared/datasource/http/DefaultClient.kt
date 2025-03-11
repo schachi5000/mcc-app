@@ -20,7 +20,7 @@ import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
 
 private const val TAG = "HttpClient"
-private const val REQUEST_TIMEOUT_MS = 5000L
+private const val REQUEST_TIMEOUT_MS = 7500L
 private const val MAX_RETRY_DELAY_MS = 5000L
 private const val MAX_RETRIES = 2
 
@@ -46,14 +46,17 @@ val DefaultClient = HttpClient {
                 AppLogger.d(TAG) { message }
             }
         }
-        level = LogLevel.INFO
+        level = LogLevel.ALL
     }
     install(HttpTimeout) {
         requestTimeoutMillis = REQUEST_TIMEOUT_MS
     }
     install(HttpRequestRetry) {
-        maxRetries = MAX_RETRIES
         exponentialDelay(maxDelayMs = MAX_RETRY_DELAY_MS)
+        retryOnException(
+            maxRetries = MAX_RETRIES,
+            retryOnTimeout = true
+        )
     }
 
     HttpResponseValidator {

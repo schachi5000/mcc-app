@@ -138,6 +138,7 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getCardsInPack(packCode: String) = withContextSafe {
+        AppLogger.d(TAG) { "Loading cards in from pack [$packCode]" }
         httpClient.get("$serviceUrl/packs/$packCode")
             .body<List<CardDto>>()
             .map {
