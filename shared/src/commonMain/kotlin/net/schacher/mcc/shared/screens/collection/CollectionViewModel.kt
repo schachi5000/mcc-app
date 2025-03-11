@@ -32,7 +32,7 @@ class CollectionViewModel(
     private val packRepository: PackRepository
 ) : ViewModel() {
 
-    private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState(emptyList()))
+    private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState())
 
     internal val state = _state.asStateFlow()
 
@@ -43,6 +43,14 @@ class CollectionViewModel(
 
         this.viewModelScope.launchAndCollect(this.packRepository.packsInCollection) {
             refresh()
+        }
+
+        this.viewModelScope.launchAndCollect(this.packRepository.refreshState) { refreshing ->
+            _state.update {
+                it.copy(
+                    refreshing = refreshing
+                )
+            }
         }
     }
 
@@ -71,6 +79,7 @@ class CollectionViewModel(
             val showOnlyOwned = updatedFilter.findAndRemove { it.type == OWNED }?.active ?: false
 
             cardRepository.cards.value
+                .filter { it.type != CardType.ALTER_EGO }
                 .filter { !showOnlyOwned || packRepository.hasPackInCollection(it.packCode) }
                 .filter { card ->
                     updatedFilter.isEmpty() || updatedFilter.any {
@@ -91,7 +100,8 @@ class CollectionViewModel(
 }
 
 data class UiState(
-    val cardsInCollection: List<Card>,
+    val cardsInCollection: List<Card> = emptyList(),
+    val refreshing: Boolean = false,
     val filters: Set<Filter> = setOf(
         Filter(AGGRESSION, false),
         Filter(PROTECTION, false),

@@ -34,6 +34,7 @@ import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.CardType.ALLY
+import net.schacher.mcc.shared.model.CardType.ALTER_EGO
 import net.schacher.mcc.shared.model.CardType.ATTACHMENT
 import net.schacher.mcc.shared.model.CardType.ENVIRONMENT
 import net.schacher.mcc.shared.model.CardType.EVENT
@@ -62,6 +63,7 @@ class KtorMarvelCDbDataSource(
 ) : MarvelCDbDataSource {
 
     private companion object {
+        const val TAG = "KtorMarvelCDbDataSource"
         const val AUTHORIZATION = "Authorization"
     }
 
@@ -84,12 +86,17 @@ class KtorMarvelCDbDataSource(
         httpClient.get("$serviceUrl/packs").body<List<PackDto>>()
             .filter { packCodes.contains(it.code) }
             .forEach { packDto ->
-                launch {
+                launch(Dispatchers.IO) {
                     val cards = measureTimedValue {
-                        AppLogger.d { "Processing Pack: ${packDto.name}" }
-                        getCardsInPack(packDto.code).getOrThrow()
+                        AppLogger.d(TAG) { "Processing Pack: ${packDto.name}" }
+                        try {
+                            getCardsInPack(packDto.code).getOrThrow()
+                        } catch (e: Exception) {
+                            AppLogger.e(TAG) { "Error processing pack: ${packDto.name} - ${e.message}" }
+                            return@launch
+                        }
                     }.also {
-                        AppLogger.d { "Processing done: ${packDto.name} in ${it.duration}" }
+                        AppLogger.d(TAG) { "Processing done: ${packDto.name} loaded in [${it.duration}]" }
                     }.value
 
                     send(
@@ -103,7 +110,8 @@ class KtorMarvelCDbDataSource(
                         )
                     )
                 }
-                AppLogger.d { "Processing done: ${packDto.name}" }
+
+                AppLogger.d(TAG) { "Processing done: ${packDto.name}" }
             }
     }
 
@@ -111,7 +119,7 @@ class KtorMarvelCDbDataSource(
         httpClient.get("$serviceUrl/packs").body<List<PackDto>>()
             .forEach { packDto ->
                 launch {
-                    AppLogger.d { "Processing Pack: ${packDto.name}" }
+                    AppLogger.d(TAG) { "Processing Pack: ${packDto.name}" }
                     val cards = getCardsInPack(packDto.code).getOrThrow()
 
                     send(
@@ -125,11 +133,12 @@ class KtorMarvelCDbDataSource(
                         )
                     )
                 }
-                AppLogger.d { "Processing done: ${packDto.name}" }
+                AppLogger.d(TAG) { "Processing done: ${packDto.name}" }
             }
     }
 
     override suspend fun getCardsInPack(packCode: String) = withContextSafe {
+        AppLogger.d(TAG) { "Loading cards in from pack [$packCode]" }
         httpClient.get("$serviceUrl/packs/$packCode")
             .body<List<CardDto>>()
             .map {
@@ -200,7 +209,7 @@ class KtorMarvelCDbDataSource(
             }
     }.also {
         it.exceptionOrNull()?.let {
-            AppLogger.e(it) { "Failed to get spotlight decks" }
+            AppLogger.e(throwable = it, tag = TAG) { "Failed to get spotlight decks" }
         }
     }
 
@@ -215,7 +224,7 @@ class KtorMarvelCDbDataSource(
                 .sortedBy { it.name }
         }.also {
             it.exceptionOrNull()?.let {
-                AppLogger.e(it) { "Failed to get user decks" }
+                AppLogger.e(TAG) { "Failed to get user decks - ${it.message}" }
             }
         }
 
@@ -322,6 +331,7 @@ private fun String?.cleanUp(): String? =
 
 private fun String?.toCardType(): CardType? = when (this) {
     "hero" -> HERO
+    "alter_ego" -> ALTER_EGO
     "ally" -> ALLY
     "event" -> EVENT
     "support" -> SUPPORT

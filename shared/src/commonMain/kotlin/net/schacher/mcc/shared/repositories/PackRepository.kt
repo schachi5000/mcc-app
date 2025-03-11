@@ -2,7 +2,9 @@ package net.schacher.mcc.shared.repositories
 
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
 import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
@@ -14,6 +16,10 @@ class PackRepository(
     private val marvelCDbDataSource: MarvelCDbDataSource,
     scope: CoroutineScope = MainScope()
 ) {
+    private companion object {
+        const val TAG = "PackRepository"
+    }
+
     val packs = this.packDatabaseDao.getAllPacks().stateIn(
         scope = scope,
         started = SharingStarted.WhileSubscribed(),
@@ -26,18 +32,29 @@ class PackRepository(
         initialValue = emptyList()
     )
 
-    suspend fun refreshAllPacks() {
-        AppLogger.d("PackRepository") { "Refreshing all packs" }
-        val packCodes = this.marvelCDbDataSource.getAllPackCodes().getOrNull() ?: emptyList()
-        val unknownPackCodes = packCodes.filter { !this.packDatabaseDao.hasPack(it) }
+    private val _refreshState = MutableStateFlow(false)
 
-        this.marvelCDbDataSource.getPacks(unknownPackCodes).collect {
-            AppLogger.i("PackRepository") { "Pack [${it.name}] loaded" }
-            try {
-                this.packDatabaseDao.addPacks(listOf(it))
-            } catch (e: Exception) {
-                AppLogger.e { "Error adding pack [${it.name}] to database: ${e.message}" }
+    val refreshState = _refreshState.asStateFlow()
+
+    suspend fun refreshAllPacks() {
+        AppLogger.d(TAG) { "Refreshing all packs" }
+
+        try {
+            this._refreshState.value = true
+
+            val packCodes = this.marvelCDbDataSource.getAllPackCodes().getOrNull() ?: emptyList()
+            val unknownPackCodes = packCodes.filter { !this.packDatabaseDao.hasPack(it) }
+
+            this.marvelCDbDataSource.getPacks(unknownPackCodes).collect {
+                AppLogger.i(TAG) { "Pack [${it.name}] loaded" }
+                try {
+                    this.packDatabaseDao.addPacks(listOf(it))
+                } catch (e: Exception) {
+                    AppLogger.e(TAG) { "Error adding pack [${it.name}] to database: ${e.message}" }
+                }
             }
+        } finally {
+            this._refreshState.value = false
         }
     }
 

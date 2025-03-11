@@ -46,63 +46,51 @@ class DatabaseDao(
     }
 
     override suspend fun addCards(cards: List<Card>) =
-        measuringWithContext(Dispatchers.IO, "addCards", TAG) {
-            AppLogger.i { "Adding ${cards.size} cards to database" }
-            cards.forEach { addCard(it) }
+        measuringWithContext(Dispatchers.IO, "addCards(${cards.size})", TAG) {
+            AppLogger.i(TAG) { "Adding ${cards.size} cards to database" }
+            database.transaction {
+                cards.forEach { card ->
+                    addCardToDatabase(card)
+                    card.linkedCard?.let { addCardToDatabase(it) }
+                }
+            }
         }
 
     override suspend fun addCard(card: Card) {
         measuringWithContext(Dispatchers.IO, "addCard", TAG) {
             database.transaction {
-                dbQuery.addCard(
-                    code = card.code,
-                    position = card.position.toLong(),
-                    type = card.type?.name,
-                    cardSetCode = card.setCode,
-                    cardSetName = card.setName,
-                    packCode = card.packCode,
-                    packName = card.packName,
-                    name = card.name,
-                    cost = card.cost?.toLong(),
-                    aspect = card.aspect?.name,
-                    text = card.text,
-                    boostText = card.boostText,
-                    attackText = card.attackText,
-                    quote = card.quote,
-                    traits = card.traits,
-                    imagePath = card.imagePath,
-                    faction = card.faction.name,
-                    linkedCardCode = card.linkedCard?.code,
-                    primaryColor = card.primaryColor,
-                    secondaryColor = card.secondaryColor
-                )
+                addCardToDatabase(card)
 
                 card.linkedCard?.let {
-                    dbQuery.addCard(
-                        code = it.code,
-                        position = it.position.toLong(),
-                        type = it.type?.name,
-                        cardSetCode = it.setCode,
-                        cardSetName = it.setName,
-                        packCode = it.packCode,
-                        packName = it.packName,
-                        name = it.name,
-                        cost = it.cost?.toLong(),
-                        aspect = it.aspect?.name,
-                        text = it.text,
-                        boostText = it.boostText,
-                        attackText = it.attackText,
-                        quote = it.quote,
-                        traits = it.traits,
-                        imagePath = it.imagePath,
-                        faction = it.faction.name,
-                        linkedCardCode = it.linkedCard?.code,
-                        primaryColor = it.primaryColor,
-                        secondaryColor = it.secondaryColor
-                    )
+                    addCardToDatabase(it)
                 }
             }
         }
+    }
+
+    private fun addCardToDatabase(card: Card) {
+        dbQuery.addCard(
+            code = card.code,
+            position = card.position.toLong(),
+            type = card.type?.name,
+            cardSetCode = card.setCode,
+            cardSetName = card.setName,
+            packCode = card.packCode,
+            packName = card.packName,
+            name = card.name,
+            cost = card.cost?.toLong(),
+            aspect = card.aspect?.name,
+            text = card.text,
+            boostText = card.boostText,
+            attackText = card.attackText,
+            quote = card.quote,
+            traits = card.traits,
+            imagePath = card.imagePath,
+            faction = card.faction.name,
+            linkedCardCode = card.linkedCard?.code,
+            primaryColor = card.primaryColor,
+            secondaryColor = card.secondaryColor
+        )
     }
 
     override suspend fun getCardsByCodes(cardCodes: List<String>): List<Card> =
@@ -216,15 +204,15 @@ class DatabaseDao(
         }
 
     override suspend fun addPacks(packs: List<Pack>) {
-        AppLogger.i { "Adding ${packs.size} packs to database" }
+        AppLogger.i(TAG) { "Adding ${packs.size} packs to database" }
         packs.forEach { this.addPack(it) }
     }
 
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
         val hasPackInCollection = isPackInPossession(pack.code)
 
-        AppLogger.i {
-            "Adding pack ${pack.name} to database - hasPackInCollection:$hasPackInCollection"
+        AppLogger.i(TAG) {
+            "Adding pack ${pack.name} to database"
         }
 
         addCards(pack.cards)
@@ -235,6 +223,19 @@ class DatabaseDao(
             pack.position.toLong(),
             pack.cards.map { it.code }.toCardCodeString(),
             hasPackInCollection.toLong()
+        )
+
+        addPackToDatabase(pack, hasPackInCollection)
+    }
+
+    private fun addPackToDatabase(pack: Pack, inPossession: Boolean) {
+        dbQuery.addPack(
+            pack.code,
+            pack.id.toLong(),
+            pack.name,
+            pack.position.toLong(),
+            pack.cardCodes.toCardCodeString(),
+            inPossession.toLong()
         )
     }
 
