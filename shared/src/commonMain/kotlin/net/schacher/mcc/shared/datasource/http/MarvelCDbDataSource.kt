@@ -12,8 +12,6 @@ interface MarvelCDbDataSource {
 
     fun getPacks(packCodes: List<String>): Flow<Pack>
 
-    fun getAllPacks(): Flow<Pack>
-
     suspend fun getCardsInPack(packCode: String): Result<List<Card>>
 
     suspend fun getCard(cardCode: String): Result<Card>

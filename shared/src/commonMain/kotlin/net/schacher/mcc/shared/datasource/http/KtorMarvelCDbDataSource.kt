@@ -16,7 +16,6 @@ import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.channelFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
@@ -86,13 +85,13 @@ class KtorMarvelCDbDataSource(
         httpClient.get("$serviceUrl/packs").body<List<PackDto>>()
             .filter { packCodes.contains(it.code) }
             .forEach { packDto ->
-                launch(Dispatchers.IO) {
+                launch {
                     val cards = measureTimedValue {
                         AppLogger.d(TAG) { "Processing Pack: ${packDto.name}" }
                         try {
                             getCardsInPack(packDto.code).getOrThrow()
                         } catch (e: Exception) {
-                            AppLogger.e(TAG) { "Error processing pack: ${packDto.name} - ${e.message}" }
+                            AppLogger.e(TAG) { "${e.message} - Error processing pack: ${packDto.name}" }
                             return@launch
                         }
                     }.also {
@@ -110,35 +109,11 @@ class KtorMarvelCDbDataSource(
                         )
                     )
                 }
-
-                AppLogger.d(TAG) { "Processing done: ${packDto.name}" }
-            }
-    }
-
-    override fun getAllPacks(): Flow<Pack> = channelFlow {
-        httpClient.get("$serviceUrl/packs").body<List<PackDto>>()
-            .forEach { packDto ->
-                launch {
-                    AppLogger.d(TAG) { "Processing Pack: ${packDto.name}" }
-                    val cards = getCardsInPack(packDto.code).getOrThrow()
-
-                    send(
-                        Pack(
-                            id = packDto.id,
-                            code = packDto.code,
-                            name = packDto.name,
-                            cards = cards,
-                            cardCodes = cards.map { it.code },
-                            position = packDto.position
-                        )
-                    )
-                }
-                AppLogger.d(TAG) { "Processing done: ${packDto.name}" }
             }
     }
 
     override suspend fun getCardsInPack(packCode: String) = withContextSafe {
-        AppLogger.d(TAG) { "Loading cards in from pack [$packCode]" }
+        AppLogger.d(TAG) { "Loading all cards from pack [$packCode]" }
         httpClient.get("$serviceUrl/packs/$packCode")
             .body<List<CardDto>>()
             .map {
@@ -378,6 +353,7 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (List<String>) -> List<
         description = this.description
     )
 }
+
 
 private suspend fun <T> withContextSafe(
     context: CoroutineContext = Dispatchers.IO,
