@@ -12,8 +12,8 @@ import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultHorizontalArrangement
 import net.schacher.mcc.shared.model.Card
 
 @Composable
@@ -35,7 +35,7 @@ fun CardRow(modifier: Modifier, cardRowEntry: CardRowEntry, onCardSelected: (Car
             )
         }
 
-        LazyRow(horizontalArrangement = Arrangement.spacedBy(12.dp)) {
+        LazyRow(horizontalArrangement = DefaultHorizontalArrangement) {
             items(cardRowEntry.cards.count()) {
                 if (it == 0) {
                     Spacer(Modifier.size(ContentPadding))

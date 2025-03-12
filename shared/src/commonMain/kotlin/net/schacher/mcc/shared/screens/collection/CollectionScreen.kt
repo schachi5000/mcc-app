@@ -49,6 +49,8 @@ import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.maxSpanItem
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultHorizontalArrangement
+import net.schacher.mcc.shared.design.theme.DefaultVerticalArrangement
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.main.BottomSheetDelegate
@@ -112,8 +114,8 @@ fun CollectionScreen(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = DefaultVerticalArrangement,
+            horizontalArrangement = DefaultHorizontalArrangement,
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = ContentPadding)
                 .nestedScroll(nestedScrollConnection),

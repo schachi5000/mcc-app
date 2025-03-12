@@ -1,7 +1,6 @@
 package net.schacher.mcc.shared.screens.packselection
 
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -21,6 +20,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.DefaultVerticalArrangement
 import net.schacher.mcc.shared.model.Pack
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -48,7 +48,7 @@ fun PackSelectionScreen(
     ) {
         LazyColumn(
             modifier = Modifier.fillMaxSize(),
-            verticalArrangement = Arrangement.spacedBy(12.dp)
+            verticalArrangement = DefaultVerticalArrangement
         ) {
             item {
                 Text(

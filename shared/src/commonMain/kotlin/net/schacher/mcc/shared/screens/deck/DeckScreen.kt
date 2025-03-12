@@ -69,6 +69,7 @@ import net.schacher.mcc.shared.design.compose.noRippleClickable
 import net.schacher.mcc.shared.design.theme.BottomSheetColors
 import net.schacher.mcc.shared.design.theme.BottomSheetShape
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultHorizontalArrangement
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
@@ -296,7 +297,7 @@ private fun CardGridSection(
                             top = if (index == 0) 0.dp else 8.dp,
                             bottom = if (index <= rows.size - 1) 8.dp else 0.dp
                         ),
-                    horizontalArrangement = Arrangement.spacedBy(8.dp)
+                    horizontalArrangement = DefaultHorizontalArrangement
                 ) {
                     rows[index].forEach { card ->
                         Box(Modifier.weight(1f)) {
