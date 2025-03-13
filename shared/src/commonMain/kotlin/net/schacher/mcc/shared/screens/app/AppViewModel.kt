@@ -7,11 +7,11 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.repositories.AuthRepository
-import net.schacher.mcc.shared.repositories.PackRepository
+import net.schacher.mcc.shared.usecases.RefreshCardsInDatabaseUseCase
 
 class AppViewModel(
-    private val packRepository: PackRepository,
-    private val authRepository: AuthRepository
+    private val authRepository: AuthRepository,
+    private val refreshCardsInDatabaseUseCase: RefreshCardsInDatabaseUseCase
 ) : ViewModel() {
 
     private val _state = MutableStateFlow(this.authRepository.loggedIn)
@@ -27,7 +27,7 @@ class AppViewModel(
 
         this.viewModelScope.launch() {
             try {
-                packRepository.refreshAllPacks()
+                refreshCardsInDatabaseUseCase()
             } catch (e: Exception) {
                 AppLogger.e(e) { "Error refreshing cards" }
             }

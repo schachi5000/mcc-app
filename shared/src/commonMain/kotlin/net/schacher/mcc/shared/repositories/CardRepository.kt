@@ -18,7 +18,7 @@ class CardRepository(
 
     val cards = this.cardDatabaseDao.getCards().stateIn(
         scope = scope,
-        started = SharingStarted.WhileSubscribed(),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
 
@@ -48,5 +48,9 @@ class CardRepository(
         return this.marvelCDbDataSource.getCard(cardCode).getOrThrow().also { newCard ->
             this.cardDatabaseDao.addCard(newCard)
         }
+    }
+
+    suspend fun addCards(cardsInPack: List<Card>) {
+        this.cardDatabaseDao.addCards(cardsInPack)
     }
 }

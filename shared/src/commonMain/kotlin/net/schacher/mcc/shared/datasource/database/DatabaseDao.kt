@@ -197,10 +197,7 @@ class DatabaseDao(
         .asFlow()
         .mapToList(Dispatchers.IO)
         .map {
-            it.map { pack ->
-                val cards = getCardsByPackCode(pack.code)
-                pack.toPack(cards)
-            }
+            it.map { pack -> pack.toPack() }
         }
 
     override suspend fun addPacks(packs: List<Pack>) {
@@ -215,13 +212,12 @@ class DatabaseDao(
             "Adding pack ${pack.name} to database"
         }
 
-        addCards(pack.cards)
         dbQuery.addPack(
             pack.code,
             pack.id.toLong(),
             pack.name,
             pack.position.toLong(),
-            pack.cards.map { it.code }.toCardCodeString(),
+            pack.cardCodes.toCardCodeString(),
             hasPackInCollection.toLong()
         )
 
@@ -239,7 +235,7 @@ class DatabaseDao(
         )
     }
 
-    private suspend fun getCardsByPackCode(packCode: String): List<Card> =
+    override suspend fun getCardsInPack(packCode: String): List<Card> =
         measuringWithContext(Dispatchers.IO, "getCardsByPackCode[$packCode]", TAG) {
             dbQuery.selectCardsByPackCode(packCode)
                 .executeAsList()
@@ -290,10 +286,9 @@ private fun Boolean.toLong() = if (this) 1L else 0L
 
 private fun Long?.toBoolean() = if (this == null) false else this != 0L
 
-private fun database.Pack.toPack(cards: List<Card>) = Pack(
+private fun database.Pack.toPack() = Pack(
     name = this.name,
     code = this.code,
-    cards = cards,
     id = this.id.toInt(),
     cardCodes = this.cardCodes.toCardCodeList(),
     position = this.position.toInt()

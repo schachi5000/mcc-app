@@ -19,4 +19,6 @@ interface CardDatabaseDao {
     suspend fun getCardImage(cardCode: String): ByteArray?
 
     suspend fun wipeCardTable()
+
+    suspend fun getCardsInPack(packCode: String): List<Card>
 }

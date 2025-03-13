@@ -16,6 +16,7 @@ import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.PackRepository
+import net.schacher.mcc.shared.usecases.RefreshCardsInDatabaseUseCase
 import net.schacher.mcc.shared.utils.launchAndCollect
 import kotlin.time.Duration
 
@@ -24,6 +25,7 @@ class MoreViewModel(
     private val deckRepository: DeckRepository,
     private val packRepository: PackRepository,
     private val authRepository: AuthRepository,
+    private val refreshCardsInDatabaseUseCase: RefreshCardsInDatabaseUseCase,
     private val settingsDao: SettingsDao,
     platformInfo: PlatformInfo
 ) : ViewModel() {
@@ -111,7 +113,7 @@ class MoreViewModel(
 
         this.viewModelScope.launch {
             try {
-                packRepository.refreshAllPacks()
+                refreshCardsInDatabaseUseCase()
             } catch (e: Exception) {
                 AppLogger.e(e) { "Error refreshing packs" }
             }

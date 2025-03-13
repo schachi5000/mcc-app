@@ -32,6 +32,7 @@ import net.schacher.mcc.shared.screens.search.SearchViewModel
 import net.schacher.mcc.shared.screens.settings.MoreViewModel
 import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
 import net.schacher.mcc.shared.usecases.GetCardImageUseCase
+import net.schacher.mcc.shared.usecases.RefreshCardsInDatabaseUseCase
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
@@ -73,6 +74,7 @@ val viewModels = module {
 
 val useCases = module {
     singleOf(::GetCardImageUseCase)
+    singleOf(::RefreshCardsInDatabaseUseCase)
 }
 
 @Composable

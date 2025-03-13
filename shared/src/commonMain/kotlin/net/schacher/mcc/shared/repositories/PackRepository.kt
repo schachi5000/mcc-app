@@ -3,19 +3,13 @@ package net.schacher.mcc.shared.repositories
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.SupervisorJob
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
-import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.stateIn
-import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
-import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.Pack
 
-class PackRepository(
-    private val packDatabaseDao: PackDatabaseDao,
-    private val marvelCDbDataSource: MarvelCDbDataSource,
-) {
+class PackRepository(private val packDatabaseDao: PackDatabaseDao) {
     private companion object {
         const val TAG = "PackRepository"
     }
@@ -34,40 +28,14 @@ class PackRepository(
         initialValue = emptyList()
     )
 
-    private val _refreshState = MutableStateFlow(false)
-
-    val refreshState = _refreshState.asStateFlow()
-
-    suspend fun refreshAllPacks() {
-        AppLogger.d(TAG) { "Refreshing all packs" }
-
-        try {
-            this._refreshState.value = true
-
-            val packCodes = this.marvelCDbDataSource.getAllPackCodes().getOrNull() ?: emptyList()
-            val unknownPackCodes = packCodes.filter { !this.packDatabaseDao.hasPack(it) }
-
-            this.marvelCDbDataSource.getPacks(unknownPackCodes).collect {
-                AppLogger.i(TAG) { "Pack [${it.name}] loaded" }
-                try {
-                    this.packDatabaseDao.addPacks(listOf(it))
-                } catch (e: Exception) {
-                    AppLogger.e(TAG) { "Error adding pack [${it.name}] to database: ${e.message}" }
-                }
-            }
-        } finally {
-            this._refreshState.value = false
-        }
-    }
-
-    suspend fun deleteAllPackData() {
-        this.packDatabaseDao.wipePackTable()
-    }
-
     fun hasPackInCollection(packCode: String) = this.packsInCollection.value.contains(packCode)
 
     fun hasCardInCollection(card: Card) =
         this.packsInCollection.value.any { it.contains(card.packCode) }
+
+    fun hasPack(packCode: String): Boolean {
+        return this.packs.value.any { it.code == packCode }
+    }
 
     suspend fun addPackToCollection(packCode: String) {
         this.packDatabaseDao.addPackToCollection(packCode)
@@ -75,5 +43,13 @@ class PackRepository(
 
     suspend fun removePackFromCollection(packCode: String) {
         this.packDatabaseDao.removePackFromCollection(packCode)
+    }
+
+    suspend fun deleteAllPackData() {
+        this.packDatabaseDao.wipePackTable()
+    }
+
+    suspend fun addPacks(packs: List<Pack>) {
+        this.packDatabaseDao.addPacks(packs)
     }
 }

@@ -16,8 +16,6 @@ import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.flow.channelFlow
-import kotlinx.coroutines.launch
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
 import kotlinx.serialization.encodeToString
@@ -53,7 +51,6 @@ import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.AuthRepository
 import kotlin.coroutines.CoroutineContext
-import kotlin.time.measureTimedValue
 
 class KtorMarvelCDbDataSource(
     private val httpClient: HttpClient,
@@ -76,39 +73,17 @@ class KtorMarvelCDbDataSource(
             .map { it.code }
     }
 
-    override fun getPacks(packCodes: List<String>) = channelFlow {
-        if (packCodes.isEmpty()) {
-            close()
-            return@channelFlow
-        }
-
+    override suspend fun getPacks(packCodes: List<String>) = withContextSafe {
         httpClient.get("$serviceUrl/packs").body<List<PackDto>>()
             .filter { packCodes.contains(it.code) }
-            .forEach { packDto ->
-                launch {
-                    val cards = measureTimedValue {
-                        AppLogger.d(TAG) { "Processing Pack: ${packDto.name}" }
-                        try {
-                            getCardsInPack(packDto.code).getOrThrow()
-                        } catch (e: Exception) {
-                            AppLogger.e(TAG) { "${e.message} - Error processing pack: ${packDto.name}" }
-                            return@launch
-                        }
-                    }.also {
-                        AppLogger.d(TAG) { "Processing done: ${packDto.name} loaded in [${it.duration}]" }
-                    }.value
-
-                    send(
-                        Pack(
-                            id = packDto.id,
-                            code = packDto.code,
-                            name = packDto.name,
-                            cards = cards,
-                            cardCodes = cards.map { it.code },
-                            position = packDto.position
-                        )
-                    )
-                }
+            .map { packDto ->
+                Pack(
+                    id = packDto.id,
+                    code = packDto.code,
+                    name = packDto.name,
+                    cardCodes = emptyList(),
+                    position = packDto.position
+                )
             }
     }
 

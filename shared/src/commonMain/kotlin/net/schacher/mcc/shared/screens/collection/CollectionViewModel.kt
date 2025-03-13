@@ -22,6 +22,7 @@ import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
 import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
+import net.schacher.mcc.shared.usecases.RefreshCardsInDatabaseUseCase
 import net.schacher.mcc.shared.utils.defaultSort
 import net.schacher.mcc.shared.utils.distinctByName
 import net.schacher.mcc.shared.utils.findAndRemove
@@ -29,7 +30,8 @@ import net.schacher.mcc.shared.utils.launchAndCollect
 
 class CollectionViewModel(
     private val cardRepository: CardRepository,
-    private val packRepository: PackRepository
+    private val packRepository: PackRepository,
+    private val refreshCardsInDatabaseUseCase: RefreshCardsInDatabaseUseCase
 ) : ViewModel() {
 
     private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState())
@@ -45,7 +47,7 @@ class CollectionViewModel(
             refresh()
         }
 
-        this.viewModelScope.launchAndCollect(this.packRepository.refreshState) { refreshing ->
+        this.viewModelScope.launchAndCollect(this.refreshCardsInDatabaseUseCase.refreshing) { refreshing ->
             _state.update {
                 it.copy(
                     refreshing = refreshing
