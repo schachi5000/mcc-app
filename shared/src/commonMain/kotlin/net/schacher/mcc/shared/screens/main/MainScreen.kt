@@ -8,7 +8,6 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.animation.togetherWith
-import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
@@ -71,7 +70,6 @@ import net.schacher.mcc.shared.screens.mydecks.MyDecksScreen
 import net.schacher.mcc.shared.screens.navigate
 import net.schacher.mcc.shared.screens.settings.MoreScreen
 import net.schacher.mcc.shared.screens.spotlight.SpotlightScreen
-import org.jetbrains.compose.resources.ExperimentalResourceApi
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.compose.viewmodel.koinViewModel
@@ -140,7 +138,6 @@ fun MainScreen(
     }
 }
 
-@OptIn(ExperimentalResourceApi::class, ExperimentalFoundationApi::class)
 @Composable
 private fun Content(
     snackbarHostState: SnackbarHostState,
