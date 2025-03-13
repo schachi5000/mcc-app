@@ -20,11 +20,11 @@ import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
 
 private const val TAG = "HttpClient"
-private const val REQUEST_TIMEOUT_MS = 10000L
+private const val REQUEST_TIMEOUT_MS = 5000L
 private const val MAX_RETRY_DELAY_MS = 5000L
 private const val MAX_RETRIES = 2
 
-val DefaultClient = HttpClient {
+val DefaultHttpClient = HttpClient {
     install(ContentNegotiation) {
         json(Json {
             ignoreUnknownKeys = true

@@ -1,7 +1,8 @@
 package net.schacher.mcc.shared.repositories
 
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.asStateFlow
@@ -14,21 +15,22 @@ import net.schacher.mcc.shared.model.Card
 class PackRepository(
     private val packDatabaseDao: PackDatabaseDao,
     private val marvelCDbDataSource: MarvelCDbDataSource,
-    scope: CoroutineScope = MainScope()
 ) {
     private companion object {
         const val TAG = "PackRepository"
     }
 
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
+
     val packs = this.packDatabaseDao.getAllPacks().stateIn(
         scope = scope,
-        started = SharingStarted.WhileSubscribed(),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
 
     val packsInCollection = this.packDatabaseDao.getPacksInCollection().stateIn(
         scope = scope,
-        started = SharingStarted.WhileSubscribed(),
+        started = SharingStarted.Eagerly,
         initialValue = emptyList()
     )
 

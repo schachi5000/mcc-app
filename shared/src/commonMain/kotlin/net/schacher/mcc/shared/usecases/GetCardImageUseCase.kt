@@ -7,10 +7,14 @@ class GetCardImageUseCase(
     private val marvelCDbDataSource: MarvelCDbDataSource,
     private val cardDatabaseDao: CardDatabaseDao
 ) {
-    suspend operator fun invoke(cardCode: String): ByteArray =
-        this.cardDatabaseDao.getCardImage(cardCode) ?: run {
-            val image = marvelCDbDataSource.getCardImage(cardCode).getOrThrow()
-            cardDatabaseDao.addCardImage(cardCode, image)
-            image
+    suspend operator fun invoke(cardCode: String): ByteArray {
+        val databaseImage = this.cardDatabaseDao.getCardImage(cardCode)
+        if (databaseImage != null) {
+            return databaseImage
         }
+
+        return this.marvelCDbDataSource.getCardImage(cardCode).also {
+            this.cardDatabaseDao.addCardImage(cardCode, it)
+        }
+    }
 }
