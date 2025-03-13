@@ -58,6 +58,7 @@ import net.schacher.mcc.shared.design.compose.ListItem
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.Tag
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.HaloTextShadow
 import net.schacher.mcc.shared.design.theme.color
 import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
@@ -166,7 +167,9 @@ private fun Content(
                     Text(
                         text = card.name,
                         maxLines = 2,
-                        style = MaterialTheme.typography.h5,
+                        style = MaterialTheme.typography.h5.copy(
+                            shadow = HaloTextShadow
+                        ),
                         color = MaterialTheme.colors.onSurface
                     )
 
@@ -174,7 +177,9 @@ private fun Content(
                         modifier = Modifier.padding(top = 4.dp),
                         text = card.packName,
                         maxLines = 1,
-                        style = MaterialTheme.typography.h6,
+                        style = MaterialTheme.typography.h6.copy(
+                            shadow = HaloTextShadow
+                        ),
                         color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
                     )
 
@@ -197,7 +202,9 @@ private fun Content(
                         modifier = Modifier.fillMaxWidth(),
                         text = it.toAnnotatedString(),
                         textAlign = TextAlign.Center,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.body1.copy(
+                            shadow = HaloTextShadow
+                        ),
                         fontWeight = FontWeight.SemiBold,
                         color = MaterialTheme.colors.onSurface
                     )
@@ -209,7 +216,9 @@ private fun Content(
                     Text(
                         text = it.toAnnotatedString(),
                         inlineContent = getInlineContent(),
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.body1.copy(
+                            shadow = HaloTextShadow
+                        ),
                         color = MaterialTheme.colors.onSurface
                     )
                 }
@@ -220,7 +229,9 @@ private fun Content(
                     Text(
                         text = it.toAnnotatedString(),
                         inlineContent = getInlineContent(),
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.body1.copy(
+                            shadow = HaloTextShadow
+                        ),
                         color = MaterialTheme.colors.onSurface
                     )
                 }
@@ -236,7 +247,9 @@ private fun Content(
                             append(it.toAnnotatedString())
                         },
                         inlineContent = getInlineContent(),
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.body1.copy(
+                            shadow = HaloTextShadow
+                        ),
                         color = MaterialTheme.colors.onSurface
                     )
                 }
@@ -246,7 +259,9 @@ private fun Content(
                 item {
                     Text(
                         text = it,
-                        style = MaterialTheme.typography.body1,
+                        style = MaterialTheme.typography.body1.copy(
+                            shadow = HaloTextShadow
+                        ),
                         fontStyle = FontStyle.Italic,
                         color = MaterialTheme.colors.onSurface
                     )

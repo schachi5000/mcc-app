@@ -1,7 +1,12 @@
 package net.schacher.mcc.shared.design.theme
 
+import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Typography
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 
 val MccTypography = Typography().let {
@@ -18,3 +23,11 @@ val MccTypography = Typography().let {
         ),
     )
 }
+
+val HaloTextShadow: Shadow
+    @Composable
+    get() = Shadow(
+        color = MaterialTheme.colors.background,
+        offset = Offset.Zero,
+        blurRadius = 16.dp.value
+    )
