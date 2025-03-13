@@ -62,7 +62,7 @@ class KtorMarvelCDbDataSource(
     private companion object {
         const val TAG = "KtorMarvelCDbDataSource"
         const val AUTHORIZATION = "Authorization"
-        const val GET_CARDS_IN_PACK_TIMEOUT_MS = 10000L
+        const val GET_CARDS_IN_PACK_TIMEOUT_MS = 12500L
     }
 
     private val authHeader: String
@@ -90,7 +90,7 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getCardsInPack(packCode: String) = withContextSafe {
         AppLogger.d(TAG) { "Loading all cards from pack [$packCode]" }
-        httpClient.get("$serviceUrl/packs/$packCode") {
+        httpClient.get("$serviceUrl/packs/$packCode/cards") {
             timeout {
                 requestTimeoutMillis = GET_CARDS_IN_PACK_TIMEOUT_MS
             }
@@ -211,19 +211,19 @@ class KtorMarvelCDbDataSource(
         deck: Deck,
         cardProvider: suspend (List<String>) -> List<Card>
     ) = withContextSafe {
-            val slots = deck.cards.toMutableList()
-                .also { it.removeAll { it.code == deck.hero.code } }
-                .groupingBy { it.code }
-                .eachCount()
-                .let { Json.encodeToString(it) }
+        val slots = deck.cards.toMutableList()
+            .also { it.removeAll { it.code == deck.hero.code } }
+            .groupingBy { it.code }
+            .eachCount()
+            .let { Json.encodeToString(it) }
 
-            httpClient.put("$serviceUrl/decks/${deck.id}") {
-                headers { append(AUTHORIZATION, authHeader) }
-                parameter("slots", slots)
-            }
-
-            getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
+        httpClient.put("$serviceUrl/decks/${deck.id}") {
+            headers { append(AUTHORIZATION, authHeader) }
+            parameter("slots", slots)
         }
+
+        getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
+    }
 
     override suspend fun deleteDeck(deckId: Int): Result<Unit> = withContextSafe {
         httpClient.delete("$serviceUrl/decks/${deckId}") {

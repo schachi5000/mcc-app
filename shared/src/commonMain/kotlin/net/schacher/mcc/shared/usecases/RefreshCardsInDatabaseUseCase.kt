@@ -55,9 +55,9 @@ class RefreshCardsInDatabaseUseCase(
 
     private suspend fun refreshPack(pack: Pack) {
         try {
-            this.packRepository.addPacks(listOf(pack))
             val cardsInPack = this.marvelCDbDataSource.getCardsInPack(pack.code).getOrThrow()
             this.cardRepository.addCards(cardsInPack)
+            this.packRepository.addPacks(listOf(pack))
         } catch (e: Exception) {
             AppLogger.e(TAG) { "Error adding pack [${pack.name}] to database: ${e.message}" }
         }

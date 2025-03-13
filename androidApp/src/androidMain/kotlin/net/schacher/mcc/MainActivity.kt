@@ -10,7 +10,6 @@ import androidx.appcompat.app.AppCompatActivity
 import androidx.browser.customtabs.CustomTabsIntent
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.tooling.preview.Preview
-import co.touchlab.kermit.Logger
 import net.schacher.mcc.shared.AppLogger
 
 
@@ -22,6 +21,7 @@ class MainActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
 
         AppLogger.d("MainActivity") { "onCreate $this" }
+
         setContent {
             MainView(
                 onQuitApp = { finish() },
