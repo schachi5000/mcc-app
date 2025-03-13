@@ -208,30 +208,14 @@ class DatabaseDao(
     private suspend fun addPack(pack: Pack) = withContext(Dispatchers.IO) {
         val hasPackInCollection = isPackInPossession(pack.code)
 
-        AppLogger.i(TAG) {
-            "Adding pack ${pack.name} to database"
-        }
+        AppLogger.i(TAG) { "Adding pack ${pack.name} to database" }
 
         dbQuery.addPack(
             pack.code,
             pack.id.toLong(),
             pack.name,
             pack.position.toLong(),
-            pack.cardCodes.toCardCodeString(),
             hasPackInCollection.toLong()
-        )
-
-        addPackToDatabase(pack, hasPackInCollection)
-    }
-
-    private fun addPackToDatabase(pack: Pack, inPossession: Boolean) {
-        dbQuery.addPack(
-            pack.code,
-            pack.id.toLong(),
-            pack.name,
-            pack.position.toLong(),
-            pack.cardCodes.toCardCodeString(),
-            inPossession.toLong()
         )
     }
 
@@ -290,7 +274,6 @@ private fun database.Pack.toPack() = Pack(
     name = this.name,
     code = this.code,
     id = this.id.toInt(),
-    cardCodes = this.cardCodes.toCardCodeList(),
     position = this.position.toInt()
 )
 

@@ -67,13 +67,12 @@ CREATE TABLE Pack (
     id INTEGER NOT NULL,
     name TEXT NOT NULL,
     position INTEGER NOT NULL,
-    cardCodes TEXT NOT NULL,
     inPosession INTEGER DEFAULT 0
 );
 
 addPack:
-INSERT OR REPLACE INTO Pack(code, id, name, position, cardCodes,  inPosession)
-VALUES(?, ?, ?, ?, ?,  ?);
+INSERT OR REPLACE INTO Pack(code, id, name, position,  inPosession)
+VALUES(?, ?, ?, ?,  ?);
 
 getPack:
 SELECT *

@@ -2,6 +2,7 @@ package net.schacher.mcc.shared.datasource.http
 
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -61,6 +62,7 @@ class KtorMarvelCDbDataSource(
     private companion object {
         const val TAG = "KtorMarvelCDbDataSource"
         const val AUTHORIZATION = "Authorization"
+        const val GET_CARDS_IN_PACK_TIMEOUT_MS = 10000L
     }
 
     private val authHeader: String
@@ -81,7 +83,6 @@ class KtorMarvelCDbDataSource(
                     id = packDto.id,
                     code = packDto.code,
                     name = packDto.name,
-                    cardCodes = emptyList(),
                     position = packDto.position
                 )
             }
@@ -89,7 +90,11 @@ class KtorMarvelCDbDataSource(
 
     override suspend fun getCardsInPack(packCode: String) = withContextSafe {
         AppLogger.d(TAG) { "Loading all cards from pack [$packCode]" }
-        httpClient.get("$serviceUrl/packs/$packCode")
+        httpClient.get("$serviceUrl/packs/$packCode") {
+            timeout {
+                requestTimeoutMillis = GET_CARDS_IN_PACK_TIMEOUT_MS
+            }
+        }
             .body<List<CardDto>>()
             .map {
                 val card = it.toCard()
@@ -205,8 +210,7 @@ class KtorMarvelCDbDataSource(
     override suspend fun updateDeck(
         deck: Deck,
         cardProvider: suspend (List<String>) -> List<Card>
-    ) =
-        withContextSafe {
+    ) = withContextSafe {
             val slots = deck.cards.toMutableList()
                 .also { it.removeAll { it.code == deck.hero.code } }
                 .groupingBy { it.code }

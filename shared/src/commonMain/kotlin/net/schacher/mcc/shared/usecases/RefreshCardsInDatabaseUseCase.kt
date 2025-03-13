@@ -11,7 +11,6 @@ import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.model.Pack
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.PackRepository
-import kotlin.time.measureTime
 
 class RefreshCardsInDatabaseUseCase(
     private val cardRepository: CardRepository,
@@ -43,12 +42,9 @@ class RefreshCardsInDatabaseUseCase(
             withContext(Dispatchers.Default) {
                 packs.map {
                     async {
-                        val time = measureTime {
-                            AppLogger.d(TAG) { "Refreshing pack [${it.name}]" }
-                            refreshPack(it)
-
-                        }
-                        AppLogger.d(TAG) { "Done...Refreshing pack [${it.name}]. Took $time" }
+                        AppLogger.d(TAG) { "Refreshing pack [${it.name}]" }
+                        refreshPack(it)
+                        AppLogger.d(TAG) { "Done...Refreshing pack [${it.name}]" }
                     }
                 }.awaitAll()
             }
@@ -63,7 +59,7 @@ class RefreshCardsInDatabaseUseCase(
             val cardsInPack = this.marvelCDbDataSource.getCardsInPack(pack.code).getOrThrow()
             this.cardRepository.addCards(cardsInPack)
         } catch (e: Exception) {
-            AppLogger.e { "Error adding pack [${pack.name}] to database: ${e.message}" }
+            AppLogger.e(TAG) { "Error adding pack [${pack.name}] to database: ${e.message}" }
         }
     }
 }
