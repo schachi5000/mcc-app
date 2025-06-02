@@ -1,5 +1,5 @@
 name:
-  Build
+  Build Android
 
 on:
   push:
