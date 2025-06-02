@@ -9,7 +9,6 @@
 /* Begin PBXBuildFile section */
 		058557BB273AAA24004C7B11 /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557BA273AAA24004C7B11 /* Assets.xcassets */; };
 		058557D9273AAEEB004C7B11 /* Preview Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = 058557D8273AAEEB004C7B11 /* Preview Assets.xcassets */; };
-		1170100A2DEDE87800EACA7C /* Symbols.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 117010092DEDE87800EACA7C /* Symbols.framework */; };
 		2152FB042600AC8F00CF470E /* iOSApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = 2152FB032600AC8F00CF470E /* iOSApp.swift */; };
 		7555FF83242A565900829871 /* ContentView.swift in Sources */ = {isa = PBXBuildFile; fileRef = 7555FF82242A565900829871 /* ContentView.swift */; };
 /* End PBXBuildFile section */
@@ -24,17 +23,6 @@
 		7555FF8C242A565B00829871 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
 		AB3632DC29227652001CCB65 /* Config.xcconfig */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = text.xcconfig; path = Config.xcconfig; sourceTree = "<group>"; };
 /* End PBXFileReference section */
-
-/* Begin PBXFrameworksBuildPhase section */
-		F85CB1118929364A9C6EFABC /* Frameworks */ = {
-			isa = PBXFrameworksBuildPhase;
-			buildActionMask = 2147483647;
-			files = (
-				1170100A2DEDE87800EACA7C /* Symbols.framework in Frameworks */,
-			);
-			runOnlyForDeploymentPostprocessing = 0;
-		};
-/* End PBXFrameworksBuildPhase section */
 
 /* Begin PBXGroup section */
 		058557D7273AAEEB004C7B11 /* Preview Content */ = {
@@ -101,7 +89,6 @@
 				05D91A912A5EF49C00F138EB /* Compile Kotlin */,
 				7555FF77242A565900829871 /* Sources */,
 				7555FF79242A565900829871 /* Resources */,
-				F85CB1118929364A9C6EFABC /* Frameworks */,
 			);
 			buildRules = (
 			);
@@ -339,6 +326,8 @@
 					"-framework",
 					shared,
 					"-lsqlite3",
+					"-undefined",
+					dynamic_lookup,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${BUNDLE_ID}${TEAM_ID}";
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = pro.schacher.mcc;
@@ -379,6 +368,8 @@
 					"-framework",
 					shared,
 					"-lsqlite3",
+					"-undefined",
+					dynamic_lookup,
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = "${BUNDLE_ID}${TEAM_ID}";
 				"PRODUCT_BUNDLE_IDENTIFIER[sdk=iphoneos*]" = pro.schacher.mcc;
