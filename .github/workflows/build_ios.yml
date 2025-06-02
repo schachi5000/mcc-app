@@ -2,9 +2,8 @@ name:
   Build
 
 on:
-  pull_request:
+  push:
     branches-ignore:
-      - main
       - release
 
 concurrency:
