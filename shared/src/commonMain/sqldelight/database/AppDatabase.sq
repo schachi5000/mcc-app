@@ -1,7 +1,3 @@
-import database.Card;
-import kotlin.String;
-import kotlin.collections.List;
-
 --- Cards
 CREATE TABLE Card (
     code TEXT NOT NULL PRIMARY KEY,
@@ -21,12 +17,17 @@ CREATE TABLE Card (
     imagePath TEXT,
     linkedCardCode TEXT,
     cardSetCode TEXT,
-    cardSetName TEXT
+    cardSetName TEXT,
+    primaryColor TEXT,
+    secondaryColor TEXT
 );
 
 addCard:
-INSERT OR REPLACE INTO Card(code, position, type, faction, cost, name, packCode, packName, text, boostText, attackText, quote, traits, aspect, imagePath, linkedCardCode, cardSetCode, cardSetName)
-VALUES(?, ?, ?, ?, ?,?, ?, ?,?,?, ?,?,?,?,?,?, ?,?);
+INSERT OR REPLACE INTO Card(code, position, type, faction, cost, name, packCode, packName, text, boostText, attackText, quote, traits, aspect, imagePath, linkedCardCode, cardSetCode, cardSetName, primaryColor, secondaryColor)
+VALUES(?, ?, ?, ?, ?,?, ?, ?,?,?, ?,?,?,?,?,?, ?,?, ?, ?);
+
+selectCardsByCodes:
+SELECT * FROM Card WHERE code IN ?;
 
 selectCardByCode:
 SELECT *
@@ -45,19 +46,33 @@ FROM Card;
 removeAllCards:
 DELETE FROM Card;
 
+--- Images
+CREATE TABLE Image (
+    code TEXT NOT NULL PRIMARY KEY,
+    base64Image TEXT NOT NULL
+);
+
+addImage:
+INSERT OR REPLACE INTO Image(code, base64Image)
+VALUES(?, ?);
+
+getImage:
+SELECT *
+FROM Image
+WHERE code = ?;
+
 -- Packs
 CREATE TABLE Pack (
     code TEXT NOT NULL PRIMARY KEY,
     id INTEGER NOT NULL,
     name TEXT NOT NULL,
     position INTEGER NOT NULL,
-    cardCodes TEXT NOT NULL,
     inPosession INTEGER DEFAULT 0
 );
 
 addPack:
-INSERT OR REPLACE INTO Pack(code, id, name, position, cardCodes,  inPosession)
-VALUES(?, ?, ?, ?, ?,  ?);
+INSERT OR REPLACE INTO Pack(code, id, name, position,  inPosession)
+VALUES(?, ?, ?, ?,  ?);
 
 getPack:
 SELECT *

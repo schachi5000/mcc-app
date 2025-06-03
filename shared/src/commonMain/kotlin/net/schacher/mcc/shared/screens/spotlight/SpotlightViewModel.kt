@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
+import kotlinx.coroutines.flow.onCompletion
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import kotlinx.datetime.Clock
@@ -48,25 +49,20 @@ class SpotlightViewModel(
         }
 
         this.viewModelScope.launch {
-            val updatedDecks = mutableMapOf<LocalDate, List<Deck>>()
-            dates.forEach { date ->
-                val spotlightDecks = spotlightRepository.getSpotlightDecks(date)
+            spotlightRepository.getSpotlightDecks(dates)
+                .onCompletion { _state.update { it.copy(loading = false) } }
+                .collect { spotlight ->
+                    _state.update {
+                        val newMap = it.decks.toMutableMap().also {
+                            it[spotlight.first] = spotlight.second
+                        }
 
-                if (spotlightDecks.isNotEmpty()) {
-                    updatedDecks[date] = spotlightDecks
+                        it.copy(
+                            decks = newMap,
+                            loading = !newMap.any { it.value.isNotEmpty() }
+                        )
+                    }
                 }
-
-                _state.update {
-                    it.copy(
-                        decks = updatedDecks,
-                        loading = updatedDecks.isNotEmpty()
-                    )
-                }
-            }
-
-            _state.update {
-                it.copy(loading = false)
-            }
         }
     }
 

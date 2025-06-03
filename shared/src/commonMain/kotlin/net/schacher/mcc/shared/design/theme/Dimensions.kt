@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.design.theme
 
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.theme.CornerRadius.Card
@@ -13,6 +14,10 @@ object CornerRadius {
 }
 
 val ContentPadding = 16.dp
+
+val DefaultHorizontalArrangement = Arrangement.spacedBy(12.dp)
+
+val DefaultVerticalArrangement = Arrangement.spacedBy(12.dp)
 
 val FABPadding = ContentPadding * 2
 

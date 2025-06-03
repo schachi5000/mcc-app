@@ -12,6 +12,7 @@ import androidx.compose.material.icons.automirrored.rounded.ArrowBack
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import net.schacher.mcc.shared.design.theme.ButtonSize
 import net.schacher.mcc.shared.design.theme.ContentPadding
@@ -20,7 +21,11 @@ import net.schacher.mcc.shared.design.theme.FABPadding
 import net.schacher.mcc.shared.platform.isAndroid
 
 @Composable
-fun BoxScope.BackButton(onClick: () -> Unit) {
+fun BoxScope.BackButton(
+    contentColor: Color = MaterialTheme.colors.onPrimary,
+    backgroundColor: Color = MaterialTheme.colors.primary,
+    onClick: () -> Unit
+) {
     FloatingActionButton(
         onClick = onClick,
         modifier = Modifier.align(Alignment.BottomStart).navigationBarsPadding()
@@ -29,8 +34,8 @@ fun BoxScope.BackButton(onClick: () -> Unit) {
                 bottom = if (isAndroid()) ContentPadding else 0.dp
             )
             .size(ButtonSize),
-        contentColor = MaterialTheme.colors.onPrimary,
-        backgroundColor = MaterialTheme.colors.primary,
+        contentColor = contentColor,
+        backgroundColor = backgroundColor,
         shape = DefaultShape
     ) {
         Icon(

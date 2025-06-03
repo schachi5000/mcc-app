@@ -19,53 +19,8 @@ import androidx.compose.ui.draw.blur
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.DpOffset
 import androidx.compose.ui.unit.dp
-import marvelchampionscompanion.shared.generated.resources.Res
-import marvelchampionscompanion.shared.generated.resources.cards
-import marvelchampionscompanion.shared.generated.resources.decks
-import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.model.Deck
-import org.jetbrains.compose.resources.pluralStringResource
 
-@Composable
-fun DeckGridItem(
-    modifier: Modifier = Modifier,
-    deck: Deck,
-    onClick: () -> Unit
-) {
-    ListItem(
-        modifier = modifier,
-        card = deck.hero,
-        title = deck.name,
-        subtitle = listOfNotNull(
-            deck.aspect?.label,
-            pluralStringResource(
-                Res.plurals.cards,
-                deck.cards.size,
-                deck.cards.size
-            ),
-            pluralStringResource(
-                Res.plurals.decks,
-                deck.requiredPacks.size,
-                deck.requiredPacks.size
-            )
-        ).joinToString(" · "),
-        onClick = onClick
-    )
-}
-
-@Composable
-fun CardGridItem(
-    card: Card,
-    onClick: () -> Unit
-) {
-    ListItem(
-        card = card,
-        title = card.name,
-        subtitle = card.type?.label,
-        onClick = onClick
-    )
-}
 
 @Composable
 fun GridItem(

@@ -29,12 +29,12 @@ val DarkColorScheme = darkColors(
     primary = primary,
     onPrimary = Color(0xFFFFFFFF),
     background = Color(0xff000000),
-    onBackground = Color(0xFFf4f4f4),
+    onBackground = Color(0xFFf9f9f9),
     surface = Color(0xff14171f),
     onSurface = Color(0xFFf0f0f0),
 )
 
-const val MIN_CONTRAST_RATIO = 4.0f
+const val MIN_CONTRAST_RATIO = 3.5
 
 object BottomSheetColors {
     val Scrim = Color(0xff000000).copy(alpha = 0.5f)
@@ -80,4 +80,34 @@ fun Color.getContrastRation(foreground: Color): Float {
 
 fun Color.isContrastRatioSufficient(foreground: Color): Boolean {
     return getContrastRation(foreground) >= MIN_CONTRAST_RATIO
+}
+
+fun Color.Companion.parseColor(colorString: String): Color {
+    // Remove the '#' if it exists
+    val cleanedHex = colorString.removePrefix("#")
+
+    // Parse the hex string
+    val colorInt = cleanedHex.toLong(16)
+
+    // Extract components
+    return when (cleanedHex.length) {
+        6 -> {
+            // If no alpha is provided, assume it's fully opaque
+            val r = (colorInt shr 16 and 0xFF).toFloat() / 255
+            val g = (colorInt shr 8 and 0xFF).toFloat() / 255
+            val b = (colorInt and 0xFF).toFloat() / 255
+            Color(r, g, b, 1f)
+        }
+
+        8 -> {
+            // If alpha is included
+            val a = (colorInt shr 24 and 0xFF).toFloat() / 255
+            val r = (colorInt shr 16 and 0xFF).toFloat() / 255
+            val g = (colorInt shr 8 and 0xFF).toFloat() / 255
+            val b = (colorInt and 0xFF).toFloat() / 255
+            Color(r, g, b, a)
+        }
+
+        else -> throw IllegalArgumentException("Invalid hex color: $colorString")
+    }
 }

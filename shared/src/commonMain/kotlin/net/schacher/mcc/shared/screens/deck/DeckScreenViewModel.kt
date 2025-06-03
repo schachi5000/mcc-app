@@ -7,13 +7,16 @@ import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 import net.schacher.mcc.shared.model.Card
+import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.Deck
+import net.schacher.mcc.shared.model.Faction
 import net.schacher.mcc.shared.repositories.DeckRepository
 import net.schacher.mcc.shared.repositories.SpotlightRepository
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption.REMOVE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.DeckOption.DELETE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.DeletingDeck
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.RemovingCard
+import net.schacher.mcc.shared.utils.defaultSort
 
 class DeckScreenViewModel(
     deckId: Int,
@@ -114,6 +117,18 @@ class DeckScreenViewModel(
         val deckOptions: Set<DeckOption>,
         val loading: Loading? = null,
     ) {
+        val heroCards = deck.cards
+            .filter { it.type != CardType.HERO && it.setCode == deck.hero.setCode }
+            .sortedBy { it.cost ?: 0 }
+
+        val aspectCards: List<Card> = this.deck.cards
+            .filter { it.setCode != deck.hero.setCode && it.aspect != null }
+            .defaultSort()
+
+        val basicCards: List<Card> = this.deck.cards
+            .filter { it.setCode != deck.hero.setCode && it.faction == Faction.BASIC }
+            .defaultSort()
+
         enum class CardOption {
             REMOVE
         }

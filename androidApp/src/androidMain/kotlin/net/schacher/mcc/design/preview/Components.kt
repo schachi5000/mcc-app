@@ -92,7 +92,12 @@ fun ShimmerBoxPreview() {
 @Composable
 fun CardInfoPreview() {
     MccTheme {
-        CardScreen(card = previewCard, onCloseClick = {}, onAddToDeckClick = {})
+        CardScreen(
+            card = previewCard,
+            onCloseClick = {},
+            onAddToDeckClick = {},
+            onLinkedCardClick = {},
+            onDeckClick = {})
     }
 }
 
@@ -121,5 +126,6 @@ private val previewDeck = Deck(
     cards = listOf(previewCard, previewCard, previewCard),
     version = "1.0",
     problem = null,
+    cardsCodes = listOf(previewCard.code),
     description = null
 )

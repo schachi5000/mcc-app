@@ -1,13 +1,8 @@
 package net.schacher.mcc.shared.datasource.http
 
-import co.touchlab.kermit.Logger
 import io.ktor.client.HttpClient
 import io.ktor.client.call.body
-import io.ktor.client.plugins.HttpRequestRetry
-import io.ktor.client.plugins.HttpResponseValidator
-import io.ktor.client.plugins.contentnegotiation.ContentNegotiation
-import io.ktor.client.plugins.logging.LogLevel
-import io.ktor.client.plugins.logging.Logging
+import io.ktor.client.plugins.timeout
 import io.ktor.client.request.delete
 import io.ktor.client.request.get
 import io.ktor.client.request.headers
@@ -16,31 +11,28 @@ import io.ktor.client.request.post
 import io.ktor.client.request.put
 import io.ktor.client.request.setBody
 import io.ktor.http.ContentType
-import io.ktor.http.HttpStatusCode
 import io.ktor.http.contentType
-import io.ktor.serialization.kotlinx.json.json
 import io.ktor.util.toUpperCasePreservingASCIIRules
 import io.ktor.utils.io.errors.IOException
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.IO
-import kotlinx.coroutines.async
-import kotlinx.coroutines.awaitAll
 import kotlinx.coroutines.withContext
 import kotlinx.datetime.LocalDate
-import kotlinx.serialization.ExperimentalSerializationApi
 import kotlinx.serialization.encodeToString
 import kotlinx.serialization.json.Json
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.dto.CardDto
+import net.schacher.mcc.shared.datasource.http.dto.CardsRequestDto
 import net.schacher.mcc.shared.datasource.http.dto.CreateDeckRequestDto
 import net.schacher.mcc.shared.datasource.http.dto.CreateDeckResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.DeckDto
-import net.schacher.mcc.shared.datasource.http.dto.ErrorResponseDto
 import net.schacher.mcc.shared.datasource.http.dto.PackDto
 import net.schacher.mcc.shared.model.Aspect
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
 import net.schacher.mcc.shared.model.CardType.ALLY
+import net.schacher.mcc.shared.model.CardType.ALTER_EGO
 import net.schacher.mcc.shared.model.CardType.ATTACHMENT
 import net.schacher.mcc.shared.model.CardType.ENVIRONMENT
 import net.schacher.mcc.shared.model.CardType.EVENT
@@ -62,6 +54,7 @@ import net.schacher.mcc.shared.repositories.AuthRepository
 import kotlin.coroutines.CoroutineContext
 
 class KtorMarvelCDbDataSource(
+    private val httpClient: HttpClient,
     private val authRepository: AuthRepository,
     private val serviceUrl: String
 ) : MarvelCDbDataSource {
@@ -69,91 +62,86 @@ class KtorMarvelCDbDataSource(
     private companion object {
         const val TAG = "KtorMarvelCDbDataSource"
         const val AUTHORIZATION = "Authorization"
-        const val MAX_RETRY_DELAY_MS = 10000L
-        const val MAX_RETRIES = 2
+        const val GET_CARDS_IN_PACK_TIMEOUT_MS = 12500L
     }
 
     private val authHeader: String
-        get() = "Bearer ${this.authRepository.accessToken?.token ?: throw IllegalStateException("No access token available")}"
+        get() = this.authRepository.accessToken?.token?.let { "Bearer $it" }
+            ?: throw IllegalStateException("No access token available")
 
-    @OptIn(ExperimentalSerializationApi::class)
-    private val httpClient = HttpClient {
-        install(ContentNegotiation) {
-            json(Json {
-                ignoreUnknownKeys = true
-                explicitNulls = false
-            })
-        }
-        install(Logging) {
-            logger = object : io.ktor.client.plugins.logging.Logger {
-                override fun log(message: String) {
-                    Logger.d(TAG) { message }
-                }
-            }
-            level = LogLevel.INFO
-        }
-        install(HttpRequestRetry) {
-            retryOnServerErrors(maxRetries = MAX_RETRIES)
-            exponentialDelay(maxDelayMs = MAX_RETRY_DELAY_MS)
-        }
-
-        HttpResponseValidator {
-            validateResponse { response ->
-                if (response.status != HttpStatusCode.OK) {
-                    val error = response.body<ErrorResponseDto>()
-                    throw ServiceException(
-                        response.status.value,
-                        "${response.status} - ${error.message}"
-                    )
-                }
-            }
-        }
-    }
-
-    override suspend fun getAllPacks() = withContextSafe {
+    override suspend fun getAllPackCodes(): Result<List<String>> = withContextSafe {
         httpClient.get("$serviceUrl/packs")
             .body<List<PackDto>>()
-            .map {
-                async(Dispatchers.Default) {
-                    Logger.d { "Processing Pack: ${it.name}" }
-                    val cards = getCardsInPack(it.code).getOrThrow()
-
-                    Pack(
-                        code = it.code,
-                        name = it.name,
-                        cards = cards,
-                        id = it.id,
-                        position = it.position
-                    ).also {
-                        Logger.d { "Processing done: ${it.name}" }
-                    }
-                }
-            }
-            .awaitAll()
+            .map { it.code }
     }
 
-    override suspend fun getCardsInPack(packCode: String) =
-        withContextSafe {
-            httpClient.get("$serviceUrl/packs/$packCode")
-                .body<List<CardDto>>()
-                .map {
-                    val card = it.toCard()
-                    val linkedCard = it.linkedCard?.toCard()?.copy(
-                        linkedCard = card
-                    )
+    override suspend fun getPacks(packCodes: List<String>) = withContextSafe {
+        httpClient.get("$serviceUrl/packs").body<List<PackDto>>()
+            .filter { packCodes.contains(it.code) }
+            .map { packDto ->
+                Pack(
+                    id = packDto.id,
+                    code = packDto.code,
+                    name = packDto.name,
+                    position = packDto.position
+                )
+            }
+    }
 
-                    card.copy(
-                        linkedCard = linkedCard
-                    )
-                }
+    override suspend fun getCardsInPack(packCode: String) = withContextSafe {
+        AppLogger.d(TAG) { "Loading all cards from pack [$packCode]" }
+        httpClient.get("$serviceUrl/packs/$packCode/cards") {
+            timeout {
+                requestTimeoutMillis = GET_CARDS_IN_PACK_TIMEOUT_MS
+            }
         }
+            .body<List<CardDto>>()
+            .map {
+                val card = it.toCard()
+                var linkedCard = it.linkedCard?.toCard()
+
+                linkedCard = linkedCard?.copy(
+                    linkedCard = card
+                )
+
+                card.copy(
+                    linkedCard = linkedCard
+                )
+            }
+    }
 
     override suspend fun getCard(cardCode: String) = withContextSafe {
         httpClient.get("$serviceUrl/cards/$cardCode")
             .body<CardDto>()
             .let {
                 val card = it.toCard()
-                val linkedCard = it.linkedCard?.toCard()?.copy(
+                var linkedCard = it.linkedCard?.toCard()
+
+                linkedCard = linkedCard?.copy(
+                    linkedCard = card
+                )
+
+                card.copy(
+                    linkedCard = linkedCard
+                )
+            }
+    }
+
+    override suspend fun getCards(cardCodes: List<String>) = withContextSafe {
+        if (cardCodes.isEmpty()) {
+            return@withContextSafe emptyList()
+        }
+
+        httpClient.post("$serviceUrl/cards") {
+            contentType(ContentType.Application.Json)
+            setBody(CardsRequestDto(cardCodes))
+        }
+            .body<List<CardDto>>()
+            .map {
+                val card = it.toCard()
+                var linkedCard = it.linkedCard?.toCard()
+
+                linkedCard = linkedCard?.copy(
                     linkedCard = card
                 )
 
@@ -164,20 +152,23 @@ class KtorMarvelCDbDataSource(
     }
 
     override suspend fun getSpotlightDecksByDate(
-        date: LocalDate, cardProvider: suspend (String) -> Card
+        date: LocalDate,
+        cardProvider: suspend (List<String>) -> List<Card>
     ) = withContextSafe {
         httpClient.get("$serviceUrl/decks/spotlight") {
             parameter("date", date.toDateString())
         }
             .body<List<DeckDto>>()
-            .map { it.toDeck(cardProvider) }
+            .map {
+                it.toDeck(cardProvider)
+            }
     }.also {
         it.exceptionOrNull()?.let {
-            Logger.e(it) { "Failed to get spotlight decks" }
+            AppLogger.e(throwable = it, tag = TAG) { "Failed to get spotlight decks" }
         }
     }
 
-    override suspend fun getUserDecks(cardProvider: suspend (String) -> Card) =
+    override suspend fun getUserDecks(cardProvider: suspend (List<String>) -> List<Card>) =
         withContextSafe {
             httpClient
                 .get("$serviceUrl/decks") {
@@ -188,13 +179,13 @@ class KtorMarvelCDbDataSource(
                 .sortedBy { it.name }
         }.also {
             it.exceptionOrNull()?.let {
-                Logger.e(it) { "Failed to get user decks" }
+                AppLogger.e(TAG) { "Failed to get user decks - ${it.message}" }
             }
         }
 
     override suspend fun getUserDeckById(
         deckId: Int,
-        cardProvider: suspend (String) -> Card
+        cardProvider: suspend (List<String>) -> List<Card>
     ) = runCatching {
         this.getUserDeckDtoById(deckId).getOrThrow().toDeck(cardProvider)
     }
@@ -216,27 +207,32 @@ class KtorMarvelCDbDataSource(
                 .deckId
         }
 
-    override suspend fun updateDeck(deck: Deck, cardProvider: suspend (String) -> Card) =
-        withContextSafe {
-            val slots = deck.cards.toMutableList()
-                .also { it.removeAll { it.code == deck.hero.code } }
-                .groupingBy { it.code }
-                .eachCount()
-                .let { Json.encodeToString(it) }
+    override suspend fun updateDeck(
+        deck: Deck,
+        cardProvider: suspend (List<String>) -> List<Card>
+    ) = withContextSafe {
+        val slots = deck.cards.toMutableList()
+            .also { it.removeAll { it.code == deck.hero.code } }
+            .groupingBy { it.code }
+            .eachCount()
+            .let { Json.encodeToString(it) }
 
-            httpClient.put("$serviceUrl/decks/${deck.id}") {
-                headers { append(AUTHORIZATION, authHeader) }
-                parameter("slots", slots)
-            }
-
-            getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
+        httpClient.put("$serviceUrl/decks/${deck.id}") {
+            headers { append(AUTHORIZATION, authHeader) }
+            parameter("slots", slots)
         }
+
+        getUserDeckById(deck.id) { cardProvider(it) }.getOrThrow()
+    }
 
     override suspend fun deleteDeck(deckId: Int): Result<Unit> = withContextSafe {
         httpClient.delete("$serviceUrl/decks/${deckId}") {
             headers { append(AUTHORIZATION, authHeader) }
         }
     }
+
+    override suspend fun getCardImage(cardCode: String): ByteArray =
+        this.httpClient.get("$serviceUrl/cards/$cardCode/image").body<ByteArray>()
 }
 
 class ServiceException(val status: Int, message: String) : IOException("[${status}] $message")
@@ -278,6 +274,9 @@ private fun CardDto.toCard() = Card(
     aspect = this.factionCode.parseAspect(),
     traits = this.traits?.takeIf { it.isNotEmpty() },
     faction = Faction.valueOf(this.factionCode.toUpperCasePreservingASCIIRules()),
+    primaryColor = this.primaryColor,
+    secondaryColor = this.secondaryColor,
+    linkedCardCode = this.linkedCard?.code,
 )
 
 private fun String?.cleanUp(): String? =
@@ -285,6 +284,7 @@ private fun String?.cleanUp(): String? =
 
 private fun String?.toCardType(): CardType? = when (this) {
     "hero" -> HERO
+    "alter_ego" -> ALTER_EGO
     "ally" -> ALLY
     "event" -> EVENT
     "support" -> SUPPORT
@@ -302,8 +302,14 @@ private fun String?.toCardType(): CardType? = when (this) {
     else -> null
 }
 
-private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck {
-    val heroCard = cardProvider(this.heroCode!!)
+private suspend fun DeckDto.toDeck(cardProvider: suspend (List<String>) -> List<Card>): Deck {
+    val cardCodes = mutableListOf(this.heroCode!!).also {
+        it.addAll(this.slots?.keys ?: emptyList())
+    }
+
+    val uniqueCardsInDeck = cardProvider.invoke(cardCodes)
+    val heroCard = uniqueCardsInDeck.find { it.code == this.heroCode }
+        ?: throw IllegalStateException("Hero not found")
 
     return Deck(id = this.id,
         name = this.name,
@@ -312,17 +318,20 @@ private suspend fun DeckDto.toDeck(cardProvider: suspend (String) -> Card): Deck
         cards = (this.slots ?: emptyMap()).entries
             .map { entry ->
                 List(entry.value) {
-                    cardProvider(entry.key)
+                    uniqueCardsInDeck.find { it.code == entry.key }
+                        ?: throw IllegalStateException("Card not found: ${entry.key}")
                 }
             }
             .flatten()
             .toMutableList()
             .also { it.add(0, heroCard) },
+        cardsCodes = cardCodes.toMutableList().also { it.add(heroCard.code) },
         problem = this.problem,
         version = this.version,
         description = this.description
     )
 }
+
 
 private suspend fun <T> withContextSafe(
     context: CoroutineContext = Dispatchers.IO,

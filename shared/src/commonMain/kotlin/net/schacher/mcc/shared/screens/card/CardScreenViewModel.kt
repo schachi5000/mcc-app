@@ -2,17 +2,17 @@ package net.schacher.mcc.shared.screens.card
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.launch
 import kotlinx.coroutines.runBlocking
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.CardType
+import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.CardRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
-import net.schacher.mcc.shared.utils.e
 
 class CardScreenViewModel(
     cardCode: String,
@@ -27,10 +27,13 @@ class CardScreenViewModel(
 
     private val _state: MutableStateFlow<UiState> = runBlocking {
         val card = cardRepository.getCard(cardCode)
+        val decks = deckRepository.getDecksWithCard(cardCode)
+
         MutableStateFlow(
             UiState(
                 card = card,
-                canAddToDeck = canAddToDeck(card)
+                canAddToDeck = canAddToDeck(card),
+                foundInDecks = decks
             )
         )
     }
@@ -42,7 +45,7 @@ class CardScreenViewModel(
             try {
                 deckRepository.addCardToDeck(it, cardCode)
             } catch (e: Exception) {
-                Logger.e(TAG) { "Error adding card to deck: $e" }
+                AppLogger.e(TAG) { "Error adding card to deck: $e" }
             }
         }
     }
@@ -58,8 +61,9 @@ class CardScreenViewModel(
             it == card.type
         }
 
-    data class UiState internal constructor(
+    data class UiState(
         val card: Card,
+        val foundInDecks: List<Deck> = emptyList(),
         val canAddToDeck: Boolean = false
     )
 }

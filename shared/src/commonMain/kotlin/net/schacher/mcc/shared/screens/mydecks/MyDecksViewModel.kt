@@ -1,18 +1,15 @@
 package net.schacher.mcc.shared.screens.mydecks
 
-import androidx.compose.runtime.State
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.repositories.AuthRepository
 import net.schacher.mcc.shared.repositories.DeckRepository
-import net.schacher.mcc.shared.utils.debug
 import net.schacher.mcc.shared.utils.launchAndCollect
 
 class MyDecksViewModel(
@@ -60,7 +57,7 @@ class MyDecksViewModel(
         try {
             deckRepository.refreshAllUserDecks()
         } catch (e: Exception) {
-            Logger.e(e.toString())
+            AppLogger.e(e.toString())
         }
 
         _state.update {
@@ -71,7 +68,7 @@ class MyDecksViewModel(
         }
     }
 
-    data class UiState internal constructor(
+    data class UiState(
         val decks: List<Deck> = emptyList(),
         val refreshing: Boolean = false,
         val allowLogIn: Boolean = false

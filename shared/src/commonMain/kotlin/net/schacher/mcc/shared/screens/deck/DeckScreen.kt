@@ -1,5 +1,7 @@
 package net.schacher.mcc.shared.screens.deck
 
+import androidx.compose.animation.core.animateIntAsState
+import androidx.compose.animation.core.spring
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -15,8 +17,9 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.LazyItemScope
+import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.ModalBottomSheetLayout
@@ -37,10 +40,16 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshotFlow
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.graphics.Shadow
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import kotlinx.coroutines.launch
 import marvelchampionscompanion.shared.generated.resources.Res
+import marvelchampionscompanion.shared.generated.resources.basic
+import marvelchampionscompanion.shared.generated.resources.delete
+import marvelchampionscompanion.shared.generated.resources.hero_cards
 import marvelchampionscompanion.shared.generated.resources.remove_card_from_deck
 import net.schacher.mcc.shared.design.compose.BackButton
 import net.schacher.mcc.shared.design.compose.BackHandler
@@ -56,17 +65,22 @@ import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.ProgressDialog
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.Tag
+import net.schacher.mcc.shared.design.compose.noRippleClickable
 import net.schacher.mcc.shared.design.theme.BottomSheetColors
 import net.schacher.mcc.shared.design.theme.BottomSheetShape
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultHorizontalArrangement
+import net.schacher.mcc.shared.design.theme.DefaultShape
+import net.schacher.mcc.shared.design.theme.color
+import net.schacher.mcc.shared.localization.label
 import net.schacher.mcc.shared.model.Card
-import net.schacher.mcc.shared.model.CardType
+import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState
+import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.CardOption.REMOVE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.DeckOption.DELETE
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.DeletingDeck
 import net.schacher.mcc.shared.screens.deck.DeckScreenViewModel.UiState.Loading.RemovingCard
-import net.schacher.mcc.shared.utils.defaultSort
 import org.jetbrains.compose.resources.stringResource
 import org.koin.compose.koinInject
 import org.koin.core.parameter.parametersOf
@@ -102,7 +116,7 @@ fun DeckScreen(
     navController: NavController,
     onShowCardOptions: (Card) -> Unit,
     onCardOptionsDismiss: () -> Unit,
-    onOptionClick: (UiState.CardOption) -> Unit,
+    onOptionClick: (CardOption) -> Unit,
     onDeleteDeckClicked: () -> Unit,
 ) {
 
@@ -144,7 +158,7 @@ fun DeckScreen(
         Content(
             state = state,
             onCloseClick = { navController.popBackStack() },
-            onCardClick = { navController.navigate("card/${it.code}") },
+            onCardClick = { navController.navigate(AppRoute.toCard(it.code)) },
             onCardOptionsClick = onShowCardOptions,
             onDeleteDeckClicked = { deleteDialog = true }
         )
@@ -186,142 +200,55 @@ private fun Content(
             .background(MaterialTheme.colors.background),
         cardCode = state.deck.hero.code,
     ) {
-        LazyColumn(modifier = Modifier.fillMaxSize()) {
+        LazyColumn(
+            modifier = Modifier.fillMaxSize(),
+            verticalArrangement = Arrangement.spacedBy(ContentPadding)
+        ) {
+            item { HeroSection(state, onCardClick) }
             item {
-                Spacer(Modifier.statusBarsPadding().height(ContentPadding))
-            }
-            item {
-                Row(
-                    modifier = Modifier.padding(
-                        vertical = 16.dp,
-                        horizontal = ContentPadding
-                    )
-                ) {
-                    Card(state.deck.hero) {
-                        onCardClick(state.deck.hero)
-                    }
-
-                    state.deck.hero.linkedCard?.let {
-                        Card(it) {
-                            onCardClick(it)
-                        }
-                    }
+                Column(Modifier.padding(horizontal = ContentPadding)) {
+                    TitleSection(state)
+                    TagSection(state)
                 }
             }
 
-            item {
-                Row(modifier = Modifier.padding(ContentPadding)) {
-                    state.deck.version?.let {
-                        Tag(text = "v$it")
-                    }
-                    state.deck.problem?.let {
-                        Tag(
-                            modifier = Modifier.padding(start = 4.dp),
-                            text = it,
-                            color = MaterialTheme.colors.error
-                        )
-                    }
-                }
+            if (state.deck.description != null) {
+                item { DescriptionSection(state.deck.description) }
             }
 
-            val heroCards = CardRowEntry("Hero cards", state.deck.cards
-                .filter { it.type != CardType.HERO && it.setCode == state.deck.hero.setCode }
-                .distinctBy { it.name }
-                .sortedBy { it.cost ?: 0 })
-
+            item { HeroCardsSection(state, onCardClick) }
             item {
-                CardRow(
-                    modifier = Modifier.padding(
-                        horizontal = ContentPadding,
-                        vertical = 16.dp,
-                    ),
-                    cardRowEntry = heroCards
-                ) {
-                    onCardClick(it)
-                }
+                CardGridSection(
+                    state.aspectCards.firstOrNull()?.aspect?.label ?: "Aspect",
+                    state.aspectCards,
+                    state.cardOptions,
+                    onCardClick,
+                    onCardOptionsClick
+                )
             }
 
-            val otherCards = state.deck.cards
-                .filter { it.setCode != state.deck.hero.setCode }
-                .distinctBy { it.name }
-                .defaultSort()
-
-            if (otherCards.isNotEmpty()) {
-                item {
-                    Row(
-                        modifier = Modifier.fillMaxWidth().padding(ContentPadding),
-                        verticalAlignment = Alignment.Bottom,
-                        horizontalArrangement = Arrangement.SpaceBetween
-                    ) {
-                        HeaderSmall(
-                            title = "Other Cards",
-                            subTitle = otherCards.size.toString()
-                        )
-                    }
-                }
-
-                val rows = otherCards.chunked(COLUMN_COUNT)
-                items(rows.size) { index ->
-                    Row(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                            .padding(
-                                start = ContentPadding,
-                                end = ContentPadding,
-                                top = 8.dp
-                            ),
-                        horizontalArrangement = Arrangement.spacedBy(8.dp)
-                    ) {
-                        rows[index].forEach { card ->
-                            Box(Modifier.weight(1f)) {
-                                val cardCount = state.deck.cards.count { it.code == card.code }
-                                LabeledCard(
-                                    modifier = Modifier.wrapContentHeight(),
-                                    label = listOfNotNull(card.name,
-                                        cardCount.takeIf { it > 1 }?.let { "($it)" })
-                                        .joinToString(" "),
-                                    card = card
-                                ) {
-                                    onCardClick(card)
-                                }
-
-                                if (state.cardOptions.isNotEmpty()) {
-                                    Icon(
-                                        modifier = Modifier
-                                            .padding(4.dp)
-                                            .size(32.dp)
-                                            .background(
-                                                MaterialTheme.colors.surface.copy(alpha = 0.8f),
-                                                CircleShape
-                                            )
-                                            .padding(4.dp)
-                                            .align(Alignment.TopEnd)
-                                            .clickable { onCardOptionsClick(card) },
-                                        imageVector = Icons.Default.MoreVert,
-                                        contentDescription = "Card Options",
-                                        tint = MaterialTheme.colors.onSurface
-                                    )
-                                }
-                            }
-                        }
-
-                        if (rows[index].size < COLUMN_COUNT) {
-                            repeat(COLUMN_COUNT - rows[index].size) {
-                                Spacer(modifier = Modifier.weight(1f))
-                            }
-                        }
-                    }
-                }
+            item {
+                CardGridSection(
+                    stringResource(Res.string.basic),
+                    state.basicCards,
+                    state.cardOptions,
+                    onCardClick,
+                    onCardOptionsClick
+                )
             }
 
             state.deckOptions.find { it == DELETE }?.let {
                 item {
                     SecondaryButton(
                         modifier = Modifier
-                            .padding(horizontal = ContentPadding)
+                            .padding(
+                                start = ContentPadding,
+                                end = ContentPadding,
+                                top = ContentPadding
+                            )
                             .fillMaxWidth(),
                         onClick = onDeleteDeckClicked,
-                        label = "Deck löschen"
+                        label = UiState.DeckOption.DELETE.label
                     )
                 }
             }
@@ -331,14 +258,216 @@ private fun Content(
             }
         }
 
-        BackButton(onCloseClick)
+        BackButton {
+            onCloseClick()
+        }
+    }
+}
+
+@Composable
+private fun CardGridSection(
+    title: String,
+    cards: List<Card>,
+    cardOptions: Set<CardOption>,
+    onCardClick: (Card) -> Unit,
+    onCardOptionsClick: (Card) -> Unit
+) {
+    if (cards.isNotEmpty()) {
+
+        Column {
+            Row(
+                modifier = Modifier.fillMaxWidth().padding(ContentPadding),
+                verticalAlignment = Alignment.Bottom,
+                horizontalArrangement = Arrangement.SpaceBetween
+            ) {
+                HeaderSmall(
+                    title = title,
+                    subTitle = cards.size.toString(),
+                )
+            }
+
+            val rows = cards.chunked(3)
+            for (index in rows.indices) {
+                Row(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .padding(
+                            start = ContentPadding,
+                            end = ContentPadding,
+                            top = if (index == 0) 0.dp else 8.dp,
+                            bottom = if (index <= rows.size - 1) 8.dp else 0.dp
+                        ),
+                    horizontalArrangement = DefaultHorizontalArrangement
+                ) {
+                    rows[index].forEach { card ->
+                        Box(Modifier.weight(1f)) {
+                            LabeledCard(
+                                modifier = Modifier.wrapContentHeight(),
+                                label = card.name,
+                                card = card
+                            ) {
+                                onCardClick(card)
+                            }
+
+                            if (cardOptions.isNotEmpty()) {
+                                Icon(
+                                    modifier = Modifier
+                                        .padding(4.dp)
+                                        .size(32.dp)
+                                        .background(
+                                            MaterialTheme.colors.surface.copy(alpha = 0.8f),
+                                            CircleShape
+                                        )
+                                        .padding(4.dp)
+                                        .align(Alignment.TopEnd)
+                                        .clickable { onCardOptionsClick(card) },
+                                    imageVector = Icons.Default.MoreVert,
+                                    contentDescription = REMOVE.label,
+                                    tint = MaterialTheme.colors.onSurface
+                                )
+                            }
+                        }
+                    }
+
+                    if (rows[index].size < COLUMN_COUNT) {
+                        repeat(COLUMN_COUNT - rows[index].size) {
+                            Spacer(modifier = Modifier.weight(1f))
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+@Composable
+private fun LazyItemScope.HeroSection(state: UiState, onCardClick: (Card) -> Unit) {
+    Row(
+        modifier = Modifier.statusBarsPadding().padding(ContentPadding).fillMaxWidth(),
+        horizontalArrangement = Arrangement.Center
+    ) {
+        Card(
+            card = state.deck.hero,
+            modifier = Modifier.padding(top = ContentPadding).fillParentMaxWidth(0.60f),
+            parallaxEffect = true
+        ) {
+            onCardClick(state.deck.hero)
+        }
+
+    }
+}
+
+@Composable
+private fun TitleSection(state: UiState) {
+    Column {
+        Text(
+            text = state.deck.name,
+            maxLines = 2,
+            style = MaterialTheme.typography.h5.copy(
+                shadow = Shadow(
+                    color = MaterialTheme.colors.background,
+                    offset = Offset.Zero,
+                    blurRadius = 16.dp.value
+                )
+            ),
+            color = MaterialTheme.colors.onSurface
+        )
+
+        Text(
+            modifier = Modifier.padding(top = 4.dp),
+            text = state.deck.hero.name,
+            maxLines = 1,
+            style = MaterialTheme.typography.h6.copy(
+                shadow = Shadow(
+                    color = MaterialTheme.colors.background,
+                    offset = Offset.Zero,
+                    blurRadius = 16.dp.value
+                )
+            ),
+            color = MaterialTheme.colors.onSurface.copy(alpha = 0.75f)
+        )
+    }
+}
+
+@Composable
+private fun TagSection(state: UiState) {
+    LazyRow(
+        modifier = Modifier.padding(top = 8.dp),
+        horizontalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        state.deck.aspect?.let {
+            item { Tag(text = it.label, color = it.color) }
+        }
+
+        item { Tag(text = state.deck.id.toString()) }
+        state.deck.version?.let {
+            item { Tag(text = "v$it") }
+        }
+
+        state.deck.problem?.let {
+            item {
+                Tag(
+                    modifier = Modifier.padding(start = 4.dp),
+                    text = it,
+                    color = MaterialTheme.colors.error
+                )
+            }
+        }
+    }
+}
+
+@Composable
+private fun DescriptionSection(description: String) {
+    var expandedDescription by remember { mutableStateOf(false) }
+    val maxLines by animateIntAsState(
+        targetValue = if (expandedDescription) 100 else 4,
+        animationSpec = spring()
+    )
+
+    Column(Modifier.fillMaxWidth()
+        .padding(
+            start = ContentPadding,
+            top = ContentPadding,
+            end = ContentPadding
+        )
+        .background(
+            color = MaterialTheme.colors.surface,
+            shape = DefaultShape
+        )
+        .padding(ContentPadding)
+        .noRippleClickable { expandedDescription = !expandedDescription })
+    {
+        Text(
+            modifier = Modifier
+                .fillMaxWidth(),
+            text = description,
+            style = MaterialTheme.typography.body1,
+            maxLines = maxLines,
+            overflow = TextOverflow.Ellipsis,
+            color = MaterialTheme.colors.onBackground,
+        )
+    }
+}
+
+@Composable
+private fun HeroCardsSection(state: UiState, onCardClick: (Card) -> Unit) {
+    val heroCards = CardRowEntry(
+        title = stringResource(Res.string.hero_cards),
+        cards = state.heroCards
+    )
+
+    CardRow(
+        modifier = Modifier.padding(top = ContentPadding),
+        cardRowEntry = heroCards
+    ) {
+        onCardClick(it)
     }
 }
 
 @Composable
 private fun OptionBottomSheet(
-    cardOptions: Set<UiState.CardOption>,
-    onOptionClick: (UiState.CardOption) -> Unit
+    cardOptions: Set<CardOption>,
+    onOptionClick: (CardOption) -> Unit
 ) {
     BottomSheetContainer {
         Column {
@@ -366,10 +495,17 @@ private fun OptionBottomSheet(
     }
 }
 
-private val UiState.CardOption.label
+private val CardOption.label
     @Composable
     get() = when (this) {
         REMOVE -> stringResource(Res.string.remove_card_from_deck)
     }
+
+private val UiState.DeckOption.label
+    @Composable
+    get() = when (this) {
+        DELETE -> stringResource(Res.string.delete)
+    }
+
 
 private data class ConfirmationState(val title: String, val message: String)

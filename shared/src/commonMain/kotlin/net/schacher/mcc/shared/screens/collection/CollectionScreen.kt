@@ -14,11 +14,14 @@ import androidx.compose.foundation.layout.statusBarsPadding
 import androidx.compose.foundation.layout.wrapContentHeight
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.material.ExperimentalMaterialApi
 import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.rounded.List
+import androidx.compose.material.pullrefresh.PullRefreshIndicator
+import androidx.compose.material.pullrefresh.rememberPullRefreshState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
@@ -41,11 +44,13 @@ import marvelchampionscompanion.shared.generated.resources.select_packs
 import net.schacher.mcc.shared.design.compose.BottomSpacer
 import net.schacher.mcc.shared.design.compose.ExpandingButton
 import net.schacher.mcc.shared.design.compose.FilterFlowRow
-import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.Header
+import net.schacher.mcc.shared.design.compose.LabeledCard
 import net.schacher.mcc.shared.design.compose.SecondaryButton
 import net.schacher.mcc.shared.design.compose.maxSpanItem
 import net.schacher.mcc.shared.design.theme.ContentPadding
+import net.schacher.mcc.shared.design.theme.DefaultHorizontalArrangement
+import net.schacher.mcc.shared.design.theme.DefaultVerticalArrangement
 import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.screens.AppRoute
 import net.schacher.mcc.shared.screens.main.BottomSheetDelegate
@@ -62,7 +67,7 @@ fun CollectionScreen(
     navController: NavController = koinInject(),
     topInset: Dp = ContentPadding,
     bottomSheetDelegate: BottomSheetDelegate,
-    onCardClicked: (Card) -> Unit
+    onCardClicked: ((Card) -> Unit)? = null
 ) {
     val state by viewModel.state.collectAsState()
 
@@ -70,12 +75,15 @@ fun CollectionScreen(
         state = state,
         navController = navController,
         topInset = topInset,
-        onCardClicked = onCardClicked,
+        onCardClicked = onCardClicked ?: { card ->
+            navController.navigate(AppRoute.toCard(card.code))
+        },
         bottomSheetDelegate = bottomSheetDelegate,
         onApplyFilerClick = viewModel::onApplyFilterClicked
     )
 }
 
+@OptIn(ExperimentalMaterialApi::class)
 @Composable
 fun CollectionScreen(
     state: UiState,
@@ -106,8 +114,8 @@ fun CollectionScreen(
 
         LazyVerticalGrid(
             columns = GridCells.Fixed(3),
-            verticalArrangement = Arrangement.spacedBy(12.dp),
-            horizontalArrangement = Arrangement.spacedBy(12.dp),
+            verticalArrangement = DefaultVerticalArrangement,
+            horizontalArrangement = DefaultHorizontalArrangement,
             modifier = Modifier.fillMaxSize()
                 .padding(horizontal = ContentPadding)
                 .nestedScroll(nestedScrollConnection),
@@ -161,6 +169,19 @@ fun CollectionScreen(
                     )
                 }
             }
+        )
+
+        val pullRefreshState = rememberPullRefreshState(
+            refreshing = state.refreshing,
+            onRefresh = {}
+        )
+
+        PullRefreshIndicator(
+            modifier = Modifier.align(Alignment.TopCenter).statusBarsPadding(),
+            refreshing = state.refreshing,
+            state = pullRefreshState,
+            contentColor = MaterialTheme.colors.onPrimary,
+            backgroundColor = MaterialTheme.colors.primary
         )
     }
 }

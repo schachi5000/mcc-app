@@ -1,6 +1,11 @@
 package net.schacher.mcc.shared.design.compose
 
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.core.LinearEasing
+import androidx.compose.animation.core.RepeatMode
+import androidx.compose.animation.core.animateFloat
+import androidx.compose.animation.core.infiniteRepeatable
+import androidx.compose.animation.core.rememberInfiniteTransition
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
@@ -23,12 +28,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.blur
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.geometry.Offset
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Shadow
 import androidx.compose.ui.graphics.Shape
+import androidx.compose.ui.graphics.graphicsLayer
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
-import co.touchlab.kermit.Logger
 import marvelchampionscompanion.shared.generated.resources.Res
 import marvelchampionscompanion.shared.generated.resources.card_blue_no_image
 import marvelchampionscompanion.shared.generated.resources.card_yellow_no_image
@@ -48,21 +55,25 @@ import org.jetbrains.compose.resources.painterResource
 
 const val PORTRAIT_RATIO = 0.715f
 const val LANDSCAPE_RATIO = 1.396f
+const val PARALLAX_DURATION_MS = 5000
 
 @Composable
 fun LabeledCard(
     card: Card,
     label: String = card.name,
     showLabel: Boolean = true,
+    minLines: Int = 1,
+    maxLines: Int = 2,
     modifier: Modifier = Modifier.height(196.dp),
     shape: Shape = CardShape,
+    parallaxEffect: Boolean = false,
     onClick: (() -> Unit)? = null
 ) {
     Column {
-        Card(card, modifier, shape, onClick)
+        Card(card, modifier, shape, parallaxEffect, onClick)
         AnimatedVisibility(
             visible = showLabel,
-            modifier = Modifier.padding(vertical = 8.dp)
+            modifier = Modifier.padding(top = 8.dp)
                 .sizeIn(maxWidth = 128.dp)
                 .align(Alignment.CenterHorizontally)
         ) {
@@ -70,8 +81,15 @@ fun LabeledCard(
                 text = label,
                 textAlign = TextAlign.Center,
                 color = MaterialTheme.colors.onBackground,
-                style = MaterialTheme.typography.caption,
-                maxLines = 2,
+                style = MaterialTheme.typography.caption.copy(
+                    shadow = Shadow(
+                        color = MaterialTheme.colors.background,
+                        offset = Offset.Zero,
+                        blurRadius = 16.dp.value
+                    ),
+                ),
+                maxLines = maxLines,
+                minLines = minLines,
             )
         }
     }
@@ -82,9 +100,38 @@ fun Card(
     card: Card,
     modifier: Modifier = Modifier.height(DefaultCardSize),
     shape: Shape = CardShape,
+    parallaxEffect: Boolean = false,
     onClick: (() -> Unit)? = null
 ) {
     var blur by remember { mutableStateOf(0.dp) }
+
+    val infiniteTransition = rememberInfiniteTransition()
+    val rotationX by infiniteTransition.animateFloat(
+        initialValue = -0.5f,
+        targetValue = 1f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = PARALLAX_DURATION_MS, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    val rotationY by infiniteTransition.animateFloat(
+        initialValue = 0.5f,
+        targetValue = -0.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = PARALLAX_DURATION_MS, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
+
+    val rotationZ by infiniteTransition.animateFloat(
+        initialValue = -0.5f,
+        targetValue = 0.5f,
+        animationSpec = infiniteRepeatable(
+            animation = tween(durationMillis = PARALLAX_DURATION_MS, easing = LinearEasing),
+            repeatMode = RepeatMode.Reverse
+        )
+    )
 
     Card(
         modifier = modifier.aspectRatio(card.aspectRation)
@@ -93,11 +140,20 @@ fun Card(
             }
             .applyIf(onClick != null) {
                 noRippleClickable { onClick?.invoke() }
+            }
+            .applyIf(parallaxEffect) {
+                graphicsLayer(
+                    rotationX = rotationX,
+                    rotationY = rotationY,
+                    rotationZ = rotationZ,
+                )
             },
         shape = shape,
     ) {
         CardImage(
-            modifier = Modifier.aspectRatio(card.aspectRation).scale(1.025f).blur(blur),
+            modifier = Modifier.aspectRatio(card.aspectRation)
+                .scale(1.025f)
+                .blur(blur),
             cardCode = card.code,
             contentDescription = card.name,
             contentScale = ContentScale.FillBounds,
@@ -108,7 +164,6 @@ fun Card(
                 ShimmerBox(modifier = Modifier.fillMaxSize())
             },
             onFailure = {
-                Logger.e { "Failed to load image for card: ${card.name}(${card.code})" }
                 FailureImage(card)
             })
     }

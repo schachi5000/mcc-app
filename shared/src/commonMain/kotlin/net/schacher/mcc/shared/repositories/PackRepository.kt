@@ -1,64 +1,55 @@
 package net.schacher.mcc.shared.repositories
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.MainScope
-import kotlinx.coroutines.flow.MutableStateFlow
-import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.launch
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.SupervisorJob
+import kotlinx.coroutines.flow.SharingStarted
+import kotlinx.coroutines.flow.stateIn
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
-import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
+import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Pack
 
-class PackRepository(
-    private val packDatabaseDao: PackDatabaseDao,
-    private val marvelCDbDataSource: MarvelCDbDataSource,
-    private val scope: CoroutineScope = MainScope()
-) {
-    private val _packs = MutableStateFlow<List<Pack>>(emptyList())
-
-    val packs = this._packs.asStateFlow()
-
-    private val _packsInCollection = MutableStateFlow<List<String>>(emptyList())
-
-    val packsInCollection = this._packsInCollection.asStateFlow()
-
-    init {
-        this.scope.launch {
-            _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
-            _packs.emit(packDatabaseDao.getAllPacks())
-        }
+class PackRepository(private val packDatabaseDao: PackDatabaseDao) {
+    private companion object {
+        const val TAG = "PackRepository"
     }
 
-    suspend fun refreshAllPacks() {
-        val newPacks = this.marvelCDbDataSource.getAllPacks().getOrThrow()
+    private val scope: CoroutineScope = CoroutineScope(Dispatchers.Default + SupervisorJob())
 
-        Logger.i { "${newPacks.size} packs loaded" }
-        try {
-            this.packDatabaseDao.addPacks(newPacks)
-        } catch (e: Exception) {
-            Logger.e { "Error adding packs to database: ${e.message}" }
-        }
+    val packs = this.packDatabaseDao.getAllPacks().stateIn(
+        scope = scope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList()
+    )
 
-        _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
-        _packs.emit(newPacks)
-    }
-
-    suspend fun deleteAllPackData() {
-        this.packDatabaseDao.wipePackTable()
-        this._packsInCollection.emit(emptyList())
-        this._packs.emit(emptyList())
-    }
+    val packsInCollection = this.packDatabaseDao.getPacksInCollection().stateIn(
+        scope = scope,
+        started = SharingStarted.Eagerly,
+        initialValue = emptyList()
+    )
 
     fun hasPackInCollection(packCode: String) = this.packsInCollection.value.contains(packCode)
 
+    fun hasCardInCollection(card: Card) =
+        this.packsInCollection.value.any { it.contains(card.packCode) }
+
+    fun hasPack(packCode: String): Boolean {
+        return this.packs.value.any { it.code == packCode }
+    }
+
     suspend fun addPackToCollection(packCode: String) {
         this.packDatabaseDao.addPackToCollection(packCode)
-        _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
     }
 
     suspend fun removePackFromCollection(packCode: String) {
         this.packDatabaseDao.removePackFromCollection(packCode)
-        _packsInCollection.emit(packDatabaseDao.getPacksInCollection())
+    }
+
+    suspend fun deleteAllPackData() {
+        this.packDatabaseDao.wipePackTable()
+    }
+
+    suspend fun addPacks(packs: List<Pack>) {
+        this.packDatabaseDao.addPacks(packs)
     }
 }

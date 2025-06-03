@@ -22,6 +22,7 @@ import net.schacher.mcc.shared.screens.search.Filter.Type.JUSTICE
 import net.schacher.mcc.shared.screens.search.Filter.Type.LEADERSHIP
 import net.schacher.mcc.shared.screens.search.Filter.Type.OWNED
 import net.schacher.mcc.shared.screens.search.Filter.Type.PROTECTION
+import net.schacher.mcc.shared.usecases.RefreshCardsInDatabaseUseCase
 import net.schacher.mcc.shared.utils.defaultSort
 import net.schacher.mcc.shared.utils.distinctByName
 import net.schacher.mcc.shared.utils.findAndRemove
@@ -29,10 +30,11 @@ import net.schacher.mcc.shared.utils.launchAndCollect
 
 class CollectionViewModel(
     private val cardRepository: CardRepository,
-    private val packRepository: PackRepository
+    private val packRepository: PackRepository,
+    private val refreshCardsInDatabaseUseCase: RefreshCardsInDatabaseUseCase
 ) : ViewModel() {
 
-    private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState(emptyList()))
+    private val _state: MutableStateFlow<UiState> = MutableStateFlow(UiState())
 
     internal val state = _state.asStateFlow()
 
@@ -44,14 +46,21 @@ class CollectionViewModel(
         this.viewModelScope.launchAndCollect(this.packRepository.packsInCollection) {
             refresh()
         }
+
+        this.viewModelScope.launchAndCollect(this.refreshCardsInDatabaseUseCase.refreshing) { refreshing ->
+            _state.update {
+                it.copy(
+                    refreshing = refreshing
+                )
+            }
+        }
     }
 
     private fun refresh() {
         this.viewModelScope.launch {
-            val cards = getFilteredCards(_state.value.filters
-                .filter { it.active }
-                .toMutableList()
-            )
+            val activeFilter = _state.value.filters.filter { it.active }
+            val cards = getFilteredCards(activeFilter)
+
             _state.update {
                 it.copy(cardsInCollection = cards)
             }
@@ -71,7 +80,8 @@ class CollectionViewModel(
             val updatedFilter = filters.toMutableList()
             val showOnlyOwned = updatedFilter.findAndRemove { it.type == OWNED }?.active ?: false
 
-            cardRepository.cards.value.values
+            cardRepository.cards.value
+                .filter { it.type != CardType.ALTER_EGO }
                 .filter { !showOnlyOwned || packRepository.hasPackInCollection(it.packCode) }
                 .filter { card ->
                     updatedFilter.isEmpty() || updatedFilter.any {
@@ -91,8 +101,9 @@ class CollectionViewModel(
         }
 }
 
-data class UiState internal constructor(
-    val cardsInCollection: List<Card>,
+data class UiState(
+    val cardsInCollection: List<Card> = emptyList(),
+    val refreshing: Boolean = false,
     val filters: Set<Filter> = setOf(
         Filter(AGGRESSION, false),
         Filter(PROTECTION, false),

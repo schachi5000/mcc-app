@@ -115,7 +115,9 @@ fun NewDeckScreen(
             }
         }
 
-        BackButton(onBackPress)
+        BackButton {
+            onBackPress()
+        }
     }
 }
 

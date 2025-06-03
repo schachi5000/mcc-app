@@ -1,14 +1,12 @@
 package net.schacher.mcc.shared.repositories
 
-import co.touchlab.kermit.Logger
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.MainScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
-import net.schacher.mcc.shared.model.Aspect
-import net.schacher.mcc.shared.model.Card
 import net.schacher.mcc.shared.model.Deck
 import net.schacher.mcc.shared.utils.launchAndCollect
 import net.schacher.mcc.shared.utils.replace
@@ -42,11 +40,16 @@ class DeckRepository(
 
     fun getDeckById(deckId: Int): Deck? = this.decks.value.find { it.id == deckId }
 
+    fun getDecksWithCard(cardCode: String): List<Deck> =
+        this.decks.value.filter {
+            it.hero.code == cardCode || it.cards.any { it.code == cardCode }
+        }
+
     suspend fun createDeck(heroCardCode: String, label: String? = null): Result<Int> =
         this.marvelCDbDataSource.createDeck(heroCardCode, label).also {
             val deckId = it.getOrNull()
             if (deckId != null) {
-                Logger.d(TAG) { "Deck[$deckId] created successfully" }
+                AppLogger.d(TAG) { "Deck[$deckId] created successfully" }
                 refreshAllUserDecks()
             }
         }
@@ -54,7 +57,7 @@ class DeckRepository(
     suspend fun removeDeck(deckId: Int): Boolean =
         this.marvelCDbDataSource.deleteDeck(deckId).also {
             if (it.isSuccess) {
-                Logger.d(TAG) { "Deck[$deckId] deleted successfully" }
+                AppLogger.d(TAG) { "Deck[$deckId] deleted successfully" }
                 _decks.update { decks ->
                     decks.toMutableList()
                         .also { it.removeAll { deck -> deck.id == deckId } }
@@ -73,7 +76,7 @@ class DeckRepository(
         )
 
         val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck) {
-            cardRepository.getCard(it)
+            cardRepository.getCards(it)
         }.getOrThrow()
 
         _decks.update { it.toMutableList().replace(deck, updateDeck) }
@@ -93,7 +96,7 @@ class DeckRepository(
         )
 
         val updateDeck = this.marvelCDbDataSource.updateDeck(newDeck) {
-            cardRepository.getCard(it)
+            cardRepository.getCards(it)
         }.getOrThrow()
 
         _decks.update { it.toMutableList().replace(deck, updateDeck) }
@@ -102,7 +105,7 @@ class DeckRepository(
 
     suspend fun refreshAllUserDecks() {
         val decks = this.marvelCDbDataSource.getUserDecks {
-            this.cardRepository.getCard(it)
+            this.cardRepository.getCards(it)
         }.getOrNull() ?: return
 
         _decks.emit(decks)

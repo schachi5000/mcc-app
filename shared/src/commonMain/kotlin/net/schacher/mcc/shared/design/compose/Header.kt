@@ -8,6 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import net.schacher.mcc.shared.design.theme.HaloTextShadow
 
 @Composable
 fun Header(title: String) {
@@ -34,7 +35,9 @@ fun HeaderSmall(
             modifier = Modifier.alignByBaseline(),
             text = title,
             color = MaterialTheme.colors.onBackground,
-            style = MaterialTheme.typography.h5,
+            style = MaterialTheme.typography.h5.copy(
+                shadow = HaloTextShadow
+            ),
         )
 
         subTitle?.let {
@@ -42,7 +45,9 @@ fun HeaderSmall(
                 modifier = Modifier.alignByBaseline().padding(start = 8.dp),
                 text = it,
                 color = MaterialTheme.colors.onBackground,
-                style = MaterialTheme.typography.h6,
+                style = MaterialTheme.typography.h6.copy(
+                    shadow = HaloTextShadow
+                ),
             )
         }
     }

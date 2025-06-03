@@ -1,13 +1,11 @@
 package net.schacher.mcc.shared.repositories
 
-import co.touchlab.kermit.Logger
 import io.ktor.http.Url
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
-import kotlinx.coroutines.flow.update
+import kotlinx.datetime.Clock
+import net.schacher.mcc.shared.AppLogger
 import net.schacher.mcc.shared.datasource.database.SettingsDao
-import net.schacher.mcc.shared.time.Time
-import net.schacher.mcc.shared.utils.debug
 import kotlin.time.Duration.Companion.seconds
 
 class AuthRepository(private val settingsDao: SettingsDao) {
@@ -22,14 +20,13 @@ class AuthRepository(private val settingsDao: SettingsDao) {
     val loginState = _loginState.asStateFlow()
 
     init {
-        Logger.d(TAG) { "AuthRepository initialized" }
         this.restoreAccessToken()
     }
 
     private var userType: UserType? = null
         set(value) {
             field = value
-            Logger.d(TAG) { "UserType set to $value" }
+            AppLogger.d(TAG) { "UserType set to $value" }
 
             this._loginState.value = this.loggedIn
         }
@@ -70,12 +67,12 @@ class AuthRepository(private val settingsDao: SettingsDao) {
 
     fun handleCallbackUrl(callbackUrl: String): Boolean {
         val fixedCallbackUrl = callbackUrl.replace("#", "?")
-        Logger.d(TAG) { "Handling callback url: $fixedCallbackUrl" }
+        AppLogger.d(TAG) { "Handling callback url: $fixedCallbackUrl" }
 
         val accessToken = try {
             this.parseData(fixedCallbackUrl)
         } catch (e: Exception) {
-            Logger.e(throwable = e) { "Error parsing access token from $fixedCallbackUrl" }
+            AppLogger.e(throwable = e) { "Error parsing access token from $fixedCallbackUrl" }
             null
         }
 
@@ -92,7 +89,7 @@ class AuthRepository(private val settingsDao: SettingsDao) {
         AccessToken(token = it.parameters["access_token"]
             ?: throw IllegalArgumentException("No access token found"),
             expiresAt = it.parameters["expires_in"]?.toLongOrNull()
-                ?.let { Time.currentTimeMillis + it.seconds.inWholeMilliseconds }
+                ?.let { Clock.System.now().toEpochMilliseconds() + it.seconds.inWholeMilliseconds }
                 ?: throw IllegalArgumentException("No expiration time found"))
     }
 
@@ -109,7 +106,7 @@ class AuthRepository(private val settingsDao: SettingsDao) {
     }
 
     private fun isAccessTokenValid(accessToken: AccessToken?): Boolean =
-        (accessToken?.expiresAt ?: 0) > Time.currentTimeMillis
+        (accessToken?.expiresAt ?: 0) > Clock.System.now().toEpochMilliseconds()
 
     fun isGuest(): Boolean = this.userType is UserType.Guest
 
@@ -123,4 +120,4 @@ internal sealed class UserType {
     data object Guest : UserType()
 }
 
-data class AccessToken internal constructor(val token: String, val expiresAt: Long)
+data class AccessToken(val token: String, val expiresAt: Long)

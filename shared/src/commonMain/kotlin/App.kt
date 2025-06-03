@@ -1,7 +1,6 @@
 import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.navigation.NavController
 import androidx.navigation.compose.rememberNavController
 import kotlinx.coroutines.CoroutineScope
@@ -10,6 +9,7 @@ import net.schacher.mcc.shared.datasource.database.CardDatabaseDao
 import net.schacher.mcc.shared.datasource.database.DatabaseDao
 import net.schacher.mcc.shared.datasource.database.PackDatabaseDao
 import net.schacher.mcc.shared.datasource.database.SettingsDao
+import net.schacher.mcc.shared.datasource.http.DefaultHttpClient
 import net.schacher.mcc.shared.datasource.http.KtorMarvelCDbDataSource
 import net.schacher.mcc.shared.datasource.http.MarvelCDbDataSource
 import net.schacher.mcc.shared.design.theme.MccTheme
@@ -29,8 +29,10 @@ import net.schacher.mcc.shared.screens.mydecks.MyDecksViewModel
 import net.schacher.mcc.shared.screens.newdeck.NewDeckViewModel
 import net.schacher.mcc.shared.screens.packselection.PackSelectionViewModel
 import net.schacher.mcc.shared.screens.search.SearchViewModel
-import net.schacher.mcc.shared.screens.settings.SettingsViewModel
+import net.schacher.mcc.shared.screens.settings.MoreViewModel
 import net.schacher.mcc.shared.screens.spotlight.SpotlightViewModel
+import net.schacher.mcc.shared.usecases.GetCardImageUseCase
+import net.schacher.mcc.shared.usecases.RefreshCardsInDatabaseUseCase
 import org.koin.compose.KoinApplication
 import org.koin.core.KoinApplication
 import org.koin.core.module.dsl.singleOf
@@ -40,7 +42,13 @@ import org.koin.dsl.module
 import pro.schacher.mcc.BuildConfig
 
 val network = module {
-    single<MarvelCDbDataSource> { KtorMarvelCDbDataSource(get(), BuildConfig.SERVICE_URL) }
+    single<MarvelCDbDataSource> {
+        KtorMarvelCDbDataSource(
+            DefaultHttpClient,
+            get(),
+            BuildConfig.SERVICE_URL,
+        )
+    }
 }
 
 val repositories = module {
@@ -57,11 +65,16 @@ val viewModels = module {
     viewModelOf(::SearchViewModel)
     viewModelOf(::PackSelectionViewModel)
     viewModelOf(::MyDecksViewModel)
-    viewModelOf(::SettingsViewModel)
+    viewModelOf(::MoreViewModel)
     viewModelOf(::SpotlightViewModel)
     viewModelOf(::CollectionViewModel)
     viewModel { (deckId: Int) -> DeckScreenViewModel(deckId, get(), get()) }
     viewModel { (cardCode: String) -> CardScreenViewModel(cardCode, get(), get(), get()) }
+}
+
+val useCases = module {
+    singleOf(::GetCardImageUseCase)
+    singleOf(::RefreshCardsInDatabaseUseCase)
 }
 
 @Composable
@@ -98,6 +111,7 @@ fun App(
             },
             network,
             repositories,
+            useCases,
             viewModels
         )
     }) {

@@ -7,12 +7,10 @@ import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material.MaterialTheme
-import androidx.compose.material.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavController
 import androidx.navigation.NavHostController
@@ -37,11 +35,9 @@ import org.koin.compose.viewmodel.koinViewModel
 fun AppScreen(
     appViewModel: AppViewModel = koinViewModel(),
     navController: NavController = koinInject(),
-    snackbarHostState: SnackbarHostState = koinInject(),
     onLogInClicked: () -> Unit,
     onQuitApp: () -> Unit
 ) {
-    val scope = rememberCoroutineScope()
     NavHost(
         navController = navController as NavHostController,
         modifier = Modifier.fillMaxSize().background(MaterialTheme.colors.background),
@@ -76,7 +72,7 @@ fun AppScreen(
             route = AppRoute.Deck.route,
             arguments = AppRoute.Deck.navArguments
         ) {
-            it.arguments?.getInt("deckId")?.let { deckId ->
+            it.arguments?.getInt(AppRoute.Deck.navArguments[0].name)?.let { deckId ->
                 DeckScreen(deckId = deckId)
             }
         }
@@ -84,7 +80,7 @@ fun AppScreen(
             route = AppRoute.Card.route,
             arguments = AppRoute.Card.navArguments
         ) {
-            it.arguments?.getString("cardCode")?.let { cardCode ->
+            it.arguments?.getString(AppRoute.Card.navArguments[0].name)?.let { cardCode ->
                 CardScreen(cardCode = cardCode)
             }
         }

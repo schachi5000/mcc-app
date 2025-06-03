@@ -2,6 +2,9 @@ package net.schacher.mcc.shared.model
 
 import net.schacher.mcc.shared.model.CardOrientation.LANDSCAPE
 import net.schacher.mcc.shared.model.CardOrientation.PORTRAIT
+import net.schacher.mcc.shared.model.CardType.MAIN_SCHEME
+import net.schacher.mcc.shared.model.CardType.PLAYER_SIDE_SCHEME
+import net.schacher.mcc.shared.model.CardType.SIDE_SCHEME
 
 
 data class Card(
@@ -22,14 +25,15 @@ data class Card(
     val traits: String?,
     val aspect: Aspect? = null,
     val linkedCard: Card? = null,
+    val linkedCardCode: String? = null,
     val imagePath: String? = null,
     val primaryColor: String? = null,
     val secondaryColor: String? = null,
 ) {
     val orientation = when (type) {
-        CardType.SIDE_SCHEME,
-        CardType.MAIN_SCHEME,
-        CardType.PLAYER_SIDE_SCHEME -> LANDSCAPE
+        SIDE_SCHEME,
+        MAIN_SCHEME,
+        PLAYER_SIDE_SCHEME -> LANDSCAPE
 
         else -> if (ForcedLandscapes.codes.contains(this.code)) {
             LANDSCAPE
@@ -49,6 +53,7 @@ enum class CardOrientation {
 
 enum class CardType {
     HERO,
+    ALTER_EGO,
     ALLY,
     EVENT,
     SUPPORT,

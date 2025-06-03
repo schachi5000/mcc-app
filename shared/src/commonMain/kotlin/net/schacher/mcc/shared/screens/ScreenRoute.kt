@@ -8,7 +8,7 @@ import kotlinx.coroutines.flow.StateFlow
 
 enum class AppRoute(
     val route: String,
-    var navArguments: List<NamedNavArgument> = emptyList()
+    val navArguments: List<NamedNavArgument> = emptyList(),
 ) {
     Login(route = "login"),
     Main(route = "main"),
@@ -26,7 +26,12 @@ enum class AppRoute(
         })
     ),
     AddDeck(route = "add_deck"),
-    Packs(route = "packs")
+    Packs(route = "packs");
+
+    companion object {
+        fun toCard(cardCode: String): String = "card/$cardCode"
+        fun toDeck(deckId: Int): String = "deck/$deckId"
+    }
 }
 
 fun NavController.navigate(appRoute: AppRoute) {
