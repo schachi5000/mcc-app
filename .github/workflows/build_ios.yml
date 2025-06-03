@@ -1,10 +1,9 @@
 name:
-  Build
+  Build iOS
 
 on:
   push:
     branches-ignore:
-      - main
       - release
 
 concurrency:
