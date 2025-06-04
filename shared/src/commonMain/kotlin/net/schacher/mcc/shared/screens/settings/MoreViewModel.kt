@@ -40,6 +40,7 @@ class MoreViewModel(
             settingsValues = settingsDao.getAllEntries(),
             versionName = platformInfo.version,
             guestLogin = authRepository.isGuest(),
+            showDebugInfo = platformInfo.debugBuild,
         )
     )
 
@@ -140,6 +141,7 @@ class MoreViewModel(
         val settingsValues: List<Pair<String, Any>> = emptyList(),
         val versionName: String,
         val guestLogin: Boolean,
+        val showDebugInfo: Boolean,
         val sessionExpiresIn: Duration? = null,
     )
 }

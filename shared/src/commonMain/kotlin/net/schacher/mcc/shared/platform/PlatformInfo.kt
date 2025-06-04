@@ -13,6 +13,7 @@ enum class Platform {
 interface PlatformInfo {
     val platform: Platform
     val version: String
+    val debugBuild: Boolean
 }
 
 @Composable

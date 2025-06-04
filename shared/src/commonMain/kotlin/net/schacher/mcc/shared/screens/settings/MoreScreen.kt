@@ -137,17 +137,19 @@ fun MoreScreen(
 
         maxSpanItem {
             Column {
-                OptionsGroup(stringResource(Res.string.database)) {
-                    OptionsEntry(
-                        label = stringResource(Res.string.sync_with_marvelcdb),
-                        imageVector = Icons.Rounded.Refresh,
-                        onClick = onSyncClick
-                    )
+                if (state.showDebugInfo) {
+                    OptionsGroup(stringResource(Res.string.database)) {
+                        OptionsEntry(
+                            label = stringResource(Res.string.sync_with_marvelcdb),
+                            imageVector = Icons.Rounded.Refresh,
+                            onClick = onSyncClick
+                        )
 
-                    OptionsEntry(
-                        label = stringResource(Res.string.delete_local_data),
-                        imageVector = Icons.Rounded.Delete,
-                        onClick = { deleteDatabaseDialog = true })
+                        OptionsEntry(
+                            label = stringResource(Res.string.delete_local_data),
+                            imageVector = Icons.Rounded.Delete,
+                            onClick = { deleteDatabaseDialog = true })
+                    }
                 }
 
                 TextButton(
