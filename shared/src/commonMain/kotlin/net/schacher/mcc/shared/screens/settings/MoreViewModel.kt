@@ -30,6 +30,8 @@ class MoreViewModel(
     platformInfo: PlatformInfo
 ) : ViewModel() {
 
+    private var versionClickCount: Int = 0
+
     private val _state = MutableStateFlow(
         UiState(
             cardCount = cardRepository.cards.value.size,
@@ -40,7 +42,7 @@ class MoreViewModel(
             settingsValues = settingsDao.getAllEntries(),
             versionName = platformInfo.version,
             guestLogin = authRepository.isGuest(),
-            showDebugInfo = platformInfo.debugBuild,
+            showDebugInfo = platformInfo.debugBuild || versionClickCount >= 5,
         )
     )
 
@@ -128,6 +130,14 @@ class MoreViewModel(
                     syncInProgress = false
                 )
             }
+        }
+    }
+
+    fun onVersionClick() {
+        this._state.update {
+            it.copy(
+                showDebugInfo = it.showDebugInfo || ++versionClickCount >= 5,
+            )
         }
     }
 

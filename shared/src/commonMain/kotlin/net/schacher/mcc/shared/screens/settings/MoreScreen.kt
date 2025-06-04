@@ -1,5 +1,6 @@
 package net.schacher.mcc.shared.screens.settings
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -54,6 +55,7 @@ import net.schacher.mcc.shared.design.compose.OptionsEntry
 import net.schacher.mcc.shared.design.compose.OptionsGridEntry
 import net.schacher.mcc.shared.design.compose.OptionsGroup
 import net.schacher.mcc.shared.design.compose.maxSpanItem
+import net.schacher.mcc.shared.design.compose.noRippleClickable
 import net.schacher.mcc.shared.design.theme.ContentPadding
 import net.schacher.mcc.shared.design.theme.DefaultShape
 import net.schacher.mcc.shared.screens.settings.MoreViewModel.UiState
@@ -79,6 +81,7 @@ fun MoreScreen(
         onLogoutClick = onLogoutClicked,
         onSyncClick = { settingsViewModel.onSyncClick() },
         onWipeDatabaseClick = { settingsViewModel.onWipeDatabaseClick() },
+        onVersionClick = { settingsViewModel.onVersionClick() }
     )
 }
 
@@ -89,7 +92,8 @@ fun MoreScreen(
     onPackSelectionClick: () -> Unit,
     onLogoutClick: () -> Unit,
     onSyncClick: () -> Unit,
-    onWipeDatabaseClick: () -> Unit
+    onWipeDatabaseClick: () -> Unit,
+    onVersionClick: () -> Unit
 ) {
     var deleteDatabaseDialog by remember { mutableStateOf(false) }
 
@@ -137,7 +141,7 @@ fun MoreScreen(
 
         maxSpanItem {
             Column {
-                if (state.showDebugInfo) {
+                AnimatedVisibility(state.showDebugInfo) {
                     OptionsGroup(stringResource(Res.string.database)) {
                         OptionsEntry(
                             label = stringResource(Res.string.sync_with_marvelcdb),
@@ -190,7 +194,10 @@ fun MoreScreen(
                 Spacer(Modifier.size(16.dp))
 
                 Text(
-                    modifier = Modifier.padding(16.dp).fillMaxWidth().alpha(0.5f),
+                    modifier = Modifier.padding(16.dp)
+                        .fillMaxWidth()
+                        .alpha(0.5f)
+                        .noRippleClickable { onVersionClick() },
                     textAlign = TextAlign.Center,
                     color = MaterialTheme.colors.onBackground,
                     text = state.versionName

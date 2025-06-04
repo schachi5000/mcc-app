@@ -16,7 +16,7 @@ class AndroidPlatformInfo(context: Context) : PlatformInfo {
     override val version: String =
         context.packageManager.getPackageInfo(context.packageName, 0).versionName ?: "unknown"
 
-    override val debugBuild: Boolean = context.applicationInfo.flags and
+    override val debugBuild: Boolean = false && context.applicationInfo.flags and
             android.content.pm.ApplicationInfo.FLAG_DEBUGGABLE != 0
 
     override fun toString(): String {
